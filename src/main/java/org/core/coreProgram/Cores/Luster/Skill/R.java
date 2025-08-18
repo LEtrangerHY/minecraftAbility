@@ -46,7 +46,7 @@ public class R implements SkillBase {
                 }
         );
 
-        double speed = 1.5;
+        double speed = 2.2;
         fb.setVelocity(dir.multiply(speed));
 
         Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(126, 126, 126), 1.3f);
@@ -61,7 +61,7 @@ public class R implements SkillBase {
         player.setVelocity(player.getVelocity().add(backward));
 
         new BukkitRunnable() {
-            int life = 20;
+            int life = 100;
 
             @Override
             public void run() {
@@ -77,7 +77,7 @@ public class R implements SkillBase {
                     return;
                 }
 
-                world.spawnParticle(Particle.ENCHANTED_HIT, spawnLoc, 3, 0.2, 0.2, 0.2, 0);
+                world.spawnParticle(Particle.ENCHANTED_HIT, fb.getLocation(), 3, 0.2, 0.2, 0.2, 0);
                 player.spawnParticle(Particle.DUST, fb.getLocation(), 1, 0.1, 0.1, 0.1, 0, dustOptions);
                 player.spawnParticle(Particle.DUST, fb.getLocation(), 2, 0.1, 0.1, 0.1, 0, dustOptions_gra);
 
@@ -89,7 +89,7 @@ public class R implements SkillBase {
                         ForceDamage forceDamage = new ForceDamage(le, config.r_Skill_Damage);
                         forceDamage.applyEffect(player);
 
-                        Vector knock = le.getLocation().toVector().subtract(fb.getLocation().toVector())
+                        Vector knock = le.getLocation().toVector().subtract(player.getLocation().toVector())
                                 .normalize().multiply(1.7);
                         le.setVelocity(le.getVelocity().add(knock));
 
@@ -97,6 +97,7 @@ public class R implements SkillBase {
                                 Material.IRON_BLOCK.createBlockData());
 
                         world.playSound(fb.getLocation(), Sound.BLOCK_ANVIL_LAND, 1f, 1f);
+                        world.playSound(fb.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1f, 1f);
 
                         fb.remove();
                         cancel();

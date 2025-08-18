@@ -2,10 +2,7 @@ package org.core.coreProgram.Cores.Benzene.Skill;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -71,6 +68,8 @@ public class R implements SkillBase {
 
                 if(ticks < 4){
                     player.getWorld().playSound(player.getLocation(), Sound.BLOCK_CHAIN_BREAK, 1.0f, 1.0f);
+                    player.getWorld().spawnParticle(Particle.BLOCK, player.getLocation().clone().add(0, 1.2, 0), 44, 0.3, 0.3, 0.3,
+                            Material.CHAIN.createBlockData());
                 }
 
                 if (ticks > 6 || player.isDead()) {

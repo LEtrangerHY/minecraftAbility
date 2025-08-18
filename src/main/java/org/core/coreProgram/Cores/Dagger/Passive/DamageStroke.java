@@ -1,6 +1,7 @@
 package org.core.coreProgram.Cores.Dagger.Passive;
 
 import org.bukkit.Color;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -30,8 +31,8 @@ public class DamageStroke {
 
     public void damageStroke(Player player, LivingEntity entity){
 
-        Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1.0f);
-        player.getWorld().spawnParticle(Particle.DUST, entity.getLocation().add(0, 1.5, 0), 16, 0.4, 0.4, 0.4, 0, dustOptions);
+        player.getWorld().spawnParticle(Particle.BLOCK, entity.getLocation().clone().add(0, 1.2, 0), 13, 0.3, 0.3, 0.3,
+                Material.REDSTONE_BLOCK.createBlockData());
 
         ForceDamage forceDamage = new ForceDamage(entity, entity.getHealth() * 0.13);
         forceDamage.applyEffect(player);

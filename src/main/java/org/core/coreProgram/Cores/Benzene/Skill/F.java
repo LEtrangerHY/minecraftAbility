@@ -52,6 +52,8 @@ public class F implements SkillBase {
         if(target != null){
             player.getWorld().playSound(player.getLocation(), Sound.ITEM_TRIDENT_HIT_GROUND, 1.0f, 1.0f);
             player.getWorld().spawnParticle(Particle.ENCHANTED_HIT, target.getLocation().add(0, 1, 0), 20, 0.6, 0, 0.6, 1);
+            player.getWorld().spawnParticle(Particle.BLOCK, target.getLocation().clone().add(0, 1.2, 0), 12, 0.3, 0.3, 0.3,
+                    Material.CHAIN.createBlockData());
         }
 
         Location origin = player.getEyeLocation().add(0, -0.6, 0);

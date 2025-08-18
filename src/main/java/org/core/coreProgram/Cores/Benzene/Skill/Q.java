@@ -58,6 +58,8 @@ public class Q implements SkillBase {
                 public void run() {
 
                     player.getWorld().playSound(player.getLocation(), Sound.BLOCK_CHAIN_PLACE, 1.0f, 1.0f);
+                    player.getWorld().spawnParticle(Particle.BLOCK, entity.getLocation().clone().add(0, 1.2, 0), 6, 0.3, 0.3, 0.3,
+                            Material.CHAIN.createBlockData());
 
                     if(ticks > 5){
                         cancel();
@@ -98,6 +100,8 @@ public class Q implements SkillBase {
 
                     player.getWorld().playSound(player.getLocation(), Sound.ITEM_TRIDENT_HIT_GROUND, 1.0f, 1.0f);
                     player.getWorld().playSound(player.getLocation(), Sound.BLOCK_CHAIN_PLACE, 1.0f, 1.0f);
+                    player.getWorld().spawnParticle(Particle.BLOCK, target.getLocation().clone().add(0, 1.2, 0), 6, 0.3, 0.3, 0.3,
+                            Material.CHAIN.createBlockData());
 
                     world.spawnParticle(Particle.SOUL, rangeTarget.getLocation().add(0, 1.1, 0), 6, 0.3, 0.3, 0.3, 0);
                     world.spawnParticle(Particle.DRAGON_BREATH, rangeTarget.getLocation().add(0, 1.1, 0), 6, 0.3, 0.3, 0.3, 0);

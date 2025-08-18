@@ -72,12 +72,12 @@ public class lustCore extends absCore {
                         Vector direction = playerLocation.getDirection().normalize().multiply(1.4);
 
                         player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue((double) 1 /3);
-                        player.playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_STEP, 1, 1);
+                        player.playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_REPAIR, 1, 1);
 
                         config.collision.put(player.getUniqueId(), false);
 
-                        Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(126, 126, 126), 1.3f);
-                        Particle.DustOptions dustOptions_gra = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 0.7f);
+                        Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(200, 200, 200), 1.7f);
+                        Particle.DustOptions dustOptions_gra = new Particle.DustOptions(Color.fromRGB(244, 244, 244), 1.4f);
 
                         new BukkitRunnable() {
                             int ticks = 0;
@@ -154,7 +154,7 @@ public class lustCore extends absCore {
     private boolean hasProperItems(Player player) {
         ItemStack main = player.getInventory().getItemInMainHand();
         ItemStack off = player.getInventory().getItemInOffHand();
-        return off.getType() == Material.LODESTONE || off.getType() == Material.IRON_INGOT;
+        return main.getType() == Material.HEAVY_CORE && (off.getType() == Material.LODESTONE || off.getType() == Material.IRON_INGOT);
     }
 
     private boolean canUseRSkill(Player player) { return true; }
@@ -176,7 +176,7 @@ public class lustCore extends absCore {
     @Override
     protected boolean isQCondition(Player player, ItemStack droppedItem) {
         ItemStack off = player.getInventory().getItemInOffHand();
-        return (off.getType() == Material.LODESTONE || off.getType() == Material.IRON_INGOT) &&
+        return droppedItem.getType() == Material.HEAVY_CORE && (off.getType() == Material.LODESTONE || off.getType() == Material.IRON_INGOT) &&
                 canUseQSkill(player);
     }
 
