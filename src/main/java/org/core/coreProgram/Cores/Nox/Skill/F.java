@@ -84,7 +84,7 @@ public class F implements SkillBase {
 
     public void Special_Attack(Player player, Location firstLocation, GameMode playerGameMode, Entity entity, double times) {
 
-        int num = (int) times;
+        int slashCount = (int) times;
 
         config.fskill_using.put(player.getUniqueId(), true);
 
@@ -93,7 +93,7 @@ public class F implements SkillBase {
 
             @Override
             public void run() {
-                if (tick >= num || player.isDead()) {
+                if (tick >= slashCount || player.isDead()) {
                     config.damaged.remove(player.getUniqueId());
                     config.fskill_using.remove(player.getUniqueId());
 

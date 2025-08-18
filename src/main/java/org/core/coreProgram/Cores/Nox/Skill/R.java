@@ -86,7 +86,7 @@ public class R implements SkillBase {
                 List<Entity> nearbyEntities = player.getNearbyEntities(0.6, 0.6, 0.6);
                 for (Entity entity : nearbyEntities) {
                     if (entity instanceof LivingEntity target && entity != player && !config.damaged.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(entity)) {
-                        ForceDamage forceDamage = new ForceDamage(target, config.r_Skill_damage * config.dreamPoint.getOrDefault(player.getUniqueId(), new HashMap<>()).getOrDefault("R", 1.0));
+                        ForceDamage forceDamage = new ForceDamage(target, config.r_Skill_damage * (config.dreamPoint.getOrDefault(player.getUniqueId(), new HashMap<>()).getOrDefault("R", 1.0)));
                         forceDamage.applyEffect(player);
                         target.setVelocity(new Vector(0, 0, 0));
                         config.damaged.getOrDefault(player.getUniqueId(), new HashSet<>()).add(target);

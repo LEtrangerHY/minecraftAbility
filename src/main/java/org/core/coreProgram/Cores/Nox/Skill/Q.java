@@ -36,13 +36,17 @@ public class Q implements SkillBase {
     @Override
     public void Trigger(Player player) {
 
-        config.damaged_3.put(player.getUniqueId(), new HashSet<>());
+        TeleportPos(player, 0);
+
+    }
+
+    public void TeleportPos(Player player, double loop){
 
         World world = player.getWorld();
 
         Location start = player.getLocation().clone();
         Vector direction = start.getDirection().normalize();
-        double maxDistance = 6;
+        double maxDistance = 6 - loop;
 
         Location targetLocation = start.clone().add(direction.clone().multiply(maxDistance));
 
@@ -58,11 +62,22 @@ public class Q implements SkillBase {
             if(6000 - (long) (config.dreamPoint.getOrDefault(player.getUniqueId(), new HashMap<>()).getOrDefault("Q", 6.0) * 1000) > 600) {
                 cool.updateCooldown(player, "Q", cools);
             }
+
+            TeleportSlash(player, maxDistance, start, direction);
+
         } else {
-            world.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_LEATHER, 1f, 1f);
-            player.sendActionBar(Component.text("failed").color(NamedTextColor.RED));
-            return;
+            if(maxDistance < 0){
+                world.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_LEATHER, 1f, 1f);
+                player.sendActionBar(Component.text("failed").color(NamedTextColor.RED));
+            }else{
+                TeleportPos(player, loop + 0.2);
+            }
         }
+    }
+
+    public void TeleportSlash(Player player, double maxDistance, Location start, Vector direction){
+
+        World world = player.getWorld();
 
         double step = 0.5;
         config.damaged_3.put(player.getUniqueId(), new HashSet<>());
@@ -80,7 +95,7 @@ public class Q implements SkillBase {
 
                             @Override
                             public void run() {
-                                if (tick >= config.dreamPoint.getOrDefault(player.getUniqueId(), new HashMap<>()).getOrDefault("Q", 1.0)
+                                if (tick > config.dreamPoint.getOrDefault(player.getUniqueId(), new HashMap<>()).getOrDefault("Q", 1.0)
                                         || player.isDead()) {
                                     this.cancel();
                                     return;
@@ -112,12 +127,10 @@ public class Q implements SkillBase {
             }, config.dreamPoint
                     .getOrDefault(player.getUniqueId(), new HashMap<>())
                     .getOrDefault("Q", 1.0)
-                    .longValue() * 2);
+                    .longValue() * 2 + 1);
         } else {
             world.playSound(start, Sound.ENTITY_WITHER_SHOOT, 1f, 1f);
             dream.wanderersDream(player, "Q");
         }
     }
-
-
 }
