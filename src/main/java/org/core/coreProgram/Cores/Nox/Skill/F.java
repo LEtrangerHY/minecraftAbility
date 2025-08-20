@@ -80,8 +80,6 @@ public class F implements SkillBase {
                 .orElse(null);
     }
 
-
-
     public void Special_Attack(Player player, Location firstLocation, GameMode playerGameMode, Entity entity, double times) {
 
         int slashCount = (int) times;

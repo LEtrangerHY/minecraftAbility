@@ -45,7 +45,7 @@ public class ChainCalc {
             int chainCount = config.Chain_Count.getOrDefault(player.getUniqueId(), 0) + 1;
             config.Chain_Count.put(player.getUniqueId(), chainCount);
 
-            player.getWorld().spawnParticle(Particle.BLOCK, entity.getLocation().clone().add(0, 1.2, 0), 6, 0.3, 0.3, 0.3,
+            player.getWorld().spawnParticle(Particle.BLOCK, entity.getLocation().clone().add(0, 1.2, 0), 12, 0.3, 0.3, 0.3,
                     Material.CHAIN.createBlockData());
 
             playerChain.put(chainCount, entity);
@@ -61,7 +61,9 @@ public class ChainCalc {
             config.Chain_Count.put(player.getUniqueId(), chainCount);
             playerChain.put(chainCount, entity);
 
-            player.getWorld().spawnParticle(Particle.BLOCK, entity.getLocation().clone().add(0, 1.2, 0), 12, 0.3, 0.3, 0.3,
+            int t = countIndivChain(player, entity);
+
+            player.getWorld().spawnParticle(Particle.BLOCK, entity.getLocation().clone().add(0, t * 0.2, 0), 6, 0.3, 0.3, 0.3,
                     Material.CHAIN.createBlockData());
 
             if (!particleUse.containsKey(entity)) {
@@ -92,16 +94,14 @@ public class ChainCalc {
 
             int t = countIndivChain(player, firstKeyEntity);
 
-            if(distance <= 24) {
+            if(distance <= 22) {
 
                 Stun stun = new Stun(config.Chain.getOrDefault(player.getUniqueId(), new LinkedHashMap<>()).get(firstKey), 100L * t);
                 stun.applyEffect(player);
 
-                Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(0, 0, 0), 1.2f);
-                player.getWorld().spawnParticle(Particle.BLOCK, firstKeyEntity.getLocation().clone().add(0, 1.2, 0), 12, 0.3, 0.3, 0.3,
+                player.getWorld().spawnParticle(Particle.BLOCK, firstKeyEntity.getLocation().clone().add(0, t * 0.2, 0), 12, 0.3, 0.3, 0.3,
                         Material.CHAIN.createBlockData());
-                player.getWorld().spawnParticle(Particle.DUST, firstKeyEntity.getLocation().add(0, t * 0.2, 0), 120, 0.6, 0, 0.6, 0.08, dustOptions);
-                player.getWorld().spawnParticle(Particle.ENCHANTED_HIT, firstKeyEntity.getLocation().add(0, 1, 0), 66, 0.6, 0, 0.6, 1);
+                player.getWorld().spawnParticle(Particle.ENCHANTED_HIT, firstKeyEntity.getLocation().add(0, t * 0.2, 0), 12, 0.6, 0, 0.6, 0);
 
             }
 

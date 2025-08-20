@@ -11,6 +11,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -26,6 +27,7 @@ import org.core.coreProgram.Cores.Luster.Skill.F;
 import org.core.coreProgram.Cores.Luster.Skill.Q;
 import org.core.coreProgram.Cores.Luster.Skill.R;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -67,7 +69,7 @@ public class lustCore extends absCore {
                 }
             }
 
-            if (owner != null && config.golems.get(owner).isEmpty()) {
+            if (owner != null && config.golems.get(owner).isEmpty() && tag.Luster.contains(owner)) {
                 long cools = 60000L;
                 cool.updateCooldown(owner, "F", cools);
                 config.golems.remove(owner);

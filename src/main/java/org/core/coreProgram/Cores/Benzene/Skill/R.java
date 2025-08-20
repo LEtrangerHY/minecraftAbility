@@ -68,7 +68,7 @@ public class R implements SkillBase {
 
                 if(ticks < 4){
                     player.getWorld().playSound(player.getLocation(), Sound.BLOCK_CHAIN_BREAK, 1.0f, 1.0f);
-                    player.getWorld().spawnParticle(Particle.BLOCK, player.getLocation().clone().add(0, 1.2, 0), 44, 0.3, 0.3, 0.3,
+                    player.getWorld().spawnParticle(Particle.BLOCK, player.getLocation().clone().add(0, 1.2, 0), 6, 0.3, 0.3, 0.3,
                             Material.CHAIN.createBlockData());
                 }
 

@@ -13,6 +13,8 @@ import org.core.Effect.Grounding;
 import org.core.Effect.Stun;
 import org.core.coreProgram.Cores.Bambo.coreSystem.Bambo;
 import org.core.coreProgram.Cores.Bambo.coreSystem.bambCore;
+import org.core.coreProgram.Cores.Blaze.coreSystem.Blaze;
+import org.core.coreProgram.Cores.Blaze.coreSystem.blazeCore;
 import org.core.coreProgram.Cores.Nox.coreSystem.Nox;
 import org.core.coreProgram.Cores.Nox.coreSystem.noxCore;
 import org.core.coreProgram.Cores.Benzene.coreSystem.Benzene;
@@ -44,6 +46,7 @@ public final class Core extends JavaPlugin {
     private glaCore glacier;
     private knightCore knight;
     private lustCore luster;
+    private blazeCore blaze;
 
     public static Core getInstance() {
         return instance;
@@ -64,6 +67,7 @@ public final class Core extends JavaPlugin {
         Glacier glaConfig = new Glacier();
         Knight knightConfig = new Knight();
         Luster lustConfig = new Luster();
+        Blaze blazeConfig = new Blaze();
 
         Cool cool = new Cool(this);
 
@@ -95,6 +99,9 @@ public final class Core extends JavaPlugin {
 
         this.luster = new lustCore(this, config, lustConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.luster, this);
+
+        this.blaze = new blazeCore(this, config, blazeConfig, cool);
+        Bukkit.getPluginManager().registerEvents(this.blaze, this);
 
         getLogger().info("Cores downloaded!");
     }

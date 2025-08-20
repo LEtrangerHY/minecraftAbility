@@ -162,7 +162,7 @@ public class Q implements SkillBase {
             ItemStack main = living.getEquipment().getItemInMainHand();
             if (main != null && checkMats.contains(main.getType())) shouldLift = true;
 
-            if (shouldLift || living.getType() == EntityType.IRON_GOLEM) {
+            if (shouldLift) {
                 living.setVelocity(new Vector(0, 3, 0));
                 liftedEntities.add(living);
             }
