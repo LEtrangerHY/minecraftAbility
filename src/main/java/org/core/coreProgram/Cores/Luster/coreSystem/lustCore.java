@@ -93,13 +93,13 @@ public class lustCore extends absCore {
                             return;
                         }
 
-                        cool.setCooldown(player, 3000L, "iron");
+                        cool.setCooldown(player, 2000L, "iron");
 
                         World world = player.getWorld();
                         Location playerLocation = player.getLocation();
                         Vector direction = playerLocation.getDirection().normalize().multiply(1.4);
 
-                        player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue((double) 1 /3);
+                        player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue((double) 0.5);
                         player.playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_REPAIR, 1, 1);
 
                         config.collision.put(player.getUniqueId(), false);

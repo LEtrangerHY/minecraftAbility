@@ -20,7 +20,7 @@ public class Luster {
     public HashMap<UUID, Boolean> collision = new HashMap<>();
 
     //R
-    public double r_Skill_Damage = 13;
+    public double r_Skill_Damage = 20;
     public long r_Skill_Cool = 13000;
 
     //Q

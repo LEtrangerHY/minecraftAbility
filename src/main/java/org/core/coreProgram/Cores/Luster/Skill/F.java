@@ -33,101 +33,120 @@ public class F implements SkillBase {
 
     @Override
     public void Trigger(Player player) {
-        final World world = player.getWorld();
-        Entity target = getTargetedEntity(player, 13, 0.3);
 
-        final int golemCount = 2;
-        final double radius = 4;
-        final double yOffset = 0;
-        Location center = player.getLocation();
+        ItemStack offhandItem = player.getInventory().getItem(EquipmentSlot.OFF_HAND);
 
-        world.playSound(center, Sound.ENTITY_WITHER_SPAWN, 1, 1);
-        world.playSound(center, Sound.ENTITY_IRON_GOLEM_HURT, 1, 1);
+        if (offhandItem.getType() == Material.LODESTONE || (offhandItem.getType() == Material.IRON_INGOT && offhandItem.getAmount() >= 18)) {
+            final World world = player.getWorld();
+            Entity target = getTargetedEntity(player, 13, 0.3);
 
-        Set<IronGolem> currentGolems = config.golems.getOrDefault(player, new HashSet<>());
-        boolean hasAlive = currentGolems.stream().anyMatch(g -> !g.isDead());
+            final int golemCount = 2;
+            final double radius = 4;
+            final double yOffset = 0;
+            Location center = player.getLocation();
 
-        if (!hasAlive) {
-            for (int i = 0; i < golemCount; i++) {
-                double angle = 2 * Math.PI / golemCount * i;
+            world.playSound(center, Sound.ENTITY_WITHER_SPAWN, 1, 1);
+            world.playSound(center, Sound.ENTITY_IRON_GOLEM_HURT, 1, 1);
 
-                double x = center.getX() + radius * Math.cos(angle);
-                double y = center.getY() + yOffset;
-                double z = center.getZ() + radius * Math.sin(angle);
+            Set<IronGolem> currentGolems = config.golems.getOrDefault(player, new HashSet<>());
+            boolean hasAlive = currentGolems.stream().anyMatch(g -> !g.isDead());
 
-                Location spawnLoc = new Location(world, x, y, z);
-                Entity golemEntity = world.spawnEntity(spawnLoc, EntityType.IRON_GOLEM);
+            if (!hasAlive) {
+                for (int i = 0; i < golemCount; i++) {
+                    double angle = 2 * Math.PI / golemCount * i;
 
-                PotionEffect glow = new PotionEffect(PotionEffectType.GLOWING, Integer.MAX_VALUE, 1, false, false);
-                ((LivingEntity) golemEntity).addPotionEffect(glow);
+                    double x = center.getX() + radius * Math.cos(angle);
+                    double y = center.getY() + yOffset;
+                    double z = center.getZ() + radius * Math.sin(angle);
 
-                boolean isObstructed = false;
-                for (double dx = -0.7; dx <= 0.7; dx += 0.7) {
-                    for (double dz = -0.7; dz <= 0.7; dz += 0.7) {
-                        for (double dy = 0; dy <= 2.7; dy += 0.7) {
-                            Location check = spawnLoc.clone().add(dx, dy, dz);
-                            if (check.getBlock().getType().isSolid()) {
-                                isObstructed = true;
-                                break;
+                    Location spawnLoc = new Location(world, x, y, z);
+                    Entity golemEntity = world.spawnEntity(spawnLoc, EntityType.IRON_GOLEM);
+
+                    PotionEffect glow = new PotionEffect(PotionEffectType.GLOWING, Integer.MAX_VALUE, 1, false, false);
+                    ((LivingEntity) golemEntity).addPotionEffect(glow);
+
+                    boolean isObstructed = false;
+                    for (double dx = -0.7; dx <= 0.7; dx += 0.7) {
+                        for (double dz = -0.7; dz <= 0.7; dz += 0.7) {
+                            for (double dy = 0; dy <= 2.7; dy += 0.7) {
+                                Location check = spawnLoc.clone().add(dx, dy, dz);
+                                if (check.getBlock().getType().isSolid()) {
+                                    isObstructed = true;
+                                    break;
+                                }
                             }
+                            if (isObstructed) break;
                         }
                         if (isObstructed) break;
                     }
-                    if (isObstructed) break;
-                }
 
-                if (isObstructed) {
-                    int clearRadius = 3;
-                    for (int bx = -clearRadius; bx <= clearRadius; bx++) {
-                        for (int by = -clearRadius; by <= clearRadius; by++) {
-                            for (int bz = -clearRadius; bz <= clearRadius; bz++) {
-                                Location checkLoc = spawnLoc.clone().add(bx, by, bz);
-                                Block block = checkLoc.getBlock();
+                    if (isObstructed) {
+                        int clearRadius = 3;
+                        for (int bx = -clearRadius; bx <= clearRadius; bx++) {
+                            for (int by = -clearRadius; by <= clearRadius; by++) {
+                                for (int bz = -clearRadius; bz <= clearRadius; bz++) {
+                                    Location checkLoc = spawnLoc.clone().add(bx, by, bz);
+                                    Block block = checkLoc.getBlock();
 
-                                if (!block.getType().isSolid()) continue;
-                                if (block.getType() == Material.BEDROCK || block.getType() == Material.BARRIER) continue;
+                                    if (!block.getType().isSolid()) continue;
+                                    if (block.getType() == Material.BEDROCK || block.getType() == Material.BARRIER)
+                                        continue;
 
-                                block.breakNaturally();
+                                    block.breakNaturally();
+                                }
                             }
                         }
                     }
-                }
 
-                if (golemEntity instanceof IronGolem ironGolem) {
-                    config.golems.computeIfAbsent(player, k -> new HashSet<>()).add(ironGolem);
-                    ironGolem.setPlayerCreated(true);
+                    if (golemEntity instanceof IronGolem ironGolem) {
+                        config.golems.computeIfAbsent(player, k -> new HashSet<>()).add(ironGolem);
+                        ironGolem.setPlayerCreated(true);
 
-                    if (target instanceof LivingEntity livingTarget) {
-                        ironGolem.setTarget(livingTarget);
+                        if (target instanceof LivingEntity livingTarget) {
+                            ironGolem.setTarget(livingTarget);
+                        }
                     }
+
+                    player.getWorld().spawnParticle(Particle.ENCHANTED_HIT, spawnLoc, 44, 0.4, 0.4, 0.4, 1);
+                    golemEntity.getWorld().spawnParticle(
+                            Particle.BLOCK,
+                            golemEntity.getLocation().clone().add(0, 1, 0),
+                            44, 0.4, 0.4, 0.4,
+                            Material.IRON_BLOCK.createBlockData()
+                    );
                 }
 
-                player.getWorld().spawnParticle(Particle.ENCHANTED_HIT, spawnLoc, 44, 0.4, 0.4, 0.4, 1);
-                golemEntity.getWorld().spawnParticle(
+                if(offhandItem.getType() == Material.IRON_INGOT && offhandItem.getAmount() >= 18) {
+                    offhandItem.setAmount(offhandItem.getAmount() - 18);
+                }
+
+            } else if(target != null){
+                long cools = 4000L;
+                cool.updateCooldown(player, "F", cools);
+
+                world.playSound(center, Sound.ENTITY_IRON_GOLEM_REPAIR, 1, 1);
+
+                target.getWorld().spawnParticle(
                         Particle.BLOCK,
-                        golemEntity.getLocation().clone().add(0, 1, 0),
+                        target.getLocation().clone().add(0, 1, 0),
                         44, 0.4, 0.4, 0.4,
                         Material.IRON_BLOCK.createBlockData()
                 );
-            }
-        } else {
-            long cools = 4000L;
-            cool.updateCooldown(player, "F", cools);
 
-            world.playSound(center, Sound.ENTITY_IRON_GOLEM_REPAIR, 1, 1);
-
-            target.getWorld().spawnParticle(
-                    Particle.BLOCK,
-                    target.getLocation().clone().add(0, 1, 0),
-                    44, 0.4, 0.4, 0.4,
-                    Material.IRON_BLOCK.createBlockData()
-            );
-
-            for (IronGolem golem : currentGolems) {
-                if (target instanceof LivingEntity livingTarget) {
+                for (IronGolem golem : currentGolems) {
+                    LivingEntity livingTarget = (LivingEntity) target;
                     golem.setTarget(livingTarget);
                 }
             }
+
+            if(offhandItem.getType() == Material.IRON_INGOT && offhandItem.getAmount() >= 18) {
+                offhandItem.setAmount(offhandItem.getAmount() - 18);
+            }
+        }else {
+            player.playSound(player.getLocation(), Sound.BLOCK_IRON_PLACE, 1, 1);
+            player.sendActionBar(Component.text("iron needed").color(NamedTextColor.RED));
+            long cools = 100L;
+            cool.updateCooldown(player, "F", cools);
         }
     }
 

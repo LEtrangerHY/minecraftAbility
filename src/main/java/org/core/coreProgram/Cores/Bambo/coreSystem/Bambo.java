@@ -28,7 +28,7 @@ public class Bambo {
     public long r_Skill_Cool = 7000;
 
     //Q
-    public long q_Skill_Cool = 15000;
+    public long q_Skill_Cool = 7000;
     public double q_Skill_Jump = 2.0;
 
     //F

@@ -1,11 +1,15 @@
 package org.core.coreProgram.Cores.Luster.Skill;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -28,93 +32,107 @@ public class R implements SkillBase {
     @Override
     public void Trigger(Player player) {
 
-        World world = player.getWorld();
+        ItemStack offhandItem = player.getInventory().getItem(EquipmentSlot.OFF_HAND);
 
-        Vector dir = player.getEyeLocation().getDirection().normalize();
-        Vector spawnOffset = dir.clone().multiply(0.8).add(new Vector(0, -0.4, 0));
-        Location spawnLoc = player.getEyeLocation().add(spawnOffset);
+        if (offhandItem.getType() == Material.LODESTONE || (offhandItem.getType() == Material.IRON_INGOT && offhandItem.getAmount() >= 4)) {
 
-        FallingBlock fb = player.getWorld().spawn(
-                spawnLoc,
-                FallingBlock.class,
-                entity -> {
-                    entity.setBlockData(Material.IRON_BLOCK.createBlockData());
-                    entity.setDropItem(false);
-                    entity.setHurtEntities(false);
-                    entity.setGravity(false);
-                    entity.setPersistent(false);
-                }
-        );
+            World world = player.getWorld();
 
-        double speed = 2.2;
-        fb.setVelocity(dir.multiply(speed));
+            Vector dir = player.getEyeLocation().getDirection().normalize();
+            Vector spawnOffset = dir.clone().multiply(0.8).add(new Vector(0, -0.4, 0));
+            Location spawnLoc = player.getEyeLocation().add(spawnOffset);
 
-        Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(126, 126, 126), 1.3f);
-        Particle.DustOptions dustOptions_gra = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 0.7f);
+            FallingBlock fb = player.getWorld().spawn(
+                    spawnLoc,
+                    FallingBlock.class,
+                    entity -> {
+                        entity.setBlockData(Material.IRON_BLOCK.createBlockData());
+                        entity.setDropItem(false);
+                        entity.setHurtEntities(false);
+                        entity.setGravity(false);
+                        entity.setPersistent(false);
+                    }
+            );
 
-        player.spawnParticle(Particle.FLASH, fb.getLocation(), 13, 0, 0, 0, 0.8);
+            double speed = 2.2;
+            fb.setVelocity(dir.multiply(speed));
 
-        world.playSound(fb.getLocation(), Sound.ENTITY_WITHER_DEATH, 1f, 1f);
-        world.spawnParticle(Particle.ENCHANTED_HIT, spawnLoc, 30, 0.2, 0.2, 0.2, 1);
+            Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(126, 126, 126), 1.3f);
+            Particle.DustOptions dustOptions_gra = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 0.7f);
 
-        Vector backward = player.getLocation().getDirection().multiply(-0.7);
-        player.setVelocity(player.getVelocity().add(backward));
+            player.spawnParticle(Particle.FLASH, fb.getLocation(), 13, 0, 0, 0, 0.8);
 
-        new BukkitRunnable() {
-            int life = 100;
+            world.playSound(fb.getLocation(), Sound.ENTITY_WITHER_DEATH, 1f, 1f);
+            world.spawnParticle(Particle.ENCHANTED_HIT, spawnLoc, 30, 0.2, 0.2, 0.2, 1);
 
-            @Override
-            public void run() {
+            Vector backward = player.getLocation().getDirection().multiply(-0.7);
+            player.setVelocity(player.getVelocity().add(backward));
 
-                if (!fb.isValid()) {
-                    cancel();
-                    return;
-                }
+            new BukkitRunnable() {
+                int life = 100;
 
-                if (life-- <= 0) {
-                    fb.remove();
-                    cancel();
-                    return;
-                }
+                @Override
+                public void run() {
 
-                world.spawnParticle(Particle.ENCHANTED_HIT, fb.getLocation(), 3, 0.2, 0.2, 0.2, 0);
-                player.spawnParticle(Particle.DUST, fb.getLocation(), 1, 0.1, 0.1, 0.1, 0, dustOptions);
-                player.spawnParticle(Particle.DUST, fb.getLocation(), 2, 0.1, 0.1, 0.1, 0, dustOptions_gra);
+                    if (!fb.isValid()) {
+                        cancel();
+                        return;
+                    }
 
-                for (Entity e : world.getNearbyEntities(fb.getLocation(), 0.7, 0.7, 0.7)) {
-                    if (e instanceof LivingEntity le && !le.equals(player)) {
-
-                        world.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1f, 1.6f);
-
-                        ForceDamage forceDamage = new ForceDamage(le, config.r_Skill_Damage);
-                        forceDamage.applyEffect(player);
-
-                        Vector knock = le.getLocation().toVector().subtract(player.getLocation().toVector())
-                                .normalize().multiply(1.7);
-                        le.setVelocity(le.getVelocity().add(knock));
-
-                        world.spawnParticle(Particle.BLOCK, fb.getLocation(), 44, 0.3, 0.3, 0.3,
-                                Material.IRON_BLOCK.createBlockData());
-
-                        world.playSound(fb.getLocation(), Sound.BLOCK_ANVIL_LAND, 1f, 1f);
-                        world.playSound(fb.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1f, 1f);
-
+                    if (life-- <= 0) {
                         fb.remove();
                         cancel();
                         return;
                     }
-                }
 
-                Block block = fb.getLocation().getBlock();
-                if (block.getType().isSolid()) {
-                    world.spawnParticle(Particle.BLOCK, fb.getLocation(), 44, 0.3, 0.3, 0.3,
-                            Material.IRON_BLOCK.createBlockData());
-                    world.playSound(fb.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.9f, 0.7f);
-                    fb.remove();
-                    cancel();
+                    world.spawnParticle(Particle.ENCHANTED_HIT, fb.getLocation(), 3, 0.2, 0.2, 0.2, 0);
+                    player.spawnParticle(Particle.DUST, fb.getLocation(), 1, 0.1, 0.1, 0.1, 0, dustOptions);
+                    player.spawnParticle(Particle.DUST, fb.getLocation(), 2, 0.1, 0.1, 0.1, 0, dustOptions_gra);
+
+                    for (Entity e : world.getNearbyEntities(fb.getLocation(), 0.7, 0.7, 0.7)) {
+                        if (e instanceof LivingEntity le && !le.equals(player)) {
+
+                            world.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1f, 1.6f);
+
+                            ForceDamage forceDamage = new ForceDamage(le, config.r_Skill_Damage);
+                            forceDamage.applyEffect(player);
+
+                            Vector knock = le.getLocation().toVector().subtract(player.getLocation().toVector())
+                                    .normalize().multiply(1.7);
+                            le.setVelocity(le.getVelocity().add(knock));
+
+                            world.spawnParticle(Particle.BLOCK, fb.getLocation(), 44, 0.3, 0.3, 0.3,
+                                    Material.IRON_BLOCK.createBlockData());
+
+                            world.playSound(fb.getLocation(), Sound.BLOCK_ANVIL_LAND, 1f, 1f);
+                            world.playSound(fb.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1f, 1f);
+
+                            fb.remove();
+                            cancel();
+                            return;
+                        }
+                    }
+
+                    Block block = fb.getLocation().getBlock();
+                    if (block.getType().isSolid()) {
+                        world.spawnParticle(Particle.BLOCK, fb.getLocation(), 44, 0.3, 0.3, 0.3,
+                                Material.IRON_BLOCK.createBlockData());
+                        world.playSound(fb.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.9f, 0.7f);
+                        fb.remove();
+                        cancel();
+                    }
                 }
+            }.runTaskTimer(plugin, 0L, 1L);
+
+            if(offhandItem.getType() == Material.IRON_INGOT && offhandItem.getAmount() >= 4) {
+                offhandItem.setAmount(offhandItem.getAmount() - 4);
             }
-        }.runTaskTimer(plugin, 0L, 1L);
+        }else{
+            player.playSound(player.getLocation(), Sound.BLOCK_IRON_PLACE, 1, 1);
+            player.sendActionBar(Component.text("iron needed").color(NamedTextColor.RED));
+            long cools = 100L;
+            cool.updateCooldown(player, "R", cools);
+        }
     }
 
 }
