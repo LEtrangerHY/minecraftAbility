@@ -114,7 +114,7 @@ public class F implements SkillBase {
             @Override
             public void run(){
 
-                if(tick > 6 || victim.isDead() || player.isDead()){
+                if(tick > 13 || victim.isDead() || player.isDead()){
 
                     blueFlamePool(player, victim);
 
@@ -141,7 +141,7 @@ public class F implements SkillBase {
 
         player.playSound(victim.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.0f, 1.0f);
 
-        for (Entity entity : victim.getWorld().getNearbyEntities(victim.getLocation().clone().add(0, 0.2, 0), 1, 10, 1)) {
+        for (Entity entity : victim.getWorld().getNearbyEntities(victim.getLocation().clone().add(0, 0.2, 0), 0.3, 13, 0.3)) {
             if (entity instanceof LivingEntity target && entity != player) {
 
                 ForceDamage forceDamage = new ForceDamage(target, 13);
@@ -150,9 +150,9 @@ public class F implements SkillBase {
                 Stun stun = new Stun(victim, 2000);
                 stun.applyEffect(player);
 
-                Burn burn = new Burn(target, 4000L);
+                Burn burn = new Burn(target, 6000L);
                 burn.applyEffect(player);
-                PotionEffect wither = new PotionEffect(PotionEffectType.WITHER, 20 * 4, 3, false, false);
+                PotionEffect wither = new PotionEffect(PotionEffectType.WITHER, 20 * 6, 3, false, false);
                 target.addPotionEffect(wither);
 
             }
