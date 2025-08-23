@@ -4,6 +4,7 @@ import com.destroystokyo.paper.event.entity.EntityJumpEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -32,7 +33,10 @@ import org.core.coreProgram.Cores.Luster.coreSystem.lustCore;
 import org.core.coreProgram.Cores.Pyro.coreSystem.Pyro;
 import org.core.coreProgram.Cores.Pyro.coreSystem.pyroCore;
 
-public final class Core extends JavaPlugin{
+import java.util.ArrayList;
+import java.util.List;
+
+public final class Core extends JavaPlugin implements TabCompleter {
 
     private coreConfig config;
 
@@ -52,10 +56,8 @@ public final class Core extends JavaPlugin{
         return instance;
     }
 
-
     @Override
     public void onEnable() {
-
         instance = this;
 
         Nox noxConfig = new Nox();
@@ -102,6 +104,16 @@ public final class Core extends JavaPlugin{
 
         this.blaze = new blazeCore(this, config, blazeConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.blaze, this);
+
+        getCommand("core").setExecutor(this);
+        getCommand("corecheck").setExecutor(this);
+        getCommand("coreclear").setExecutor(this);
+        getCommand("gc").setExecutor(this);
+
+        getCommand("core").setTabCompleter(this);
+        getCommand("corecheck").setTabCompleter(this);
+        getCommand("coreclear").setTabCompleter(this);
+        getCommand("gc").setTabCompleter(this);
 
         getLogger().info("Cores downloaded!");
     }
@@ -152,78 +164,92 @@ public final class Core extends JavaPlugin{
         }
 
         if (command.getName().equalsIgnoreCase("corecheck")) {
-
             if(args.length == 1){
-
                 Player target = Bukkit.getPlayer(args[0]);
-
                 if (target == null) {
                     sender.sendMessage("§c해당 플레이어를 찾을 수 없습니다.");
                     return true;
                 }
-
                 sender.sendMessage( "§a" + target.getName() + " 소유의 core : " + this.config.getPlayerCore(target));
-
                 return true;
-
             }else if(args.length == 0){
-
                 if (!(sender instanceof Player player)) return true;
                 sender.sendMessage( "§a본인 소유의 core : " + this.config.getPlayerCore(player));
                 return true;
-
             }else{
-
                 sender.sendMessage("§c사용법: /corecheck <플레이어 닉네임|공백>");
                 return true;
-
             }
-
         }
 
         if (command.getName().equalsIgnoreCase("coreclear")) {
-
             if(args.length == 1){
-
                 Player target = Bukkit.getPlayer(args[0]);
-
                 if (target == null) {
                     sender.sendMessage("§c해당 플레이어를 찾을 수 없습니다.");
                     return true;
                 }
-
                 this.config.clearPlayerCore(target);
                 sender.sendMessage( "§c" + target.getName() + " 소유의 core을 모두 제거했습니다");
-
                 return true;
-
             }else if(args.length == 0){
-
                 if (!(sender instanceof Player player)) return true;
                 this.config.clearPlayerCore(player);
                 sender.sendMessage( "§c본인 소유의 core을 모두 제거했습니다.");
                 return true;
-
             }else{
-
                 sender.sendMessage("§c사용법: /coreclear <플레이어 닉네임|공백>");
                 return true;
-
             }
         }
 
         if (command.getName().equalsIgnoreCase("gc")) {
-
             if (args.length != 0) {
                 sender.sendMessage("§c사용법: /gc");
                 return true;
             }
-
             System.gc();
             sender.sendMessage("가비지 컬렉션 작동");
             return true;
         }
 
         return false;
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        List<String> suggestions = new ArrayList<>();
+
+        if (command.getName().equalsIgnoreCase("core")) {
+            if (args.length == 1) {
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    suggestions.add(p.getName());
+                }
+            } else if (args.length == 2) {
+                suggestions.add("benzene");
+                suggestions.add("nox");
+                suggestions.add("knight");
+                suggestions.add("pyro");
+                suggestions.add("glacier");
+                suggestions.add("dagger");
+                suggestions.add("carpenter");
+                suggestions.add("bambo");
+                suggestions.add("luster");
+                suggestions.add("blaze");
+            } else if (args.length == 3) {
+                suggestions.add("true");
+                suggestions.add("false");
+            }
+        }
+
+        if (command.getName().equalsIgnoreCase("corecheck") || command.getName().equalsIgnoreCase("coreclear")) {
+            if (args.length == 1) {
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    suggestions.add(p.getName());
+                }
+            }
+        }
+
+        return suggestions;
     }
 }
