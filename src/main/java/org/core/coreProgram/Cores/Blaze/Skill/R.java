@@ -46,7 +46,7 @@ public class R implements SkillBase{
                 }
 
                 if(tick < 20){
-                    world.spawnParticle(Particle.SOUL_FIRE_FLAME, player.getLocation().clone().add(0, 1, 0), 13, 0.2, 0.1, 0.2, 0.13);
+                    world.spawnParticle(Particle.SOUL_FIRE_FLAME, player.getLocation().clone().add(0, 1, 0), 13, 0.2, 0.1, 0.2, 0.05);
                 }else{
                     world.spawnParticle(Particle.SOUL, player.getLocation().clone().add(0, 1, 0), 4, 0.4, 0.4, 0.4, 0.04);
                     player.playSound(player.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 1);
