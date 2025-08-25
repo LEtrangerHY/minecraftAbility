@@ -43,19 +43,18 @@ public class Stun implements Effects, Listener {
             @Override
             public void run() {
 
-                stunnedEntities.put(target, endTime);
-
                 if (System.currentTimeMillis() >= endTime || target.isDead()) {
                     removeEffect(target);
                     cancel();
                 }
 
-                livingEntity.setAI(false);
+                stunnedEntities.put(target, endTime);
+
+                target.teleport(stunPos);
+                target.setVelocity(new Vector(0, 0, 0));
 
                 if (target instanceof Player) {
                     target.sendActionBar(Component.text("Stunned").color(NamedTextColor.YELLOW));
-                    target.teleport(stunPos);
-                    target.setVelocity(new Vector(0, 0, 0));
                 }
             }
         }.runTaskTimer(Objects.requireNonNull(Bukkit.getPluginManager().getPlugin("Core")), 0L, 1L);
@@ -66,7 +65,6 @@ public class Stun implements Effects, Listener {
         if (!(entity instanceof LivingEntity livingEntity)) return;
 
         stunnedEntities.remove(entity);
-        livingEntity.setAI(true);
     }
 
     @EventHandler

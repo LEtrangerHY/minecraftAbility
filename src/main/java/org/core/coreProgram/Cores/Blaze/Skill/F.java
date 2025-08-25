@@ -56,6 +56,8 @@ public class F implements SkillBase {
 
             setBiome(world, center, 21);
 
+            PotionEffect wither = new PotionEffect(PotionEffectType.WITHER, 20 * 6, 1, false, false);
+            player.addPotionEffect(wither);
             PotionEffect speed = new PotionEffect(PotionEffectType.SPEED, 20 * 13, 1, false, false);
             player.addPotionEffect(speed);
 
