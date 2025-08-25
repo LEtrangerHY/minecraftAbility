@@ -17,7 +17,7 @@ import java.util.*;
 
 public class Causalgia {
 
-    //걍 귀찮 구현 안함. 나중에 시간 되면 구현할 예정
+    //걍 귀찮. 구현 안함. 나중에 시간 되면 구현할 예정
 
     private final coreConfig tag;
     private final Pyro config;
