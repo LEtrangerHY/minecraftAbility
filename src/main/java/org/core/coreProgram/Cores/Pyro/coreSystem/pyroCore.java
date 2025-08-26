@@ -129,7 +129,7 @@ public class pyroCore extends absCore {
                                 }
 
 
-                                if(!particleLocation.getBlock().isPassable()){
+                                if(!block.isPassable()){
                                     Burst(player, particleLocation);
                                     config.collision.put(player.getUniqueId(), true);
                                 }

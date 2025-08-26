@@ -80,6 +80,11 @@ public class F implements SkillBase {
                         }
                     }
 
+                    if(!particleLocation.getBlock().isPassable()){
+                        Delay(player, particleLocation);
+                        config.F_collision.put(player.getUniqueId(), true);
+                    }
+
                     player.spawnParticle(Particle.FLAME, particleLocation, 3, 0.1, 0.1, 0.1, 0);
                     player.spawnParticle(Particle.SMOKE, particleLocation, 2, 0.1, 0.1, 0.1, 0);
 
