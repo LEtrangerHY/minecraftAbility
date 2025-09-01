@@ -143,7 +143,7 @@ public class comCore extends absCore {
             ForceDamage forceDamage = new ForceDamage((LivingEntity) entity, 1);
             forceDamage.applyEffect(player);
 
-            Location start = fb.getLocation().clone().add(0.5, 0.5, 0.5);
+            Location start = fb.getLocation().clone().add(0, 0.5, 0);
 
             Vector dir = entity.getLocation().clone().add(0, 1.2, 0).toVector().subtract(start.toVector()).normalize();
 

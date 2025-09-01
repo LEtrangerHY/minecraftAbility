@@ -37,7 +37,7 @@ public class Q implements SkillBase {
     public void Trigger(Player player){
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
         for(FallingBlock fb : config.comBlocks.getOrDefault(player.getUniqueId(), new HashSet<>())){
-            player.getWorld().spawnParticle(Particle.ENCHANTED_HIT, fb.getLocation().clone().add(0.5, 0.5, 0.5), 30, 0.2, 0.2, 0.2, 1);
+            player.getWorld().spawnParticle(Particle.ENCHANTED_HIT, fb.getLocation().clone().add(0, 0.5, 0), 30, 0.2, 0.2, 0.2, 1);
             circleParticle(player, fb.getLocation().clone().add(0, 0.5, 0));
             commandReceiver(player, fb);
         }

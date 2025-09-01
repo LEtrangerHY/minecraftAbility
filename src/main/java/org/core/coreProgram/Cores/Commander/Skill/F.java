@@ -33,9 +33,9 @@ public class F implements SkillBase {
     public void Trigger(Player player){
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
         for(FallingBlock fb : config.comBlocks.getOrDefault(player.getUniqueId(), new HashSet<>())){
-            player.getWorld().spawnParticle(Particle.DRAGON_BREATH, fb.getLocation().clone().add(0.5, 0.5, 0.5), 30, 0.2, 0.2, 0.2, 1);
+            player.getWorld().spawnParticle(Particle.DRAGON_BREATH, fb.getLocation().clone().add(0, 0.5, 0), 30, 0.2, 0.2, 0.2, 1);
             circleParticle(player, fb.getLocation().clone().add(0, 0.5, 0));
-            commandReceiver(player, fb);
+            commandReceiver_1(player, fb);
         }
     }
 
@@ -84,26 +84,50 @@ public class F implements SkillBase {
         }.runTaskTimer(plugin, tickDelay, 1L);
     }
 
-    public void commandReceiver(Player player, FallingBlock fb) {
+    public void commandReceiver_1(Player player, FallingBlock fb) {
         World world = player.getWorld();
         Location center = fb.getLocation();
 
         for (Entity entity : world.getNearbyEntities(center, 6, 6, 6)) {
             if (entity.equals(player) || !(entity instanceof LivingEntity)) continue;
 
-            ForceDamage forceDamage = new ForceDamage((LivingEntity) entity, 2);
-            forceDamage.applyEffect(player);
-            entity.setVelocity(new Vector(0, 0, 0));
-
             fb.getWorld().playSound(fb.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1, 1);
 
-            Location start = fb.getLocation().clone().add(0.5, 0.5, 0.5);
+            Location start = fb.getLocation().clone().add(0, 0.5, 0);
 
             Vector dir = entity.getLocation().clone().add(0, 1.2, 0).toVector().subtract(start.toVector()).normalize();
 
             double maxDistance = start.distance(entity.getLocation().clone().add(0, 1, 0));
 
             attackLine(player, maxDistance, start, dir);
+
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (world.getNearbyEntities(center, 1, 1, 1).contains(entity)) {
+                        commandReceiver_2(player, center);
+                        this.cancel();
+                    } else {
+                        Vector direction = center.toVector().subtract(entity.getLocation().toVector()).normalize().multiply(1.0);
+                        entity.setVelocity(direction);
+                    }
+                }
+            }.runTaskTimer(plugin, 0L, 1L);
+        }
+    }
+
+    public void commandReceiver_2(Player player, Location center) {
+        World world = player.getWorld();
+
+        for (Entity entity : world.getNearbyEntities(center, 6, 6, 6)) {
+            if (entity.equals(player) || !(entity instanceof LivingEntity)) continue;
+
+            player.getWorld().playSound(center, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1, 1);
+
+            ForceDamage forceDamage = new ForceDamage((LivingEntity) entity, 12);
+            forceDamage.applyEffect(player);
+            entity.setVelocity(new Vector(0, 0, 0));
+
         }
     }
 
