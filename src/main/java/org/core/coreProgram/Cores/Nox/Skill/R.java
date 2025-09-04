@@ -47,7 +47,7 @@ public class R implements SkillBase {
         player.setVelocity(direction);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.0f, 1.0f);
 
-        Invulnerable invulnerable = new Invulnerable(600);
+        Invulnerable invulnerable = new Invulnerable(player, 600);
         invulnerable.applyEffect(player);
 
         long cools = 3000 - (long) (config.dreamPoint.getOrDefault(player.getUniqueId(), new HashMap<>()).getOrDefault("R", 6.0) * 1000);

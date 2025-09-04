@@ -18,8 +18,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class Grounding implements  Effects, Listener {
-    private static final Map<Entity, Long> groundedEntities = new HashMap();
+public class Grounding implements Effects, Listener {
+    public static Map<Entity, Long> groundedEntities = new HashMap();
 
     private final Entity target;
     private final long duration;
@@ -46,6 +46,14 @@ public class Grounding implements  Effects, Listener {
                     cancel();
                 }
 
+                if (entity instanceof Player player) {
+                    if(!player.isOnline()){
+                        removeEffect(player);
+                        cancel();
+                    }
+                    target.sendActionBar(Component.text("Grounded").color(NamedTextColor.YELLOW));
+                }
+
                 groundedEntities.put(target, endTime);
 
                 Location fixed = new Location(target.getWorld(), target.getX(), groundLoc.getY(), target.getZ(), target.getYaw(), target.getPitch());
@@ -54,48 +62,18 @@ public class Grounding implements  Effects, Listener {
                 }else if(fixed.getY() > target.getY()){
                     groundLoc = target.getLocation();
                 }
-
-                if (target instanceof Player) {
-                    target.sendActionBar(Component.text("Grounded").color(NamedTextColor.YELLOW));
-                }
             }
         }.runTaskTimer(Objects.requireNonNull(Bukkit.getPluginManager().getPlugin("Core")), 0L, 1L);
     }
 
     @Override
     public void removeEffect(Entity entity) {
-        entity.setVelocity(new Vector(0, 0, 0));
         groundedEntities.remove(entity);
     }
 
     public static boolean isGrounded(Entity entity) {
         Long endTime = groundedEntities.get(entity);
         return endTime != null && System.currentTimeMillis() < endTime;
-    }
-
-    @EventHandler
-    public void quitRemove(PlayerQuitEvent event){
-        Player player = event.getPlayer();
-        removeEffect(player);
-    }
-
-    public static void handleEntityJump(EntityJumpEvent event) {
-        Entity entity = event.getEntity();
-
-        if (isGrounded(entity)) {
-
-            Bukkit.getScheduler().runTaskLater(
-                    Objects.requireNonNull(Bukkit.getPluginManager().getPlugin("Core")),
-                    () -> {
-                        if (entity instanceof LivingEntity living) {
-                            living.setVelocity(living.getVelocity().setY(-1));
-                        }
-                    },
-                    1L
-            );
-
-            event.setCancelled(true);
-        }
     }
 
 }

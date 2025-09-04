@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.Objects;
 
 public class Stun implements Effects, Listener {
-    private static final Map<Entity, Long> stunnedEntities = new HashMap();
+    public static Map<Entity, Long> stunnedEntities = new HashMap();
 
     private final Entity target;
     private final long duration;
@@ -48,14 +48,18 @@ public class Stun implements Effects, Listener {
                     cancel();
                 }
 
+                if (entity instanceof Player player) {
+                    if(!player.isOnline()){
+                        removeEffect(player);
+                        cancel();
+                    }
+                    target.sendActionBar(Component.text("Stunned").color(NamedTextColor.YELLOW));
+                }
+
                 stunnedEntities.put(target, endTime);
 
                 target.teleport(stunPos);
                 target.setVelocity(new Vector(0, 0, 0));
-
-                if (target instanceof Player) {
-                    target.sendActionBar(Component.text("Stunned").color(NamedTextColor.YELLOW));
-                }
             }
         }.runTaskTimer(Objects.requireNonNull(Bukkit.getPluginManager().getPlugin("Core")), 0L, 1L);
     }
@@ -67,31 +71,9 @@ public class Stun implements Effects, Listener {
         stunnedEntities.remove(entity);
     }
 
-    @EventHandler
-    public void playerQuit(PlayerQuitEvent event){
-        Player player= event.getPlayer();
-        removeEffect(player);
-    }
-
     public static boolean isStunned(Entity entity) {
         Long endTime = stunnedEntities.get(entity);
         return endTime != null && System.currentTimeMillis() < endTime;
-    }
-
-    public static void handlePlayerMove(PlayerMoveEvent event) {
-        Player player = event.getPlayer();
-
-        if (isStunned(player)) {
-            Location from = event.getFrom();
-            Location to = event.getTo();
-
-            to.setX(from.getX());
-            to.setY(from.getY());
-            to.setZ(from.getZ());
-            event.setTo(to);
-
-            player.setVelocity(new Vector(0, 0, 0));
-        }
     }
 
 }

@@ -44,7 +44,7 @@ public class Q implements SkillBase {
         player.setVelocity(direction);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.0f, 1.0f);
 
-        Invulnerable invulnerable = new Invulnerable(500);
+        Invulnerable invulnerable = new Invulnerable(player, 500);
         invulnerable.applyEffect(player);
 
         detect_1(player);
@@ -105,7 +105,7 @@ public class Q implements SkillBase {
         player.getWorld().playSound(player.getLocation(), Sound.ITEM_TRIDENT_RIPTIDE_2, 1.0f, 1.0f);
         player.spawnParticle(Particle.SPIT, player.getLocation().add(0, 1.0, 0),10, 0.1, 0.2, 0.1, 0.5);
 
-        Invulnerable invulnerable = new Invulnerable(800);
+        Invulnerable invulnerable = new Invulnerable(player, 800);
         invulnerable.applyEffect(player);
 
         detect_2(player);

@@ -44,7 +44,7 @@ public class R implements SkillBase {
         player.setVelocity(direction);
         player.getWorld().playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_IRON, 1.0f, 1.0f);
 
-        Invulnerable invulnerable = new Invulnerable(500);
+        Invulnerable invulnerable = new Invulnerable(player,500);
         invulnerable.applyEffect(player);
 
         detect_1(player);

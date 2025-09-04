@@ -7,11 +7,14 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.core.Cool.Cool;
-import org.core.Effect.Grounding;
-import org.core.Effect.Stun;
+import org.core.Effect.*;
+import org.core.Level.LevelingManager;
 import org.core.coreProgram.Cores.Bambo.coreSystem.Bambo;
 import org.core.coreProgram.Cores.Bambo.coreSystem.bambCore;
 import org.core.coreProgram.Cores.Blaze.coreSystem.Blaze;
@@ -38,9 +41,12 @@ import org.core.coreProgram.Cores.Pyro.coreSystem.pyroCore;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class Core extends JavaPlugin implements TabCompleter {
+import static org.bukkit.Bukkit.getLogger;
+
+public final class Core extends JavaPlugin implements Listener, TabCompleter {
 
     private coreConfig config;
+    private LevelingManager level;
 
     private static Core instance;
     private noxCore nox;
@@ -55,6 +61,8 @@ public final class Core extends JavaPlugin implements TabCompleter {
     private blazeCore blaze;
     private comCore commander;
 
+    private EffectManager effectManager = new EffectManager();
+
     public static Core getInstance() {
         return instance;
     }
@@ -62,6 +70,7 @@ public final class Core extends JavaPlugin implements TabCompleter {
     @Override
     public void onEnable() {
         instance = this;
+        Bukkit.getPluginManager().registerEvents(this, this);
 
         Nox noxConfig = new Nox();
         Benzene benzConfig = new Benzene();
@@ -78,6 +87,9 @@ public final class Core extends JavaPlugin implements TabCompleter {
         Cool cool = new Cool(this);
 
         this.config = new coreConfig(this);
+
+        this.level = new LevelingManager(this.config);
+        Bukkit.getPluginManager().registerEvents(this.level, this);
 
         this.nox = new noxCore(this, this.config, noxConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.nox, this);
@@ -125,19 +137,14 @@ public final class Core extends JavaPlugin implements TabCompleter {
         getLogger().info("Cores downloaded!");
     }
 
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event){
+        event.getPlayer().setInvulnerable(false);
+    }
+
     @Override
     public void onDisable() {
         getLogger().info("Cores disabled!");
-    }
-
-    @EventHandler
-    public void onPlayerMove(PlayerMoveEvent event) {
-        Stun.handlePlayerMove(event);
-    }
-
-    @EventHandler
-    public void onEntityJump(EntityJumpEvent event) {
-        Grounding.handleEntityJump(event);
     }
 
     @Override

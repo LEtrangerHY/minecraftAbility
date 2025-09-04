@@ -1,5 +1,7 @@
 package org.core.Effect;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -7,49 +9,50 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-public class Invulnerable implements Effects, Listener {
-    private static final Set<Entity> invulnerablePlayers = new HashSet<>();
+import static org.bukkit.Bukkit.getLogger;
 
+public class Invulnerable implements Effects, Listener {
+    public static Set<Entity> invulnerablePlayers = new HashSet<>();
+
+    private final Player player;
     private final long duration;
 
-    public Invulnerable(long duration) {
+    public Invulnerable(Player player, long duration) {
+        this.player = player;
         this.duration = duration;
     }
 
     @Override
     public void applyEffect(Entity entity) {
-        if (invulnerablePlayers.contains(entity)) {
-            return;
-        }
 
-        invulnerablePlayers.add(entity);
+        invulnerablePlayers.add(player);
+        long endTime = System.currentTimeMillis() + duration;
+
         entity.setInvulnerable(true);
 
         new BukkitRunnable() {
             @Override
             public void run() {
-                removeEffect(entity);
+
+                if (System.currentTimeMillis() >= endTime || !player.isOnline()) {
+                    removeEffect(player);
+                    cancel();
+                }
+
             }
-        }.runTaskLater(Objects.requireNonNull(Bukkit.getPluginManager().getPlugin("Core")), duration / 50L); // 50tick = 1ticket
+        }.runTaskTimer(Objects.requireNonNull(Bukkit.getPluginManager().getPlugin("Core")), 0L, 1L);
     }
 
     @Override
     public void removeEffect(Entity entity) {
-        if (invulnerablePlayers.contains(entity)) {
-            invulnerablePlayers.remove(entity);
-            entity.setInvulnerable(false);
-        }
-    }
-
-    @EventHandler
-    public void quitRemove(PlayerQuitEvent event){
-        Player player = event.getPlayer();
-        removeEffect(player);
+        invulnerablePlayers.remove(entity);
+        entity.setInvulnerable(false);
     }
 
     public static boolean isInvulnerable(Player player) {

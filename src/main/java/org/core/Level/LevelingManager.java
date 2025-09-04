@@ -1,72 +1,87 @@
 package org.core.Level;
 
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.persistence.PersistentDataType;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.*;
+import org.core.Core;
+import org.core.coreConfig;
+import org.core.coreProgram.Cores.Bambo.coreSystem.bambLeveling;
+import org.core.coreProgram.Cores.Benzene.coreSystem.benzLeveling;
+import org.core.coreProgram.Cores.Blaze.coreSystem.blazeLeveling;
+import org.core.coreProgram.Cores.Carpenter.coreSystem.carpLeveling;
+import org.core.coreProgram.Cores.Commander.coreSystem.comLeveling;
+import org.core.coreProgram.Cores.Dagger.coreSystem.dagLeveling;
+import org.core.coreProgram.Cores.Glacier.coreSystem.glaLeveling;
+import org.core.coreProgram.Cores.Knight.coreSystem.knightLeveling;
+import org.core.coreProgram.Cores.Luster.coreSystem.lustLeveling;
+import org.core.coreProgram.Cores.Nox.coreSystem.noxLeveling;
+import org.core.coreProgram.Cores.Pyro.coreSystem.pyroLeveling;
 
 public class LevelingManager implements Listener {
 
-    public LevelingManager(){
+    private final coreConfig config;
 
+    public LevelingManager(coreConfig config){
+        this.config = config;
     }
 
-    public void addLevel(Player player) {
+    @EventHandler
+    public void Exp(PlayerExpChangeEvent event){
 
-    }
+        if(event.getAmount() > 0){
+            Player player = event.getPlayer();
+            long exp = event.getAmount();
 
-    private class PersistentPlayerSet extends AbstractSet<Player> {
-        private final JavaPlugin plugin;
-        private final NamespacedKey key;
-
-        public PersistentPlayerSet(JavaPlugin plugin, String keyName) {
-            this.plugin = plugin;
-            this.key = new NamespacedKey(plugin, keyName);
-        }
-
-        @Override
-        public boolean add(Player player) {
-            player.getPersistentDataContainer().set(key, PersistentDataType.BYTE, (byte) 1);
-            return true;
-        }
-
-        @Override
-        public boolean remove(Object o) {
-            if (o instanceof Player player) {
-                player.getPersistentDataContainer().set(key, PersistentDataType.BYTE, (byte) 0);
-                return true;
+            switch (config.getPlayerCore(player)) {
+                case "benzene" :
+                    benzLeveling benzene = new benzLeveling(player, exp);
+                    benzene.addExp(player);
+                    break;
+                case "nox" :
+                    noxLeveling nox = new noxLeveling(player, exp);
+                    nox.addExp(player);
+                    break;
+                case "bambo" :
+                    bambLeveling bambo = new bambLeveling(player, exp);
+                    bambo.addExp(player);
+                    break;
+                case "carpenter" :
+                    carpLeveling carpenter = new carpLeveling(player, exp);
+                    carpenter.addExp(player);
+                    break;
+                case "dagger" :
+                    dagLeveling dagger = new dagLeveling(player, exp);
+                    dagger.addExp(player);
+                    break;
+                case "pyro" :
+                    pyroLeveling pyro = new pyroLeveling(player, exp);
+                    pyro.addExp(player);
+                    break;
+                case "glacier" :
+                    glaLeveling glacier = new glaLeveling(player, exp);
+                    glacier.addExp(player);
+                    break;
+                case "knight" :
+                    knightLeveling knight = new knightLeveling(player, exp);
+                    knight.addExp(player);
+                    break;
+                case "luster" :
+                    lustLeveling luster = new lustLeveling(player, exp);
+                    luster.addExp(player);
+                    break;
+                case "blaze" :
+                    blazeLeveling blaze = new blazeLeveling(player, exp);
+                    blaze.addExp(player);
+                    break;
+                case "commander" :
+                    comLeveling commander = new comLeveling(player, exp);
+                    commander.addExp(player);
+                    break;
+                default :
+                    break;
             }
-            return false;
-        }
-
-        @Override
-        public boolean contains(Object o) {
-            if (o instanceof Player player) {
-                Byte result = player.getPersistentDataContainer().get(key, PersistentDataType.BYTE);
-                return result != null && result == (byte) 1;
-            }
-            return false;
-        }
-
-        @Override
-        public @NotNull Iterator<Player> iterator() {
-            Set<Player> result = new HashSet<>();
-            for (Player player : plugin.getServer().getOnlinePlayers()) {
-                if (contains(player)) {
-                    result.add(player);
-                }
-            }
-            return result.iterator();
-        }
-
-        @Override
-        public int size() {
-            return (int) plugin.getServer().getOnlinePlayers().stream()
-                    .filter(this::contains).count();
         }
     }
 }
