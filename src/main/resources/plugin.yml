@@ -12,6 +12,9 @@ commands:
   corecheck:
     description: "coreclear"
     usage: "/coreclear"
+  corelevelreset:
+    description: "coreLevelReset"
+    usage: "/coreLevelReset"
 
   gc:
     description: "gc"

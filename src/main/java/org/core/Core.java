@@ -2,6 +2,7 @@ package org.core;
 
 import com.destroystokyo.paper.event.entity.EntityJumpEvent;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -11,6 +12,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.core.Cool.Cool;
 import org.core.Effect.*;
@@ -38,6 +40,7 @@ import org.core.coreProgram.Cores.Luster.coreSystem.lustCore;
 import org.core.coreProgram.Cores.Pyro.coreSystem.Pyro;
 import org.core.coreProgram.Cores.Pyro.coreSystem.pyroCore;
 
+import javax.naming.Name;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -88,7 +91,7 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
 
         this.config = new coreConfig(this);
 
-        this.level = new LevelingManager(this.config);
+        this.level = new LevelingManager(this, this.config);
         Bukkit.getPluginManager().registerEvents(this.level, this);
 
         this.nox = new noxCore(this, this.config, noxConfig, cool);
@@ -213,6 +216,30 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
                 return true;
             }else{
                 sender.sendMessage("§c사용법: /coreclear <플레이어 닉네임|공백>");
+                return true;
+            }
+        }
+
+        if (command.getName().equalsIgnoreCase("corelevelreset")) {
+            if(args.length == 1){
+                Player target = Bukkit.getPlayer(args[0]);
+                if (target == null) {
+                    sender.sendMessage("§c해당 플레이어를 찾을 수 없습니다.");
+                    return true;
+                }
+
+                target.getPersistentDataContainer().set(new NamespacedKey(this, "exp"), PersistentDataType.LONG, 0L);
+                target.getPersistentDataContainer().set(new NamespacedKey(this, "level"), PersistentDataType.LONG, 0L);
+                sender.sendMessage( "§a" + target.getName() + " 경험치, 레벨 리셋 : " + this.level.Exp.getOrDefault(target, 0L) + ", " + this.level.Level.getOrDefault(target, 0L));
+                return true;
+            }else if(args.length == 0){
+                if (!(sender instanceof Player player)) return true;
+                player.getPersistentDataContainer().set(new NamespacedKey(this, "exp"), PersistentDataType.LONG, 0L);
+                player.getPersistentDataContainer().set(new NamespacedKey(this, "level"), PersistentDataType.LONG, 0L);
+                sender.sendMessage( "§a본인의 경험치, 레벨 리셋 " + this.level.Exp.getOrDefault(player, 0L) + ", " + this.level.Level.getOrDefault(player, 0L));
+                return true;
+            }else{
+                sender.sendMessage("§c사용법: /corelevelreset <플레이어 닉네임|공백>");
                 return true;
             }
         }

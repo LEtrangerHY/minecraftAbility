@@ -1,9 +1,12 @@
 package org.core.Level;
 
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerExpChangeEvent;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.core.Core;
 import org.core.coreConfig;
@@ -18,13 +21,27 @@ import org.core.coreProgram.Cores.Knight.coreSystem.knightLeveling;
 import org.core.coreProgram.Cores.Luster.coreSystem.lustLeveling;
 import org.core.coreProgram.Cores.Nox.coreSystem.noxLeveling;
 import org.core.coreProgram.Cores.Pyro.coreSystem.pyroLeveling;
+import org.core.playerSettings.persistentPlayerHashMap;
+
+import javax.naming.Name;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class LevelingManager implements Listener {
 
+    private final JavaPlugin plugin;
     private final coreConfig config;
 
-    public LevelingManager(coreConfig config){
+    public Map<Player, Long> Level;
+    public Map<Player, Long> Exp;
+
+    public LevelingManager(JavaPlugin plugin, coreConfig config){
+        this.plugin = plugin;
         this.config = config;
+
+        this.Level = new persistentPlayerHashMap(plugin, "level");
+        this.Exp = new persistentPlayerHashMap(plugin, "exp");
     }
 
     @EventHandler
@@ -36,47 +53,47 @@ public class LevelingManager implements Listener {
 
             switch (config.getPlayerCore(player)) {
                 case "benzene" :
-                    benzLeveling benzene = new benzLeveling(player, exp);
+                    benzLeveling benzene = new benzLeveling(plugin, player, exp);
                     benzene.addExp(player);
                     break;
                 case "nox" :
-                    noxLeveling nox = new noxLeveling(player, exp);
+                    noxLeveling nox = new noxLeveling(plugin, player, exp);
                     nox.addExp(player);
                     break;
                 case "bambo" :
-                    bambLeveling bambo = new bambLeveling(player, exp);
+                    bambLeveling bambo = new bambLeveling(plugin, player, exp);
                     bambo.addExp(player);
                     break;
                 case "carpenter" :
-                    carpLeveling carpenter = new carpLeveling(player, exp);
+                    carpLeveling carpenter = new carpLeveling(plugin, player, exp);
                     carpenter.addExp(player);
                     break;
                 case "dagger" :
-                    dagLeveling dagger = new dagLeveling(player, exp);
+                    dagLeveling dagger = new dagLeveling(plugin, player, exp);
                     dagger.addExp(player);
                     break;
                 case "pyro" :
-                    pyroLeveling pyro = new pyroLeveling(player, exp);
+                    pyroLeveling pyro = new pyroLeveling(plugin, player, exp);
                     pyro.addExp(player);
                     break;
                 case "glacier" :
-                    glaLeveling glacier = new glaLeveling(player, exp);
+                    glaLeveling glacier = new glaLeveling(plugin, player, exp);
                     glacier.addExp(player);
                     break;
                 case "knight" :
-                    knightLeveling knight = new knightLeveling(player, exp);
+                    knightLeveling knight = new knightLeveling(plugin, player, exp);
                     knight.addExp(player);
                     break;
                 case "luster" :
-                    lustLeveling luster = new lustLeveling(player, exp);
+                    lustLeveling luster = new lustLeveling(plugin, player, exp);
                     luster.addExp(player);
                     break;
                 case "blaze" :
-                    blazeLeveling blaze = new blazeLeveling(player, exp);
+                    blazeLeveling blaze = new blazeLeveling(plugin, player, exp);
                     blaze.addExp(player);
                     break;
                 case "commander" :
-                    comLeveling commander = new comLeveling(player, exp);
+                    comLeveling commander = new comLeveling(plugin, player, exp);
                     commander.addExp(player);
                     break;
                 default :

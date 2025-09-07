@@ -44,6 +44,7 @@ public class persistentPlayerSet extends AbstractSet<Player> {
         return false;
     }
 
+
     @Override
     public @NotNull Iterator<Player> iterator() {
         Set<Player> result = new HashSet<>();
