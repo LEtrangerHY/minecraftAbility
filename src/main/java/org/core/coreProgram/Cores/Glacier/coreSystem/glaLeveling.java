@@ -37,7 +37,7 @@ public class glaLeveling implements Levels {
     @Override
     public void addExp(Entity entity){
 
-        player.sendMessage("get exp : " + exp);
+        player.sendMessage("§e" + "exp : " + exp + " 획득");
 
         long currentExp = 0L;
         long currentLevel = player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "level"), PersistentDataType.LONG, 0L);
@@ -51,8 +51,5 @@ public class glaLeveling implements Levels {
                 }
             }
         }
-
-        player.sendMessage("current exp : " + player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "exp"), PersistentDataType.LONG, 0L));
-
     }
 }

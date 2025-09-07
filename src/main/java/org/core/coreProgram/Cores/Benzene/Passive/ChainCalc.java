@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.*;
@@ -199,7 +200,6 @@ public class ChainCalc {
 
         return t;
     }
-
     private final Map<UUID, BukkitRunnable> activeTasks = new HashMap<>();
 
     public void updateChainList(Player player) {
@@ -213,24 +213,30 @@ public class ChainCalc {
             @Override
             public void run() {
                 if (!player.isOnline() || !tag.Benzene.contains(player)) {
-
                     player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
-
                     activeTasks.remove(playerUUID);
                     this.cancel();
                     return;
                 }
 
-                ScoreboardManager manager = Bukkit.getScoreboardManager();
-                Scoreboard scoreboard = manager.getNewScoreboard();
+                Scoreboard scoreboard = player.getScoreboard();
+                if (scoreboard == null || scoreboard == Bukkit.getScoreboardManager().getMainScoreboard()) {
+                    scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+                    player.setScoreboard(scoreboard);
+                }
 
-                Objective objective = scoreboard.registerNewObjective("BENZENE", Criteria.DUMMY, Component.text("BENZENE"));
-                objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+                Objective objective = scoreboard.getObjective(DisplaySlot.SIDEBAR);
+                if (objective == null) {
+                    objective = scoreboard.registerNewObjective("benzene", Criteria.DUMMY, Component.text("benzene"));
+                    objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+                }
 
-                Score score1 = objective.getScore("------------");
-                score1.setScore(7);
+                int startScore = 7;
 
-                if(!config.Chain.getOrDefault(player.getUniqueId(), new LinkedHashMap<>()).isEmpty()) {
+                if (!config.Chain.getOrDefault(player.getUniqueId(), new LinkedHashMap<>()).isEmpty()) {
+
+                    Score score1 = objective.getScore("⏣⌬⌬⌬⌬⌬⌬⌬⌬⌬⌬⌬⌬⌬");
+                    score1.setScore(startScore--);
 
                     Map<UUID, LinkedHashMap<UUID, Integer>> index = new LinkedHashMap<>();
                     Map<UUID, ArrayList<String>> names = new LinkedHashMap<>();
@@ -241,7 +247,6 @@ public class ChainCalc {
                     distances.put(player.getUniqueId(), new ArrayList<>());
 
                     for (Entity entity : config.Chain.getOrDefault(player.getUniqueId(), new LinkedHashMap<>()).sequencedValues()) {
-
                         Location loc1 = player.getLocation().add(0, player.getHeight() / 2 + 0.2, 0);
                         Location loc2 = entity.getLocation().add(0, entity.getHeight() / 2 + 0.2, 0);
 
@@ -254,7 +259,6 @@ public class ChainCalc {
                         index.get(player.getUniqueId()).put(uuid, globalCount);
 
                         names.get(player.getUniqueId()).add(baseName);
-
                     }
 
                     Map<UUID, ArrayList<String>> diff = new HashMap<>();
@@ -284,7 +288,7 @@ public class ChainCalc {
                     for (UUID entityUuid : index.get(player.getUniqueId()).keySet()) {
                         con.get(player.getUniqueId()).add(diff.get(player.getUniqueId()).get(k.get(player.getUniqueId())) + "*".repeat(index.get(player.getUniqueId()).get(entityUuid)));
                         lastDist.get(player.getUniqueId()).add(distances.get(player.getUniqueId()).get(k.get(player.getUniqueId())));
-                        for(int i = 0; i < index.get(player.getUniqueId()).get(entityUuid); i++) {
+                        for (int i = 0; i < index.get(player.getUniqueId()).get(entityUuid); i++) {
                             k.put(player.getUniqueId(), k.get(player.getUniqueId()) + 1);
                         }
                     }
@@ -293,11 +297,17 @@ public class ChainCalc {
                     j.put(player.getUniqueId(), 0);
 
                     for (String displayName : con.get(player.getUniqueId())) {
-                        Score score = (lastDist.get(player.getUniqueId()).get(j.get(player.getUniqueId())) <= 22) ? objective.getScore(displayName) : objective.getScore("§7" + displayName);
-                        score.setScore(j.get(player.getUniqueId()));
+                        Score score = (lastDist.get(player.getUniqueId()).get(j.get(player.getUniqueId())) <= 22)
+                                ? objective.getScore(displayName)
+                                : objective.getScore("§7" + displayName);
+                        score.setScore(startScore--);
                         j.put(player.getUniqueId(), j.get(player.getUniqueId()) + 1);
                     }
+
+                    Score score2 = objective.getScore("⌬⌬⌬⌬⌬⌬⌬⌬⌬⌬⌬⌬⌬⏣");
+                    score2.setScore(startScore);
                 }
+
                 player.setScoreboard(scoreboard);
             }
         };
@@ -305,4 +315,5 @@ public class ChainCalc {
         activeTasks.put(playerUUID, task);
         task.runTaskTimer(plugin, 0, 1L);
     }
+
 }

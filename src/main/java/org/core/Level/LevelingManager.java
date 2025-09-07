@@ -1,13 +1,20 @@
 package org.core.Level;
 
-import org.bukkit.NamespacedKey;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.*;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerExpChangeEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.*;
+import org.bukkit.util.Vector;
 import org.core.Core;
 import org.core.coreConfig;
 import org.core.coreProgram.Cores.Bambo.coreSystem.bambLeveling;
@@ -22,11 +29,10 @@ import org.core.coreProgram.Cores.Luster.coreSystem.lustLeveling;
 import org.core.coreProgram.Cores.Nox.coreSystem.noxLeveling;
 import org.core.coreProgram.Cores.Pyro.coreSystem.pyroLeveling;
 import org.core.playerSettings.persistentPlayerHashMap;
+import org.core.playerSettings.persistentPlayerSet;
 
 import javax.naming.Name;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class LevelingManager implements Listener {
 
@@ -42,6 +48,11 @@ public class LevelingManager implements Listener {
 
         this.Level = new persistentPlayerHashMap(plugin, "level");
         this.Exp = new persistentPlayerHashMap(plugin, "exp");
+    }
+
+    @EventHandler
+    public void Join(PlayerJoinEvent event){
+        levelActionBar(event.getPlayer());
     }
 
     @EventHandler
@@ -101,4 +112,48 @@ public class LevelingManager implements Listener {
             }
         }
     }
+
+    public void levelActionBar(Player player) {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+
+                if (!player.isOnline()) {
+                    this.cancel();
+                    return;
+                }
+
+                Long level = player.getPersistentDataContainer().getOrDefault(
+                        new NamespacedKey(plugin, "level"), PersistentDataType.LONG, 0L
+                );
+                Long exp = player.getPersistentDataContainer().getOrDefault(
+                        new NamespacedKey(plugin, "exp"), PersistentDataType.LONG, 0L
+                );
+
+                Scoreboard scoreboard = player.getScoreboard();
+                if (scoreboard == null || scoreboard == Bukkit.getScoreboardManager().getMainScoreboard()) {
+                    scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+                    player.setScoreboard(scoreboard);
+                }
+
+                Objective objective = scoreboard.getObjective(DisplaySlot.SIDEBAR);
+                if (objective == null) {
+                    objective = scoreboard.registerNewObjective(
+                            config.getPlayerCore(player),
+                            Criteria.DUMMY,
+                            Component.text(config.getPlayerCore(player))
+                    );
+                    objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+                }
+
+                scoreboard.getEntries().forEach(scoreboard::resetScores);
+
+                objective.getScore("------------").setScore(10);
+                objective.getScore("§aLevel : " + level).setScore(9);
+                objective.getScore("§eExp : " + exp).setScore(8);
+            }
+        }.runTaskTimer(plugin, 0L, 1L);
+    }
+
+
 }
