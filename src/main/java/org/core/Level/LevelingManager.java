@@ -1,5 +1,6 @@
 package org.core.Level;
 
+import it.unimi.dsi.fastutil.Hash;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
@@ -58,6 +59,7 @@ public class LevelingManager implements Listener {
     public void Join(PlayerJoinEvent event){
         Player player = event.getPlayer();
 
+        player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
         levelActionBar(player);
 
         Long level = player.getPersistentDataContainer().getOrDefault(
@@ -146,8 +148,16 @@ public class LevelingManager implements Listener {
         }
     }
 
+    public HashMap<UUID, BukkitRunnable> runnableHashMap = new HashMap<>();
+
     public void levelActionBar(Player player) {
-        new BukkitRunnable() {
+
+        if(runnableHashMap.containsKey(player.getUniqueId())){
+            runnableHashMap.get(player.getUniqueId()).cancel();
+            runnableHashMap.remove(player.getUniqueId());
+        }
+
+        BukkitRunnable runnable = new BukkitRunnable() {
             @Override
             public void run() {
 
@@ -185,7 +195,10 @@ public class LevelingManager implements Listener {
                 objective.getScore("§aLevel : " + level).setScore(9);
                 objective.getScore("§eExp : " + exp).setScore(8);
             }
-        }.runTaskTimer(plugin, 0L, 1L);
+        };
+
+        runnableHashMap.put(player.getUniqueId(), runnable);
+        runnable.runTaskTimer(plugin, 0L, 1L);
     }
 
 

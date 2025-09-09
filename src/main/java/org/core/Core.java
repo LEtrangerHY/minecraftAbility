@@ -178,6 +178,8 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
             }
 
             this.config.setSetting(target, setting, value);
+            target.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
+            level.levelActionBar(target);
             sender.sendMessage("§a" + target.getName() + "의 " + setting + " 값을 " + value + "로 설정했습니다.");
             return true;
         }
@@ -209,11 +211,15 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
                     return true;
                 }
                 this.config.clearPlayerCore(target);
+                target.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
+                level.levelActionBar(target);
                 sender.sendMessage( "§c" + target.getName() + " 소유의 core을 모두 제거했습니다");
                 return true;
             }else if(args.length == 0){
                 if (!(sender instanceof Player player)) return true;
                 this.config.clearPlayerCore(player);
+                player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
+                level.levelActionBar(player);
                 sender.sendMessage( "§c본인 소유의 core을 모두 제거했습니다.");
                 return true;
             }else{
@@ -238,6 +244,7 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
 
                 target.getPersistentDataContainer().set(new NamespacedKey(this, "exp"), PersistentDataType.LONG, 0L);
                 target.getPersistentDataContainer().set(new NamespacedKey(this, "level"), PersistentDataType.LONG, 0L);
+                level.levelActionBar(target);
                 sender.sendMessage( "§a" + target.getName() + " 경험치, 레벨 리셋 : " + this.level.Exp.getOrDefault(target, 0L) + ", " + this.level.Level.getOrDefault(target, 0L));
                 return true;
             }else if(args.length == 0){
@@ -251,6 +258,7 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
 
                 player.getPersistentDataContainer().set(new NamespacedKey(this, "exp"), PersistentDataType.LONG, 0L);
                 player.getPersistentDataContainer().set(new NamespacedKey(this, "level"), PersistentDataType.LONG, 0L);
+                level.levelActionBar(player);
                 sender.sendMessage( "§a본인의 경험치, 레벨 리셋 " + this.level.Exp.getOrDefault(player, 0L) + ", " + this.level.Level.getOrDefault(player, 0L));
                 return true;
             }else{

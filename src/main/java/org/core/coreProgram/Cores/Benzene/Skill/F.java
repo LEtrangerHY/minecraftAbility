@@ -144,9 +144,10 @@ public class F implements SkillBase {
                         }
 
                         if (distanceFromOrigin >= innerRadius) {
-                            world.spawnParticle(Particle.DUST, particleLocation, 1, 0, 0, 0, 0, dustOption_slash_gra);
                             if (Math.random() < 0.11) {
                                 world.spawnParticle(Particle.DUST, particleLocation, 1, 0, 0, 0, 0, dustOption_slash);
+                            }else{
+                                world.spawnParticle(Particle.DUST, particleLocation, 1, 0, 0, 0, 0, dustOption_slash_gra);
                             }
 
                             for (Entity entity : world.getNearbyEntities(particleLocation, 0.6, 0.6, 0.6)) {

@@ -10,6 +10,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.core.Level.Levels;
 
+import java.util.Collections;
 import java.util.Set;
 
 public class carpLeveling implements Levels {
@@ -47,24 +48,34 @@ public class carpLeveling implements Levels {
     }
 
     @Override
-    public void addExp(Entity entity){
+    public void addExp(Entity entity) {
+        NamespacedKey expKey = new NamespacedKey(plugin, "exp");
+        NamespacedKey levelKey = new NamespacedKey(plugin, "level");
 
-        long currentExp = 0L;
-        long currentLevel = player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "level"), PersistentDataType.LONG, 0L);
+        long currentLevel = player.getPersistentDataContainer().getOrDefault(levelKey, PersistentDataType.LONG, 0L);
+        long currentExp = player.getPersistentDataContainer().getOrDefault(expKey, PersistentDataType.LONG, 0L);
+
+        long maxExp = Collections.max(requireExp);
 
         if (currentLevel < requireExp.size()) {
             player.sendMessage("§e" + "exp : " + exp + " 획득");
         }
 
         for (int i = 0; i < exp; i++) {
-            if (currentLevel < requireExp.size()) {
-                currentExp = player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "exp"), PersistentDataType.LONG, 0L);
-                player.getPersistentDataContainer().set(new NamespacedKey(plugin, "exp"), PersistentDataType.LONG, currentExp + 1);
-                if (requireExp.contains(player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "exp"), PersistentDataType.LONG, 0L))) {
-                    addLV(player);
-                }
-            }else{
+            if (currentLevel >= requireExp.size()) {
                 break;
+            }
+            if (currentExp >= maxExp) {
+                break;
+            }
+
+            currentExp++;
+
+            player.getPersistentDataContainer().set(expKey, PersistentDataType.LONG, currentExp);
+
+            if (requireExp.contains(currentExp)) {
+                addLV(player);
+                currentLevel++;
             }
         }
     }
