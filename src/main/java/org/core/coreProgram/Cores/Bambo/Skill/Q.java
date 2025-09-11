@@ -1,6 +1,5 @@
 package org.core.coreProgram.Cores.Bambo.Skill;
 
-import org.bukkit.Location;
 import org.bukkit.*;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -11,9 +10,8 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 import org.core.Cool.Cool;
-import org.core.Effect.Invulnerable;
 import org.core.coreProgram.Cores.Bambo.coreSystem.Bambo;
-import org.core.coreProgram.Abs.SkillBase;
+import org.core.coreProgram.AbsCoreSystem.SkillBase;
 
 public class Q implements SkillBase {
 

@@ -1,7 +1,5 @@
 package org.core.coreProgram.Cores.Nox.Skill;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Damageable;
@@ -14,7 +12,7 @@ import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.core.Cool.Cool;
 import org.core.Effect.ForceDamage;
-import org.core.coreProgram.Abs.SkillBase;
+import org.core.coreProgram.AbsCoreSystem.SkillBase;
 import org.core.coreProgram.Cores.Nox.Passive.Dream;
 import org.core.coreProgram.Cores.Nox.coreSystem.Nox;
 

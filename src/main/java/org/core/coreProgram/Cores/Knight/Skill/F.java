@@ -13,11 +13,10 @@ import org.bukkit.util.Vector;
 import org.core.Cool.Cool;
 import org.core.Effect.ForceDamage;
 import org.core.Effect.Stun;
-import org.core.coreProgram.Abs.SkillBase;
+import org.core.coreProgram.AbsCoreSystem.SkillBase;
 import org.core.coreProgram.Cores.Knight.coreSystem.Knight;
 
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.Set;
 
 public class F implements SkillBase {

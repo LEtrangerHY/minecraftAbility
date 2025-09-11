@@ -10,11 +10,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.util.Vector;
 import org.core.Cool.Cool;
 import org.core.Debuff.Burn;
-import org.core.Effect.Grounding;
-import org.core.coreProgram.Abs.SkillBase;
+import org.core.coreProgram.AbsCoreSystem.SkillBase;
 import org.core.coreProgram.Cores.Pyro.coreSystem.Pyro;
 import java.util.Random;
 

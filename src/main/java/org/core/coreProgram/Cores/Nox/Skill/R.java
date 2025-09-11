@@ -13,7 +13,7 @@ import org.bukkit.util.Vector;
 import org.core.Cool.Cool;
 import org.core.Effect.ForceDamage;
 import org.core.Effect.Invulnerable;
-import org.core.coreProgram.Abs.SkillBase;
+import org.core.coreProgram.AbsCoreSystem.SkillBase;
 import org.core.coreProgram.Cores.Nox.Passive.Dream;
 import org.core.coreProgram.Cores.Nox.coreSystem.Nox;
 

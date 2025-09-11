@@ -8,15 +8,11 @@ import org.bukkit.entity.*;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.util.EulerAngle;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.core.Cool.Cool;
-import org.core.coreProgram.Abs.SkillBase;
+import org.core.coreProgram.AbsCoreSystem.SkillBase;
 import org.core.coreProgram.Cores.Luster.coreSystem.Luster;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 

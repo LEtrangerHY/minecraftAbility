@@ -19,11 +19,10 @@ import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.core.Cool.Cool;
 import org.core.Effect.ForceDamage;
-import org.core.coreProgram.Abs.SkillBase;
+import org.core.coreProgram.AbsCoreSystem.SkillBase;
 import org.core.coreProgram.Cores.Knight.coreSystem.Knight;
 
 import java.util.*;
-import java.util.concurrent.locks.StampedLock;
 
 public class Q implements SkillBase {
     private final Knight config;

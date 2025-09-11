@@ -11,9 +11,8 @@ import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.core.Cool.Cool;
 import org.core.Effect.ForceDamage;
-import org.core.coreProgram.Abs.SkillBase;
+import org.core.coreProgram.AbsCoreSystem.SkillBase;
 import org.core.coreProgram.Cores.Luster.coreSystem.Luster;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 

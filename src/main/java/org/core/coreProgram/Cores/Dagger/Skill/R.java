@@ -10,13 +10,12 @@ import org.bukkit.util.Vector;
 import org.core.Cool.Cool;
 import org.core.Effect.ForceDamage;
 import org.core.Effect.Stun;
-import org.core.coreProgram.Abs.SkillBase;
+import org.core.coreProgram.AbsCoreSystem.SkillBase;
 import org.core.coreProgram.Cores.Dagger.Passive.DamageStroke;
 import org.core.coreProgram.Cores.Dagger.coreSystem.Dagger;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 public class R implements SkillBase {

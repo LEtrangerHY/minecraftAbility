@@ -15,12 +15,9 @@ import org.core.Cool.Cool;
 import org.core.Effect.ForceDamage;
 import org.core.Effect.Grounding;
 import org.core.coreProgram.Cores.Benzene.coreSystem.Benzene;
-import org.core.coreProgram.Abs.SkillBase;
+import org.core.coreProgram.AbsCoreSystem.SkillBase;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 public class Q implements SkillBase {
 
@@ -41,36 +38,18 @@ public class Q implements SkillBase {
 
         World world = player.getWorld();
 
-        Entity entity = getTargetedEntity(player, 12, 0.3);
+        LivingEntity entity = getTargetedEntity(player, 12, 0.3);
 
-        Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(30, 30, 30), 1.0f);
-        world.spawnParticle(Particle.DUST, player.getLocation().add(0, 0.6, 0), 220, 3, 0, 3, 0, dustOptions);
+        Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(30, 30, 30), 0.6f);
+
+        world.spawnParticle(Particle.ENCHANTED_HIT, player.getLocation().clone().add(0, 1.2, 0), 12, 0.3, 0.3, 0.3, 1);
 
         player.getWorld().playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.0f, 1.0f);
         player.getWorld().playSound(player.getLocation(), Sound.ITEM_TRIDENT_HIT_GROUND, 1.0f, 1.0f);
 
         if(entity != null){
 
-            new BukkitRunnable() {
-                private double ticks = 0;
-
-                @Override
-                public void run() {
-
-                    player.getWorld().playSound(entity.getLocation(), Sound.BLOCK_CHAIN_PLACE, 1.12f, 1.0f);
-                    player.getWorld().spawnParticle(Particle.BLOCK, entity.getLocation().clone().add(0, 1.2, 0), 6, 0.3, 0.3, 0.3,
-                            Material.CHAIN.createBlockData());
-
-                    if(ticks > 5){
-                        cancel();
-                        return;
-                    }
-
-                    ticks++;
-                }
-            }.runTaskTimer(plugin, 0, 1);
-
-            player.getWorld().spawnParticle(Particle.ENCHANTED_HIT, entity.getLocation().add(0, 1, 0), 30, 0.6, 0, 0.6, 1);
+            int atk = Math.min(6 + config.Chain.getOrDefault(player.getUniqueId(), new LinkedHashMap<>()).size() * 2, 12);
 
             chain_qSkill_Particle_Effect(player, entity, 40);
 
@@ -78,48 +57,57 @@ public class Q implements SkillBase {
             grounding.applyEffect(entity);
 
             config.q_Skill_effect_1.put(player.getUniqueId(), entity);
-            for(int i = 0; i < 3; i++) {
-                if(config.atkCount.getOrDefault(player.getUniqueId(), 0) < 3) {
-                    config.atkCount.put(player.getUniqueId(), config.atkCount.getOrDefault(player.getUniqueId(), 0) + 1);
-                }
-            }
 
-            if(config.atkCount.getOrDefault(player.getUniqueId(), 0) == 3) {
-                player.sendActionBar(Component.text("R Enabled").color(NamedTextColor.DARK_GRAY));
-            }else{
-                player.sendActionBar(Component.text("Attack Count : " + config.atkCount.getOrDefault(player.getUniqueId(), 0)).color(NamedTextColor.GRAY));
-            }
+            new BukkitRunnable() {
+                int tick = 0;
+
+                @Override
+                public void run() {
+                    if (tick >= atk || player.isDead()) {
+                        this.cancel();
+                        return;
+                    }
+
+                    world.playSound(entity.getLocation(), Sound.BLOCK_CHAIN_PLACE, 1.6f, 1.0f);
+                    world.spawnParticle(Particle.BLOCK, entity.getLocation().clone().add(0, 1.2, 0), 12, 0.3, 0.3, 0.3,
+                            Material.CHAIN.createBlockData());
+
+                    if(tick % 2 == 0) {
+                        ForceDamage forceDamage = new ForceDamage(entity, config.q_Skill_damage / 2);
+                        forceDamage.applyEffect(player);
+                        entity.setVelocity(new Vector(0, 0, 0));
+
+                        world.playSound(entity.getLocation(), Sound.ITEM_TRIDENT_HIT_GROUND, 1.6f, 1.0f);
+                        world.spawnParticle(Particle.DUST, player.getLocation().clone().add(0, 1.2, 0), 12, 0.6, 0.6, 0.6, 0, dustOptions);
+                    }
+
+                    tick++;
+                }
+            }.runTaskTimer(plugin, 0L, 1L);
 
             entity.setVelocity(new Vector(0, 0, 0));
 
         }else{
+            world.spawnParticle(Particle.DUST, player.getLocation().add(0, 0.6, 0), 222, 3, 0, 3, 0, dustOptions);
+
             for (Entity rangeTarget : world.getNearbyEntities(player.getLocation(), 6.0, 6.0, 6.0)) {
                 if (rangeTarget instanceof LivingEntity target && rangeTarget != player) {
 
-                    player.getWorld().playSound(target.getLocation(), Sound.ITEM_TRIDENT_HIT_GROUND, 1.0f, 1.0f);
-                    player.getWorld().playSound(target.getLocation(), Sound.BLOCK_CHAIN_PLACE, 1.12f, 1.0f);
-                    player.getWorld().spawnParticle(Particle.BLOCK, target.getLocation().clone().add(0, 1.2, 0), 6, 0.3, 0.3, 0.3,
+                    world.playSound(target.getLocation(), Sound.ITEM_TRIDENT_HIT_GROUND, 1.6f, 1.0f);
+                    world.playSound(target.getLocation(), Sound.BLOCK_CHAIN_PLACE, 1.6f, 1.0f);
+                    world.spawnParticle(Particle.BLOCK, target.getLocation().clone().add(0, 1.2, 0), 12, 0.3, 0.3, 0.3,
                             Material.CHAIN.createBlockData());
-
                     chain_qSkill_Particle_Effect(player, rangeTarget, 40);
 
                     Grounding grounding = new Grounding(rangeTarget, 2000);
                     grounding.applyEffect(rangeTarget);
 
                     config.q_Skill_effect_2.put(player.getUniqueId(), rangeTarget);
+                    ForceDamage forceDamage = new ForceDamage(target, config.q_Skill_damage);
+                    forceDamage.applyEffect(player);
                     target.setVelocity(new Vector(0, 0, 0));
 
-                    if(config.atkCount.getOrDefault(player.getUniqueId(), 0) < 3) {
-                        config.atkCount.put(player.getUniqueId(), config.atkCount.getOrDefault(player.getUniqueId(), 0) + 1);
-                    }
-
                 }
-            }
-
-            if(config.atkCount.getOrDefault(player.getUniqueId(), 0) == 3) {
-                player.sendActionBar(Component.text("R Enabled").color(NamedTextColor.DARK_GRAY));
-            }else{
-                player.sendActionBar(Component.text("Count : " + config.atkCount.getOrDefault(player.getUniqueId(), 0)).color(NamedTextColor.GRAY));
             }
         }
     }

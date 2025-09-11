@@ -6,13 +6,10 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -22,15 +19,13 @@ import org.core.Core;
 import org.core.Debuff.Burn;
 import org.core.Effect.ForceDamage;
 import org.core.coreConfig;
-import org.core.coreProgram.Abs.ConfigWrapper;
-import org.core.coreProgram.Abs.SkillBase;
-import org.core.coreProgram.Abs.absCore;
+import org.core.coreProgram.AbsCoreSystem.ConfigWrapper;
+import org.core.coreProgram.AbsCoreSystem.SkillBase;
+import org.core.coreProgram.AbsCoreSystem.absCore;
 import org.core.coreProgram.Cores.Blaze.Passive.BlueFlame;
 import org.core.coreProgram.Cores.Blaze.Skill.F;
 import org.core.coreProgram.Cores.Blaze.Skill.Q;
 import org.core.coreProgram.Cores.Blaze.Skill.R;
-
-import java.util.HashSet;
 
 import static org.bukkit.Bukkit.getLogger;
 

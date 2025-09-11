@@ -6,7 +6,6 @@ import org.bukkit.*;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -21,15 +20,11 @@ import org.core.Cool.Cool;
 import org.core.Debuff.Burn;
 import org.core.Effect.ForceDamage;
 import org.core.Effect.Stun;
-import org.core.coreProgram.Abs.SkillBase;
+import org.core.coreProgram.AbsCoreSystem.SkillBase;
 import org.core.coreProgram.Cores.Blaze.Passive.BlueFlame;
 import org.core.coreProgram.Cores.Blaze.coreSystem.Blaze;
-import org.core.coreProgram.Cores.Dagger.Passive.DamageStroke;
-import org.core.coreProgram.Cores.Dagger.coreSystem.Dagger;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class F implements SkillBase {

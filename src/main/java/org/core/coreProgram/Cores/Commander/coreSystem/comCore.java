@@ -6,7 +6,6 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -15,18 +14,14 @@ import org.core.Cool.Cool;
 import org.core.Core;
 import org.core.Effect.ForceDamage;
 import org.core.coreConfig;
-import org.core.coreProgram.Abs.ConfigWrapper;
-import org.core.coreProgram.Abs.SkillBase;
-import org.core.coreProgram.Abs.absCore;
+import org.core.coreProgram.AbsCoreSystem.ConfigWrapper;
+import org.core.coreProgram.AbsCoreSystem.SkillBase;
+import org.core.coreProgram.AbsCoreSystem.absCore;
 import org.core.coreProgram.Cores.Commander.Skill.F;
 import org.core.coreProgram.Cores.Commander.Skill.Q;
 import org.core.coreProgram.Cores.Commander.Skill.R;
-import org.core.coreProgram.Cores.Commander.coreSystem.Commander;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 import static org.bukkit.Bukkit.getLogger;
 

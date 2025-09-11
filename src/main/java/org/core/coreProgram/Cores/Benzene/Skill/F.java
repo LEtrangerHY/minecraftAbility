@@ -6,8 +6,6 @@ import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -18,7 +16,7 @@ import org.core.Cool.Cool;
 import org.core.Effect.ForceDamage;
 import org.core.coreProgram.Cores.Benzene.Passive.ChainCalc;
 import org.core.coreProgram.Cores.Benzene.coreSystem.Benzene;
-import org.core.coreProgram.Abs.SkillBase;
+import org.core.coreProgram.AbsCoreSystem.SkillBase;
 
 import java.util.*;
 
@@ -54,7 +52,7 @@ public class F implements SkillBase {
         Entity target = getTargetedEntity(player,4.8, 0.3);
 
         if(target != null){
-            player.getWorld().playSound(player.getLocation(), Sound.ITEM_TRIDENT_HIT_GROUND, 1.0f, 1.0f);
+            player.getWorld().playSound(player.getLocation(), Sound.ITEM_TRIDENT_HIT_GROUND, 1.6f, 1.0f);
             player.getWorld().spawnParticle(Particle.ENCHANTED_HIT, target.getLocation().clone().add(0, 1, 0), 20, 0.6, 0, 0.6, 1);
             player.getWorld().spawnParticle(Particle.BLOCK, target.getLocation().clone().add(0, 1.2, 0), 12, 0.3, 0.3, 0.3,
                     Material.CHAIN.createBlockData());
@@ -73,7 +71,7 @@ public class F implements SkillBase {
             public void run() {
 
                 if(ticks < 2){
-                    player.getWorld().playSound(player.getLocation(), Sound.BLOCK_CHAIN_BREAK, 1.12f, 1.0f);
+                    player.getWorld().playSound(player.getLocation(), Sound.BLOCK_CHAIN_BREAK, 1.6f, 1.0f);
                 }
 
                 if (ticks >= maxTicks || player.isDead()) {
@@ -149,18 +147,18 @@ public class F implements SkillBase {
                             }else{
                                 world.spawnParticle(Particle.DUST, particleLocation, 1, 0, 0, 0, 0, dustOption_slash_gra);
                             }
+                        }
 
-                            for (Entity entity : world.getNearbyEntities(particleLocation, 0.6, 0.6, 0.6)) {
-                                if (entity instanceof LivingEntity target && entity != player && !config.damaged.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(entity)) {
-                                    config.damaged.getOrDefault(player.getUniqueId(), new HashSet<>()).add(entity);
-                                    ForceDamage forceDamage = new ForceDamage(target, config.f_Skill_Damage);
-                                    forceDamage.applyEffect(player);
-                                    target.setVelocity(new Vector(0, 0, 0));
-                                    if(!target.isDead()){
-                                        chainCalc.increase(player, target);
-                                        if(target.isDead()){
-                                            chainCalc.decrease(target);
-                                        }
+                        for (Entity entity : world.getNearbyEntities(particleLocation, 0.6, 0.6, 0.6)) {
+                            if (entity instanceof LivingEntity target && entity != player && !config.damaged.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(entity)) {
+                                config.damaged.getOrDefault(player.getUniqueId(), new HashSet<>()).add(entity);
+                                ForceDamage forceDamage = new ForceDamage(target, config.f_Skill_Damage);
+                                forceDamage.applyEffect(player);
+                                target.setVelocity(new Vector(0, 0, 0));
+                                if(!target.isDead()){
+                                    chainCalc.increase(player, target);
+                                    if(target.isDead()){
+                                        chainCalc.decrease(target);
                                     }
                                 }
                             }
@@ -306,7 +304,7 @@ public class F implements SkillBase {
             public void run() {
 
                 if(ticks < 1){
-                    player.getWorld().playSound(player.getLocation(), Sound.BLOCK_CHAIN_BREAK, 1.12f, 1.0f);
+                    player.getWorld().playSound(player.getLocation(), Sound.BLOCK_CHAIN_BREAK, 1.2f, 1.0f);
                 }
 
                 if (ticks >= maxTicks || player.isDead()) {

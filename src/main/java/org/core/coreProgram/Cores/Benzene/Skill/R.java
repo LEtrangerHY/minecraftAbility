@@ -14,7 +14,7 @@ import org.core.Effect.ForceDamage;
 import org.core.Effect.Invulnerable;
 import org.core.coreProgram.Cores.Benzene.Passive.ChainCalc;
 import org.core.coreProgram.Cores.Benzene.coreSystem.Benzene;
-import org.core.coreProgram.Abs.SkillBase;
+import org.core.coreProgram.AbsCoreSystem.SkillBase;
 
 import java.util.HashSet;
 import java.util.List;
@@ -70,7 +70,7 @@ public class R implements SkillBase {
             public void run() {
 
                 if(ticks < 4){
-                    player.getWorld().playSound(player.getLocation(), Sound.BLOCK_CHAIN_BREAK, 1.12f, 1.0f);
+                    player.getWorld().playSound(player.getLocation(), Sound.BLOCK_CHAIN_BREAK, 1.6f, 1.0f);
                     player.getWorld().spawnParticle(Particle.BLOCK, player.getLocation().clone().add(0, 1.2, 0), 6, 0.3, 0.3, 0.3,
                             Material.CHAIN.createBlockData());
                 }

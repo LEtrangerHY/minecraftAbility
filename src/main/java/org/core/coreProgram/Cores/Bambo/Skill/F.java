@@ -4,21 +4,15 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Damageable;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.core.Cool.Cool;
-import org.core.Effect.ForceDamage;
 import org.core.coreProgram.Cores.Bambo.coreSystem.Bambo;
-import org.core.coreProgram.Abs.SkillBase;
+import org.core.coreProgram.AbsCoreSystem.SkillBase;
 
 import java.util.*;
 

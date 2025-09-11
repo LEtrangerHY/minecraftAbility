@@ -1,10 +1,5 @@
-package org.core.coreProgram.Abs;
+package org.core.coreProgram.AbsCoreSystem;
 
-import it.unimi.dsi.fastutil.Hash;
-import net.kyori.adventure.text.event.ClickEvent;
-import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

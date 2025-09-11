@@ -66,7 +66,7 @@ public class DamageShare {
                 forceDamage.applyEffect(player);
                 chainedEntity.setVelocity(new Vector(0, 0, 0));
 
-                Location effectLoc = chainedEntity.getLocation().add(0, 1, 0);
+                Location effectLoc = chainedEntity.getLocation().add(0, 1.2, 0);
                 chainedEntity.getWorld().spawnParticle(Particle.SWEEP_ATTACK, effectLoc, 1, 0.1, 0.1, 0.1, 1);
                 chainedEntity.getWorld().spawnParticle(Particle.ENCHANTED_HIT, effectLoc, 10, 0.4, 0, 0.4, 1);
                 chainedEntity.getWorld().playSound(effectLoc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.0f, 1.0f);

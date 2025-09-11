@@ -17,13 +17,12 @@ import org.core.Core;
 import org.core.Debuff.Frost;
 import org.core.Effect.ForceDamage;
 import org.core.coreConfig;
-import org.core.coreProgram.Abs.ConfigWrapper;
-import org.core.coreProgram.Abs.SkillBase;
-import org.core.coreProgram.Abs.absCore;
+import org.core.coreProgram.AbsCoreSystem.ConfigWrapper;
+import org.core.coreProgram.AbsCoreSystem.SkillBase;
+import org.core.coreProgram.AbsCoreSystem.absCore;
 import org.core.coreProgram.Cores.Glacier.Skill.F;
 import org.core.coreProgram.Cores.Glacier.Skill.Q;
 import org.core.coreProgram.Cores.Glacier.Skill.R;
-import org.core.coreProgram.Cores.Glacier.coreSystem.Glacier;
 
 import static org.bukkit.Bukkit.getLogger;
 

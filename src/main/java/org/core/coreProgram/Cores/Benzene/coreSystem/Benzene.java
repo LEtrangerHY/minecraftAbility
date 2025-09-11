@@ -30,6 +30,7 @@ public class Benzene {
     //Q
     public HashMap<UUID, Entity> q_Skill_effect_1 = new HashMap<>();
     public HashMap<UUID, Entity> q_Skill_effect_2 = new HashMap<>();
+    public double q_Skill_damage = 2;
     public long q_Skill_Cool = 3000;
 
     //F

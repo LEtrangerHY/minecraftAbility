@@ -1,4 +1,4 @@
-package org.core.coreProgram.Abs;
+package org.core.coreProgram.AbsCoreSystem;
 
 import org.bukkit.entity.Player;
 

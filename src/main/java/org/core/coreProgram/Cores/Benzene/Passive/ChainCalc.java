@@ -129,9 +129,6 @@ public class ChainCalc {
 
                     particleUse.remove(target);
 
-                    config.Chain.remove(player.getUniqueId());
-                    config.Chain_Count.remove(player.getUniqueId());
-
                     this.cancel();
                     return;
                 }

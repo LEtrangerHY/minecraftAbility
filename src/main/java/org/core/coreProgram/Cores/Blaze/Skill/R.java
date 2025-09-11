@@ -7,15 +7,13 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.*;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.core.Cool.Cool;
-import org.core.coreProgram.Abs.SkillBase;
+import org.core.coreProgram.AbsCoreSystem.SkillBase;
 import org.core.coreProgram.Cores.Blaze.Passive.BlueFlame;
 import org.core.coreProgram.Cores.Blaze.coreSystem.Blaze;
 
