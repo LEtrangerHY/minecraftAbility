@@ -3,6 +3,7 @@ package org.core.coreProgram.Cores.Benzene.Skill;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -62,6 +63,7 @@ public class R implements SkillBase {
 
         Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(111, 111, 111), 0.6f);
         Particle.DustOptions dustOptions_small = new Particle.DustOptions(Color.fromRGB(66, 66, 66), 0.6f);
+        BlockData chain = Material.CHAIN.createBlockData();
 
         new BukkitRunnable() {
             private double ticks = 0;
@@ -72,7 +74,7 @@ public class R implements SkillBase {
                 if(ticks < 4){
                     player.getWorld().playSound(player.getLocation(), Sound.BLOCK_CHAIN_BREAK, 1.6f, 1.0f);
                     player.getWorld().spawnParticle(Particle.BLOCK, player.getLocation().clone().add(0, 1.2, 0), 6, 0.3, 0.3, 0.3,
-                            Material.CHAIN.createBlockData());
+                            chain);
                 }
 
                 if (ticks > 6 || player.isDead()) {

@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -46,6 +47,8 @@ public class F implements SkillBase {
 
             Set<IronGolem> currentGolems = config.golems.getOrDefault(player, new HashSet<>());
             boolean hasAlive = currentGolems.stream().anyMatch(g -> !g.isDead());
+
+            BlockData iron = Material.IRON_BLOCK.createBlockData();
 
             if (!hasAlive) {
                 for (int i = 0; i < golemCount; i++) {
@@ -107,7 +110,7 @@ public class F implements SkillBase {
                             Particle.BLOCK,
                             golemEntity.getLocation().clone().add(0, 1, 0),
                             44, 0.4, 0.4, 0.4,
-                            Material.IRON_BLOCK.createBlockData()
+                            iron
                     );
                 }
 

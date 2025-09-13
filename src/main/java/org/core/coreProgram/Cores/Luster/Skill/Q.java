@@ -178,6 +178,8 @@ public class Q implements SkillBase {
     public void Attack(Player player, LivingEntity target) {
         if (target == null) return;
 
+        BlockData iron = Material.IRON_BLOCK.createBlockData();
+
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1f, 1f);
 
         double projectileSpeed = 1.7;
@@ -204,7 +206,7 @@ public class Q implements SkillBase {
                         if (living.equals(player)) continue;
 
                         living.getWorld().spawnParticle(Particle.BLOCK, living.getLocation().clone().add(0, 1, 0), 6, 0.2, 0.2, 0.2,
-                                Material.IRON_BLOCK.createBlockData());
+                                iron);
 
                         living.getWorld().playSound(living.getLocation(), Sound.BLOCK_ANVIL_LAND, 1f, 1f);
 
@@ -241,7 +243,7 @@ public class Q implements SkillBase {
                         if (living.equals(player)) continue;
 
                         living.getWorld().spawnParticle(Particle.BLOCK, living.getLocation().clone().add(0, 1, 0), 6, 0.2, 0.2, 0.2,
-                                Material.IRON_BLOCK.createBlockData());
+                                iron);
 
                         living.getWorld().spawnParticle(Particle.EXPLOSION, living.getLocation().clone().add(0, 1, 0), 1, 0, 0 ,0, 1);
 

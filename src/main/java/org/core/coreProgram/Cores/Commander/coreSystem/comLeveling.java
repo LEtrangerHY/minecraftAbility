@@ -25,7 +25,7 @@ public class comLeveling implements Levels {
         this.exp = exp;
     }
 
-    public Set<Long> requireExp = Set.of(0L);
+    public Set<Long> requireExp = Set.of(77L, 177L, 347L, 527L, 777L, 1114L, 1427L, 2104L, 3371L, 4137L);
 
     @Override
     public void addLV(Entity entity){

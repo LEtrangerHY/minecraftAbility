@@ -2,6 +2,7 @@ package org.core.coreProgram.Cores.Commander.Skill;
 
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
@@ -56,6 +57,7 @@ public class R implements SkillBase, Listener{
 
         Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(220, 150, 100), 1.2f);
         Particle.DustOptions dustOptions_gra = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 0.7f);
+        BlockData command = Material.COMMAND_BLOCK.createBlockData();
 
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
         world.spawnParticle(Particle.ENCHANTED_HIT, spawnLoc, 30, 0.2, 0.2, 0.2, 1);
@@ -82,7 +84,7 @@ public class R implements SkillBase, Listener{
                     if(!config.comBlocks.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(fb)) {
                         config.damaged.remove(player.getUniqueId());
                         world.spawnParticle(Particle.BLOCK, fb.getLocation(), 20, 0.3, 0.3, 0.3,
-                                Material.COMMAND_BLOCK.createBlockData());
+                                command);
                         config.comBlocks.computeIfAbsent(player.getUniqueId(), k -> new HashSet<>()).add(fb);
                     }
                     fb.setVelocity(new Vector(0, 0, 0));
@@ -106,7 +108,7 @@ public class R implements SkillBase, Listener{
                             le.setVelocity(new Vector(0, 0, 0));
 
                             world.spawnParticle(Particle.BLOCK, fb.getLocation(), 44, 0.3, 0.3, 0.3,
-                                    Material.COMMAND_BLOCK.createBlockData());
+                                    command);
                         }
                     }
 

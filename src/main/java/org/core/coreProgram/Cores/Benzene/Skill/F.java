@@ -2,6 +2,7 @@ package org.core.coreProgram.Cores.Benzene.Skill;
 
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -51,18 +52,19 @@ public class F implements SkillBase {
 
         Entity target = getTargetedEntity(player,4.8, 0.3);
 
-        if(target != null){
-            player.getWorld().playSound(player.getLocation(), Sound.ITEM_TRIDENT_HIT_GROUND, 1.6f, 1.0f);
-            player.getWorld().spawnParticle(Particle.ENCHANTED_HIT, target.getLocation().clone().add(0, 1, 0), 20, 0.6, 0, 0.6, 1);
-            player.getWorld().spawnParticle(Particle.BLOCK, target.getLocation().clone().add(0, 1.2, 0), 12, 0.3, 0.3, 0.3,
-                    Material.CHAIN.createBlockData());
-        }
-
         Location origin = player.getEyeLocation().add(0, -0.6, 0);
         Vector direction = player.getLocation().getDirection().clone().setY(0).normalize();
 
         Particle.DustOptions dustOption_slash = new Particle.DustOptions(Color.fromRGB(66, 66, 66), 0.6f);
         Particle.DustOptions dustOption_slash_gra = new Particle.DustOptions(Color.fromRGB(111, 111, 111), 0.6f);
+        BlockData chain = Material.CHAIN.createBlockData();
+
+        if(target != null){
+            player.getWorld().playSound(player.getLocation(), Sound.ITEM_TRIDENT_HIT_GROUND, 1.6f, 1.0f);
+            player.getWorld().spawnParticle(Particle.ENCHANTED_HIT, target.getLocation().clone().add(0, 1, 0), 20, 0.6, 0, 0.6, 1);
+            player.getWorld().spawnParticle(Particle.BLOCK, target.getLocation().clone().add(0, 1.2, 0), 12, 0.3, 0.3, 0.3,
+                    chain);
+        }
 
         new BukkitRunnable() {
             int ticks = 0;

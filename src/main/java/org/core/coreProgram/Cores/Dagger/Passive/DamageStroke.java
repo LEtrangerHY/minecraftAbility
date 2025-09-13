@@ -3,6 +3,7 @@ package org.core.coreProgram.Cores.Dagger.Passive;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -31,8 +32,10 @@ public class DamageStroke {
 
     public void damageStroke(Player player, LivingEntity entity){
 
+        BlockData blood = Material.REDSTONE_BLOCK.createBlockData();
+
         player.getWorld().spawnParticle(Particle.BLOCK, entity.getLocation().clone().add(0, 1.2, 0), 13, 0.3, 0.3, 0.3,
-                Material.REDSTONE_BLOCK.createBlockData());
+                blood);
 
         ForceDamage forceDamage = new ForceDamage(entity, entity.getHealth() * 0.13);
         forceDamage.applyEffect(player);

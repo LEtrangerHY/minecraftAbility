@@ -3,6 +3,7 @@ package org.core.coreProgram.Cores.Benzene.Skill;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -41,71 +42,56 @@ public class Q implements SkillBase {
         LivingEntity entity = getTargetedEntity(player, 12, 0.3);
 
         Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(30, 30, 30), 0.6f);
-
-        world.spawnParticle(Particle.ENCHANTED_HIT, player.getLocation().clone().add(0, 1.2, 0), 12, 0.3, 0.3, 0.3, 1);
+        BlockData chain = Material.CHAIN.createBlockData();
 
         player.getWorld().playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.0f, 1.0f);
-        player.getWorld().playSound(player.getLocation(), Sound.ITEM_TRIDENT_HIT_GROUND, 1.0f, 1.0f);
 
         if(entity != null){
-
-            int atk = Math.min(6 + config.Chain.getOrDefault(player.getUniqueId(), new LinkedHashMap<>()).size() * 2, 12);
-
             chain_qSkill_Particle_Effect(player, entity, 40);
 
             Grounding grounding = new Grounding(entity, 2000);
+            entity.setVelocity(new Vector(0, 0, 0));
             grounding.applyEffect(entity);
 
             config.q_Skill_effect_1.put(player.getUniqueId(), entity);
+            world.playSound(entity.getLocation(), Sound.ITEM_TRIDENT_HIT_GROUND, 1.6f, 1.0f);
 
             new BukkitRunnable() {
                 int tick = 0;
 
                 @Override
                 public void run() {
-                    if (tick >= atk || player.isDead()) {
+                    if (tick >= 6 || player.isDead()) {
                         this.cancel();
                         return;
                     }
 
                     world.playSound(entity.getLocation(), Sound.BLOCK_CHAIN_PLACE, 1.6f, 1.0f);
-                    world.spawnParticle(Particle.BLOCK, entity.getLocation().clone().add(0, 1.2, 0), 12, 0.3, 0.3, 0.3,
-                            Material.CHAIN.createBlockData());
-
-                    if(tick % 2 == 0) {
-                        ForceDamage forceDamage = new ForceDamage(entity, config.q_Skill_damage / 2);
-                        forceDamage.applyEffect(player);
-                        entity.setVelocity(new Vector(0, 0, 0));
-
-                        world.playSound(entity.getLocation(), Sound.ITEM_TRIDENT_HIT_GROUND, 1.6f, 1.0f);
-                        world.spawnParticle(Particle.DUST, player.getLocation().clone().add(0, 1.2, 0), 12, 0.6, 0.6, 0.6, 0, dustOptions);
-                    }
+                    world.spawnParticle(Particle.BLOCK, entity.getLocation().clone().add(0, 1.2, 0), 12, 0.6, 0.6, 0.6,
+                            chain);
 
                     tick++;
                 }
             }.runTaskTimer(plugin, 0L, 1L);
 
-            entity.setVelocity(new Vector(0, 0, 0));
-
         }else{
             world.spawnParticle(Particle.DUST, player.getLocation().add(0, 0.6, 0), 222, 3, 0, 3, 0, dustOptions);
+            player.getWorld().playSound(player.getLocation(), Sound.ITEM_TRIDENT_HIT_GROUND, 1.0f, 1.0f);
 
             for (Entity rangeTarget : world.getNearbyEntities(player.getLocation(), 6.0, 6.0, 6.0)) {
                 if (rangeTarget instanceof LivingEntity target && rangeTarget != player) {
 
                     world.playSound(target.getLocation(), Sound.ITEM_TRIDENT_HIT_GROUND, 1.6f, 1.0f);
                     world.playSound(target.getLocation(), Sound.BLOCK_CHAIN_PLACE, 1.6f, 1.0f);
-                    world.spawnParticle(Particle.BLOCK, target.getLocation().clone().add(0, 1.2, 0), 12, 0.3, 0.3, 0.3,
-                            Material.CHAIN.createBlockData());
+                    world.spawnParticle(Particle.BLOCK, target.getLocation().clone().add(0, 1.2, 0), 12, 0.6, 0.6, 0.6,
+                            chain);
                     chain_qSkill_Particle_Effect(player, rangeTarget, 40);
 
                     Grounding grounding = new Grounding(rangeTarget, 2000);
                     grounding.applyEffect(rangeTarget);
+                    target.setVelocity(new Vector(0, 0, 0));
 
                     config.q_Skill_effect_2.put(player.getUniqueId(), rangeTarget);
-                    ForceDamage forceDamage = new ForceDamage(target, config.q_Skill_damage);
-                    forceDamage.applyEffect(player);
-                    target.setVelocity(new Vector(0, 0, 0));
 
                 }
             }

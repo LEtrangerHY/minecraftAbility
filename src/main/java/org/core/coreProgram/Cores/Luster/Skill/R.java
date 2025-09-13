@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
@@ -59,6 +60,7 @@ public class R implements SkillBase {
 
             Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(126, 126, 126), 1.3f);
             Particle.DustOptions dustOptions_gra = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 0.7f);
+            BlockData iron = Material.IRON_BLOCK.createBlockData();
 
             player.spawnParticle(Particle.FLASH, fb.getLocation(), 13, 0, 0, 0, 0.8);
 
@@ -103,7 +105,7 @@ public class R implements SkillBase {
                             le.setVelocity(le.getVelocity().add(knock));
 
                             world.spawnParticle(Particle.BLOCK, fb.getLocation(), 44, 0.3, 0.3, 0.3,
-                                    Material.IRON_BLOCK.createBlockData());
+                                    iron);
 
                             fb.remove();
                             cancel();
@@ -114,7 +116,7 @@ public class R implements SkillBase {
                     Block block = fb.getLocation().getBlock();
                     if (block.getType().isSolid()) {
                         world.spawnParticle(Particle.BLOCK, fb.getLocation(), 44, 0.3, 0.3, 0.3,
-                                Material.IRON_BLOCK.createBlockData());
+                                iron);
                         world.playSound(fb.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.9f, 0.7f);
                         fb.remove();
                         cancel();
