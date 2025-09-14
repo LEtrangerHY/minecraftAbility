@@ -57,10 +57,8 @@ public class Q implements SkillBase {
 
             dream.dreamPoint(player, config.q_Skill_Cool, "Q");
 
-            world.spawnParticle(Particle.ENCHANTED_HIT, player.getLocation().clone().add(0, 1.2, 0), 33, 0.6, 0.6, 0.6, 1);
-
             Location finalLocation = targetLocation.clone();
-            finalLocation.setYaw(start.getYaw() + 180);
+            finalLocation.setDirection(start.toVector().subtract(targetLocation.toVector()));
 
             player.teleport(finalLocation);
 

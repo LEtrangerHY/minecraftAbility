@@ -18,6 +18,7 @@ public class Nox {
 
     //passive
     public HashMap<UUID, Integer> dreamPoint = new HashMap<>();
+    public HashMap<UUID, String> dreamSkill = new HashMap<>();
 
     //R
     public HashMap<UUID, HashSet<Entity>> damaged = new HashMap<>();

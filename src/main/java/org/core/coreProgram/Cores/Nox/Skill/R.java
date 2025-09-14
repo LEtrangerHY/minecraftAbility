@@ -38,7 +38,7 @@ public class R implements SkillBase {
     @Override
     public void Trigger(Player player) {
 
-        dream.dreamPoint(player, config.q_Skill_Cool, "R");
+        dream.dreamPoint(player, config.r_Skill_Cool, "R");
 
         player.swingMainHand();
 

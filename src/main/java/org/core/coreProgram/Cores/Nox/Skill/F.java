@@ -99,7 +99,9 @@ public class F implements SkillBase {
 
                     player.setGameMode(playerGameMode);
 
-                    dream.removePoint(player);
+                    if(!justTeleport) {
+                        dream.removePoint(player);
+                    }
 
                     this.cancel();
                     return;
