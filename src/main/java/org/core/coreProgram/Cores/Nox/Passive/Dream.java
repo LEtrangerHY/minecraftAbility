@@ -1,6 +1,7 @@
 package org.core.coreProgram.Cores.Nox.Passive;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.boss.BarColor;
@@ -32,62 +33,23 @@ public class Dream implements Listener {
         this.tag = tag;
     }
 
-    private final Map<String, BossBar> activeDreamBars = new HashMap<>();
-    private final Map<String, BukkitRunnable> activeDreamTasks = new HashMap<>();
+    public void dreamPoint(Player player, long coolTime, String skill) {
+        int point = config.dreamPoint.getOrDefault(player.getUniqueId(), 0);
 
-    public void wanderersDream(Player player, String skill) {
+        long cools = (point > 1) ? coolTime : (long) (coolTime * Math.pow(3, point));
+        cool.updateCooldown(player, skill, cools);
 
-        long duration = switch (skill) {
-            case "F" -> 12000;
-            case "R" -> 3000;
-            default -> 6000;
-        };
-
-        String key = player.getUniqueId().toString() + "_" + skill;
-
-        if (activeDreamBars.containsKey(key)) {
-            BossBar oldBar = activeDreamBars.get(key);
-            oldBar.removeAll();
-            activeDreamBars.remove(key);
+        config.dreamPoint.put(player.getUniqueId(), point + 1);
+        if(config.dreamPoint.getOrDefault(player.getUniqueId(), 0) < 6){
+            player.sendActionBar(Component.text("Dreams : " + config.dreamPoint.getOrDefault(player.getUniqueId(), 0)).color(NamedTextColor.GRAY));
+        }else{
+            player.sendActionBar(Component.text("Oblivion").color(NamedTextColor.DARK_GRAY));
         }
+    }
 
-        if (activeDreamTasks.containsKey(key)) {
-            BukkitRunnable oldTask = activeDreamTasks.get(key);
-            if (!oldTask.isCancelled()) oldTask.cancel();
-            activeDreamTasks.remove(key);
-        }
-
-        BossBar bossBar = Bukkit.createBossBar(skill + " wanderersDream", BarColor.PURPLE, BarStyle.SOLID);
-        bossBar.setProgress(0.0);
-        bossBar.addPlayer(player);
-        activeDreamBars.put(key, bossBar);
-
-        long cooldownEndTime = System.currentTimeMillis() + duration;
-        long finalDuration = duration;
-
-        BukkitRunnable task = new BukkitRunnable() {
-            @Override
-            public void run() {
-                long remainingTime = cooldownEndTime - System.currentTimeMillis();
-                if (remainingTime <= 0) {
-                    bossBar.setProgress(1.0);
-                    bossBar.removePlayer(player);
-                    activeDreamBars.remove(key);
-                    activeDreamTasks.remove(key);
-                    cancel();
-                } else {
-                    Map<String, Double> skillMap = config.dreamPoint
-                            .computeIfAbsent(player.getUniqueId(), k -> new HashMap<>());
-                    double elapsed = finalDuration - remainingTime;
-                    skillMap.putIfAbsent(skill, 1.0);
-                    skillMap.put(skill, elapsed / 1000);
-                    double progress = elapsed / finalDuration;
-                    bossBar.setProgress(progress);
-                }
-            }
-        };
-
-        task.runTaskTimer(plugin, 0L, 1L);
-        activeDreamTasks.put(key, task);
+    public void removePoint(Player player){
+        config.dreamPoint.remove(player.getUniqueId());
+        player.sendActionBar(Component.text("Dreams : " + config.dreamPoint.getOrDefault(player.getUniqueId(), 0)).color(NamedTextColor.GRAY));
     }
 }
+

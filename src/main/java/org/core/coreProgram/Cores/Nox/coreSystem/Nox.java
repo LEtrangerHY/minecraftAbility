@@ -17,7 +17,7 @@ public class Nox {
     public long frozenCool = 10000;
 
     //passive
-    public HashMap<UUID, HashMap<String, Double>> dreamPoint = new HashMap<>();
+    public HashMap<UUID, Integer> dreamPoint = new HashMap<>();
 
     //R
     public HashMap<UUID, HashSet<Entity>> damaged = new HashMap<>();
@@ -28,7 +28,6 @@ public class Nox {
 
     //Q
     public HashMap<UUID, HashSet<Entity>> damaged_3 = new HashMap<>();
-    public HashMap<UUID, Boolean> qskill_using = new HashMap<>();
     public double q_Skill_damage = 1;
     public long q_Skill_Cool = 600;
 

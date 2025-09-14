@@ -9,6 +9,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
@@ -43,6 +45,7 @@ public class Q implements SkillBase {
 
         Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(30, 30, 30), 0.6f);
         BlockData chain = Material.CHAIN.createBlockData();
+        PotionEffect glow = new PotionEffect(PotionEffectType.GLOWING, 10, 2, false, false);
 
         player.getWorld().playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.0f, 1.0f);
 
@@ -52,6 +55,8 @@ public class Q implements SkillBase {
             Grounding grounding = new Grounding(entity, 2000);
             entity.setVelocity(new Vector(0, 0, 0));
             grounding.applyEffect(entity);
+
+            entity.addPotionEffect(glow);
 
             config.q_Skill_effect_1.put(player.getUniqueId(), entity);
             world.playSound(entity.getLocation(), Sound.ITEM_TRIDENT_HIT_GROUND, 1.6f, 1.0f);
@@ -90,6 +95,8 @@ public class Q implements SkillBase {
                     Grounding grounding = new Grounding(rangeTarget, 2000);
                     grounding.applyEffect(rangeTarget);
                     target.setVelocity(new Vector(0, 0, 0));
+
+                    target.addPotionEffect(glow);
 
                     config.q_Skill_effect_2.put(player.getUniqueId(), rangeTarget);
 

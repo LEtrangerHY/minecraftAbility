@@ -46,7 +46,7 @@ public class F implements SkillBase {
 
         if(target != null){
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1.0f, 1.0f);
-            Special_Attack(player, firstLocation, playerGameMode, target, (config.dreamPoint.getOrDefault(player.getUniqueId(), new HashMap<>()).getOrDefault("F", 2.0) + 0.6) / 2);
+            Special_Attack(player, firstLocation, playerGameMode, target, config.dreamPoint.getOrDefault(player.getUniqueId(), 0));
         }else{
             world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_WEAK, 1, 1);
             long cools = 250L;
@@ -78,10 +78,9 @@ public class F implements SkillBase {
                 .orElse(null);
     }
 
-    public void Special_Attack(Player player, Location firstLocation, GameMode playerGameMode, Entity entity, double times) {
+    public void Special_Attack(Player player, Location firstLocation, GameMode playerGameMode, Entity entity, int slashCount) {
 
-        int slashCount = (times > 1.0) ? (int) times : 1;
-        boolean justTeleport = !(times > 1.0);
+        boolean justTeleport = !(slashCount > 1.0);
 
         config.fskill_using.put(player.getUniqueId(), true);
 
@@ -100,7 +99,8 @@ public class F implements SkillBase {
 
                     player.setGameMode(playerGameMode);
 
-                    dream.wanderersDream(player, "F");
+                    dream.removePoint(player);
+
                     this.cancel();
                     return;
                 }
@@ -190,7 +190,7 @@ public class F implements SkillBase {
                         for (Entity entity : world.getNearbyEntities(particleLocation, 1.2, 1.2, 1.2)) {
                             if (entity instanceof LivingEntity target && entity != player && !config.damaged_2.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(entity)) {
 
-                                ForceDamage forceDamage = new ForceDamage(target, config.f_Skill_damage * (config.dreamPoint.getOrDefault(player.getUniqueId(), new HashMap<>()).getOrDefault("F", 1.0) / 2));
+                                ForceDamage forceDamage = new ForceDamage(target, config.f_Skill_damage * (config.dreamPoint.getOrDefault(player.getUniqueId(), 1)));
                                 forceDamage.applyEffect(player);
                                 target.setVelocity(new Vector(0, 0, 0));
 

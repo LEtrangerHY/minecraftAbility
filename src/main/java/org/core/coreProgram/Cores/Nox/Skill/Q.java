@@ -54,16 +54,21 @@ public class Q implements SkillBase {
         Block headBlock = targetLocation.clone().add(0, 1, 0).getBlock();
 
         if (feetBlock.isPassable() && headBlock.isPassable()) {
+
+            dream.dreamPoint(player, config.q_Skill_Cool, "Q");
+
             world.spawnParticle(Particle.ENCHANTED_HIT, player.getLocation().clone().add(0, 1.2, 0), 33, 0.6, 0.6, 0.6, 1);
-            player.teleport(targetLocation);
+
+            Location finalLocation = targetLocation.clone();
+            finalLocation.setYaw(start.getYaw() + 180);
+
+            player.teleport(finalLocation);
+
             world.spawnParticle(Particle.SPIT, player.getLocation().clone(), 33, 0.2, 0.3, 0.2, 1);
 
-            long cools = 6000 - (long) (config.dreamPoint.getOrDefault(player.getUniqueId(), new HashMap<>()).getOrDefault("Q", 6.0) * 1000);
-            if(6000 - (long) (config.dreamPoint.getOrDefault(player.getUniqueId(), new HashMap<>()).getOrDefault("Q", 6.0) * 1000) > 600) {
-                cool.updateCooldown(player, "Q", cools);
-            }
+            int atk = Math.min(config.dreamPoint.getOrDefault(player.getUniqueId(), 1) + 3, 6);
 
-            TeleportSlash(player, maxDistance, start, direction);
+            TeleportSlash(player, maxDistance, start, direction, atk);
 
         } else {
             if(maxDistance < 0){
@@ -75,7 +80,7 @@ public class Q implements SkillBase {
         }
     }
 
-    public void TeleportSlash(Player player, double maxDistance, Location start, Vector direction){
+    public void TeleportSlash(Player player, double maxDistance, Location start, Vector direction, int atk){
 
         World world = player.getWorld();
 
@@ -95,8 +100,7 @@ public class Q implements SkillBase {
 
                             @Override
                             public void run() {
-                                if (tick > config.dreamPoint.getOrDefault(player.getUniqueId(), new HashMap<>()).getOrDefault("Q", 1.0)
-                                        || player.isDead()) {
+                                if (tick > atk || player.isDead()) {
                                     this.cancel();
                                     return;
                                 }
@@ -123,14 +127,9 @@ public class Q implements SkillBase {
         if (hit) {
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 world.playSound(start, Sound.ENTITY_WITHER_SHOOT, 1f, 1f);
-                dream.wanderersDream(player, "Q");
-            }, config.dreamPoint
-                    .getOrDefault(player.getUniqueId(), new HashMap<>())
-                    .getOrDefault("Q", 1.0)
-                    .longValue() * 2 + 1);
+            }, atk * 2L + 1);
         } else {
             world.playSound(start, Sound.ENTITY_WITHER_SHOOT, 1f, 1f);
-            dream.wanderersDream(player, "Q");
         }
     }
 }
