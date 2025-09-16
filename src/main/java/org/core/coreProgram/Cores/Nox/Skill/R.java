@@ -35,6 +35,8 @@ public class R implements SkillBase {
     @Override
     public void Trigger(Player player) {
 
+        boolean diff = (config.dreamSkill.containsKey(player.getUniqueId()) && !config.dreamSkill.getOrDefault(player.getUniqueId(), "").equals("R"));
+
         dream.dreamPoint(player, config.r_Skill_Cool, "R");
 
         player.swingMainHand();
@@ -49,10 +51,10 @@ public class R implements SkillBase {
         Invulnerable invulnerable = new Invulnerable(player, 600);
         invulnerable.applyEffect(player);
 
-        detect(player);
+        detect(player, diff);
     }
 
-    public void detect(Player player){
+    public void detect(Player player, boolean diff){
 
         World world = player.getWorld();
 
@@ -60,7 +62,6 @@ public class R implements SkillBase {
 
         config.damaged.put(player.getUniqueId(), new HashSet<>());
 
-        boolean diff = (config.dreamSkill.containsKey(player.getUniqueId()) && !config.dreamSkill.getOrDefault(player.getUniqueId(), "").equals("R"));
         double damage = diff ? config.r_Skill_damage * 3 : config.r_Skill_damage;
 
         new BukkitRunnable() {
@@ -85,6 +86,7 @@ public class R implements SkillBase {
                     if (entity instanceof LivingEntity target && entity != player && !config.damaged.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(entity)) {
 
                         if(diff) {
+                            world.playSound(target.getLocation(), Sound.BLOCK_CHAIN_PLACE, 1.6f, 1.0f);
                             world.spawnParticle(Particle.ENCHANTED_HIT, target.getLocation().clone().add(0, 1.2, 0), 33, 0.6, 0.6, 0.6, 1);
                         }
 

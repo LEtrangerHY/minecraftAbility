@@ -193,8 +193,8 @@ public class LevelingManager implements Listener {
                 scoreboard.getEntries().forEach(scoreboard::resetScores);
 
                 objective.getScore("------------").setScore(10);
-                objective.getScore("§aLevel : " + level).setScore(9);
-                objective.getScore("§eExp : " + exp).setScore(8);
+                objective.getScore("§aLv." + level).setScore(9);
+                objective.getScore("§eCORE EXP : " + exp).setScore(8);
             }
         };
 

@@ -13,8 +13,11 @@ commands:
     description: "coreclear"
     usage: "/coreclear"
   corelevelreset:
-    description: "coreLevelReset"
+    description: "corelevelreset"
     usage: "/coreLevelReset"
+  corelevelset:
+    description: "corelevelset"
+    usage: "/corelevelset"
 
   gc:
     description: "gc"

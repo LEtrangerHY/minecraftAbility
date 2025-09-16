@@ -1,6 +1,8 @@
 package org.core;
 
 import com.destroystokyo.paper.event.entity.EntityJumpEvent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
@@ -21,10 +23,19 @@ import org.core.Effect.*;
 import org.core.Level.LevelingManager;
 import org.core.coreProgram.Cores.Bambo.coreSystem.Bambo;
 import org.core.coreProgram.Cores.Bambo.coreSystem.bambCore;
+import org.core.coreProgram.Cores.Bambo.coreSystem.bambInventory;
+import org.core.coreProgram.Cores.Benzene.coreSystem.benzInventory;
 import org.core.coreProgram.Cores.Blaze.coreSystem.Blaze;
 import org.core.coreProgram.Cores.Blaze.coreSystem.blazeCore;
+import org.core.coreProgram.Cores.Blaze.coreSystem.blazeInventory;
+import org.core.coreProgram.Cores.Carpenter.coreSystem.carpInventory;
 import org.core.coreProgram.Cores.Commander.coreSystem.Commander;
 import org.core.coreProgram.Cores.Commander.coreSystem.comCore;
+import org.core.coreProgram.Cores.Commander.coreSystem.comInventory;
+import org.core.coreProgram.Cores.Dagger.coreSystem.dagInventory;
+import org.core.coreProgram.Cores.Glacier.coreSystem.glaInventory;
+import org.core.coreProgram.Cores.Knight.coreSystem.knightInventory;
+import org.core.coreProgram.Cores.Luster.coreSystem.lustInventory;
 import org.core.coreProgram.Cores.Nox.coreSystem.Nox;
 import org.core.coreProgram.Cores.Nox.coreSystem.noxCore;
 import org.core.coreProgram.Cores.Benzene.coreSystem.Benzene;
@@ -39,8 +50,10 @@ import org.core.coreProgram.Cores.Knight.coreSystem.Knight;
 import org.core.coreProgram.Cores.Knight.coreSystem.knightCore;
 import org.core.coreProgram.Cores.Luster.coreSystem.Luster;
 import org.core.coreProgram.Cores.Luster.coreSystem.lustCore;
+import org.core.coreProgram.Cores.Nox.coreSystem.noxInventory;
 import org.core.coreProgram.Cores.Pyro.coreSystem.Pyro;
 import org.core.coreProgram.Cores.Pyro.coreSystem.pyroCore;
+import org.core.coreProgram.Cores.Pyro.coreSystem.pyroInventory;
 
 import javax.naming.Name;
 import java.util.ArrayList;
@@ -54,6 +67,7 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
     private LevelingManager level;
 
     private static Core instance;
+
     private noxCore nox;
     private benzCore benz;
     private bambCore bamb;
@@ -65,6 +79,18 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
     private lustCore luster;
     private blazeCore blaze;
     private comCore commander;
+
+    private noxInventory noxInv;
+    private benzInventory benzInv;
+    private bambInventory bambInv;
+    private carpInventory carpInv;
+    private dagInventory dagInv;
+    private pyroInventory pyroInv;
+    private glaInventory glaInv;
+    private knightInventory knightInv;
+    private lustInventory lustInv;
+    private blazeInventory blazeInv;
+    private comInventory comInv;
 
     private EffectManager effectManager = new EffectManager();
 
@@ -98,45 +124,72 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
 
         this.nox = new noxCore(this, this.config, noxConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.nox, this);
+        this.noxInv = new noxInventory(this, this.config);
+        Bukkit.getPluginManager().registerEvents(this.noxInv, this);
 
         this.benz = new benzCore(this, this.config, benzConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.benz, this);
+        this.benzInv = new benzInventory(this, this.config);
+        Bukkit.getPluginManager().registerEvents(this.benzInv, this);
 
         this.bamb = new bambCore(this, this.config, bambConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.bamb, this);
+        this.bambInv = new bambInventory(this, this.config);
+        Bukkit.getPluginManager().registerEvents(this.bambInv, this);
 
         this.carp = new carpCore(this, this.config, carpConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.carp, this);
+        this.carpInv = new carpInventory(this, this.config);
+        Bukkit.getPluginManager().registerEvents(this.carpInv, this);
 
         this.dag = new dagCore(this, this.config, dagConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.dag, this);
+        this.dagInv = new dagInventory(this, this.config);
+        Bukkit.getPluginManager().registerEvents(this.dagInv, this);
 
         this.pyro = new pyroCore(this, config, pyroConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.pyro, this);
+        this.pyroInv = new pyroInventory(this, this.config);
+        Bukkit.getPluginManager().registerEvents(this.pyroInv, this);
 
         this.glacier = new glaCore(this, config, glaConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.glacier, this);
+        this.glaInv = new glaInventory(this, this.config);
+        Bukkit.getPluginManager().registerEvents(this.glaInv, this);
 
         this.knight = new knightCore(this, config, knightConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.knight, this);
+        this.knightInv = new knightInventory(this, this.config);
+        Bukkit.getPluginManager().registerEvents(this.knightInv, this);
 
         this.luster = new lustCore(this, config, lustConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.luster, this);
+        this.lustInv = new lustInventory(this, this.config);
+        Bukkit.getPluginManager().registerEvents(this.lustInv, this);
 
         this.blaze = new blazeCore(this, config, blazeConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.blaze, this);
+        this.blazeInv = new blazeInventory(this, this.config);
+        Bukkit.getPluginManager().registerEvents(this.blazeInv, this);
 
         this.commander = new comCore(this, config, comConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.commander, this);
+        this.noxInv = new noxInventory(this, this.config);
+        Bukkit.getPluginManager().registerEvents(this.noxInv, this);
+
 
         getCommand("core").setExecutor(this);
         getCommand("corecheck").setExecutor(this);
         getCommand("coreclear").setExecutor(this);
+        getCommand("corelevelreset").setExecutor(this);
+        getCommand("corelevelset").setExecutor(this);
         getCommand("gc").setExecutor(this);
 
         getCommand("core").setTabCompleter(this);
         getCommand("corecheck").setTabCompleter(this);
         getCommand("coreclear").setTabCompleter(this);
+        getCommand("corelevelreset").setTabCompleter(this);
+        getCommand("corelevelset").setTabCompleter(this);
         getCommand("gc").setTabCompleter(this);
 
         getLogger().info("Cores downloaded!");
@@ -238,7 +291,9 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
                     maxHealth.setBaseValue(20.0);
                     target.setHealth(20.0);
                 }
-
+                target.getPersistentDataContainer().set(new NamespacedKey(this, "R"), PersistentDataType.LONG, 0L);
+                target.getPersistentDataContainer().set(new NamespacedKey(this, "Q"), PersistentDataType.LONG, 0L);
+                target.getPersistentDataContainer().set(new NamespacedKey(this, "F"), PersistentDataType.LONG, 0L);
                 target.getPersistentDataContainer().set(new NamespacedKey(this, "exp"), PersistentDataType.LONG, 0L);
                 target.getPersistentDataContainer().set(new NamespacedKey(this, "level"), PersistentDataType.LONG, 0L);
                 sender.sendMessage( "§a" + target.getName() + " 경험치, 레벨 리셋 : " + this.level.Exp.getOrDefault(target, 0L) + ", " + this.level.Level.getOrDefault(target, 0L));
@@ -252,6 +307,9 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
                     player.setHealth(20.0);
                 }
 
+                player.getPersistentDataContainer().set(new NamespacedKey(this, "R"), PersistentDataType.LONG, 0L);
+                player.getPersistentDataContainer().set(new NamespacedKey(this, "Q"), PersistentDataType.LONG, 0L);
+                player.getPersistentDataContainer().set(new NamespacedKey(this, "F"), PersistentDataType.LONG, 0L);
                 player.getPersistentDataContainer().set(new NamespacedKey(this, "exp"), PersistentDataType.LONG, 0L);
                 player.getPersistentDataContainer().set(new NamespacedKey(this, "level"), PersistentDataType.LONG, 0L);
                 sender.sendMessage( "§a본인의 경험치, 레벨 리셋 " + this.level.Exp.getOrDefault(player, 0L) + ", " + this.level.Level.getOrDefault(player, 0L));
@@ -260,6 +318,42 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
                 sender.sendMessage("§c사용법: /corelevelreset <플레이어 닉네임|공백>");
                 return true;
             }
+        }
+
+        if (command.getName().equalsIgnoreCase("corelevelset")) {
+            if (args.length != 3) {
+                sender.sendMessage("§c사용법: /corelevelset <플레이어 닉네임> <경험치(음이 아닌 정수)> <레벨(0~10)>");
+                return true;
+            }
+
+            Player target = Bukkit.getPlayer(args[0]);
+            if (target == null) {
+                sender.sendMessage("§c해당 플레이어를 찾을 수 없습니다.");
+                return true;
+            }
+
+            long xp = 0;
+            long lv = 0;
+
+            try {
+                xp = Long.parseLong(args[1].toLowerCase());
+            } catch (Exception e) {
+                target.sendMessage(Component.text("유효한 숫자가 아닙니다").color(NamedTextColor.RED));
+                return true;
+            }
+
+            try {
+                lv = Long.parseLong(args[2].toLowerCase());
+            } catch (Exception e) {
+                target.sendMessage(Component.text("유효한 숫자가 아닙니다").color(NamedTextColor.RED));
+                return true;
+            }
+
+            target.getPersistentDataContainer().set(new NamespacedKey(this, "exp"), PersistentDataType.LONG, lv);
+            target.getPersistentDataContainer().set(new NamespacedKey(this, "level"), PersistentDataType.LONG, xp);
+            level.levelActionBar(target);
+            sender.sendMessage( "§a" + target +"의 경험치, 레벨 수정 " + this.level.Exp.getOrDefault(target, 0L) + ", " + this.level.Level.getOrDefault(target, 0L));
+            return true;
         }
 
         if (command.getName().equalsIgnoreCase("gc")) {
