@@ -174,8 +174,8 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
 
         this.commander = new comCore(this, config, comConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.commander, this);
-        this.noxInv = new noxInventory(this, this.config);
-        Bukkit.getPluginManager().registerEvents(this.noxInv, this);
+        this.comInv = new comInventory(this, this.config);
+        Bukkit.getPluginManager().registerEvents(this.comInv, this);
 
 
         getCommand("core").setExecutor(this);
@@ -352,7 +352,7 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
             target.getPersistentDataContainer().set(new NamespacedKey(this, "exp"), PersistentDataType.LONG, lv);
             target.getPersistentDataContainer().set(new NamespacedKey(this, "level"), PersistentDataType.LONG, xp);
             level.levelActionBar(target);
-            sender.sendMessage( "§a" + target +"의 경험치, 레벨 수정 " + this.level.Exp.getOrDefault(target, 0L) + ", " + this.level.Level.getOrDefault(target, 0L));
+            sender.sendMessage( "§a" + target.getName() +"의 경험치, 레벨 수정 " + xp + ", " + lv);
             return true;
         }
 

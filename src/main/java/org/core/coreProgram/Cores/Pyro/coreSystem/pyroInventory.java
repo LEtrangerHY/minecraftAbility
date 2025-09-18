@@ -29,7 +29,7 @@ public class pyroInventory extends absInventory {
 
     @Override
     protected boolean contains(Player player) {
-        return tag.Nox.contains(player);
+        return tag.Pyro.contains(player);
     }
 
     @Override

@@ -66,13 +66,13 @@ public class Q implements SkillBase {
 
                 @Override
                 public void run() {
-                    if (tick >= 6 || player.isDead()) {
+                    if (tick >= 3 || player.isDead()) {
                         this.cancel();
                         return;
                     }
 
                     world.playSound(entity.getLocation(), Sound.BLOCK_CHAIN_PLACE, 1.6f, 1.0f);
-                    world.spawnParticle(Particle.BLOCK, entity.getLocation().clone().add(0, 1.2, 0), 12, 0.6, 0.6, 0.6,
+                    world.spawnParticle(Particle.BLOCK, entity.getLocation().clone().add(0, 1.2, 0), 6, 0.6, 0.6, 0.6,
                             chain);
 
                     tick++;

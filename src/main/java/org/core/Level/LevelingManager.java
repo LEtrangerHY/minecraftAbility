@@ -7,9 +7,12 @@ import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -202,5 +205,27 @@ public class LevelingManager implements Listener {
         runnable.runTaskTimer(plugin, 0L, 1L);
     }
 
+    @EventHandler(priority = EventPriority.HIGH)
+    public void lvAtk(EntityDamageByEntityEvent event) {
 
+        if (!(event.getDamager() instanceof Player player)) return;
+
+        long level = player.getPersistentDataContainer().getOrDefault(
+                new NamespacedKey(plugin, "level"),
+                PersistentDataType.LONG,
+                0L
+        );
+
+        if (level < 0) return;
+        if (level > 10) level = 10;
+
+        double[] cumulativeP = {0.0, 0.15, 0.32, 0.49, 0.66, 0.86, 1.09, 1.36, 1.68, 2.06, 2.50};
+
+        double p = cumulativeP[(int)level];
+
+        double originalDamage = event.getDamage();
+        double amplifiedDamage = originalDamage * (1 + p);
+
+        event.setDamage(amplifiedDamage);
+    }
 }

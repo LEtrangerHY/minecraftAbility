@@ -5,6 +5,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
@@ -20,6 +21,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.core.Cool.Cool;
 import org.core.Core;
@@ -88,6 +90,10 @@ public class benzCore extends absCore {
         Player player = event.getPlayer();
 
         if (!event.isSneaking() || cool.isReloading(player, "F") || !hasProperItems(player) || !tag.Benzene.contains(player)) return;
+
+        long lvLock = player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L);
+
+        if(lvLock < 10) return;
 
         long durationTicks = 60L;
 

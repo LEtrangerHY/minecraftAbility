@@ -51,8 +51,8 @@ public class glaInventory extends absInventory {
     @Override
     protected Material getTotem(Player player, String skill) {
         return switch (skill) {
-            case "R" -> Material.FROSTED_ICE;
-            case "Q" -> Material.POWDER_SNOW;
+            case "R" -> Material.ICE;
+            case "Q" -> Material.POWDER_SNOW_BUCKET;
             case "F" -> Material.BLUE_ICE;
             default -> Material.BARRIER;
         };

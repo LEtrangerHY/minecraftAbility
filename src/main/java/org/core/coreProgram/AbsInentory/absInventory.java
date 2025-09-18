@@ -61,32 +61,30 @@ abstract public class absInventory implements Listener {
                 if (clicked.getType() == getTotem(player, "R")) {
                     reinforceSkill(player, "R", getSkillLevel(player, "R"), event.getView().getTopInventory());
                     customInvReroll(player, event.getView().getTopInventory());
+                    return;
                 }
 
                 if (clicked.getType() == getTotem(player, "Q")) {
                     reinforceSkill(player, "Q", getSkillLevel(player, "Q"), event.getView().getTopInventory());
                     customInvReroll(player, event.getView().getTopInventory());
+                    return;
                 }
 
                 if (clicked.getType() == getTotem(player, "F")) {
                     reinforceSkill(player, "F", getSkillLevel(player, "F"), event.getView().getTopInventory());
                     customInvReroll(player, event.getView().getTopInventory());
+                    return;
                 }
+
+                return;
             }
-            return;
         }
 
         if (clicked != null && event.isRightClick() && isCoreItemClicked(player, clicked)) {
 
-            ItemStack cursorItem = player.getItemOnCursor();
-            if (cursorItem != null && cursorItem.getType() != Material.AIR) {
-                player.getInventory().addItem(cursorItem);
-                player.setItemOnCursor(null);
-            }
-
             event.setCancelled(true);
 
-            Inventory customInv = Bukkit.createInventory(player, 27, Component.text("CORE MENU").color(NamedTextColor.LIGHT_PURPLE));
+            Inventory customInv = Bukkit.createInventory(null, 27, Component.text("CORE MENU").color(NamedTextColor.LIGHT_PURPLE));
 
             CoreMenuHolder holder = new CoreMenuHolder(player, customInv);
 
