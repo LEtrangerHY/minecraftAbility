@@ -24,9 +24,11 @@ public class Blaze {
     //Q
     public HashMap<UUID, Boolean> BurstBlaze = new HashMap<>();
     public long q_Skill_Cool = 44000;
+    public double q_Skill_amp = 0.13;
 
     //F
     public long f_Skill_Cool = 666000;
+    public double f_Skill_amp = 0.2;
 
 
     public void variableReset(Player player){

@@ -5,6 +5,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.*;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.RayTraceResult;
@@ -184,6 +185,9 @@ public class Q implements SkillBase {
 
         double projectileSpeed = 1.7;
 
+        double amp = config.q_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L);
+        double damage = config.q_Skill_Damage * (1 + amp);
+
         for (FallingBlock block : liftedBlocks) {
             if (block.isDead()) continue;
 
@@ -210,7 +214,7 @@ public class Q implements SkillBase {
 
                         living.getWorld().playSound(living.getLocation(), Sound.BLOCK_ANVIL_LAND, 1f, 1f);
 
-                        ForceDamage forceDamage = new ForceDamage(living, config.q_Skill_Damage);
+                        ForceDamage forceDamage = new ForceDamage(living, damage);
                         forceDamage.applyEffect(player);
 
                         block.remove();
@@ -249,7 +253,7 @@ public class Q implements SkillBase {
 
                         living.getWorld().playSound(living.getLocation(), Sound.BLOCK_ANVIL_LAND, 1f, 1f);
 
-                        ForceDamage forceDamage = new ForceDamage(living, config.q_Skill_Damage);
+                        ForceDamage forceDamage = new ForceDamage(living, damage);
                         forceDamage.applyEffect(player);
 
                         cancel();

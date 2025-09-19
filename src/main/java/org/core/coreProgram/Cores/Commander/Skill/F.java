@@ -7,6 +7,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -127,10 +128,13 @@ public class F implements SkillBase {
     public void commandReceiver_2(Player player, Location center, Entity entity) {
         World world = player.getWorld();
 
+        double amp = config.f_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L);
+        double damage = 4 * (1 + amp);
+
         player.getWorld().spawnParticle(Particle.DRAGON_BREATH, center, 70, 0.2, 0.2, 0.2, 0.4);
         player.getWorld().playSound(center, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1, 1);
 
-        ForceDamage forceDamage = new ForceDamage((LivingEntity) entity, 4);
+        ForceDamage forceDamage = new ForceDamage((LivingEntity) entity, damage);
         forceDamage.applyEffect(player);
         entity.setVelocity(new Vector(0, 0, 0));
     }

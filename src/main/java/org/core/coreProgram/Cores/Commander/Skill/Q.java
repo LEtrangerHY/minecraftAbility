@@ -7,6 +7,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -97,11 +98,14 @@ public class Q implements SkillBase {
         World world = player.getWorld();
         Location center = fb.getLocation();
 
+        double amp = config.q_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L);
+        double damage = 2 * (1 + amp);
+
         for (Entity entity : world.getNearbyEntities(center, 3.5, 3.5, 3.5)) {
             if (!(entity instanceof LivingEntity)) continue;
 
             if(!entity.equals(player)) {
-                ForceDamage forceDamage = new ForceDamage((LivingEntity) entity, 2);
+                ForceDamage forceDamage = new ForceDamage((LivingEntity) entity, damage);
                 forceDamage.applyEffect(player);
                 entity.setVelocity(new Vector(0, 0, 0));
 

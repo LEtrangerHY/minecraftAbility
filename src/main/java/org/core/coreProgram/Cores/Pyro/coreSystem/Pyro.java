@@ -27,6 +27,7 @@ public class Pyro {
     public double burnDownStats = 0.7;
 
     //R
+    public double r_Skill_amp = 2;
     public double r_Skill_Damage = 1;
     public long r_Skill_Cool = 10000;
     public long r_Skill_stun = 3000;

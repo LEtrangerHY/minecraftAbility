@@ -6,6 +6,7 @@ import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.RayTraceResult;
@@ -147,6 +148,9 @@ public class F implements SkillBase {
             default -> Math.toRadians(0);
         };
 
+        double amp = config.f_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L);
+        double damage = config.f_Skill_damage * (1 + amp);
+
         Location origin = player.getEyeLocation().add(0, 0, 0);
         Vector direction = player.getLocation().getDirection().clone().setY(0).normalize();
 
@@ -192,7 +196,7 @@ public class F implements SkillBase {
                         for (Entity entity : world.getNearbyEntities(particleLocation, 1.2, 1.2, 1.2)) {
                             if (entity instanceof LivingEntity target && entity != player && !config.damaged_2.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(entity)) {
 
-                                ForceDamage forceDamage = new ForceDamage(target, config.f_Skill_damage * (config.dreamPoint.getOrDefault(player.getUniqueId(), 1)));
+                                ForceDamage forceDamage = new ForceDamage(target, damage * (config.dreamPoint.getOrDefault(player.getUniqueId(), 1)));
                                 forceDamage.applyEffect(player);
                                 target.setVelocity(new Vector(0, 0, 0));
 

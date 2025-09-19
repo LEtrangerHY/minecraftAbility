@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
 import org.bukkit.entity.*;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
@@ -41,12 +42,15 @@ public class R implements SkillBase {
 
         if(target != null){
 
+            double amp = config.r_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L);
+            double damage = config.r_Skill_damage * (1 + amp);
+
             Stun stun = new Stun(target, config.r_Stun);
             stun.applyEffect(player);
 
             config.r_damaged.put(player.getUniqueId(), true);
             damagestroker.damageStroke(player, target);
-            ForceDamage forceDamage = new ForceDamage(target, config.r_Skill_damage);
+            ForceDamage forceDamage = new ForceDamage(target, damage);
             forceDamage.applyEffect(player);
             target.setVelocity(new Vector(0, 0, 0));
             config.r_damaged.remove(player.getUniqueId());

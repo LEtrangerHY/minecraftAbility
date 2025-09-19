@@ -7,6 +7,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -85,6 +86,9 @@ public class Q implements SkillBase {
         double step = 0.5;
         config.damaged_3.put(player.getUniqueId(), new HashSet<>());
 
+        double amp = config.q_SKill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L);
+        double damage = config.q_Skill_damage * (1 + amp);
+
         boolean hit = false;
 
         for (double i = 0; i <= maxDistance; i += step) {
@@ -105,7 +109,7 @@ public class Q implements SkillBase {
                                 world.playSound(target.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f);
                                 world.playSound(target.getLocation(), Sound.ITEM_TRIDENT_HIT_GROUND, 1f, 1f);
 
-                                ForceDamage forceDamage = new ForceDamage(target, config.q_Skill_damage);
+                                ForceDamage forceDamage = new ForceDamage(target, damage);
                                 forceDamage.applyEffect(player);
                                 target.setVelocity(new Vector(0, 0, 0));
 

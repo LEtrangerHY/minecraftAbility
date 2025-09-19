@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -64,6 +65,9 @@ public class R implements SkillBase, Listener{
 
         config.damaged.put(player.getUniqueId(), new HashSet<>());
 
+        double amp = config.r_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L);
+        double damage = config.r_Skill_Damage * (1 + amp);
+
         new BukkitRunnable() {
             int life = 8;
 
@@ -102,7 +106,7 @@ public class R implements SkillBase, Listener{
 
                             world.playSound(fb.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
 
-                            ForceDamage forceDamage = new ForceDamage(le, config.r_Skill_Damage);
+                            ForceDamage forceDamage = new ForceDamage(le, damage);
                             forceDamage.applyEffect(player);
 
                             le.setVelocity(new Vector(0, 0, 0));

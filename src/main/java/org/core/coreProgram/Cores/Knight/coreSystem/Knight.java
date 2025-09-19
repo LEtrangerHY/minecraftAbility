@@ -23,6 +23,7 @@ public class Knight {
 
     //R
     public HashMap<UUID, Integer> swordCount = new HashMap<>();
+    public double r_Skill_amplify = 0.2;
     public double R_Skill_Damage = (double) 7 /3;
     public long r_Skill_Cool = 300;
 
@@ -30,11 +31,13 @@ public class Knight {
     public HashMap<UUID, Boolean> q_Skill_Using = new HashMap<>();
     public HashMap<UUID, Boolean> isFocusing = new HashMap<>();
     public HashMap<UUID, Boolean> isFocusCancel = new HashMap<>();
+    public double q_Skill_amp = 0.14;
     public double q_Skill_Damage = 7;
     public long q_Skill_Cool = 12000;
 
     //F
     public HashMap<UUID, HashSet<Entity>> damaged = new HashMap<>();
+    public double f_Skill_amp = 0.2;
     public double f_Skill_Damage = 22;
     public long f_Skill_Cool = 30000;
 

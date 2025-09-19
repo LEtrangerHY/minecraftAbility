@@ -11,6 +11,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -185,6 +186,9 @@ public class Q implements SkillBase {
         int maxTicks = 3;
         double innerRadius = 2.7;
 
+        double amp = config.q_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L);
+        double damage = config.q_Skill_Damage * (1 + amp);
+
         Location origin = player.getEyeLocation().add(0, 0, 0);
         Vector direction = player.getLocation().getDirection().clone();
         Vector rightAxis = direction.clone().crossProduct(new Vector(0, 1, 0)).normalize();
@@ -244,7 +248,7 @@ public class Q implements SkillBase {
                         for (Entity entity : world.getNearbyEntities(particleLocation, 0.7, 0.7, 0.7)) {
                             if (entity instanceof LivingEntity target && entity != player) {
                                 if(!config.damaged.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(entity)) {
-                                    ForceDamage forceDamage = new ForceDamage(target, config.q_Skill_Damage);
+                                    ForceDamage forceDamage = new ForceDamage(target, damage);
                                     forceDamage.applyEffect(player);
                                     target.setVelocity(new Vector(0, 0, 0));
                                     config.damaged.get(player.getUniqueId()).add(entity);

@@ -7,6 +7,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -43,6 +44,9 @@ public class F implements SkillBase {
         long tickDelay = 0L;
         int maxTicks = 5;
         double innerRadius = 3.3;
+
+        double amp = config.f_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L);
+        double damage = config.f_Skill_Damage * (1 + amp);
 
         config.damaged.put(player.getUniqueId(), new HashSet<>());
 
@@ -109,7 +113,7 @@ public class F implements SkillBase {
                                     player.getWorld().spawnParticle(Particle.DAMAGE_INDICATOR, target.getLocation().clone().add(0, 1.3, 0), 20, 0.4, 0.4, 0.4, 1);
                                     Stun stun = new Stun(target, 700);
                                     stun.applyEffect(player);
-                                    ForceDamage forceDamage = new ForceDamage(target, config.f_Skill_Damage);
+                                    ForceDamage forceDamage = new ForceDamage(target, damage);
                                     forceDamage.applyEffect(player);
                                     target.setVelocity(new Vector(0, 0, 0));
                                 }

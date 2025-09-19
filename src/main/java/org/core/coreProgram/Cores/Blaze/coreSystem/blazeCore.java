@@ -10,6 +10,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -99,9 +100,15 @@ public class blazeCore extends absCore {
                             return;
                         }
 
+                        double damage = 0.4;
+
                         if(config.BurstBlaze.getOrDefault(player.getUniqueId(), false)){
+                            double amp = config.q_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L);
+                            damage = 0.4 * (1 + amp);
+                            player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(0.5);
                             cool.setCooldown(player, 2000L, "blaze");
                         }else {
+                            player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(0.25);
                             cool.setCooldown(player, 4000L, "blaze");
                         }
 
@@ -109,11 +116,6 @@ public class blazeCore extends absCore {
                         Location origin = player.getLocation().add(0, 1.3, 0);
                         Vector forward = origin.getDirection().normalize();
 
-                        if(config.BurstBlaze.getOrDefault(player.getUniqueId(), false)){
-                            player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(0.5);
-                        }else {
-                            player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(0.25);
-                        }
                         player.playSound(player.getLocation(), Sound.ITEM_FIRECHARGE_USE, 1, 1);
                         player.playSound(player.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 1);
 
@@ -136,6 +138,8 @@ public class blazeCore extends absCore {
                                 }
                             }
                         }
+
+                        double finalDamage = damage;
 
                         new BukkitRunnable() {
                             double distance = 1.0;
@@ -160,7 +164,7 @@ public class blazeCore extends absCore {
                                         if (entity instanceof LivingEntity && entity != player) {
 
                                             LivingEntity target = (LivingEntity) entity;
-                                            ForceDamage forceDamage = new ForceDamage(target, 0.4);
+                                            ForceDamage forceDamage = new ForceDamage(target, finalDamage);
                                             forceDamage.applyEffect(player);
 
                                             double per = (config.BurstBlaze.getOrDefault(player.getUniqueId(), false)) ? 1.0 : 0.4;

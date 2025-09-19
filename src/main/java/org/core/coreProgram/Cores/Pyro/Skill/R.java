@@ -9,6 +9,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.RayTraceResult;
@@ -100,6 +101,9 @@ public class R implements SkillBase {
 
         World world = player.getWorld();
 
+        double amp = config.r_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L);
+        double damage = config.r_Skill_Damage * (1 + amp);
+
         player.getWorld().playSound(initiateLoc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1, 1);
         player.getWorld().playSound(initiateLoc, Sound.ENTITY_GENERIC_EXPLODE, 1.0f, 1.0f);
 
@@ -109,7 +113,7 @@ public class R implements SkillBase {
         for (Entity entity : world.getNearbyEntities(initiateLoc, 1, 6, 1)) {
             if (entity instanceof LivingEntity target && entity != player) {
 
-                ForceDamage forceDamage = new ForceDamage(target, config.r_Skill_Damage);
+                ForceDamage forceDamage = new ForceDamage(target, damage);
                 forceDamage.applyEffect(player);
                 target.setVelocity(new Vector(0, 0, 0));
 

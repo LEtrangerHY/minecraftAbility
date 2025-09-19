@@ -4,6 +4,7 @@ import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -64,6 +65,10 @@ public class R implements SkillBase {
 
         double damage = diff ? config.r_Skill_damage * 3 : config.r_Skill_damage;
 
+        double amp = config.r_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L);
+        damage = damage * (1 + amp);
+
+        double finalDamage = damage;
         new BukkitRunnable() {
             private double ticks = 0;
 
@@ -90,7 +95,7 @@ public class R implements SkillBase {
                             world.spawnParticle(Particle.ENCHANTED_HIT, target.getLocation().clone().add(0, 1.2, 0), 33, 0.6, 0.6, 0.6, 1);
                         }
 
-                        ForceDamage forceDamage = new ForceDamage(target, damage);
+                        ForceDamage forceDamage = new ForceDamage(target, finalDamage);
                         forceDamage.applyEffect(player);
                         target.setVelocity(new Vector(0, 0, 0));
 

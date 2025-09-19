@@ -8,6 +8,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.core.Cool.Cool;
 import org.core.Effect.ForceDamage;
@@ -72,6 +73,9 @@ public class R implements SkillBase {
         Location playerLocation = player.getLocation();
         Vector direction = playerLocation.getDirection().normalize().multiply(1.2);
 
+        double amp = config.r_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L);
+        double damage = config.r_Skill_damage * (1 + amp);
+
         config.r_damaged.put(player.getUniqueId(), true);
         for (int ticks = 0; ticks < 40; ticks++) {
             Location particleLocation = playerLocation.clone()
@@ -87,7 +91,7 @@ public class R implements SkillBase {
                         && entity != player
                         && !config.damaged.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(entity)) {
 
-                    ForceDamage forceDamage = new ForceDamage(target, config.r_Skill_damage);
+                    ForceDamage forceDamage = new ForceDamage(target, damage);
                     forceDamage.applyEffect(player);
 
                     config.damaged.computeIfAbsent(player.getUniqueId(), k -> new HashSet<>()).add(target);

@@ -6,6 +6,7 @@ import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -126,6 +127,9 @@ public class F implements SkillBase {
 
         config.f_damaged_2.put(player.getUniqueId(), new HashSet<>());
 
+        double amp = config.f_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L);
+        double damage = config.f_Skill_Damage_2 * (1 + amp);
+
         new BukkitRunnable() {
             private double ticks = 0;
 
@@ -151,7 +155,7 @@ public class F implements SkillBase {
 
                         config.f_damaging.put(player.getUniqueId(), true);
                         damagestroker.damageStroke(player, target);
-                        ForceDamage forceDamage = new ForceDamage(target, config.f_Skill_Damage_2 / config.dash_num.getOrDefault(player.getUniqueId(), 1));
+                        ForceDamage forceDamage = new ForceDamage(target, damage / config.dash_num.getOrDefault(player.getUniqueId(), 1));
                         forceDamage.applyEffect(player);
                         target.setVelocity(new Vector(0, 0, 0));
                         config.f_damaging.remove(player.getUniqueId());

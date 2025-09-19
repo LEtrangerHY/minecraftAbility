@@ -2,13 +2,11 @@ package org.core.coreProgram.Cores.Carpenter.Skill;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -53,6 +51,9 @@ public class R implements SkillBase {
     public void detect_1(Player player){
         config.r_damaged.put(player.getUniqueId(), new HashSet<>());
 
+        double amp = config.r_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L);
+        double damage = config.r_Skill_damage * (1 + amp);
+
         new BukkitRunnable() {
             private double ticks = 0;
 
@@ -83,7 +84,7 @@ public class R implements SkillBase {
                         stun.applyEffect(player);
 
                         config.r_damaging.put(player.getUniqueId(), true);
-                        ForceDamage forceDamage = new ForceDamage(target, config.r_Skill_damage * velocity);
+                        ForceDamage forceDamage = new ForceDamage(target, damage * velocity);
                         forceDamage.applyEffect(player);
                         target.setVelocity(new Vector(0, 0, 0));
                         config.r_damaging.remove(player.getUniqueId());
@@ -94,11 +95,11 @@ public class R implements SkillBase {
                             player.getWorld().playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1);
                             Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(255, 255, 0), 1.0f);
                             player.getWorld().spawnParticle(Particle.DUST, player.getLocation().add(0, 1, 0), 25, 0.4, 0.3, 0.4, 0.08, dustOptions);
-                            String send = String.format("%.2f", config.r_Skill_damage * velocity);
+                            String send = String.format("%.2f", damage * velocity);
                             player.sendActionBar(Component.text(send).color(NamedTextColor.YELLOW));
                             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1.0f, 1.0f);
                         }else {
-                            String send = String.format("%.2f", config.r_Skill_damage * velocity);
+                            String send = String.format("%.2f", damage * velocity);
                             player.sendActionBar(Component.text(send).color(NamedTextColor.WHITE));
                             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_WEAK, 1.0f, 1.0f);
                         }

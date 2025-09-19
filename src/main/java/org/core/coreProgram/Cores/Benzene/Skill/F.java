@@ -9,6 +9,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.RayTraceResult;
@@ -49,6 +50,9 @@ public class F implements SkillBase {
         double innerRadius = 2.6;
 
         config.damaged.put(player.getUniqueId(), new HashSet<>());
+
+        double amp = config.f_Skill_Amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L);
+        double damage = config.f_Skill_Damage * (1 + amp);
 
         Entity target = getTargetedEntity(player,4.8, 0.3);
 
@@ -154,7 +158,7 @@ public class F implements SkillBase {
                         for (Entity entity : world.getNearbyEntities(particleLocation, 0.6, 0.6, 0.6)) {
                             if (entity instanceof LivingEntity target && entity != player && !config.damaged.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(entity)) {
                                 config.damaged.getOrDefault(player.getUniqueId(), new HashSet<>()).add(entity);
-                                ForceDamage forceDamage = new ForceDamage(target, config.f_Skill_Damage);
+                                ForceDamage forceDamage = new ForceDamage(target, damage);
                                 forceDamage.applyEffect(player);
                                 target.setVelocity(new Vector(0, 0, 0));
                                 if(!target.isDead()){
@@ -296,6 +300,9 @@ public class F implements SkillBase {
             default -> Math.toRadians(0);
         };
 
+        double amp = config.f_Skill_Amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L);
+        double damage = config.f_Skill_Damage * 3 * (1 + amp);
+
         Location origin = player.getEyeLocation().add(0, 0, 0);
         Vector direction = player.getLocation().getDirection().clone().setY(0).normalize();
 
@@ -351,7 +358,7 @@ public class F implements SkillBase {
 
                                 if(!config.damaged.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(entity)) {
 
-                                    ForceDamage forceDamage = new ForceDamage(target, config.f_Skill_Damage * 3);
+                                    ForceDamage forceDamage = new ForceDamage(target, damage);
                                     forceDamage.applyEffect(player);
                                     target.setVelocity(new Vector(0, 0, 0));
 

@@ -7,6 +7,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -58,6 +59,9 @@ public class R implements SkillBase {
         config.rskill_using.put(player.getUniqueId(), true);
         config.damaged_2.put(player.getUniqueId(), new HashSet<>());
 
+        double amp = config.r_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L);
+        double damage = config.r_Skill_damage * (1 + amp);
+
         config.atkCount.put(player.getUniqueId(), 0);
         player.sendActionBar(Component.text("Forever").color(NamedTextColor.GRAY));
 
@@ -90,7 +94,7 @@ public class R implements SkillBase {
                 List<Entity> nearbyEntities = player.getNearbyEntities(1.2, 1.2, 1.2);
                 for (Entity entity : nearbyEntities) {
                     if (entity instanceof LivingEntity target && entity != player && !config.damaged_2.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(entity)) {
-                        ForceDamage forceDamage = new ForceDamage(target, config.r_Skill_damage);
+                        ForceDamage forceDamage = new ForceDamage(target, damage);
                         forceDamage.applyEffect(player);
                         config.damaged_2.getOrDefault(player.getUniqueId(), new HashSet<>()).add(target);
                         target.setVelocity(new Vector(0, 0, 0));

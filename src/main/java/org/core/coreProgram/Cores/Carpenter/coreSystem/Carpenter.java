@@ -23,6 +23,7 @@ public class Carpenter {
     //R
     public HashMap<UUID, Boolean> r_damaging = new HashMap<>();
     public HashMap<UUID, HashSet<Entity>> r_damaged = new HashMap<>();
+    public double r_Skill_amp = 0.12;
     public double r_Skill_damage = 7;
     public long r_Stun = 2400;
     public long r_Skill_Cool = 13000;
@@ -34,6 +35,7 @@ public class Carpenter {
     public HashMap<UUID, Boolean> q_using = new HashMap<>();
     public HashMap<UUID, Boolean> crash = new HashMap<>();
     public HashMap<UUID, Double> normal_distribution = new HashMap<>();
+    public double q_Skill_amp = 0.12;
     public double q_Skill_damage = 7;
     public double q_Skill_jump = 0.7;
     public long q_Skill_Load = 5000;

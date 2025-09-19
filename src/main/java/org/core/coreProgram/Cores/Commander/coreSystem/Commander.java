@@ -26,15 +26,18 @@ public class Commander {
 
     //R
     public HashMap<UUID, HashSet<Entity>> damaged = new HashMap<>();
+    public double r_Skill_amp = 0.2;
     public double r_Skill_Damage = 4;
     public long r_Skill_Cool = 4000;
 
     //Q
+    public double q_Skill_amp = 0.1;
     public double q_Skill_Damage = 2;
     public long q_Skill_Cool = 9000;
 
     //F
     public HashMap<UUID, HashSet<FallingBlock>> received = new HashMap<>();
+    public double f_Skill_amp = 0.2;
     public long f_Skill_Cool = 7000;
 
     public void variableReset(Player player){

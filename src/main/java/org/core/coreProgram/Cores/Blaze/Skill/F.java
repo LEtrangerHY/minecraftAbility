@@ -11,6 +11,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -117,6 +118,9 @@ public class F implements SkillBase {
 
     public void blueFlamePool(Player player, Location pollLoc){
 
+        double amp = config.f_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L);
+        double damage = 0.6 * (1 + amp);
+
         player.spawnParticle(Particle.SOUL_FIRE_FLAME, pollLoc.clone().add(0, 0.6, 0), 20, 0.1, 0.1, 0.1, 0.8);
         player.spawnParticle(Particle.FLAME, pollLoc.clone().add(0, 0.6, 0), 6, 0.1, 0.1, 0.1, 0.8);
 
@@ -158,7 +162,7 @@ public class F implements SkillBase {
                 for (Entity entity : player.getWorld().getNearbyEntities(pollLoc.clone().add(0, 0.2, 0), 1.3, 13, 1.3)) {
                     if (entity instanceof LivingEntity target && entity != player) {
 
-                        ForceDamage forceDamage = new ForceDamage(target, 0.6);
+                        ForceDamage forceDamage = new ForceDamage(target, damage);
                         forceDamage.applyEffect(player);
                         target.setVelocity(new Vector(0, 0, 0));
 

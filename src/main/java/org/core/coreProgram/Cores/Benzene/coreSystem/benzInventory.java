@@ -72,7 +72,7 @@ public class benzInventory extends absInventory {
         long playerLevel = player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "level"), PersistentDataType.LONG, 0L);
 
         long maxLevel = switch ((int) playerLevel){
-            case 6 -> 5;
+            case 6, 7, 8, 9 -> 5;
             case 10 -> 6;
             default -> 3;
         };

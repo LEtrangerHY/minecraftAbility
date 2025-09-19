@@ -6,6 +6,7 @@ import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -205,6 +206,10 @@ public class R implements SkillBase {
 
         final Location fixedTargetPos = target.getLocation().clone().add(0, 0.3, 0);
 
+        double amp = config.r_Skill_amplify * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L);
+        damage = damage * (1 + amp);
+
+        double finalDamage = damage;
         new BukkitRunnable() {
             Vector dir = null;
 
@@ -240,7 +245,7 @@ public class R implements SkillBase {
                     if (e != player && e instanceof LivingEntity) {
                         player.getWorld().spawnParticle(Particle.ENCHANTED_HIT, e.getLocation().clone().add(0, 1, 0), 21, 0.4, 0.4, 0.4, 1);
                         player.playSound(e.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1);
-                        ForceDamage forceDamage = new ForceDamage((LivingEntity) e, damage);
+                        ForceDamage forceDamage = new ForceDamage((LivingEntity) e, finalDamage);
                         forceDamage.applyEffect(player);
                         PotionEffect darkness = new PotionEffect(PotionEffectType.DARKNESS, 20 * 3, 1, false, false);
                         ((LivingEntity) e).addPotionEffect(darkness);

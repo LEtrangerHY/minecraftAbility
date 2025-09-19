@@ -18,11 +18,13 @@ public class Dagger {
 
     //R
     public HashMap<UUID, Boolean> r_damaged = new HashMap<>();
+    public double r_Skill_amp = 0.11;
     public double r_Skill_damage = 10;
     public long r_Skill_Cool = 4000;
     public long r_Stun = 2000;
 
     //Q
+    public double q_Skill_amp = 0.1;
     public double q_Skill_Damage = 4;
     public long q_Skill_Cool = 8000;
     public long q_Skill_Cool_2 = 20000;
@@ -32,6 +34,7 @@ public class Dagger {
     public HashMap<UUID, HashSet<Entity>> q_damaged = new HashMap<>();
 
     //F
+    public double f_Skill_amp = 0.2;
     public double f_Skill_Damage = 4;
     public double f_Skill_Damage_2 = 12;
     public long f_Skill_Cool = 0;

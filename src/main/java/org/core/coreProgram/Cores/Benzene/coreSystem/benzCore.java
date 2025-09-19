@@ -93,7 +93,7 @@ public class benzCore extends absCore {
 
         long lvLock = player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L);
 
-        if(lvLock < 10) return;
+        if(lvLock < 3) return;
 
         long durationTicks = 60L;
 

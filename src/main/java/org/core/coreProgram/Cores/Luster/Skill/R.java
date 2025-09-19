@@ -11,6 +11,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -58,6 +59,9 @@ public class R implements SkillBase {
             double speed = 2.2;
             fb.setVelocity(dir.multiply(speed));
 
+            double amp = config.r_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L);
+            double damage = config.r_Skill_Damage * (1 + amp);
+
             Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(126, 126, 126), 1.3f);
             Particle.DustOptions dustOptions_gra = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 0.7f);
             BlockData iron = Material.IRON_BLOCK.createBlockData();
@@ -97,7 +101,7 @@ public class R implements SkillBase {
                             world.playSound(fb.getLocation(), Sound.BLOCK_ANVIL_LAND, 1f, 1f);
                             world.playSound(fb.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1f, 1f);
 
-                            ForceDamage forceDamage = new ForceDamage(le, config.r_Skill_Damage);
+                            ForceDamage forceDamage = new ForceDamage(le, damage);
                             forceDamage.applyEffect(player);
 
                             Vector knock = le.getLocation().toVector().subtract(player.getLocation().toVector())
