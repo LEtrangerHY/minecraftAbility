@@ -56,7 +56,6 @@ public class Dream implements Listener {
                     break;
                 }
             }
-            config.dreamSkill.put(player.getUniqueId(), skill);
 
             world.playSound(playerLoc, Sound.BLOCK_CHAIN_PLACE, 1.6f, 1.0f);
             world.spawnParticle(Particle.BLOCK, playerLoc.clone().add(0, 1.2, 0), 33, 0.6, 0.6, 0.6,
@@ -71,6 +70,8 @@ public class Dream implements Listener {
                 player.sendActionBar(Component.text("Enlighten").color(NamedTextColor.DARK_GRAY));
             }
         }
+
+        config.dreamSkill.put(player.getUniqueId(), skill);
 
     }
 

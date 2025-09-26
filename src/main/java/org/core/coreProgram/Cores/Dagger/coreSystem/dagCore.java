@@ -1,6 +1,8 @@
 package org.core.coreProgram.Cores.Dagger.coreSystem;
 
 import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -9,7 +11,10 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.core.Cool.Cool;
@@ -53,6 +58,38 @@ public class dagCore extends absCore {
         this.Fskill = new F(config, plugin, cool, damagestroker);
 
         getLogger().info("Dagger downloaded...");
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void onJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        applyAdditionalHealth(player, false);
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void onRespawn(PlayerRespawnEvent event) {
+        Player player = event.getPlayer();
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            applyAdditionalHealth(player, true);
+        }, 1L);
+    }
+
+    private void applyAdditionalHealth(Player player, boolean healFull) {
+        long addHP = 0;
+
+        AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
+        if (maxHealth != null) {
+            double current = maxHealth.getBaseValue();
+            double newMax = current + addHP;
+
+            maxHealth.setBaseValue(newMax);
+
+            if (healFull) {
+                player.setHealth(newMax);
+            } else if (player.getHealth() > newMax) {
+                player.setHealth(newMax);
+            }
+        }
     }
 
     @EventHandler(priority = EventPriority.NORMAL)

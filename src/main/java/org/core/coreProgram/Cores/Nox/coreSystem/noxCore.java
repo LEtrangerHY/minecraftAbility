@@ -1,11 +1,16 @@
 package org.core.coreProgram.Cores.Nox.coreSystem;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.core.Cool.Cool;
 import org.core.Core;
@@ -46,19 +51,44 @@ public class noxCore extends absCore {
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
+    public void onJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        applyAdditionalHealth(player, false);
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void onRespawn(PlayerRespawnEvent event) {
+        Player player = event.getPlayer();
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            applyAdditionalHealth(player, true);
+        }, 1L);
+    }
+
+    private void applyAdditionalHealth(Player player, boolean healFull) {
+        long addHP = 0;
+
+        AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
+        if (maxHealth != null) {
+            double current = maxHealth.getBaseValue();
+            double newMax = current + addHP;
+
+            maxHealth.setBaseValue(newMax);
+
+            if (healFull) {
+                player.setHealth(newMax);
+            } else if (player.getHealth() > newMax) {
+                player.setHealth(newMax);
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL)
     public void passiveAttackEffect(PlayerInteractEvent event) {
         if(tag.Nox.contains(event.getPlayer())){
             if (skillUsing.contains(event.getPlayer().getUniqueId())) {
                 skillUsing.remove(event.getPlayer().getUniqueId());
             }
         }
-    }
-
-    @EventHandler
-    public void reinforce(PlayerMoveEvent event){
-        Player player = event.getPlayer();
-
-
     }
 
     @Override

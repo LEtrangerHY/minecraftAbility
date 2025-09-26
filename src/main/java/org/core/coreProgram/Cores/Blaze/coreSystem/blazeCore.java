@@ -2,6 +2,7 @@ package org.core.coreProgram.Cores.Blaze.coreSystem;
 
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -9,6 +10,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
@@ -55,6 +58,40 @@ public class blazeCore extends absCore {
 
 
         getLogger().info("Blaze downloaded...");
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void onJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        applyAdditionalHealth(player, false);
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void onRespawn(PlayerRespawnEvent event) {
+        Player player = event.getPlayer();
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            applyAdditionalHealth(player, true);
+        }, 1L);
+    }
+
+    private void applyAdditionalHealth(Player player, boolean healFull) {
+        long addHP =
+                player.getPersistentDataContainer().getOrDefault(
+                        new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L);
+
+        AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
+        if (maxHealth != null) {
+            double current = maxHealth.getBaseValue();
+            double newMax = current + addHP;
+
+            maxHealth.setBaseValue(newMax);
+
+            if (healFull) {
+                player.setHealth(newMax);
+            } else if (player.getHealth() > newMax) {
+                player.setHealth(newMax);
+            }
+        }
     }
 
     @EventHandler

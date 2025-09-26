@@ -58,38 +58,38 @@ public class LevelingManager implements Listener {
         this.Exp = new persistentPlayerHashMap(plugin, "exp");
     }
 
-    @EventHandler
-    public void Join(PlayerJoinEvent event){
+    @EventHandler(priority = EventPriority.LOW)
+    public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
+        applyLevelHealth(player, false);
+    }
 
-        levelActionBar(player);
+    @EventHandler(priority = EventPriority.LOW)
+    public void onRespawn(PlayerRespawnEvent event) {
+        Player player = event.getPlayer();
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            applyLevelHealth(player, true);
+        }, 1L);
+    }
 
-        Long level = player.getPersistentDataContainer().getOrDefault(
+    private void applyLevelHealth(Player player, boolean healFull) {
+        long level = player.getPersistentDataContainer().getOrDefault(
                 new NamespacedKey(plugin, "level"), PersistentDataType.LONG, 0L
         );
 
         AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
         if (maxHealth != null) {
-            maxHealth.setBaseValue(20.0 + 2.0 * level);
-        }
-    }
+            double base = maxHealth.getDefaultValue();
+            double newMax = base + (2.0 * level);
 
+            maxHealth.setBaseValue(newMax);
 
-    @EventHandler
-    public void Respawn(PlayerRespawnEvent event) {
-        Player player = event.getPlayer();
-
-        Long level = player.getPersistentDataContainer().getOrDefault(
-                new NamespacedKey(plugin, "level"), PersistentDataType.LONG, 0L
-        );
-
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
-            if (maxHealth != null) {
-                maxHealth.setBaseValue(20.0 + 2.0 * level);
-                player.setHealth(maxHealth.getBaseValue());
+            if (healFull) {
+                player.setHealth(newMax);
+            } else if (player.getHealth() > newMax) {
+                player.setHealth(newMax);
             }
-        }, 1L);
+        }
     }
 
     @EventHandler
@@ -152,7 +152,7 @@ public class LevelingManager implements Listener {
 
     public HashMap<UUID, BukkitRunnable> runnableHashMap = new HashMap<>();
 
-    public void levelActionBar(Player player) {
+    public void levelScoreBoard(Player player) {
 
         if(runnableHashMap.containsKey(player.getUniqueId())){
             runnableHashMap.get(player.getUniqueId()).cancel();

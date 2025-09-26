@@ -231,7 +231,7 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
             }
 
             this.config.setSetting(target, setting, value);
-            level.levelActionBar(target);
+            level.levelScoreBoard(target);
             sender.sendMessage("§a" + target.getName() + "의 " + setting + " 값을 " + value + "로 설정했습니다.");
             return true;
         }
@@ -263,13 +263,13 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
                     return true;
                 }
                 this.config.clearPlayerCore(target);
-                level.levelActionBar(target);
+                level.levelScoreBoard(target);
                 sender.sendMessage( "§c" + target.getName() + " 소유의 core을 모두 제거했습니다");
                 return true;
             }else if(args.length == 0){
                 if (!(sender instanceof Player player)) return true;
                 this.config.clearPlayerCore(player);
-                level.levelActionBar(player);
+                level.levelScoreBoard(player);
                 sender.sendMessage( "§c본인 소유의 core을 모두 제거했습니다.");
                 return true;
             }else{
@@ -351,7 +351,7 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
 
             target.getPersistentDataContainer().set(new NamespacedKey(this, "exp"), PersistentDataType.LONG, lv);
             target.getPersistentDataContainer().set(new NamespacedKey(this, "level"), PersistentDataType.LONG, xp);
-            level.levelActionBar(target);
+            level.levelScoreBoard(target);
             sender.sendMessage( "§a" + target.getName() +"의 경험치, 레벨 수정 " + xp + ", " + lv);
             return true;
         }
