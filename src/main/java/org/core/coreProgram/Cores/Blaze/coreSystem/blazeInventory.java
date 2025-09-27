@@ -5,6 +5,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -119,7 +121,7 @@ public class blazeInventory extends absInventory {
 
     @Override
     protected void reinforceSkill(Player player, String skill, Long skillLevel, Inventory customInv) {
-        if (skillLevel >= 6) return;
+        if (skillLevel >= 6 || !contains(player)) return;
 
         long level = player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "level"), PersistentDataType.LONG, 0L);
 
@@ -146,7 +148,7 @@ public class blazeInventory extends absInventory {
 
         List<Long> requireExpList;
         switch (skill) {
-            case "R": requireExpList = requireExpOfR; break;
+            case "R": requireExpList = requireExpOfR; applyAdditionalHealth(player, 1); break;
             case "Q": requireExpList = requireExpOfQ; break;
             case "F": requireExpList = requireExpOfF; break;
             default: return;
@@ -177,6 +179,18 @@ public class blazeInventory extends absInventory {
                     Component.text("경험치(Minecraft EXP) 부족 " + requiredExp + "Exp 필요")
                             .color(NamedTextColor.RED)
             );
+        }
+    }
+
+    private void applyAdditionalHealth(Player player, long addHP) {
+
+        AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
+        if (maxHealth != null) {
+            double current = maxHealth.getBaseValue();
+            double newMax = current + addHP;
+
+            maxHealth.setBaseValue(newMax);
+
         }
     }
 

@@ -62,12 +62,16 @@ public class blazeCore extends absCore {
 
     @EventHandler(priority = EventPriority.NORMAL)
     public void onJoin(PlayerJoinEvent event) {
+        if(!contains(event.getPlayer())) return;
+
         Player player = event.getPlayer();
         applyAdditionalHealth(player, false);
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
     public void onRespawn(PlayerRespawnEvent event) {
+        if(!contains(event.getPlayer())) return;
+
         Player player = event.getPlayer();
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             applyAdditionalHealth(player, true);

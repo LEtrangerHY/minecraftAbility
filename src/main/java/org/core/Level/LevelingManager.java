@@ -61,12 +61,16 @@ public class LevelingManager implements Listener {
     @EventHandler(priority = EventPriority.LOW)
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
+
+        levelScoreBoard(player);
         applyLevelHealth(player, false);
     }
 
     @EventHandler(priority = EventPriority.LOW)
     public void onRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
+
+        levelScoreBoard(player);
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             applyLevelHealth(player, true);
         }, 1L);
@@ -85,8 +89,6 @@ public class LevelingManager implements Listener {
             maxHealth.setBaseValue(newMax);
 
             if (healFull) {
-                player.setHealth(newMax);
-            } else if (player.getHealth() > newMax) {
                 player.setHealth(newMax);
             }
         }

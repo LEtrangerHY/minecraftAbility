@@ -49,7 +49,7 @@ public abstract class absCore implements Listener {
 
     public static HashSet<UUID> skillUsing = new HashSet<>();
 
-    @EventHandler(priority = EventPriority.LOW)
+    @EventHandler(priority = EventPriority.HIGH)
     public void rSkillTrigger(PlayerInteractEvent event) {
         Player player = event.getPlayer();
 
@@ -73,7 +73,7 @@ public abstract class absCore implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOW)
+    @EventHandler(priority = EventPriority.HIGH)
     public void qSkillTrigger(PlayerDropItemEvent event) {
         Player player = event.getPlayer();
 
@@ -94,7 +94,7 @@ public abstract class absCore implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOW)
+    @EventHandler(priority = EventPriority.HIGH)
     public void fSkillTrigger(PlayerSwapHandItemsEvent event) {
 
         Player player = event.getPlayer();

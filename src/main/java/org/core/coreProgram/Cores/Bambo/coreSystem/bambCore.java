@@ -56,12 +56,16 @@ public class bambCore extends absCore {
 
     @EventHandler(priority = EventPriority.NORMAL)
     public void onJoin(PlayerJoinEvent event) {
+        if(!contains(event.getPlayer())) return;
+
         Player player = event.getPlayer();
         applyAdditionalHealth(player, false);
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
     public void onRespawn(PlayerRespawnEvent event) {
+        if(!contains(event.getPlayer())) return;
+
         Player player = event.getPlayer();
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             applyAdditionalHealth(player, true);
@@ -109,7 +113,7 @@ public class bambCore extends absCore {
         ItemStack itemInMainHand = player.getInventory().getItemInMainHand();
         ItemStack itemInOffHand = player.getInventory().getItemInOffHand();
 
-        if(itemInMainHand.getType() == Material.BAMBOO && itemInOffHand.getType() == Material.IRON_NUGGET){
+        if(itemInMainHand.getType() == Material.BAMBOO && itemInOffHand.getType() == Material.IRON_NUGGET && contains(player)){
             if(!config.r_damaged.getOrDefault(player.getUniqueId(), false)) {
                 if (!config.reloaded.getOrDefault(player.getUniqueId(), false)) {
                     player.playSound(player.getLocation(), Sound.ITEM_TRIDENT_HIT, 1, 1);
