@@ -83,21 +83,36 @@ public class carpInventory extends absInventory {
                 lore.add(requireXp.color(NamedTextColor.AQUA));
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("R 스킬 설명임 누가 좀 적어주셈").color(NamedTextColor.GREEN));
+                lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+                lore.add(Component.text("전방으로 돌진하여 피격된 대상에게 피해를 가한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("돌진한 속도에 비례한 시간만큼 대상을 기절시킨다.").color(NamedTextColor.GREEN));
                 break;
             case "Q":
-                requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfR.get((int) level)) : Component.text("Require EXP : MAX");
+                requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfQ.get((int) level)) : Component.text("Require EXP : MAX");
                 lore.add(requireXp.color(NamedTextColor.AQUA));
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("Q 스킬 설명임 누가 좀 적어주셈").color(NamedTextColor.GREEN));
+                lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : 타이밍").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+                lore.add(Component.text("타이밍에 따른 정규분포 값에 비례한 만큼의 피해를 전방의 범위 내의 대상에게 가한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("전방의 범위 내의 대상들을 상승시킨다.").color(NamedTextColor.GREEN));
                 break;
             case "F":
-                requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfR.get((int) level)) : Component.text("Require EXP : MAX");
+                requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfF.get((int) level)) : Component.text("Require EXP : MAX");
                 lore.add(requireXp.color(NamedTextColor.AQUA));
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("F 스킬 설명임 누가 좀 적어주셈").color(NamedTextColor.GREEN));
+                lore.add(Component.text("타입 : 회복").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : 횟수").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("대상 : 플레이어").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+                lore.add(Component.text("1~3회 : 체력을 3 회복한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("4회 : 불사의 토템 1개가 지급된다.").color(NamedTextColor.GREEN));
                 break;
             default:
                 break;

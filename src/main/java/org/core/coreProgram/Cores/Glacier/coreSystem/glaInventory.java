@@ -83,21 +83,36 @@ public class glaInventory extends absInventory {
                 lore.add(requireXp.color(NamedTextColor.AQUA));
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("R 스킬 설명임 누가 좀 적어주셈").color(NamedTextColor.GREEN));
+                lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+                lore.add(Component.text("전방으로 푸른 얼음 결정을 투사한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("피격-수면 : 수면 일부를 냉각시킨다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("피격-적 오브젝트 : 적 오브젝트를 냉각시킨다.").color(NamedTextColor.GREEN));
                 break;
             case "Q":
-                requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfR.get((int) level)) : Component.text("Require EXP : MAX");
+                requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfQ.get((int) level)) : Component.text("Require EXP : MAX");
                 lore.add(requireXp.color(NamedTextColor.AQUA));
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("Q 스킬 설명임 누가 좀 적어주셈").color(NamedTextColor.GREEN));
+                lore.add(Component.text("타입 : 효과").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+                lore.add(Component.text("전방으로 60° 부채꼴 가루눈을 방사한다.").color(NamedTextColor.GREEN));
                 break;
             case "F":
-                requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfR.get((int) level)) : Component.text("Require EXP : MAX");
+                requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfF.get((int) level)) : Component.text("Require EXP : MAX");
                 lore.add(requireXp.color(NamedTextColor.AQUA));
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("F 스킬 설명임 누가 좀 적어주셈").color(NamedTextColor.GREEN));
+                lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : 장판").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("대상 : 적 오브젝트/바이옴").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+                lore.add(Component.text("바이옴 : 범위 내의 바이옴을 [차가운 평야] 로 변경한다").color(NamedTextColor.GREEN));
+                lore.add(Component.text("적 오브젝트 : 범위 내의 대상을 밀쳐내고 냉각시킨다.").color(NamedTextColor.GREEN));
                 break;
             default:
                 break;

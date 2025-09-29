@@ -396,7 +396,7 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
             }
         }
 
-        if (command.getName().equalsIgnoreCase("corecheck") || command.getName().equalsIgnoreCase("coreclear")) {
+        if (command.getName().equalsIgnoreCase("corecheck") || command.getName().equalsIgnoreCase("coreclear") || command.getName().equalsIgnoreCase("corelevelsetr")) {
             if (args.length == 1) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     suggestions.add(p.getName());

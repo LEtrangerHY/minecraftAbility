@@ -83,21 +83,34 @@ public class lustInventory extends absInventory {
                 lore.add(requireXp.color(NamedTextColor.AQUA));
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("R 스킬 설명임 누가 좀 적어주셈").color(NamedTextColor.GREEN));
+                lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+                lore.add(Component.text("전방으로 철 블럭을 투사한다.").color(NamedTextColor.GREEN));
                 break;
             case "Q":
-                requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfR.get((int) level)) : Component.text("Require EXP : MAX");
+                requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfQ.get((int) level)) : Component.text("Require EXP : MAX");
                 lore.add(requireXp.color(NamedTextColor.AQUA));
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("Q 스킬 설명임 누가 좀 적어주셈").color(NamedTextColor.GREEN));
+                lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : 지정형").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("대상 : 적 오브젝트/블럭").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+                lore.add(Component.text("지정 : 범위 내 설치된 철 관련 블럭을 들어올려 대상에게 투사한다.").color(NamedTextColor.GREEN));
                 break;
             case "F":
-                requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfR.get((int) level)) : Component.text("Require EXP : MAX");
+                requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfF.get((int) level)) : Component.text("Require EXP : MAX");
                 lore.add(requireXp.color(NamedTextColor.AQUA));
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("F 스킬 설명임 누가 좀 적어주셈").color(NamedTextColor.GREEN));
+                lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : 지정형").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("대상 : -/적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+                lore.add(Component.text("좌우에 철골렘을 각각 1 개체씩 소환한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("지정 : 지정한 대상을 철골렘의 공격 ").color(NamedTextColor.GREEN));
                 break;
             default:
                 break;

@@ -83,21 +83,35 @@ public class blazeInventory extends absInventory {
                 lore.add(requireXp.color(NamedTextColor.AQUA));
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("R 스킬 설명임 누가 좀 적어주셈").color(NamedTextColor.GREEN));
+                lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("대상 : -").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+                lore.add(Component.text("선딜레이 후 화염구 7개를 투사한다.").color(NamedTextColor.GREEN));
                 break;
             case "Q":
-                requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfR.get((int) level)) : Component.text("Require EXP : MAX");
+                requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfQ.get((int) level)) : Component.text("Require EXP : MAX");
                 lore.add(requireXp.color(NamedTextColor.AQUA));
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("Q 스킬 설명임 누가 좀 적어주셈").color(NamedTextColor.GREEN));
+                lore.add(Component.text("타입 : 강화").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : 지속시간").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("대상 : 플레이어").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+                lore.add(Component.text("지속시간 : 13초 동안 시듦 피해를 입는 대신, 일반 공격의 방사 범위를 360°로 확장시키고, 피해량을 150% 상승시킨다.").color(NamedTextColor.GREEN));
                 break;
             case "F":
-                requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfR.get((int) level)) : Component.text("Require EXP : MAX");
+                requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfF.get((int) level)) : Component.text("Require EXP : MAX");
                 lore.add(requireXp.color(NamedTextColor.AQUA));
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("F 스킬 설명임 누가 좀 적어주셈").color(NamedTextColor.GREEN));
+                lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : 장판").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("대상 : 플레이어/적 오브젝트/바이옴").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+                lore.add(Component.text("바이옴 : 범위 내의 바이옴을 [창백한 정원] 으로 변경한다").color(NamedTextColor.GREEN));
+                lore.add(Component.text("플레이어 : 6초 동안 시듦 피해를 입고, 13초 동안 이동 속도가 45% 증가한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("적 오브젝트 : 발 밑에 불기둥을 생성하여 피해를 가한다.").color(NamedTextColor.GREEN));
                 break;
             default:
                 break;

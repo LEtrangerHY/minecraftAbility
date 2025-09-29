@@ -85,25 +85,45 @@ public class benzInventory extends absInventory {
 
         switch (skill) {
             case "R":
-                requireXp = (level < 6) ? Component.text("Require Minecraft EXP : " + requireExpOfR.get((int) level)) : Component.text("Require CORE EXP : MAX");
+                requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfR.get((int) level)) : Component.text("Require EXP : MAX");
                 lore.add(requireXp.color(NamedTextColor.AQUA));
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("R 스킬 설명임 누가 좀 적어주셈").color(NamedTextColor.GREEN));
+                lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : 활성화").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+                lore.add(Component.text("패시브 : 비활성화 시 이동속도가 33% 증가한다").color(NamedTextColor.GREEN));
+                lore.add(Component.text("활성화 : 3회 이상 피해 가하기").color(NamedTextColor.GREEN));
+                lore.add(Component.text("전방으로 돌진하며 경로 내 대상들을 베어낸다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("피격-돌진 : ⏣을 1개 소모해 대상에게 연쇄방향을 1회 중첩한다.").color(NamedTextColor.GREEN));
+
                 break;
             case "Q":
-                requireXp = (level < 6) ? Component.text("Require Minecraft EXP : " + requireExpOfR.get((int) level)) : Component.text("Require CORE EXP : MAX");
+                requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfQ.get((int) level)) : Component.text("Require EXP : MAX");
                 lore.add(requireXp.color(NamedTextColor.AQUA));
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("Q 스킬 설명임 누가 좀 적어주셈").color(NamedTextColor.GREEN));
+                lore.add(Component.text("타입 : 효과").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : 지정형").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+                lore.add(Component.text("3초간 대상을 고정시킨다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("지정 : 3초간 대상에게 중첩된 연쇄반향의 피해증폭율을 66% 상승시킨다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("비지정 : 3초간 대상에게 중첩된 연쇄반향의 피해전파율을 66% 상승시킨다.").color(NamedTextColor.GREEN));
                 break;
             case "F":
-                requireXp = (level < 6) ? Component.text("Require Minecraft EXP : " + requireExpOfR.get((int) level)) : Component.text("Require CORE EXP : MAX");
+                requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfF.get((int) level)) : Component.text("Require EXP : MAX");
                 lore.add(requireXp.color(NamedTextColor.AQUA));
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("F 스킬 설명임 누가 좀 적어주셈").color(NamedTextColor.GREEN));
+                lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : 지정형").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+                lore.add(Component.text("공통 : 전방으로 강한 참격을 가한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("지정 : 대상을 중심으로 소모한 연쇄반향의 수만큼 연쇄 참격을 시전한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("피격-강한 참격 : ⏣을 1개 소모해 대상에게 연쇄방향을 1회 중첩한다.").color(NamedTextColor.GREEN));
                 break;
             default:
                 break;
