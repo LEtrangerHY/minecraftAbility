@@ -166,7 +166,7 @@ public class bambInventory extends absInventory {
         switch (skill) {
             case "R": requireExpList = requireExpOfR; break;
             case "Q": requireExpList = requireExpOfQ; applyAdditionalHealth(player, 1); break;
-            case "F": requireExpList = requireExpOfF; applyAdditionalHealth(player, 1);break;
+            case "F": requireExpList = requireExpOfF; applyAdditionalHealth(player, 1); break;
             default: return;
         }
 
