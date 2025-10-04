@@ -401,6 +401,7 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
                 suggestions.add("luster");
                 suggestions.add("blaze");
                 suggestions.add("commander");
+                suggestions.add("harvester");
             } else if (args.length == 3) {
                 suggestions.add("true");
                 suggestions.add("false");

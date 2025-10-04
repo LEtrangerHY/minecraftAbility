@@ -32,6 +32,7 @@ import org.core.coreProgram.Cores.Carpenter.coreSystem.carpLeveling;
 import org.core.coreProgram.Cores.Commander.coreSystem.comLeveling;
 import org.core.coreProgram.Cores.Dagger.coreSystem.dagLeveling;
 import org.core.coreProgram.Cores.Glacier.coreSystem.glaLeveling;
+import org.core.coreProgram.Cores.Harvester.coreSystem.harvLeveling;
 import org.core.coreProgram.Cores.Knight.coreSystem.knightLeveling;
 import org.core.coreProgram.Cores.Luster.coreSystem.lustLeveling;
 import org.core.coreProgram.Cores.Nox.coreSystem.noxLeveling;
@@ -145,6 +146,10 @@ public class LevelingManager implements Listener {
                 case "commander" :
                     comLeveling commander = new comLeveling(plugin, player, exp);
                     commander.addExp(player);
+                    break;
+                case "harvester" :
+                    harvLeveling harvester = new harvLeveling(plugin, player, exp);
+                    harvester.addExp(player);
                     break;
                 default :
                     break;

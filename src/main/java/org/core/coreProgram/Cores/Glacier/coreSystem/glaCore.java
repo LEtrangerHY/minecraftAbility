@@ -49,7 +49,6 @@ public class glaCore extends absCore {
         this.Qskill = new Q(config, plugin, cool);
         this.Fskill = new F(config, plugin, cool);
 
-
         getLogger().info("Glacier downloaded...");
     }
 
