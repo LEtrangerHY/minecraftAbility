@@ -162,7 +162,7 @@ public class harvInventory extends absInventory {
         List<Long> requireExpList;
         switch (skill) {
             case "R": requireExpList = requireExpOfR; break;
-            case "Q": requireExpList = requireExpOfQ; break;
+            case "Q": requireExpList = requireExpOfQ; applyAdditionalHealth(player, 1); break;
             case "F": requireExpList = requireExpOfF; break;
             default: return;
         }

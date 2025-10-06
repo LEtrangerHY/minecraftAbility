@@ -209,7 +209,6 @@ public class F implements SkillBase {
         block.breakNaturally(new ItemStack(Material.IRON_SWORD));
     }
 
-
     public static LivingEntity getTargetedEntity(Player player, double range, double raySize) {
         World world = player.getWorld();
         Location eyeLocation = player.getEyeLocation();

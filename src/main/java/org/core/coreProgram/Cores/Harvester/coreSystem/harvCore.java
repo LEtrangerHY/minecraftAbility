@@ -14,6 +14,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Vector;
 import org.core.Cool.Cool;
 import org.core.Core;
@@ -76,7 +77,8 @@ public class harvCore extends absCore {
     }
 
     private void applyAdditionalHealth(Player player, boolean healFull) {
-        long addHP = 0;
+        long addHP = player.getPersistentDataContainer().getOrDefault(
+                new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L);
 
         AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
         if (maxHealth != null) {

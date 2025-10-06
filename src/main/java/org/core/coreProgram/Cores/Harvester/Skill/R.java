@@ -58,7 +58,7 @@ public class R implements SkillBase {
 
         damage = (player.isInvisible()) ? damage * 4 : damage;
 
-        Location origin = player.getEyeLocation().add(0, -0.8, 0);
+        Location origin = player.getEyeLocation().add(0, -0.7, 0);
         Vector direction = player.getLocation().getDirection().clone().setY(0).normalize();
 
         Particle.DustOptions dustOption_slash = new Particle.DustOptions(Color.fromRGB(108, 108, 44), 0.6f);

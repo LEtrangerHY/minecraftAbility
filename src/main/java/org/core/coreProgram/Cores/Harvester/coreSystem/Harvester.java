@@ -23,7 +23,7 @@ public class Harvester {
     public long r_Skill_Cool = 3000;
 
     //Q
-    public long q_Skill_Cool = 10000;
+    public long q_Skill_Cool = 16000;
 
     //F
     public HashMap<UUID, Boolean> fskill_using = new HashMap<>();
