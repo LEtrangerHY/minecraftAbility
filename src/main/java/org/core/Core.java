@@ -1,6 +1,5 @@
 package org.core;
 
-import com.destroystokyo.paper.event.entity.EntityJumpEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -13,14 +12,12 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.core.Cool.Cool;
-import org.core.Effect.*;
 import org.core.Level.LevelingManager;
+import org.core.coreEntity.EntitySpawnOption.EntityLevelingManager;
 import org.core.coreProgram.Cores.Bambo.coreSystem.Bambo;
 import org.core.coreProgram.Cores.Bambo.coreSystem.bambCore;
 import org.core.coreProgram.Cores.Bambo.coreSystem.bambInventory;
@@ -61,18 +58,16 @@ import org.core.coreProgram.Cores.Pyro.coreSystem.Pyro;
 import org.core.coreProgram.Cores.Pyro.coreSystem.pyroCore;
 import org.core.coreProgram.Cores.Pyro.coreSystem.pyroInventory;
 
-import javax.naming.Name;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.bukkit.Bukkit.getLogger;
-
 public final class Core extends JavaPlugin implements Listener, TabCompleter {
 
-    private coreConfig config;
-    private LevelingManager level;
-
     private static Core instance;
+
+    private coreConfig config;
+
+    private LevelingManager level;
 
     private noxCore nox;
     private benzCore benz;
@@ -102,7 +97,7 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
     private harvInventory harvInv;
     private bloomInventory bloomInv;
 
-    private EffectManager effectManager = new EffectManager();
+    private EntityLevelingManager Elevel;
 
     public static Core getInstance() {
         return instance;
@@ -199,6 +194,8 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
         this.bloomInv = new bloomInventory(this, this.config);
         Bukkit.getPluginManager().registerEvents(this.bloomInv, this);
 
+        this.Elevel = new EntityLevelingManager(this);
+        Bukkit.getPluginManager().registerEvents(this.Elevel, this);
 
         getCommand("core").setExecutor(this);
         getCommand("corecheck").setExecutor(this);
