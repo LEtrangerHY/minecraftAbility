@@ -1,10 +1,11 @@
-package org.core.coreEntity.EntitySpawnOption;
+package org.core.coreEntity.AbsEntityLeveling;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
-import org.bukkit.entity.Entity;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
@@ -13,8 +14,6 @@ import org.bukkit.event.entity.*;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -33,6 +32,7 @@ public class EntityLevelingManager implements Listener {
         this.levelKey = new NamespacedKey(plugin, "entity_level");
 
         Bukkit.getScheduler().runTaskTimer(plugin, this::processSpawnQueue, 1L, 2L);
+        Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
     @EventHandler
@@ -44,7 +44,8 @@ public class EntityLevelingManager implements Listener {
 
         if (type == EntityType.FALLING_BLOCK || type == EntityType.ITEM
                 || type == EntityType.ARMOR_STAND || type == EntityType.VILLAGER
-                || type == EntityType.BAT || type == EntityType.SQUID || type == EntityType.GLOW_SQUID) return;
+                || type == EntityType.BAT || type == EntityType.SQUID || type == EntityType.GLOW_SQUID)
+            return;
 
         spawnQueue.add(entity);
     }
@@ -60,7 +61,6 @@ public class EntityLevelingManager implements Listener {
             double sigma = 64.0;
             double normalized = Math.exp(-Math.pow((y - centerY), 2) / (2 * sigma * sigma));
             int baseLevel = (int) Math.round((1.0 - normalized) * 10.0);
-
             int jitter = ThreadLocalRandom.current().nextInt(-2, 3);
             int level = Math.max(0, Math.min(10, baseLevel + jitter));
 
@@ -87,75 +87,81 @@ public class EntityLevelingManager implements Listener {
                 entity.setHealth(newHealth);
             }
 
-            double health = Math.round(entity.getHealth() * 10.0) / 10.0;
-            double maxHealth = Math.round(entity.getAttribute(Attribute.MAX_HEALTH).getValue() * 10.0) / 10.0;
-
-            Component displayName = Component.text("[Lv." + level + "] " + readableName + " " + health + "/" + maxHealth + "❤", color);
-            entity.customName(displayName);
-            entity.setCustomNameVisible(true);
-
-            registerHealthUpdateListener(entity, readableName, level, color);
+            updateHealthName(entity, readableName, level, color);
         }
     }
 
-    private void registerHealthUpdateListener(LivingEntity entity, String name, int level, NamedTextColor color) {
-        Bukkit.getPluginManager().registerEvents(new Listener() {
-
-            @EventHandler
-            public void onDamage(EntityDamageEvent e) {
-                if (e.getEntity() != entity) return;
-                Bukkit.getScheduler().runTaskLater(plugin, () -> updateHealthName(entity, name, level, color), 1L);
-            }
-
-            @EventHandler
-            public void onHeal(EntityRegainHealthEvent e) {
-                if (e.getEntity() != entity) return;
-                Bukkit.getScheduler().runTaskLater(plugin, () -> updateHealthName(entity, name, level, color), 1L);
-            }
-
-        }, plugin);
-    }
-
     private void updateHealthName(LivingEntity entity, String name, int level, NamedTextColor color) {
-        if (entity.isDead()) return;
+        if (!entity.isValid()) return;
 
         double health = Math.max(0, Math.round(entity.getHealth() * 10.0) / 10.0);
         double maxHealth = Math.round(entity.getAttribute(Attribute.MAX_HEALTH).getValue() * 10.0) / 10.0;
 
         Component newName = Component.text("[Lv." + level + "] " + name + " " + health + "/" + maxHealth + "❤", color);
         entity.customName(newName);
+        entity.setCustomNameVisible(true);
     }
 
+    private String getReadableName(LivingEntity entity) {
+        return Arrays.stream(entity.getType().name().split("_"))
+                .map(s -> s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase())
+                .reduce((a, b) -> a + " " + b)
+                .orElse(entity.getType().name());
+    }
+
+    @EventHandler
+    public void onDamage(EntityDamageEvent e) {
+        if (!(e.getEntity() instanceof LivingEntity entity)) return;
+
+        PersistentDataContainer data = entity.getPersistentDataContainer();
+        if (!data.has(levelKey, PersistentDataType.INTEGER)) return;
+
+        int level = data.get(levelKey, PersistentDataType.INTEGER);
+        String name = getReadableName(entity);
+        NamedTextColor color = levelColorCache.getOrDefault(level, NamedTextColor.WHITE);
+
+        Bukkit.getScheduler().runTaskLater(plugin, () -> updateHealthName(entity, name, level, color), 1L);
+    }
+
+    @EventHandler
+    public void onHeal(EntityRegainHealthEvent e) {
+        if (!(e.getEntity() instanceof LivingEntity entity)) return;
+
+        PersistentDataContainer data = entity.getPersistentDataContainer();
+        if (!data.has(levelKey, PersistentDataType.INTEGER)) return;
+
+        int level = data.get(levelKey, PersistentDataType.INTEGER);
+        String name = getReadableName(entity);
+        NamedTextColor color = levelColorCache.getOrDefault(level, NamedTextColor.WHITE);
+
+        Bukkit.getScheduler().runTaskLater(plugin, () -> updateHealthName(entity, name, level, color), 1L);
+    }
 
     @EventHandler
     public void onEntityDamage(EntityDamageByEntityEvent event) {
-        if (!(event.getDamager() instanceof LivingEntity)) return;
+        if (!(event.getDamager() instanceof LivingEntity attacker)) return;
 
-        LivingEntity attacker = (LivingEntity) event.getDamager();
         PersistentDataContainer data = attacker.getPersistentDataContainer();
         if (!data.has(levelKey, PersistentDataType.INTEGER)) return;
 
         int level = data.get(levelKey, PersistentDataType.INTEGER);
         double p = (0.005 * level * level + 0.055 * level);
-
         double originalDamage = event.getDamage();
-        double amplifiedDamage = (originalDamage * (1 + p) >= 20) ? originalDamage * (1 + p) : originalDamage * (1 + p) * 1.66;
+        double amplifiedDamage = (originalDamage * (1 + p) >= 20)
+                ? originalDamage * (1 + p)
+                : originalDamage * (1 + p) * 1.66;
+
         event.setDamage(amplifiedDamage);
     }
 
     @EventHandler
     public void onEntityDeath(EntityDeathEvent event) {
         LivingEntity deadEntity = event.getEntity();
-
         PersistentDataContainer data = deadEntity.getPersistentDataContainer();
         if (!data.has(levelKey, PersistentDataType.INTEGER)) return;
 
         int level = data.get(levelKey, PersistentDataType.INTEGER);
-
         int baseExp = event.getDroppedExp();
-        int newExp = baseExp * (level + 1);
-
-        event.setDroppedExp(newExp);
+        event.setDroppedExp(baseExp * (level + 1));
     }
-
 }

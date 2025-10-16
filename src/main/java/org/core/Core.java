@@ -17,7 +17,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.core.Cool.Cool;
 import org.core.Level.LevelingManager;
-import org.core.coreEntity.EntitySpawnOption.EntityLevelingManager;
+import org.core.coreEntity.AbsEntityLeveling.EntityLevelingManager;
 import org.core.coreProgram.Cores.Bambo.coreSystem.Bambo;
 import org.core.coreProgram.Cores.Bambo.coreSystem.bambCore;
 import org.core.coreProgram.Cores.Bambo.coreSystem.bambInventory;
