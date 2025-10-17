@@ -1,4 +1,4 @@
-package org.core.coreProgram.Cores.Nox.coreSystem;
+package org.core.coreProgram.Cores.Nightel.coreSystem;
 
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
@@ -13,13 +13,13 @@ import org.core.Level.Levels;
 import java.util.Collections;
 import java.util.Set;
 
-public class noxLeveling implements Levels {
+public class nightLeveling implements Levels {
 
     private final JavaPlugin plugin;
     private final Player player;
     private final long exp;
 
-    public noxLeveling(JavaPlugin plugin, Player player, long exp) {
+    public nightLeveling(JavaPlugin plugin, Player player, long exp) {
         this.plugin = plugin;
         this.player = player;
         this.exp = exp;

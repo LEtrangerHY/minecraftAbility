@@ -1,30 +1,21 @@
 package org.core.Level;
 
-import it.unimi.dsi.fastutil.Hash;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityRegainHealthEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.*;
-import org.bukkit.util.Vector;
-import org.core.Core;
 import org.core.coreConfig;
 import org.core.coreProgram.Cores.Bambo.coreSystem.bambLeveling;
 import org.core.coreProgram.Cores.Benzene.coreSystem.benzLeveling;
@@ -37,12 +28,10 @@ import org.core.coreProgram.Cores.Glacier.coreSystem.glaLeveling;
 import org.core.coreProgram.Cores.Harvester.coreSystem.harvLeveling;
 import org.core.coreProgram.Cores.Knight.coreSystem.knightLeveling;
 import org.core.coreProgram.Cores.Luster.coreSystem.lustLeveling;
-import org.core.coreProgram.Cores.Nox.coreSystem.noxLeveling;
+import org.core.coreProgram.Cores.Nightel.coreSystem.nightLeveling;
 import org.core.coreProgram.Cores.Pyro.coreSystem.pyroLeveling;
 import org.core.playerSettings.persistentPlayerHashMap;
-import org.core.playerSettings.persistentPlayerSet;
 
-import javax.naming.Name;
 import java.util.*;
 
 public class LevelingManager implements Listener {
@@ -110,7 +99,7 @@ public class LevelingManager implements Listener {
                     benzene.addExp(player);
                     break;
                 case "nox" :
-                    noxLeveling nox = new noxLeveling(plugin, player, exp);
+                    nightLeveling nox = new nightLeveling(plugin, player, exp);
                     nox.addExp(player);
                     break;
                 case "bambo" :

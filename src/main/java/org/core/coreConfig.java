@@ -20,7 +20,7 @@ public class coreConfig {
 
     private final JavaPlugin plugin;
 
-    public Set<Player> Nox;
+    public Set<Player> Nightel;
     public Set<Player> Benzene;
     public Set<Player> Bambo;
     public Set<Player> Carpenter;
@@ -38,7 +38,7 @@ public class coreConfig {
     public coreConfig(JavaPlugin plugin) {
         this.plugin = plugin;
 
-        this.Nox = new persistentPlayerSet(plugin, "setting_nox");
+        this.Nightel = new persistentPlayerSet(plugin, "setting_nightel");
         this.Benzene = new persistentPlayerSet(plugin, "setting_benzene");
         this.Bambo = new persistentPlayerSet(plugin, "setting_bambo");
         this.Carpenter = new persistentPlayerSet(plugin, "setting_carpenter");
@@ -55,7 +55,7 @@ public class coreConfig {
     }
 
     public String getPlayerCore(Player player) {
-        if (Nox.contains(player)) return "nox";
+        if (Nightel.contains(player)) return "nightel";
         if (Benzene.contains(player)) return "benzene";
         if (Bambo.contains(player)) return "bambo";
         if (Carpenter.contains(player)) return "carpenter";
@@ -75,7 +75,7 @@ public class coreConfig {
     public void clearPlayerCore(Player player){
         player.setWalkSpeed(0.2f);
         player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(4.0);
-        player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_nox"), PersistentDataType.BYTE, (byte) 0);
+        player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_nightel"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_benzene"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_bambo"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_carpenter"), PersistentDataType.BYTE, (byte) 0);
@@ -101,7 +101,7 @@ public class coreConfig {
 
     private NamespacedKey getSettingKey(String setting) {
         return switch (setting.toLowerCase()) {
-            case "nox" -> new NamespacedKey(plugin, "setting_nox");
+            case "nox" -> new NamespacedKey(plugin, "setting_nightel");
             case "benzene" -> new NamespacedKey(plugin, "setting_benzene");
             case "bambo" -> new NamespacedKey(plugin, "setting_bambo");
             case "carpenter" -> new NamespacedKey(plugin, "setting_carpenter");

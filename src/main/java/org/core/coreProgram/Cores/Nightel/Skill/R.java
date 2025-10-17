@@ -1,4 +1,4 @@
-package org.core.coreProgram.Cores.Nox.Skill;
+package org.core.coreProgram.Cores.Nightel.Skill;
 
 import org.bukkit.*;
 import org.bukkit.entity.Entity;
@@ -12,21 +12,20 @@ import org.core.Cool.Cool;
 import org.core.Effect.ForceDamage;
 import org.core.Effect.Invulnerable;
 import org.core.coreProgram.AbsCoreSystem.SkillBase;
-import org.core.coreProgram.Cores.Nox.Passive.Dream;
-import org.core.coreProgram.Cores.Nox.coreSystem.Nox;
+import org.core.coreProgram.Cores.Nightel.Passive.Dream;
+import org.core.coreProgram.Cores.Nightel.coreSystem.Nightel;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
 public class R implements SkillBase {
 
-    private final Nox config;
+    private final Nightel config;
     private final JavaPlugin plugin;
     private final Cool cool;
     private final Dream dream;
 
-    public R(Nox config, JavaPlugin plugin, Cool cool, Dream dream) {
+    public R(Nightel config, JavaPlugin plugin, Cool cool, Dream dream) {
         this.config = config;
         this.plugin = plugin;
         this.cool = cool;

@@ -1,13 +1,11 @@
-package org.core.coreProgram.Cores.Nox.coreSystem;
+package org.core.coreProgram.Cores.Nightel.coreSystem;
 
-import it.unimi.dsi.fastutil.Hash;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
-public class Nox {
+public class Nightel {
 
     //CoolHashmap
     public HashMap<UUID, Long> R_COOLDOWN = new HashMap<>();

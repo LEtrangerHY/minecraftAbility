@@ -1,4 +1,4 @@
-package org.core.coreProgram.Cores.Nox.coreSystem;
+package org.core.coreProgram.Cores.Nightel.coreSystem;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -18,14 +18,12 @@ import org.core.coreProgram.AbsInentory.absInventory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 
-public class noxInventory extends absInventory {
+public class nightInventory extends absInventory {
 
     private final Core plugin;
 
-    public noxInventory(Core plugin, coreConfig config) {
+    public nightInventory(Core plugin, coreConfig config) {
         super(config);
 
         this.plugin = plugin;
@@ -33,7 +31,7 @@ public class noxInventory extends absInventory {
 
     @Override
     protected boolean contains(Player player) {
-        return tag.Nox.contains(player);
+        return tag.Nightel.contains(player);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package org.core.coreProgram.Cores.Nox.coreSystem;
+package org.core.coreProgram.Cores.Nightel.coreSystem;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -9,7 +9,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.core.Cool.Cool;
@@ -18,16 +17,16 @@ import org.core.coreConfig;
 import org.core.coreProgram.AbsCoreSystem.ConfigWrapper;
 import org.core.coreProgram.AbsCoreSystem.SkillBase;
 import org.core.coreProgram.AbsCoreSystem.absCore;
-import org.core.coreProgram.Cores.Nox.Passive.Dream;
-import org.core.coreProgram.Cores.Nox.Skill.F;
-import org.core.coreProgram.Cores.Nox.Skill.Q;
-import org.core.coreProgram.Cores.Nox.Skill.R;
+import org.core.coreProgram.Cores.Nightel.Passive.Dream;
+import org.core.coreProgram.Cores.Nightel.Skill.F;
+import org.core.coreProgram.Cores.Nightel.Skill.Q;
+import org.core.coreProgram.Cores.Nightel.Skill.R;
 
 import static org.bukkit.Bukkit.getLogger;
 
-public class noxCore extends absCore {
+public class nightCore extends absCore {
     private final Core plugin;
-    private final Nox config;
+    private final Nightel config;
 
     private final Dream dream;
 
@@ -35,7 +34,7 @@ public class noxCore extends absCore {
     private final Q Qskill;
     private final F Fskill;
 
-    public noxCore(Core plugin, coreConfig tag, Nox config, Cool cool) {
+    public nightCore(Core plugin, coreConfig tag, Nightel config, Cool cool) {
         super(tag, cool);
 
         this.plugin = plugin;
@@ -47,7 +46,7 @@ public class noxCore extends absCore {
         this.Qskill = new Q(config, plugin, cool, dream);
         this.Fskill = new F(config, plugin, cool, dream);
 
-        getLogger().info("Nox downloaded...");
+        getLogger().info("Nightel downloaded...");
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
@@ -88,7 +87,7 @@ public class noxCore extends absCore {
 
     @EventHandler(priority = EventPriority.NORMAL)
     public void passiveAttackEffect(PlayerInteractEvent event) {
-        if(tag.Nox.contains(event.getPlayer())){
+        if(tag.Nightel.contains(event.getPlayer())){
             if (skillUsing.contains(event.getPlayer().getUniqueId())) {
                 skillUsing.remove(event.getPlayer().getUniqueId());
             }
@@ -97,7 +96,7 @@ public class noxCore extends absCore {
 
     @Override
     protected boolean contains(Player player) {
-        return tag.Nox.contains(player);
+        return tag.Nightel.contains(player);
     }
 
     @Override

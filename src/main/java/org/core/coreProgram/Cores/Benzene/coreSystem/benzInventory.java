@@ -7,23 +7,17 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.core.Core;
 import org.core.coreConfig;
-import org.core.coreProgram.AbsCoreSystem.ConfigWrapper;
 import org.core.coreProgram.AbsInentory.InventoryWrapper;
 import org.core.coreProgram.AbsInentory.absInventory;
-import org.core.coreProgram.Cores.Bambo.coreSystem.bambLeveling;
-import org.core.coreProgram.Cores.Nox.coreSystem.noxLeveling;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public class benzInventory extends absInventory {
 

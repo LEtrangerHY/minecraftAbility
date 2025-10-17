@@ -39,8 +39,8 @@ import org.core.coreProgram.Cores.Harvester.coreSystem.harvCore;
 import org.core.coreProgram.Cores.Harvester.coreSystem.harvInventory;
 import org.core.coreProgram.Cores.Knight.coreSystem.knightInventory;
 import org.core.coreProgram.Cores.Luster.coreSystem.lustInventory;
-import org.core.coreProgram.Cores.Nox.coreSystem.Nox;
-import org.core.coreProgram.Cores.Nox.coreSystem.noxCore;
+import org.core.coreProgram.Cores.Nightel.coreSystem.Nightel;
+import org.core.coreProgram.Cores.Nightel.coreSystem.nightCore;
 import org.core.coreProgram.Cores.Benzene.coreSystem.Benzene;
 import org.core.coreProgram.Cores.Benzene.coreSystem.benzCore;
 import org.core.coreProgram.Cores.Carpenter.coreSystem.Carpenter;
@@ -53,7 +53,7 @@ import org.core.coreProgram.Cores.Knight.coreSystem.Knight;
 import org.core.coreProgram.Cores.Knight.coreSystem.knightCore;
 import org.core.coreProgram.Cores.Luster.coreSystem.Luster;
 import org.core.coreProgram.Cores.Luster.coreSystem.lustCore;
-import org.core.coreProgram.Cores.Nox.coreSystem.noxInventory;
+import org.core.coreProgram.Cores.Nightel.coreSystem.nightInventory;
 import org.core.coreProgram.Cores.Pyro.coreSystem.Pyro;
 import org.core.coreProgram.Cores.Pyro.coreSystem.pyroCore;
 import org.core.coreProgram.Cores.Pyro.coreSystem.pyroInventory;
@@ -69,7 +69,7 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
 
     private LevelingManager level;
 
-    private noxCore nox;
+    private nightCore nightel;
     private benzCore benz;
     private bambCore bamb;
     private carpCore carp;
@@ -83,7 +83,7 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
     private harvCore harvester;
     private bloomCore bloom;
 
-    private noxInventory noxInv;
+    private nightInventory nightInv;
     private benzInventory benzInv;
     private bambInventory bambInv;
     private carpInventory carpInv;
@@ -108,7 +108,7 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
         instance = this;
         Bukkit.getPluginManager().registerEvents(this, this);
 
-        Nox noxConfig = new Nox();
+        Nightel nightConfig = new Nightel();
         Benzene benzConfig = new Benzene();
         Bambo bambConfig = new Bambo();
         Carpenter carpConfig = new Carpenter();
@@ -129,10 +129,10 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
         this.level = new LevelingManager(this, this.config);
         Bukkit.getPluginManager().registerEvents(this.level, this);
 
-        this.nox = new noxCore(this, this.config, noxConfig, cool);
-        Bukkit.getPluginManager().registerEvents(this.nox, this);
-        this.noxInv = new noxInventory(this, this.config);
-        Bukkit.getPluginManager().registerEvents(this.noxInv, this);
+        this.nightel = new nightCore(this, this.config, nightConfig, cool);
+        Bukkit.getPluginManager().registerEvents(this.nightel, this);
+        this.nightInv = new nightInventory(this, this.config);
+        Bukkit.getPluginManager().registerEvents(this.nightInv, this);
 
         this.benz = new benzCore(this, this.config, benzConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.benz, this);
