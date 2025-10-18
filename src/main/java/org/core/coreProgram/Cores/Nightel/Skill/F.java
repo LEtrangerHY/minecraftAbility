@@ -47,7 +47,8 @@ public class F implements SkillBase {
         Entity target = getTargetedEntity(player,4.8, 0.3);
 
         if(target != null){
-            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1.0f, 1.0f);
+            world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1.0f, 1.0f);
+            world.spawnParticle(Particle.ENCHANTED_HIT, target.getLocation().clone().add(0, 1.2, 0), 22, 0.6, 0.6, 0.6, 1);
             Special_Attack(player, firstLocation, playerGameMode, target, config.dreamPoint.getOrDefault(player.getUniqueId(), 0));
         }else{
             world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_WEAK, 1, 1);
@@ -84,6 +85,8 @@ public class F implements SkillBase {
 
         boolean justTeleport = !(slashCount > 1.0);
 
+        World world = player.getWorld();
+
         config.fskill_using.put(player.getUniqueId(), true);
 
         Invulnerable invulnerable = new Invulnerable(player, 150L * slashCount);
@@ -111,7 +114,9 @@ public class F implements SkillBase {
                     this.cancel();
                     return;
                 }
-                player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1, 1);
+
+                world.playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1, 1);
+                world.spawnParticle(Particle.ENCHANTED_HIT, entity.getLocation().clone().add(0, 1.2, 0), 22, 0.6, 0.6, 0.6, 1);
 
                 teleportBehind(player, playerGameMode, entity, -5.0);
 

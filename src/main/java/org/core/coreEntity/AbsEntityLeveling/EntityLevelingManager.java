@@ -81,7 +81,7 @@ public class EntityLevelingManager implements Listener {
             AttributeInstance healthAttr = entity.getAttribute(Attribute.MAX_HEALTH);
             if (healthAttr != null) {
                 double baseHealth = healthAttr.getBaseValue();
-                double p = (0.005 * level * level + 0.055 * level) * 1.33;
+                double p = (0.005 * level * level + 0.055 * level) * 1.44;
                 double newHealth = baseHealth * (1 + p);
                 healthAttr.setBaseValue(newHealth);
                 entity.setHealth(newHealth);
@@ -149,7 +149,7 @@ public class EntityLevelingManager implements Listener {
         double originalDamage = event.getDamage();
         double amplifiedDamage = (originalDamage * (1 + p) >= 20)
                 ? originalDamage * (1 + p)
-                : originalDamage * (1 + p) * 1.66;
+                : originalDamage * (1 + p) * 1.33;
 
         event.setDamage(amplifiedDamage);
     }

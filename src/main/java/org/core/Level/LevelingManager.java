@@ -21,6 +21,7 @@ import org.core.coreProgram.Cores.Bambo.coreSystem.bambLeveling;
 import org.core.coreProgram.Cores.Benzene.coreSystem.benzLeveling;
 import org.core.coreProgram.Cores.Blaze.coreSystem.blazeLeveling;
 import org.core.coreProgram.Cores.Bloom.coreSystem.bloomLeveling;
+import org.core.coreProgram.Cores.Blue.coreSystem.blueLeveling;
 import org.core.coreProgram.Cores.Carpenter.coreSystem.carpLeveling;
 import org.core.coreProgram.Cores.Commander.coreSystem.comLeveling;
 import org.core.coreProgram.Cores.Dagger.coreSystem.dagLeveling;
@@ -98,7 +99,7 @@ public class LevelingManager implements Listener {
                     benzLeveling benzene = new benzLeveling(plugin, player, exp);
                     benzene.addExp(player);
                     break;
-                case "nox" :
+                case "nightel" :
                     nightLeveling nox = new nightLeveling(plugin, player, exp);
                     nox.addExp(player);
                     break;
@@ -145,6 +146,10 @@ public class LevelingManager implements Listener {
                 case "bloom" :
                     bloomLeveling bloom = new bloomLeveling(plugin, player, exp);
                     bloom.addExp(player);
+                    break;
+                case "blue" :
+                    blueLeveling blue = new blueLeveling(plugin, player, exp);
+                    blue.addExp(player);
                     break;
                 default :
                     break;

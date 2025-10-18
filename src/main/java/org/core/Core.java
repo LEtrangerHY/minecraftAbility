@@ -28,6 +28,9 @@ import org.core.coreProgram.Cores.Blaze.coreSystem.blazeInventory;
 import org.core.coreProgram.Cores.Bloom.coreSystem.Bloom;
 import org.core.coreProgram.Cores.Bloom.coreSystem.bloomCore;
 import org.core.coreProgram.Cores.Bloom.coreSystem.bloomInventory;
+import org.core.coreProgram.Cores.Blue.coreSystem.Blue;
+import org.core.coreProgram.Cores.Blue.coreSystem.blueCore;
+import org.core.coreProgram.Cores.Blue.coreSystem.blueInventory;
 import org.core.coreProgram.Cores.Carpenter.coreSystem.carpInventory;
 import org.core.coreProgram.Cores.Commander.coreSystem.Commander;
 import org.core.coreProgram.Cores.Commander.coreSystem.comCore;
@@ -82,6 +85,7 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
     private comCore commander;
     private harvCore harvester;
     private bloomCore bloom;
+    private blueCore blue;
 
     private nightInventory nightInv;
     private benzInventory benzInv;
@@ -96,6 +100,7 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
     private comInventory comInv;
     private harvInventory harvInv;
     private bloomInventory bloomInv;
+    private blueInventory blueInv;
 
     private EntityLevelingManager Elevel;
 
@@ -121,6 +126,7 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
         Commander comConfig = new Commander();
         Harvester harvConfig = new Harvester();
         Bloom bloomConfig = new Bloom();
+        Blue blueConfig = new Blue();
 
         Cool cool = new Cool(this);
 
@@ -193,6 +199,11 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
         Bukkit.getPluginManager().registerEvents(this.bloom, this);
         this.bloomInv = new bloomInventory(this, this.config);
         Bukkit.getPluginManager().registerEvents(this.bloomInv, this);
+
+        this.blue = new blueCore(this, config, blueConfig, cool);
+        Bukkit.getPluginManager().registerEvents(this.blue, this);
+        this.blueInv = new blueInventory(this, this.config);
+        Bukkit.getPluginManager().registerEvents(this.blueInv, this);
 
         this.Elevel = new EntityLevelingManager(this);
         Bukkit.getPluginManager().registerEvents(this.Elevel, this);
@@ -399,7 +410,7 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
                 }
             } else if (args.length == 2) {
                 suggestions.add("benzene");
-                suggestions.add("nox");
+                suggestions.add("nightel");
                 suggestions.add("knight");
                 suggestions.add("pyro");
                 suggestions.add("glacier");
@@ -411,6 +422,7 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
                 suggestions.add("commander");
                 suggestions.add("harvester");
                 suggestions.add("bloom");
+                suggestions.add("blue");
             } else if (args.length == 3) {
                 suggestions.add("true");
                 suggestions.add("false");

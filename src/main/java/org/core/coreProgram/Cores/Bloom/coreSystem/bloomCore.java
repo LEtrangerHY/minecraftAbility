@@ -143,7 +143,6 @@ public class bloomCore extends absCore {
                                     if (entity instanceof LivingEntity target && entity != player) {
                                         ForceDamage forceDamage = new ForceDamage(target, 1.7);
                                         forceDamage.applyEffect(player);
-                                        break;
                                     }
                                 }
 

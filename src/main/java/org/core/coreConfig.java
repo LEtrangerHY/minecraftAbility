@@ -101,7 +101,7 @@ public class coreConfig {
 
     private NamespacedKey getSettingKey(String setting) {
         return switch (setting.toLowerCase()) {
-            case "nox" -> new NamespacedKey(plugin, "setting_nightel");
+            case "nightel" -> new NamespacedKey(plugin, "setting_nightel");
             case "benzene" -> new NamespacedKey(plugin, "setting_benzene");
             case "bambo" -> new NamespacedKey(plugin, "setting_bambo");
             case "carpenter" -> new NamespacedKey(plugin, "setting_carpenter");
