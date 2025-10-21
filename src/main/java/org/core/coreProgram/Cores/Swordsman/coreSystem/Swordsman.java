@@ -23,8 +23,13 @@ public class Swordsman {
     //R
     public long r_Skill_Cool = 550;
     public double r_Skill_damage = 3;
-    public double r_Skill_amp = 0.2;
+    public double r_Skill_amp = 0.15;
+    public double r_Skill_dash = 1.6;
+    public double r_Skill_add_damage = 12;
+    public long r_Skill_stun = 2000;
+    public HashMap<UUID, Integer> r_Skill_count = new HashMap<>();
     public HashMap<UUID, HashSet<Entity>> r_damaged = new HashMap<>();
+    public HashMap<UUID, HashSet<Entity>> r_damaged_2 = new HashMap<>();
 
     //Q
     public long q_Skill_Cool = 5500;

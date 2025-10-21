@@ -57,9 +57,9 @@ public class swordCore extends absCore {
 
         this.laido = new Laido(config, tag, plugin, cool);
 
-        this.Rskill = new R(config, plugin, cool);
+        this.Rskill = new R(config, plugin, cool, laido);
         this.Qskill = new Q(config, plugin, cool, laido);
-        this.Fskill = new F(config, plugin, cool);
+        this.Fskill = new F(config, plugin, cool, laido);
 
         getLogger().info("Swordsman downloaded...");
     }
@@ -226,7 +226,7 @@ public class swordCore extends absCore {
             }
         }
 
-        return main.getType() == Material.BUNDLE && off.getType() == Material.AIR && ironSwordInBundle;
+        return main.getType() == Material.BUNDLE && off.getType() == Material.AIR && ironSwordInBundle && config.laidoSlash.getOrDefault(player.getUniqueId(), false);
     }
 
     private boolean hasProperItems_Sheath(Player player) {
@@ -243,7 +243,7 @@ public class swordCore extends absCore {
             }
         }
 
-        return main.getType() == Material.IRON_SWORD && off.getType() == Material.BUNDLE && bundleIsEmpty;
+        return main.getType() == Material.IRON_SWORD && off.getType() == Material.BUNDLE && bundleIsEmpty && !config.laidoSlash.getOrDefault(player.getUniqueId(), false);
     }
 
     private boolean canUseRSkill(Player player) {
@@ -294,8 +294,8 @@ public class swordCore extends absCore {
             }
         }
         return ((droppedItem.getType() == Material.IRON_SWORD &&
-                off.getType() == Material.BUNDLE && bundleIsEmpty) || (droppedItem.getType() == Material.BUNDLE &&
-                off.getType() == Material.AIR) && ironSwordInBundle) &&
+                off.getType() == Material.BUNDLE && bundleIsEmpty && !config.laidoSlash.getOrDefault(player.getUniqueId(), false)) || (droppedItem.getType() == Material.BUNDLE &&
+                off.getType() == Material.AIR) && ironSwordInBundle && config.laidoSlash.getOrDefault(player.getUniqueId(), false)) &&
                 canUseQSkill(player);
     }
 

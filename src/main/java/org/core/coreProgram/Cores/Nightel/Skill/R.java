@@ -67,6 +67,8 @@ public class R implements SkillBase {
         double amp = config.r_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L);
         damage = damage * (1 + amp);
 
+        Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 0.6f);
+
         double finalDamage = damage;
         new BukkitRunnable() {
             private double ticks = 0;
@@ -82,8 +84,7 @@ public class R implements SkillBase {
                     return;
                 }
 
-                Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 0.6f);
-                player.getWorld().spawnParticle(Particle.DUST, player.getLocation().add(0, 1, 0), 120, 0.3, 0, 0.3, 0.08, dustOptions);
+                world.spawnParticle(Particle.DUST, player.getLocation().clone().add(0, 1, 0), 120, 0.3, 0, 0.3, 0.08, dustOptions);
 
                 List<Entity> nearbyEntities = player.getNearbyEntities(0.6, 0.6, 0.6);
                 for (Entity entity : nearbyEntities) {

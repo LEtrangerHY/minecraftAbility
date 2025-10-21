@@ -80,7 +80,6 @@ public class Laido {
     public void Draw(Player player) {
         PlayerInventory inv = player.getInventory();
         ItemStack main = inv.getItemInMainHand();
-        ItemStack off = inv.getItemInOffHand();
 
         if (main.getType() == Material.BUNDLE) {
             ItemMeta meta = main.getItemMeta();
