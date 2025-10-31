@@ -146,8 +146,6 @@ public class knightCore extends absCore {
         }
     }
 
-
-
     @EventHandler
     public void respawnHealthSet(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
@@ -159,7 +157,6 @@ public class knightCore extends absCore {
 
         player.setHealth(originalMax);
     }
-
 
     @EventHandler(priority = EventPriority.NORMAL)
     public void passiveAttackEffect(PlayerInteractEvent event) {

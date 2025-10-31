@@ -16,18 +16,20 @@ public class Saboteur {
     public long frozenCool = 10000;
 
     //passive
+    public HashMap<UUID, Integer> trapType = new HashMap<>();
+    public HashMap<UUID, Boolean> isHackAway = new HashMap<>();
     public HashMap<UUID, Boolean> collision = new HashMap<>();
-    public HashMap<UUID, HashSet<Entity>> damaged = new HashMap<>();
+
+    public HashMap<UUID, Boolean> skillUsing = new HashMap<>();
 
     //R
-    public long r_Skill_Cool = 10000;
+    public long r_Skill_Cool = 500;
 
     //Q
-    public long q_Skill_Cool = 44000;
-    public double q_Skill_amp = 0.13;
+    public long q_Skill_Cool = 4000;
 
     //F
-    public long f_Skill_Cool = 666000;
+    public long f_Skill_Cool = 44440;
     public double f_Skill_amp = 0.2;
 
 

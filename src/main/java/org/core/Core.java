@@ -63,6 +63,9 @@ import org.core.coreProgram.Cores.Nightel.coreSystem.nightInventory;
 import org.core.coreProgram.Cores.Pyro.coreSystem.Pyro;
 import org.core.coreProgram.Cores.Pyro.coreSystem.pyroCore;
 import org.core.coreProgram.Cores.Pyro.coreSystem.pyroInventory;
+import org.core.coreProgram.Cores.Saboteur.coreSystem.Saboteur;
+import org.core.coreProgram.Cores.Saboteur.coreSystem.sabCore;
+import org.core.coreProgram.Cores.Saboteur.coreSystem.sabInventory;
 import org.core.coreProgram.Cores.Swordsman.coreSystem.Swordsman;
 import org.core.coreProgram.Cores.Swordsman.coreSystem.swordCore;
 import org.core.coreProgram.Cores.Swordsman.coreSystem.swordInventory;
@@ -93,6 +96,7 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
     private bloomCore bloom;
     private blueCore blue;
     private swordCore swordsman;
+    private sabCore saboteur;
 
     private nightInventory nightInv;
     private benzInventory benzInv;
@@ -109,6 +113,7 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
     private bloomInventory bloomInv;
     private blueInventory blueInv;
     private swordInventory swordInv;
+    private sabInventory sabInv;
 
     private EntityLevelingManager Elevel;
 
@@ -136,6 +141,7 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
         Bloom bloomConfig = new Bloom();
         Blue blueConfig = new Blue();
         Swordsman swordConfig = new Swordsman();
+        Saboteur sabConfig = new Saboteur();
 
         Cool cool = new Cool(this);
 
@@ -218,6 +224,11 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
         Bukkit.getPluginManager().registerEvents(this.swordsman, this);
         this.swordInv = new swordInventory(this, this.config);
         Bukkit.getPluginManager().registerEvents(this.swordInv, this);
+
+        this.saboteur = new sabCore(this, config, sabConfig, cool);
+        Bukkit.getPluginManager().registerEvents(this.saboteur, this);
+        this.sabInv = new sabInventory(this, this.config);
+        Bukkit.getPluginManager().registerEvents(this.sabInv, this);
 
         this.Elevel = new EntityLevelingManager(this);
         Bukkit.getPluginManager().registerEvents(this.Elevel, this);
@@ -438,6 +449,7 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
                 suggestions.add("bloom");
                 suggestions.add("blue");
                 suggestions.add("swordsman");
+                suggestions.add("saboteur");
             } else if (args.length == 3) {
                 suggestions.add("true");
                 suggestions.add("false");

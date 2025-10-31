@@ -82,6 +82,7 @@ public class coreConfig {
     public void clearPlayerCore(Player player){
         player.setWalkSpeed(0.2f);
         player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(4.0);
+        player.setInvisible(false);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_nightel"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_benzene"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_bambo"), PersistentDataType.BYTE, (byte) 0);

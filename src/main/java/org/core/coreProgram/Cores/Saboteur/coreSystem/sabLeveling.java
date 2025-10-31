@@ -25,7 +25,7 @@ public class sabLeveling implements Levels {
         this.exp = exp;
     }
 
-    public Set<Long> requireExp = Set.of(44L, 136L, 262L, 505L, 1045L, 2350L, 3421L, 4501L, 5140L, 6112L);
+    public Set<Long> requireExp = Set.of(44L, 144L, 244L, 544L, 1044L, 2044L, 3044L, 4044L, 5044L, 6444L);
 
     @Override
     public void addLV(Entity entity) {
