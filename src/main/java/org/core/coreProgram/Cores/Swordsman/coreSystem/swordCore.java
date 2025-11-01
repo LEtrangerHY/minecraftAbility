@@ -130,7 +130,7 @@ public class swordCore extends absCore {
             activeChargeBars.remove(player.getUniqueId());
         }
 
-        BossBar bossBar = Bukkit.createBossBar("laido", BarColor.PURPLE, BarStyle.SOLID);
+        BossBar bossBar = Bukkit.createBossBar("change", BarColor.PURPLE, BarStyle.SOLID);
         bossBar.setProgress(0.0);
         bossBar.addPlayer(player);
         activeChargeBars.put(player.getUniqueId(), bossBar);

@@ -225,15 +225,18 @@ public class blazeCore extends absCore {
                                     if(config.BurstBlaze.getOrDefault(player.getUniqueId(), false)) {
                                         for (int i = -3; i < 4; i++) {
                                             Block block = particleLoc.clone().add(0, i, 0).getBlock();
-                                            if (block.isBurnable() || block.getType() == Material.ICE || block.getType() == Material.SNOW || block.getType() == Material.BLUE_ICE || block.getType() == Material.FROSTED_ICE || block.getType() == Material.PACKED_ICE || block.getType() == Material.POWDER_SNOW || block.getType() == Material.SNOW_BLOCK) {
-                                                if(block.getType() == Material.BLUE_ICE) {
-                                                    if(Math.random() < 0.06) {
+                                            Material type = block.getType();
+                                            if (block.isBurnable() || type == Material.ICE || type == Material.SNOW || type == Material.BLUE_ICE || type == Material.FROSTED_ICE || type == Material.PACKED_ICE || type == Material.POWDER_SNOW || type == Material.SNOW_BLOCK ||
+                                                type == Material.WHEAT || type == Material.POTATOES || type == Material.CARROTS || type == Material.BEETROOTS) {
+
+                                                if (block.getType() == Material.BLUE_ICE) {
+                                                    if (Math.random() < 0.06) {
                                                         block.setType(Material.FIRE);
                                                     }
-                                                }else{
+                                                } else {
                                                     block.setType(Material.FIRE);
                                                 }
-                                                if(Math.random() < 0.2) {
+                                                if (Math.random() < 0.2) {
                                                     block.getWorld().playSound(block.getLocation(), Sound.ENTITY_GENERIC_BURN, 1, 1);
                                                 }
                                             }

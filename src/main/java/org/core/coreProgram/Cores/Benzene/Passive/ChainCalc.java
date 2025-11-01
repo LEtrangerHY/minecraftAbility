@@ -22,7 +22,6 @@ public class ChainCalc {
     private final Benzene config;
     private final JavaPlugin plugin;
     private final Cool cool;
-    private EffectManager effectManager = new EffectManager();
 
     public ChainCalc(coreConfig tag, Benzene config, JavaPlugin plugin, Cool cool) {
         this.tag = tag;
@@ -232,7 +231,7 @@ public class ChainCalc {
 
                 Objective objective = scoreboard.getObjective(DisplaySlot.SIDEBAR);
                 if (objective == null) {
-                    objective = scoreboard.registerNewObjective("benzene", Criteria.DUMMY, Component.text("benzene"));
+                    objective = scoreboard.registerNewObjective("BENZENE", Criteria.DUMMY, Component.text("BENZENE"));
                     objective.setDisplaySlot(DisplaySlot.SIDEBAR);
                 }
 

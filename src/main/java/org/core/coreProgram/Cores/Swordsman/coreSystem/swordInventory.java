@@ -87,7 +87,9 @@ public class swordInventory extends absInventory {
                 lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("").color(NamedTextColor.GREEN));
+                lore.add(Component.text("2회 까지 돌진하며 경로 내 대상들을 베어낸다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("발도 - 일섬 : 돌진하며 경로 내 대상들을 베어내고, 경직시킨다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("발도 : 발도 - 일섬 이후 딜레이 뒤에 돌진 경로 내 적에게 한번 더 피해를 가한다.").color(NamedTextColor.GREEN));
                 break;
             case "Q":
                 requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfQ.get((int) level)) : Component.text("Require EXP : MAX");
@@ -98,18 +100,22 @@ public class swordInventory extends absInventory {
                 lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("").color(NamedTextColor.GREEN));
+                lore.add(Component.text("자신을 중심으로 회전베기를 시전한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("발도 : 전방으로 2번의 참격을 가한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("피해를 준 대상 수만큼 추가 체력을 획득한다.").color(NamedTextColor.GREEN));
                 break;
             case "F":
                 requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfF.get((int) level)) : Component.text("Require EXP : MAX");
                 lore.add(requireXp.color(NamedTextColor.AQUA));
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("타입 : 효과/공격").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("").color(NamedTextColor.GREEN));
+                lore.add(Component.text("검을 납도하고, 해당 스킬을 제외한 모든 스킬의 쿨타임을 초기화시킨다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("발도 - 참격 : 전방으로 참격을 가하고, 피격된 적들을 기절시킨다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("발도 : 발도 - 참격 이후, 전방으로 돌진한 후 범위 내의 대상에게 7번의 피해를 가한다.").color(NamedTextColor.GREEN));
                 break;
             default:
                 break;

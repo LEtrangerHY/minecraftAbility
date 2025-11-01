@@ -9,9 +9,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
@@ -33,6 +31,8 @@ import org.core.coreConfig;
 import org.core.coreProgram.AbsCoreSystem.ConfigWrapper;
 import org.core.coreProgram.AbsCoreSystem.SkillBase;
 import org.core.coreProgram.AbsCoreSystem.absCore;
+import org.core.coreProgram.Cores.Benzene.Passive.ChainCalc;
+import org.core.coreProgram.Cores.Saboteur.Passive.TrapType;
 import org.core.coreProgram.Cores.Saboteur.Skill.F;
 import org.core.coreProgram.Cores.Saboteur.Skill.Q;
 import org.core.coreProgram.Cores.Saboteur.Skill.R;
@@ -49,6 +49,8 @@ public class sabCore extends absCore {
     private final Core plugin;
     private final Saboteur config;
 
+    private final TrapType trapType;
+
     private final R Rskill;
     private final Q Qskill;
     private final F Fskill;
@@ -58,6 +60,8 @@ public class sabCore extends absCore {
 
         this.plugin = plugin;
         this.config = config;
+
+        this.trapType = new TrapType(tag, config, plugin, cool);
 
         this.Rskill = new R(config, plugin, cool);
         this.Qskill = new Q(config, plugin, cool);
@@ -104,7 +108,7 @@ public class sabCore extends absCore {
 
     @EventHandler(priority = EventPriority.NORMAL)
     public void passiveAttackEffect(PlayerInteractEvent event) {
-        if(tag.Saboteur.contains(event.getPlayer())){
+        if(tag.Saboteur.contains(event.getPlayer()) && config.trapType.getOrDefault(event.getPlayer().getUniqueId(), 1) == 1){
             if (pAttackUsing.contains(event.getPlayer().getUniqueId())) {
                 pAttackUsing.remove(event.getPlayer().getUniqueId());
             }
@@ -118,16 +122,22 @@ public class sabCore extends absCore {
         if (!(event.getEntity() instanceof LivingEntity target)) return;
 
         if(tag.Saboteur.contains(player) && hasProperItems(player)){
-            if(!config.skillUsing.getOrDefault(player.getUniqueId(), false)) {
+            if(!config.skillUsing.getOrDefault(player.getUniqueId(), false) && config.trapType.getOrDefault(player.getUniqueId(), 1) == 1) {
 
-                Vector direction = player.getEyeLocation().add(0, -0.5, 0).getDirection().normalize();
-                Location particleLocation = player.getEyeLocation().clone()
-                        .add(direction.clone().multiply(2.6));
-
-                player.spawnParticle(Particle.SWEEP_ATTACK, particleLocation, 1, 0, 0, 0, 0);
+                player.spawnParticle(Particle.SWEEP_ATTACK, target.getLocation().clone().add(0, 1.2, 0), 1, 0, 0, 0, 0);
 
                 player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
-                event.setDamage(3.0);
+
+                Location loc1 = player.getLocation().add(0, player.getHeight() / 2 + 0.2, 0);
+                Location loc2 = target.getLocation().add(0, target.getHeight() / 2 + 0.2, 0);
+
+                double distance = loc1.distance(loc2);
+
+                if(distance > 3) {
+                    event.setDamage(event.getDamage() * 3);
+                }else {
+                    event.setDamage(event.getDamage() * 5);
+                }
 
             }
         }
@@ -136,74 +146,78 @@ public class sabCore extends absCore {
     @EventHandler(priority = EventPriority.NORMAL)
     public void passiveThrow(PlayerInteractEvent event) {
 
-        if(tag.Knight.contains(event.getPlayer())) {
-            if (!pAttackUsing.contains(event.getPlayer().getUniqueId()) && !config.skillUsing.getOrDefault(event.getPlayer().getUniqueId(), false)) {
+        if (tag.Saboteur.contains(event.getPlayer())) {
+            if (!pAttackUsing.contains(event.getPlayer().getUniqueId()) &&
+                    !config.skillUsing.getOrDefault(event.getPlayer().getUniqueId(), false)) {
 
                 Player player = event.getPlayer();
 
-                if (hasProperItems(player)) {
+                if (hasProperItems(player) &&
+                        config.trapType.getOrDefault(event.getPlayer().getUniqueId(), 1) == 2) {
+
                     if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
 
-                        if (cool.isReloading(player, "cutting")) {
-                            player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_WEAK, 1, 1);
+                        if (cool.isReloading(player, "throw")) {
+                            player.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_LEATHER, 1, 1);
                             return;
                         }
 
-                        cool.setCooldown(player, 625L, "cutting");
+                        cool.setCooldown(player, 1000L, "throw");
+
+                        BlockData blood = Material.REDSTONE_BLOCK.createBlockData();
+                        BlockData iron = Material.IRON_BLOCK.createBlockData();
 
                         World world = player.getWorld();
-                        Location playerLocation = player.getLocation();
-                        Vector direction = playerLocation.getDirection().normalize().multiply(1.3);
+                        Location playerLocation = player.getLocation().add(0, 1.5, 0);
+                        Vector direction = playerLocation.getDirection().normalize().multiply(2.3);
 
-                        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
+                        player.playSound(player.getLocation(), Sound.ITEM_TRIDENT_THROW, 1, 1);
 
-                        config.collision.put(player.getUniqueId(), false);
+                        Item item = world.dropItem(playerLocation, new ItemStack(Material.IRON_NUGGET));
+                        item.setVelocity(direction);
+                        item.setPickupDelay(1000);
+                        item.setGravity(true);
 
-                        new BukkitRunnable() {
-                            int ticks = 0;
+                        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+                            int life = 80;
 
                             @Override
                             public void run() {
-                                if (ticks >= 7 || config.collision.getOrDefault(player.getUniqueId(), true)) {
-                                    config.collision.remove(player.getUniqueId());
-                                    this.cancel();
+                                if (item.isDead() || !item.isValid()) {
+                                    Bukkit.getScheduler().cancelTask(this.hashCode());
                                     return;
                                 }
 
-                                Location particleLocation = playerLocation.clone()
-                                        .add(direction.clone().multiply(ticks * 1.4))
-                                        .add(0, 1.4, 0);
+                                Location loc = item.getLocation();
 
-                                player.spawnParticle(Particle.SWEEP_ATTACK, particleLocation, 1, 0, 0, 0, 0);
-                                player.spawnParticle(Particle.ENCHANTED_HIT, particleLocation, 7, 0.3, 0.1, 0.3, 0);
+                                for (Entity nearby : item.getNearbyEntities(0.6, 0.6, 0.6)) {
+                                    if (nearby instanceof LivingEntity target && nearby != player) {
+                                        target.damage(5, player);
+                                        target.getWorld().playSound(target.getLocation().clone(), Sound.ITEM_TRIDENT_HIT, 1.0f, 1.0f);
+                                        player.getWorld().spawnParticle(Particle.BLOCK, target.getLocation().clone().add(0, 1.2, 0), 14, 0.3, 0.3, 0.3,
+                                                blood);
 
-                                for (Entity entity : world.getNearbyEntities(particleLocation, 0.7, 0.3, 0.7)) {
-                                    if (entity instanceof LivingEntity target && entity != player) {
-
-                                        ForceDamage forceDamage = new ForceDamage(target, 3);
-                                        forceDamage.applyEffect(player);
-
-                                        config.collision.put(player.getUniqueId(), true);
-                                        break;
+                                        item.remove();
+                                        Bukkit.getScheduler().cancelTask(this.hashCode());
+                                        return;
                                     }
                                 }
 
-                                ticks++;
-                            }
-                        }.runTaskTimer(plugin, 0L, 1L);
+                                if (!loc.clone().add(direction).getBlock().isPassable()) {
+                                    loc.getWorld().playSound(loc.clone(), Sound.ITEM_TRIDENT_HIT_GROUND, 1.0f, 1.0f);
+                                    player.getWorld().spawnParticle(Particle.BLOCK,loc.clone(), 14, 0.3, 0.3, 0.3,
+                                            iron);
+                                    item.remove();
+                                    Bukkit.getScheduler().cancelTask(this.hashCode());
+                                    return;
+                                }
 
-                        ItemStack offHand = player.getInventory().getItemInOffHand();
-                        ItemMeta meta = offHand.getItemMeta();
-                        if (meta instanceof Damageable && offHand.getType().getMaxDurability() > 0) {
-                            Damageable damageable = (Damageable) meta;
-                            int newDamage = damageable.getDamage() + 1;
-                            damageable.setDamage(newDamage);
-                            offHand.setItemMeta(meta);
-
-                            if (newDamage >= offHand.getType().getMaxDurability()) {
-                                player.getInventory().setItemInOffHand(null);
+                                if (life-- <= 0) {
+                                    item.remove();
+                                    Bukkit.getScheduler().cancelTask(this.hashCode());
+                                }
                             }
-                        }
+                        }, 1L, 1L);
 
                         event.setCancelled(true);
                     }
@@ -258,11 +272,14 @@ public class sabCore extends absCore {
                     bossBar.setProgress(1.0);
                     int trap = (config.trapType.getOrDefault(player.getUniqueId(), 1) == 1) ? 2 : 1;
                     config.trapType.put(player.getUniqueId(), trap);
-                    if(config.trapType.getOrDefault(player.getUniqueId(), 1) == 2) {
-                        player.sendActionBar(Component.text("Spike").color(NamedTextColor.YELLOW));
+                    if(config.trapType.getOrDefault(player.getUniqueId(), 1) == 1) {
+                        player.sendActionBar(Component.text("Spike").color(NamedTextColor.GREEN));
                     }else{
-                        player.sendActionBar(Component.text("Throw").color(NamedTextColor.YELLOW));
+                        player.sendActionBar(Component.text("Throw").color(NamedTextColor.GREEN));
                     }
+
+                    trapType.trapTypeBoard(player);
+                    cleanup();
                 }
             }
 

@@ -98,7 +98,7 @@ public class EntityLevelingManager implements Listener {
                 entity.setHealth(newHealth);
             }
 
-            entity.setCustomNameVisible(false); // 초반 숨김
+            entity.setCustomNameVisible(false);
             updateHealthName(entity, readableName, level, color);
         }
     }
@@ -107,7 +107,7 @@ public class EntityLevelingManager implements Listener {
         if (!entity.isValid()) return;
 
         double health = Math.max(0, Math.round(entity.getHealth() * 10.0) / 10.0);
-        double maxHealth = Math.round(entity.getAttribute(Attribute.MAX_HEALTH).getValue() * 10.0) / 10.0;
+        double maxHealth = Math.round(Objects.requireNonNull(entity.getAttribute(Attribute.MAX_HEALTH)).getValue() * 10.0) / 10.0;
 
         Component newName = Component.text("[Lv." + level + "] " + name + " " + health + "/" + maxHealth + "❤", color);
         entity.customName(newName);

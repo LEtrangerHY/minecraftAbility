@@ -91,7 +91,7 @@ public abstract class absCore implements Listener {
 
         ItemStack dropped = event.getItemDrop().getItemStack();
 
-        if (contains(player) && !Stun.isStunned(player)) {
+        if (contains(player) && !Stun.isStunned(player) && isQCondition(player, dropped)) {
 
             event.setCancelled(true);
 
