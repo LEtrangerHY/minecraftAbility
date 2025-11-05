@@ -10,6 +10,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -86,6 +88,21 @@ public class blueCore extends absCore {
             }
         }
     }
+
+    @EventHandler
+    public void passiveDamage(EntityDamageByEntityEvent event) {
+
+        if (!(event.getDamager() instanceof Player player)) return;
+        if (!(event.getEntity() instanceof LivingEntity target)) return;
+
+        if (tag.Blue.contains(player)) {
+
+            if (event.getCause() == EntityDamageEvent.DamageCause.WITHER) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
 
     @EventHandler(priority = EventPriority.NORMAL)
     public void passiveAttackEffect(PlayerInteractEvent event) {
@@ -175,7 +192,7 @@ public class blueCore extends absCore {
     private boolean hasProperItems(Player player) {
         ItemStack main = player.getInventory().getItemInMainHand();
         ItemStack off = player.getInventory().getItemInOffHand();
-        return main.getType() == Material.BREEZE_ROD && off.getType() == Material.SOUL_LANTERN;
+        return main.getType() == Material.SOUL_LANTERN && off.getType() == Material.WITHER_ROSE;
     }
 
     private boolean canUseRSkill(Player player) { return true; }
@@ -190,16 +207,20 @@ public class blueCore extends absCore {
     }
 
     @Override
+    protected boolean isDropRequired(Player player, ItemStack droppedItem){
+        ItemStack off = player.getInventory().getItemInOffHand();
+        return droppedItem.getType() == Material.SOUL_LANTERN &&
+                off.getType() == Material.WITHER_ROSE;
+    }
+
+    @Override
     protected boolean isRCondition(Player player) {
         return canUseRSkill(player);
     }
 
     @Override
-    protected boolean isQCondition(Player player, ItemStack droppedItem) {
-        ItemStack off = player.getInventory().getItemInOffHand();
-        return droppedItem.getType() == Material.BREEZE_ROD &&
-                off.getType() == Material.SOUL_LANTERN &&
-                canUseQSkill(player);
+    protected boolean isQCondition(Player player) {
+        return canUseQSkill(player);
     }
 
     @Override

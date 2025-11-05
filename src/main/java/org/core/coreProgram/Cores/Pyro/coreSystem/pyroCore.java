@@ -255,16 +255,20 @@ public class pyroCore extends absCore {
     }
 
     @Override
+    protected boolean isDropRequired(Player player, ItemStack droppedItem){
+        ItemStack off = player.getInventory().getItemInOffHand();
+        return droppedItem.getType() == Material.BLAZE_ROD &&
+                off.getType() == Material.BLAZE_POWDER;
+    }
+
+    @Override
     protected boolean isRCondition(Player player) {
         return canUseRSkill(player);
     }
 
     @Override
-    protected boolean isQCondition(Player player, ItemStack droppedItem) {
-        ItemStack off = player.getInventory().getItemInOffHand();
-        return droppedItem.getType() == Material.BLAZE_ROD &&
-                off.getType() == Material.BLAZE_POWDER &&
-                canUseQSkill(player);
+    protected boolean isQCondition(Player player) {
+        return canUseQSkill(player);
     }
 
     @Override

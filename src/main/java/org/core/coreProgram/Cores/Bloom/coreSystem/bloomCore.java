@@ -197,16 +197,20 @@ public class bloomCore extends absCore {
     }
 
     @Override
+    protected boolean isDropRequired(Player player, ItemStack droppedItem){
+        ItemStack off = player.getInventory().getItemInOffHand();
+        return droppedItem.getType() == Material.PINK_PETALS &&
+                off.getType() == Material.AIR;
+    }
+
+    @Override
     protected boolean isRCondition(Player player) {
         return canUseRSkill(player);
     }
 
     @Override
-    protected boolean isQCondition(Player player, ItemStack droppedItem) {
-        ItemStack off = player.getInventory().getItemInOffHand();
-        return droppedItem.getType() == Material.PINK_PETALS &&
-                off.getType() == Material.AIR &&
-                canUseQSkill(player);
+    protected boolean isQCondition(Player player) {
+        return canUseQSkill(player);
     }
 
     @Override

@@ -19,27 +19,20 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BundleMeta;
-import org.bukkit.inventory.meta.Damageable;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.core.Cool.Cool;
 import org.core.Core;
-import org.core.Effect.ForceDamage;
 import org.core.coreConfig;
 import org.core.coreProgram.AbsCoreSystem.ConfigWrapper;
 import org.core.coreProgram.AbsCoreSystem.SkillBase;
 import org.core.coreProgram.AbsCoreSystem.absCore;
-import org.core.coreProgram.Cores.Benzene.Passive.ChainCalc;
 import org.core.coreProgram.Cores.Saboteur.Passive.TrapType;
 import org.core.coreProgram.Cores.Saboteur.Skill.F;
 import org.core.coreProgram.Cores.Saboteur.Skill.Q;
 import org.core.coreProgram.Cores.Saboteur.Skill.R;
-import org.core.coreProgram.Cores.Saboteur.coreSystem.Saboteur;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -130,7 +123,7 @@ public class sabCore extends absCore {
         if (!(event.getEntity() instanceof LivingEntity target)) return;
 
         if(tag.Saboteur.contains(player) && hasProperItems(player)){
-            if(!skilUsing(player) && config.trapType.getOrDefault(player.getUniqueId(), 1) == 1) {
+            if(!skillUsing(player) && config.trapType.getOrDefault(player.getUniqueId(), 1) == 1) {
 
                 player.spawnParticle(Particle.SWEEP_ATTACK, target.getLocation().clone().add(0, 1.2, 0), 1, 0, 0, 0, 0);
 
@@ -157,7 +150,7 @@ public class sabCore extends absCore {
 
         if (tag.Saboteur.contains(event.getPlayer())) {
             if (!pAttackUsing.contains(event.getPlayer().getUniqueId()) &&
-                    !skilUsing(event.getPlayer())) {
+                    !skillUsing(event.getPlayer())) {
 
                 Player player = event.getPlayer();
 
@@ -244,7 +237,7 @@ public class sabCore extends absCore {
     public void sneakCharge(PlayerToggleSneakEvent event) {
         Player player = event.getPlayer();
 
-        if (!event.isSneaking() || !hasProperItems(player) || !tag.Saboteur.contains(player) || skilUsing(player)) return;
+        if (!event.isSneaking() || !hasProperItems(player) || !tag.Saboteur.contains(player) || skillUsing(player)) return;
 
         long durationTicks =(config.isHackAway.getOrDefault(player.getUniqueId(), false)) ? 4L : 10L;
 
@@ -268,7 +261,7 @@ public class sabCore extends absCore {
             @Override
             public void run() {
                 if (!player.isSneaking() || !hasProperItems(player)
-                        || skilUsing(player)) {
+                        || skillUsing(player)) {
                     cleanup();
                     return;
                 }
@@ -330,22 +323,22 @@ public class sabCore extends absCore {
         return main.getType() == Material.SHEARS && off.getType() == Material.AIR;
     }
 
-    private boolean skilUsing(Player player){
+    private boolean skillUsing(Player player){
         return (config.r_skillUsing_Hack.getOrDefault(player.getUniqueId(), false) || config.q_skillUsing_Hack.getOrDefault(player.getUniqueId(), false)
                 || config.r_skillUsing_Hack.getOrDefault(player.getUniqueId(), false) || config.r_skillUsing_Sweep_Hack.getOrDefault(player.getUniqueId(), false)
                 || config.q_skillUsing_Hack.getOrDefault(player.getUniqueId(), false) || config.q_skillUsing_Sweep_Hack.getOrDefault(player.getUniqueId(), false));
     }
 
     private boolean canUseRSkill(Player player) {
-        return !skilUsing(player);
+        return !skillUsing(player);
     }
 
     private boolean canUseQSkill(Player player) {
-        return !skilUsing(player);
+        return !skillUsing(player);
     }
 
     private boolean canUseFSkill(Player player) {
-        return !skilUsing(player);
+        return !skillUsing(player);
     }
 
     @Override
@@ -354,16 +347,20 @@ public class sabCore extends absCore {
     }
 
     @Override
+    protected boolean isDropRequired(Player player, ItemStack droppedItem){
+        ItemStack off = player.getInventory().getItemInOffHand();
+        return droppedItem.getType() == Material.SHEARS &&
+                off.getType() == Material.AIR;
+    }
+
+    @Override
     protected boolean isRCondition(Player player) {
         return canUseRSkill(player);
     }
 
     @Override
-    protected boolean isQCondition(Player player, ItemStack droppedItem) {
-        ItemStack off = player.getInventory().getItemInOffHand();
-        return droppedItem.getType() == Material.SHEARS &&
-                off.getType() == Material.AIR &&
-                canUseQSkill(player);
+    protected boolean isQCondition(Player player) {
+        return canUseQSkill(player);
     }
 
     @Override

@@ -25,7 +25,7 @@ public class Dagger {
 
     //Q
     public double q_Skill_amp = 0.06;
-    public double q_Skill_Damage = 4;
+    public double q_Skill_Damage = 3;
     public long q_Skill_Cool = 8000;
     public long q_Skill_Cool_2 = 20000;
     public long q_Skill_Cool_decrease = 4000;
@@ -36,7 +36,7 @@ public class Dagger {
     //F
     public double f_Skill_amp = 0.06;
     public double f_Skill_Damage = 4;
-    public double f_Skill_Damage_2 = 12;
+    public double f_Skill_Damage_2 = 13;
     public long f_Skill_Cool = 0;
     public double f_Skill_dash = 1.8;
 

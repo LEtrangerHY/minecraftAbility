@@ -23,11 +23,11 @@ public class Blue {
     public long r_Skill_Cool = 10000;
 
     //Q
-    public long q_Skill_Cool = 44000;
+    public long q_Skill_Cool = 10000;
     public double q_Skill_amp = 0.13;
 
     //F
-    public long f_Skill_Cool = 666000;
+    public long f_Skill_Cool = 4000;
     public double f_Skill_amp = 0.2;
 
 

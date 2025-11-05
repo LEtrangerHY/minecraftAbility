@@ -32,8 +32,9 @@ public abstract class absCore implements Listener {
     protected abstract SkillBase getFSkill();
 
     protected abstract boolean isItemRequired(Player player);
+    protected abstract boolean isDropRequired(Player player, ItemStack droppedItem);
     protected abstract boolean isRCondition(Player player);
-    protected abstract boolean isQCondition(Player player, ItemStack droppedItem);
+    protected abstract boolean isQCondition(Player player);
     protected abstract boolean isFCondition(Player player);
 
     protected abstract ConfigWrapper getConfigWrapper();
@@ -64,7 +65,7 @@ public abstract class absCore implements Listener {
     public void rSkillTrigger(PlayerInteractEvent event) {
         Player player = event.getPlayer();
 
-        if (!(contains(player) && isItemRequired(player) && !Stun.isStunned(player))) return;
+        if (!contains(player) || !isItemRequired(player) || Stun.isStunned(player)) return;
 
         if (event.getAction() != Action.LEFT_CLICK_AIR && event.getAction() != Action.LEFT_CLICK_BLOCK) {
             if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
@@ -91,15 +92,13 @@ public abstract class absCore implements Listener {
 
         ItemStack dropped = event.getItemDrop().getItemStack();
 
-        if (contains(player) && !Stun.isStunned(player)) {
+        if (contains(player) && !Stun.isStunned(player) && isDropRequired(player, dropped)) {
 
             event.setCancelled(true);
 
-            if(!isQCondition(player, dropped)) return;
-
             if(!pAttackUsing.contains(player.getUniqueId())) pAttackUsing.add(player.getUniqueId());
 
-            if (cool.isReloading(player, "Q") || !isQCondition(player, dropped)) return;
+            if (cool.isReloading(player, "Q") || !isQCondition(player)) return;
 
             cool.setCooldown(player, getConfigWrapper().getQcooldown(player), "Q");
             getQSkill().Trigger(player);
@@ -111,7 +110,7 @@ public abstract class absCore implements Listener {
 
         Player player = event.getPlayer();
 
-        if (!(contains(player) && isItemRequired(player) && !Stun.isStunned(player))) return;
+        if (!contains(player) || !isItemRequired(player) || Stun.isStunned(player)) return;
 
         event.setCancelled(true);
 

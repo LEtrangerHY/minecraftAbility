@@ -268,12 +268,7 @@ public class swordCore extends absCore {
     }
 
     @Override
-    protected boolean isRCondition(Player player) {
-        return canUseRSkill(player);
-    }
-
-    @Override
-    protected boolean isQCondition(Player player, ItemStack droppedItem) {
+    protected boolean isDropRequired(Player player, ItemStack droppedItem){
         ItemStack off = player.getInventory().getItemInOffHand();
         boolean ironSwordInBundle = false;
 
@@ -299,8 +294,17 @@ public class swordCore extends absCore {
         }
         return ((droppedItem.getType() == Material.IRON_SWORD &&
                 off.getType() == Material.BUNDLE && bundleIsEmpty && !config.laidoSlash.getOrDefault(player.getUniqueId(), false)) || (droppedItem.getType() == Material.BUNDLE &&
-                off.getType() == Material.AIR) && ironSwordInBundle && config.laidoSlash.getOrDefault(player.getUniqueId(), false)) &&
-                canUseQSkill(player);
+                off.getType() == Material.AIR) && ironSwordInBundle && config.laidoSlash.getOrDefault(player.getUniqueId(), false));
+    }
+
+    @Override
+    protected boolean isRCondition(Player player) {
+        return canUseRSkill(player);
+    }
+
+    @Override
+    protected boolean isQCondition(Player player) {
+        return canUseQSkill(player);
     }
 
     @Override

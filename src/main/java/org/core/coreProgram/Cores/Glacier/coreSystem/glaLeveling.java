@@ -25,7 +25,7 @@ public class glaLeveling implements Levels {
         this.exp = exp;
     }
 
-    public Set<Long> requireExp = Set.of(77L, 144L, 288L, 488L, 788L, 888L, 977L, 1287L, 1688L, 2688L);
+    public Set<Long> requireExp = Set.of(77L, 144L, 288L, 488L, 788L, 1288L, 2388L, 3988L, 4844L, 5888L);
 
     @Override
     public void addLV(Entity entity){

@@ -168,6 +168,15 @@ public class carpCore extends absCore {
         return ((main.getType() == Material.TRIPWIRE_HOOK && off.getType() == Material.AIR) || (main.getType() == Material.TRIPWIRE_HOOK && off.getType() == Material.TOTEM_OF_UNDYING));
     }
 
+    @Override
+    protected boolean isDropRequired(Player player, ItemStack droppedItem){
+        ItemStack off = player.getInventory().getItemInOffHand();
+        return (droppedItem.getType() == Material.TRIPWIRE_HOOK &&
+                off.getType() == Material.AIR &&
+                canUseQSkill(player)) || (droppedItem.getType() == Material.TRIPWIRE_HOOK &&
+                off.getType() == Material.TOTEM_OF_UNDYING);
+    }
+
     private boolean canUseRSkill(Player player) { return true; }
 
     private boolean canUseQSkill(Player player) {
@@ -187,13 +196,8 @@ public class carpCore extends absCore {
     }
 
     @Override
-    protected boolean isQCondition(Player player, ItemStack droppedItem) {
-        ItemStack off = player.getInventory().getItemInOffHand();
-        return (droppedItem.getType() == Material.TRIPWIRE_HOOK &&
-                off.getType() == Material.AIR &&
-                canUseQSkill(player)) || (droppedItem.getType() == Material.TRIPWIRE_HOOK &&
-                off.getType() == Material.TOTEM_OF_UNDYING &&
-                canUseQSkill(player));
+    protected boolean isQCondition(Player player) {
+        return canUseQSkill(player);
     }
 
     @Override

@@ -53,7 +53,7 @@ public class blueInventory extends absInventory {
     @Override
     protected Material getTotem(Player player, String skill) {
         return switch (skill) {
-            case "R" -> Material.CHERRY_LEAVES;
+            case "R" -> Material.SOUL_SAND;
             case "Q" -> Material.CHERRY_WOOD;
             case "F" -> Material.CHERRY_SAPLING;
             default -> Material.BARRIER;

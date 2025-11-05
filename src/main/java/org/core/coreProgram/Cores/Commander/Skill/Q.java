@@ -99,7 +99,7 @@ public class Q implements SkillBase {
         Location center = fb.getLocation();
 
         double amp = config.q_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L);
-        double damage = 2 * (1 + amp);
+        double damage = config.q_Skill_Damage * (1 + amp);
 
         for (Entity entity : world.getNearbyEntities(center, 3.5, 3.5, 3.5)) {
             if (!(entity instanceof LivingEntity)) continue;
