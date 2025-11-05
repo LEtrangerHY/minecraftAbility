@@ -115,7 +115,7 @@ public class swordInventory extends absInventory {
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
                 lore.add(Component.text("검을 납도하고, 해당 스킬을 제외한 모든 스킬의 쿨타임을 초기화시킨다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("발도 - 참격 : 전방으로 참격을 가하고, 피격된 적들을 기절시킨다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("발도 : 발도 - 참격 이후, 전방으로 돌진한 후 범위 내의 대상에게 7번의 피해를 가한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("발도 : 발도 - 참격 이후, 전방으로 돌진 후 범위 내의 대상에게 7번의 피해를 가한뒤 검을 납도한다.").color(NamedTextColor.GREEN));
                 break;
             default:
                 break;

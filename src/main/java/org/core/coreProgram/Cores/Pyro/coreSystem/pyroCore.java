@@ -168,7 +168,7 @@ public class pyroCore extends absCore {
 
                                 for (Entity entity : world.getNearbyEntities(particleLocation, 0.5, 0.5, 0.5)) {
                                     if (entity instanceof LivingEntity target && entity != player) {
-                                        ForceDamage forceDamage = new ForceDamage(target, 9);
+                                        ForceDamage forceDamage = new ForceDamage(target, 5);
                                         forceDamage.applyEffect(player);
                                         Burst(player, particleLocation);
                                         config.collision.put(player.getUniqueId(), true);

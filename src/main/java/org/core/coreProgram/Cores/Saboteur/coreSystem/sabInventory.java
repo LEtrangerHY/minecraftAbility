@@ -87,7 +87,12 @@ public class sabInventory extends absInventory {
                 lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("").color(NamedTextColor.GREEN));
+                lore.add(Component.text("트래퍼 - 스파이크 : 지정한 구역에 마름쇠를 설치한다. 구역 내의 대상의 이동속도가 45% 감소하며, 지속피해를 입는다. 트리거 될 시, ").color(NamedTextColor.GREEN));
+                lore.add(Component.text("트래퍼 - 스파이크 - 트리거 : 추가적으로 구역 내의 대상에게 맹독을 부여한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("트래퍼 - 투사 : 지정한 구역에 디스펜서를 설치한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("트래퍼 - 투사 - 트리거 : 트리거 될 시, 트리거를 작동시킨 대상에게 표창을 투사해 피해를 가하고 맹독을 입힌다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("마지막 수단 - 스파이크 : 참격을 가한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("마지막 수단 - 투사 : 전방으로 맹독 표창을 투척한다.").color(NamedTextColor.GREEN));
                 break;
             case "Q":
                 requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfQ.get((int) level)) : Component.text("Require EXP : MAX");
@@ -98,7 +103,9 @@ public class sabInventory extends absInventory {
                 lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("").color(NamedTextColor.GREEN));
+                lore.add(Component.text("트래퍼 : 지정한 구역에 트리거를 설치한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("마지막 수단 - 스파이크 : 마지막 수단.R 을 사용한 횟수만큼 회전베기(최대 4번)를 시전하며 돌진한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("마지막 수단 - 투사 : 돌진 후 자신을 중심으로 마지막 수단.R 을 사용한 횟수만큼의 방위(2방위, 4방위, 6방위, 8방위)로 맹독 표창들을 투척한다.").color(NamedTextColor.GREEN));
                 break;
             case "F":
                 requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfF.get((int) level)) : Component.text("Require EXP : MAX");
@@ -109,7 +116,7 @@ public class sabInventory extends absInventory {
                 lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("대상 : 플레이어").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("").color(NamedTextColor.GREEN));
+                lore.add(Component.text("13초간 R, Q 스킬의 효과를 변경하는 대신 맹독 상태에 빠진다.").color(NamedTextColor.GREEN));
                 break;
             default:
                 break;

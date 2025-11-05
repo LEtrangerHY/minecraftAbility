@@ -110,7 +110,7 @@ public class lustInventory extends absInventory {
                 lore.add(Component.text("대상 : -/적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
                 lore.add(Component.text("좌우에 철골렘을 각각 1 개체씩 소환한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("지정 : 지정한 대상을 철골렘의 공격 ").color(NamedTextColor.GREEN));
+                lore.add(Component.text("지정 : 대상을 철골렘의 공격 타깃으로써 지정한다.").color(NamedTextColor.GREEN));
                 break;
             default:
                 break;

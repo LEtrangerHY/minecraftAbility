@@ -110,7 +110,8 @@ public class harvInventory extends absInventory {
                 lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("전방으로 돌진하며 대상들을 여러번 베어낸다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("범위 내의 풀을 모두 제거하고, 구역 내에 회전 참격을 생성한다,").color(NamedTextColor.GREEN));
+                lore.add(Component.text("회전 참격 범위 내의 적들에게 제거한 풀의 수만큼의 횟수의 지속 피해를 가하고, 이동속도를 ").color(NamedTextColor.GREEN));
                 break;
             default:
                 break;
