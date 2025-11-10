@@ -79,7 +79,7 @@ public class LevelingManager implements Listener {
         AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
         if (maxHealth != null) {
             double base = maxHealth.getDefaultValue();
-            double newMax = base + (2.0 * level);
+            double newMax = base + (4.0 * level);
 
             maxHealth.setBaseValue(newMax);
 

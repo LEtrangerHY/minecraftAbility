@@ -90,10 +90,9 @@ public class blueCore extends absCore {
     }
 
     @EventHandler
-    public void passiveDamage(EntityDamageByEntityEvent event) {
+    public void passiveDamage(EntityDamageEvent event) {
 
-        if (!(event.getDamager() instanceof Player player)) return;
-        if (!(event.getEntity() instanceof LivingEntity target)) return;
+        if (!(event.getEntity() instanceof Player player)) return;
 
         if (tag.Blue.contains(player)) {
 
@@ -103,6 +102,25 @@ public class blueCore extends absCore {
         }
     }
 
+    @EventHandler
+    public void qSkillAbsorb(EntityDamageByEntityEvent event) {
+
+        if (!(event.getDamager() instanceof Player player)) return;
+        if (!(event.getEntity() instanceof LivingEntity target)) return;
+
+        if(tag.Blue.contains(player) && hasProperItems(player)){
+            if(config.qSoulAbsorb.getOrDefault(player.getUniqueId(), false)) {
+
+                World world = player.getWorld();
+
+                world.spawnParticle(Particle.SOUL, target.getLocation().clone().add(0, 1.3, 0), 4, 0.4, 0.4, 0.4, 0);
+                world.spawnParticle(Particle.SOUL, player.getLocation().clone().add(0, 1.3, 0), 4, 0.4, 0.4, 0.4, 0);
+
+                player.heal(1);
+
+            }
+        }
+    }
 
     @EventHandler(priority = EventPriority.NORMAL)
     public void passiveAttackEffect(PlayerInteractEvent event) {
@@ -128,6 +146,18 @@ public class blueCore extends absCore {
 
                         player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(1/1.3);
                         world.playSound(player.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 1.3f, 1.0f);
+
+                        if(config.qSoulAbsorb.getOrDefault(player.getUniqueId(), false)){
+
+                            world.spawnParticle(Particle.SMOKE, player.getLocation().add(0, 1.3, 0), 44, 0.4, 0.4, 0.4, 1);
+
+                            for (Entity entity : world.getNearbyEntities(player.getLocation(), 4.0, 1.3, 4.0)) {
+                                if (entity instanceof LivingEntity target && entity != player) {
+                                    ForceDamage forceDamage = new ForceDamage(target, 2.0);
+                                    forceDamage.applyEffect(player);
+                                }
+                            }
+                        }
 
                         new BukkitRunnable() {
                             int ticks = 0;

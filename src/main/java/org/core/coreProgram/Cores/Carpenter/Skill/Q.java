@@ -61,7 +61,7 @@ public class Q implements SkillBase {
             public void run() {
 
                 if(ticks % 5 == 0){
-                    player.getWorld().spawnParticle(Particle.SMOKE, player.getLocation().add(0, 1.0, 0), 13, 0.5, 0.1, 0.5, 0);
+                    player.getWorld().spawnParticle(Particle.SMOKE, player.getLocation().add(0, 1.0, 0), 12, 0.5, 0.1, 0.5, 0);
                 }
 
                 if(ticks >= 100 || config.crash.getOrDefault(player.getUniqueId(), false)){

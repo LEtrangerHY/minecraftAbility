@@ -170,7 +170,7 @@ public class EntityLevelingManager implements Listener {
 
         int level = data.get(levelKey, PersistentDataType.INTEGER);
         int baseExp = event.getDroppedExp();
-        event.setDroppedExp(baseExp * (level + 1));
+        event.setDroppedExp((int) (baseExp * (1 + (Math.pow(level, 1.5f) * 1/3))));
     }
 
     private void startNameTagUpdater() {

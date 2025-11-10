@@ -37,7 +37,7 @@ public class sabLeveling implements Levels {
 
         AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
         if (maxHealth != null) {
-            maxHealth.setBaseValue(maxHealth.getBaseValue() + 2.0);
+            maxHealth.setBaseValue(maxHealth.getBaseValue() + 4.0);
 
             player.setHealth(maxHealth.getBaseValue());
         }

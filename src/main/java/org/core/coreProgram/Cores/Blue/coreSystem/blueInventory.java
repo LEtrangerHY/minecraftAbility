@@ -36,7 +36,7 @@ public class blueInventory extends absInventory {
 
     @Override
     protected boolean isCoreItemClicked(Player player, ItemStack clicked){
-        return clicked.getType() == Material.BREEZE_ROD;
+        return clicked.getType() == Material.SOUL_LANTERN;
     }
 
     @Override
@@ -54,7 +54,7 @@ public class blueInventory extends absInventory {
     protected Material getTotem(Player player, String skill) {
         return switch (skill) {
             case "R" -> Material.SOUL_SAND;
-            case "Q" -> Material.CHERRY_WOOD;
+            case "Q" -> Material.WITHER_SKELETON_SKULL;
             case "F" -> Material.CHERRY_SAPLING;
             default -> Material.BARRIER;
         };

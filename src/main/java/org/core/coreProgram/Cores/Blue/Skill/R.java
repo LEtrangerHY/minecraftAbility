@@ -2,16 +2,23 @@ package org.core.coreProgram.Cores.Blue.Skill;
 
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.core.Cool.Cool;
+import org.core.Effect.ForceDamage;
 import org.core.coreProgram.AbsCoreSystem.SkillBase;
 import org.core.coreProgram.Cores.Blue.coreSystem.Blue;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 
 public class R implements SkillBase {
@@ -30,11 +37,24 @@ public class R implements SkillBase {
 
         World world = player.getWorld();
 
-        world.spawnParticle(Particle.WITCH, player.getLocation().clone().add(0, 1, 0), 80, 1.5, 1.5, 1.5, 0.1);
-        world.spawnParticle(Particle.SMOKE, player.getLocation().clone().add(0, 1, 0), 80, 1.5, 1.5, 1.5, 0.1);
-        world.playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1, 1);
-        world.playSound(player.getLocation(), Sound.BLOCK_GRASS_PLACE, 1, 1);
-        placeWitherFlower(player, 10.0, 44.0);
+        if(!cool.isReloading(player, "R Reuse")) {
+            world.spawnParticle(Particle.WITCH, player.getLocation().clone().add(0, 1, 0), 80, 1.5, 1.5, 1.5, 0.1);
+            world.spawnParticle(Particle.SMOKE, player.getLocation().clone().add(0, 1, 0), 80, 1.5, 1.5, 1.5, 1);
+
+            world.playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1, 1);
+            world.playSound(player.getLocation(), Sound.BLOCK_GRASS_PLACE, 1, 1);
+            cool.updateCooldown(player, "R", 0L);
+            cool.setCooldown(player, 4000L, "R Reuse");
+            placeWitherFlower(player, 10.0, 44.0);
+        }else{
+            world.spawnParticle(Particle.WITCH, player.getLocation().clone().add(0, 1, 0), 80, 1.5, 1.5, 1.5, 0.1);
+            world.spawnParticle(Particle.SMOKE, player.getLocation().clone().add(0, 1, 0), 80, 1.5, 1.5, 1.5, 1);
+
+            world.playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.6f, 1.0f);
+            world.playSound(player.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 1.3f, 1.0f);
+            cool.updateCooldown(player, "R Reuse", 0L);
+            slowFlower(player, config.Flower.getOrDefault(player.getUniqueId(), new ArrayList<>()));
+        }
 
     }
 
@@ -53,7 +73,7 @@ public class R implements SkillBase {
         int maxZ = (int) Math.ceil(playerLoc.getZ() + radius);
         int playerY = playerLoc.getBlockY();
 
-        List<Block> blocksToPlace = new ArrayList<>();
+        config.Flower.putIfAbsent(player.getUniqueId(), new ArrayList<>());
 
         for (int x = minX; x <= maxX; x++) {
             for (int z = minZ; z <= maxZ; z++) {
@@ -96,21 +116,65 @@ public class R implements SkillBase {
                     if (foundY != -1 && !(x == px && foundY == py && z == pz)) {
                         Block aboveBlock = world.getBlockAt(x, foundY, z);
                         if (aboveBlock.isPassable() || aboveBlock.getType() == Material.AIR) {
-                            blocksToPlace.add(aboveBlock);
+                            config.Flower.get(player.getUniqueId()).add(aboveBlock);
                         }
                     }
 
                     if (foundUpperY != -1 && foundUpperY != foundY && !(x == px && foundUpperY == py && z == pz)) {
                         Block aboveBlock = world.getBlockAt(x, foundUpperY, z);
                         if (aboveBlock.isPassable() || aboveBlock.getType() == Material.AIR) {
-                            blocksToPlace.add(aboveBlock);
+                            config.Flower.get(player.getUniqueId()).add(aboveBlock);
                         }
                     }
                 }
             }
         }
 
-        blocksToPlace.sort(Comparator.comparingDouble(b -> b.getLocation().distance(playerLoc)));
+        config.Flower.get(player.getUniqueId()).sort(Comparator.comparingDouble(b -> b.getLocation().distance(playerLoc)));
+        List<Block> flower = config.Flower.get(player.getUniqueId());
+
+        new BukkitRunnable() {
+            int index = 0;
+            @Override
+            public void run() {
+                int perTick = 3;
+                for (int i = 0; i < perTick && index < flower.size(); i++, index++) {
+                    Block block = flower.get(index);
+                    block.setType(Material.WITHER_ROSE, false);
+
+                    world.spawnParticle(Particle.SOUL, block.getLocation().clone().add(0.5, 0.5, 0.5), 3, 0.1, 0.1, 0.1, 0.02);
+
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            cool.setCooldown(player, config.r_Skill_Cool, "R");
+                            if (block.getType() == Material.WITHER_ROSE) {
+                                block.setType(Material.AIR);
+                                world.spawnParticle(Particle.SMOKE, block.getLocation().add(0.5, 0.2, 0.5), 5, 0.1, 0.1, 0.1, 0.02);
+
+                                if(!config.Flower.isEmpty()) {
+                                    config.Flower.remove(player.getUniqueId());
+                                }
+                            }
+                        }
+                    }.runTaskLater(plugin, 80L);
+                }
+
+                if (index >= flower.size()){
+                    cancel();
+                }
+            }
+        }.runTaskTimer(plugin, 0L, 1L);
+    }
+
+    public void slowFlower(Player player, List<Block> blocksToPlace){
+
+        World world = player.getWorld();
+
+        double amp = config.r_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L);
+        double damage = config.r_Skill_damage * (1 + amp);
+
+        config.r_damaged.putIfAbsent(player.getUniqueId(), new HashSet<>());
 
         new BukkitRunnable() {
             int index = 0;
@@ -118,26 +182,32 @@ public class R implements SkillBase {
             public void run() {
                 int perTick = 3;
                 for (int i = 0; i < perTick && index < blocksToPlace.size(); i++, index++) {
-                    Block block = blocksToPlace.get(index);
-                    block.setType(Material.WITHER_ROSE, false);
 
-                    world.spawnParticle(Particle.SOUL, block.getLocation().add(0.5, 0.5, 0.5), 3, 0.1, 0.1, 0.1, 0.02);
+                    List<Entity> nearbyEntities = (List<Entity>) blocksToPlace.get(index).getLocation().getNearbyEntities(0.5, 0.5, 0.5);
 
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            if (block.getType() == Material.WITHER_ROSE) {
-                                block.setType(Material.AIR);
-                                world.spawnParticle(Particle.SMOKE, block.getLocation().add(0.5, 0.2, 0.5), 5, 0.1, 0.1, 0.1, 0.02);
-                            }
+                    for (Entity entity : nearbyEntities) {
+                        if (entity instanceof LivingEntity target && entity != player && !config.r_damaged.get(player.getUniqueId()).contains(target)) {
+
+                            PotionEffect slowness = new PotionEffect(PotionEffectType.SLOWNESS, 80, 3, false, false);
+                            target.addPotionEffect(slowness);
+
+                            ForceDamage forceDamage = new ForceDamage(target, damage);
+                            forceDamage.applyEffect(player);
+                            target.setVelocity(new Vector(0, 0, 0));
+
+                            config.r_damaged.get(player.getUniqueId()).add(target);
                         }
-                    }.runTaskLater(plugin, 80L);
+                    }
+
+                    world.spawnParticle(Particle.SOUL, blocksToPlace.get(index).getLocation().add(0.5, 0.5, 0.5), 3, 0.1, 0.1, 0.1, 0.02);
+                    world.spawnParticle(Particle.SMOKE, blocksToPlace.get(index).getLocation().add(0.5, 0.2, 0.5), 5, 0.1, 0.1, 0.1, 1);
                 }
 
-                if (index >= blocksToPlace.size()) cancel();
+                if (index >= blocksToPlace.size()){
+                    config.r_damaged.remove(player.getUniqueId());
+                    cancel();
+                }
             }
         }.runTaskTimer(plugin, 0L, 1L);
     }
-
-
 }
