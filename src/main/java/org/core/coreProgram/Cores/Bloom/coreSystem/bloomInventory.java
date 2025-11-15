@@ -43,9 +43,9 @@ public class bloomInventory extends absInventory {
     protected Component getName(Player player, String skill) {
 
         return switch (skill) {
-            case "R" -> Component.text("");
-            case "Q" -> Component.text("");
-            case "F" -> Component.text("");
+            case "R" -> Component.text("Blossomrise");
+            case "Q" -> Component.text("Petalblizzard");
+            case "F" -> Component.text("WONDERLAND");
             default -> Component.text("???");
         };
     }
@@ -85,20 +85,21 @@ public class bloomInventory extends absInventory {
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
                 lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("대상 : -").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("").color(NamedTextColor.GREEN));
+                lore.add(Component.text("전방으로 벚꽃 돌풍을 투사한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("도달한 지점 주위의 대상을 상승시키며 피해를 가한다.").color(NamedTextColor.GREEN));
                 break;
             case "Q":
                 requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfQ.get((int) level)) : Component.text("Require EXP : MAX");
                 lore.add(requireXp.color(NamedTextColor.AQUA));
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("타입 : 강화").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("시스템 : 지속시간").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("대상 : 플레이어").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("").color(NamedTextColor.GREEN));
+                lore.add(Component.text("플레이어 주위의 대상을 밀쳐내고, 피해를 가한다.").color(NamedTextColor.GREEN));
                 break;
             case "F":
                 requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfF.get((int) level)) : Component.text("Require EXP : MAX");
@@ -107,9 +108,11 @@ public class bloomInventory extends absInventory {
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
                 lore.add(Component.text("타입 : 효과").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("시스템 : 장판").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("대상 : 플레이어/적 오브젝트/바이옴").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("대상 : 플레이어/적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("").color(NamedTextColor.GREEN));
+                lore.add(Component.text("지정한 위치에 벚꽃 나무를 소환한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("벚꽃 나무 주위에 있을 시, 방어력이 40% 증가하고, 재생 효과를 부여받는다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("벚꽃 나무 주위의 적 오브젝트에게 지속피해를 가한다.").color(NamedTextColor.GREEN));
                 break;
             default:
                 break;
