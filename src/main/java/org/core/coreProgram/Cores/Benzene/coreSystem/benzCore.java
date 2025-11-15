@@ -208,9 +208,6 @@ public class benzCore extends absCore {
         if (!(event.getDamager() instanceof Player player)) return;
         if (!(event.getEntity() instanceof LivingEntity target)) return;
 
-        ItemStack itemInMainHand = player.getInventory().getItemInMainHand();
-        ItemStack itemInOffHand = player.getInventory().getItemInOffHand();
-
         Location loc1 = player.getLocation().add(0, player.getHeight() / 2 + 0.2, 0);
         Location loc2 = target.getLocation().add(0, target.getHeight() / 2 + 0.2, 0);
         double distance = loc1.distance(loc2);
@@ -229,15 +226,13 @@ public class benzCore extends absCore {
             }
         }
 
-        if(config.Chain.getOrDefault(player.getUniqueId(), new LinkedHashMap<>()).containsValue(target)
-                && distance <= 24){
+        if(tag.Benzene.contains(player) && config.Chain.getOrDefault(player.getUniqueId(), new LinkedHashMap<>()).containsValue(target) && distance <= 24){
             double originalDamage = event.getDamage();
             double amplifiedDamage = damageAmplify.Amplify(player, target, originalDamage);
 
             event.setDamage(amplifiedDamage);
 
             damageShare.damageShareTrigger(player, target, originalDamage);
-
         }
     }
 

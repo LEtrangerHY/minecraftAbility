@@ -107,9 +107,6 @@ public class carpCore extends absCore {
         if (!(event.getDamager() instanceof Player player)) return;
         if (!(event.getEntity() instanceof LivingEntity target)) return;
 
-        ItemStack itemInMainHand = player.getInventory().getItemInMainHand();
-        ItemStack itemInOffHand = player.getInventory().getItemInOffHand();
-
         if(tag.Carpenter.contains(player) && hasProperItems(player)){
             if(!config.r_damaging.getOrDefault(player.getUniqueId(), false)) {
 

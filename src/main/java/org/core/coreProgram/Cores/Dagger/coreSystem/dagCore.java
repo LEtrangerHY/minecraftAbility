@@ -111,10 +111,7 @@ public class dagCore extends absCore {
         if (!(event.getDamager() instanceof Player player)) return;
         if (!(event.getEntity() instanceof LivingEntity target)) return;
 
-        ItemStack itemInMainHand = player.getInventory().getItemInMainHand();
-        ItemStack itemInOffHand = player.getInventory().getItemInOffHand();
-
-        if(tag.Dagger.contains(player) && itemInMainHand.getType() == Material.ECHO_SHARD && itemInOffHand.getType() == Material.AIR){
+        if(tag.Dagger.contains(player) && hasProperItems(player)){
             if(!config.r_damaged.getOrDefault(player.getUniqueId(), false) && !config.f_using.getOrDefault(player.getUniqueId(), false) && !config.f_damaging.getOrDefault(player.getUniqueId(), false)) {
 
                 Vector direction = player.getEyeLocation().add(0, -0.5, 0).getDirection().normalize();

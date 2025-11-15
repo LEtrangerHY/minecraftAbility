@@ -110,17 +110,16 @@ public class bambCore extends absCore {
         if (!(event.getDamager() instanceof Player player)) return;
         if (!(event.getEntity() instanceof LivingEntity target)) return;
 
-        ItemStack itemInMainHand = player.getInventory().getItemInMainHand();
-        ItemStack itemInOffHand = player.getInventory().getItemInOffHand();
-
-        if(itemInMainHand.getType() == Material.BAMBOO && itemInOffHand.getType() == Material.IRON_NUGGET && contains(player)){
-            if(!config.r_damaged.getOrDefault(player.getUniqueId(), false)) {
-                if (!config.reloaded.getOrDefault(player.getUniqueId(), false)) {
-                    player.playSound(player.getLocation(), Sound.ITEM_TRIDENT_HIT, 1, 1);
-                    event.setDamage(4.0);
-                } else {
-                    player.playSound(player.getLocation(), Sound.ITEM_TRIDENT_HIT_GROUND, 1, 1);
-                    event.setDamage(6.0);
+        if(tag.Bambo.contains(player)) {
+            if (hasProperItems(player)) {
+                if (!config.r_damaged.getOrDefault(player.getUniqueId(), false)) {
+                    if (!config.reloaded.getOrDefault(player.getUniqueId(), false)) {
+                        player.playSound(player.getLocation(), Sound.ITEM_TRIDENT_HIT, 1, 1);
+                        event.setDamage(4.0);
+                    } else {
+                        player.playSound(player.getLocation(), Sound.ITEM_TRIDENT_HIT_GROUND, 1, 1);
+                        event.setDamage(6.0);
+                    }
                 }
             }
         }

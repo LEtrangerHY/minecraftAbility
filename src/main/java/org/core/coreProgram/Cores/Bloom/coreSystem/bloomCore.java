@@ -90,7 +90,7 @@ public class bloomCore extends absCore {
     @EventHandler(priority = EventPriority.NORMAL)
     public void passiveAttackEffect(PlayerInteractEvent event) {
 
-        if(tag.Bloom.contains(event.getPlayer())) {
+        if(tag.Bloom.contains(event.getPlayer()) && hasProperItems(event.getPlayer())) {
             if (!pAttackUsing.contains(event.getPlayer().getUniqueId())) {
 
                 Player player = event.getPlayer();

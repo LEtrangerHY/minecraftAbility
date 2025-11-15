@@ -36,7 +36,7 @@ public class F implements SkillBase {
         World world = player.getWorld();
 
         world.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1, 1);
-        world.playSound(player.getLocation(), Sound.ENTITY_WIND_CHARGE_THROW, 1, 1);
+        world.playSound(player.getLocation(), Sound.ENTITY_BREEZE_WIND_BURST, 1, 1);
         world.playSound(player.getLocation(), Sound.ITEM_TRIDENT_RIPTIDE_1, 1, 1);
         world.playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1, 1);
         world.playSound(player.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 1, 1);

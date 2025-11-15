@@ -2,16 +2,14 @@ package org.core.coreEntity.AbsEntityLeveling;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.NamespacedKey;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.*;
+import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -44,25 +42,53 @@ public class EntityLevelingManager implements Listener {
         Bukkit.getPluginManager().registerEvents(this, plugin);
 
         startNameTagUpdater();
+
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            for (World world : Bukkit.getWorlds()) {
+                for (LivingEntity entity : world.getLivingEntities()) {
+                    if (isExcludedEntity(entity)) continue;
+                    PersistentDataContainer data = entity.getPersistentDataContainer();
+                    if (!data.has(levelKey, PersistentDataType.INTEGER)) {
+                        spawnQueue.add(entity);
+                    }
+                }
+            }
+        }, 40L);
     }
 
     @EventHandler
     public void onEntitySpawn(EntitySpawnEvent event) {
         if (!(event.getEntity() instanceof LivingEntity entity)) return;
-
-        EntityType type = entity.getType();
-        if (type == EntityType.FALLING_BLOCK || type == EntityType.ITEM
-                || type == EntityType.ARMOR_STAND || type == EntityType.VILLAGER
-                || type == EntityType.BAT || type == EntityType.SQUID || type == EntityType.GLOW_SQUID || type == EntityType.BEE)
-            return;
-
+        if (isExcludedEntity(entity)) return; // 플레이어 제외 포함
         spawnQueue.add(entity);
+    }
+
+    @EventHandler
+    public void onChunkLoad(ChunkLoadEvent event) {
+        for (Entity e : event.getChunk().getEntities()) {
+            if (!(e instanceof LivingEntity entity)) continue;
+            if (isExcludedEntity(entity)) continue; // 플레이어 제외 포함
+            PersistentDataContainer data = entity.getPersistentDataContainer();
+            if (!data.has(levelKey, PersistentDataType.INTEGER)) {
+                spawnQueue.add(entity);
+            }
+        }
+    }
+
+    private boolean isExcludedEntity(Entity entity) {
+        if (entity instanceof Player) return true;
+        EntityType type = entity.getType();
+        return type == EntityType.FALLING_BLOCK || type == EntityType.ITEM
+                || type == EntityType.ARMOR_STAND || type == EntityType.VILLAGER
+                || type == EntityType.BAT || type == EntityType.SQUID
+                || type == EntityType.GLOW_SQUID || type == EntityType.BEE;
     }
 
     private void processSpawnQueue() {
         LivingEntity entity;
         while ((entity = spawnQueue.poll()) != null) {
             if (!entity.isValid()) continue;
+            if (entity instanceof Player) continue; // 안전하게 플레이어 제외
 
             PersistentDataContainer data = entity.getPersistentDataContainer();
             if (data.has(levelKey, PersistentDataType.INTEGER)) continue;
@@ -84,10 +110,7 @@ public class EntityLevelingManager implements Listener {
                 else return NamedTextColor.RED;
             });
 
-            String readableName = Arrays.stream(entity.getType().name().split("_"))
-                    .map(s -> s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase())
-                    .reduce((a, b) -> a + " " + b)
-                    .orElse(entity.getType().name());
+            String readableName = getReadableName(entity);
 
             AttributeInstance healthAttr = entity.getAttribute(Attribute.MAX_HEALTH);
             if (healthAttr != null) {
@@ -105,10 +128,8 @@ public class EntityLevelingManager implements Listener {
 
     private void updateHealthName(LivingEntity entity, String name, int level, NamedTextColor color) {
         if (!entity.isValid()) return;
-
         double health = Math.max(0, Math.round(entity.getHealth() * 10.0) / 10.0);
         double maxHealth = Math.round(Objects.requireNonNull(entity.getAttribute(Attribute.MAX_HEALTH)).getValue() * 10.0) / 10.0;
-
         Component newName = Component.text("[Lv." + level + "] " + name + " " + health + "/" + maxHealth + "❤", color);
         entity.customName(newName);
     }
@@ -123,6 +144,7 @@ public class EntityLevelingManager implements Listener {
     @EventHandler
     public void onDamage(EntityDamageEvent e) {
         if (!(e.getEntity() instanceof LivingEntity entity)) return;
+        if (entity instanceof Player) return; // 플레이어 제외
         PersistentDataContainer data = entity.getPersistentDataContainer();
         if (!data.has(levelKey, PersistentDataType.INTEGER)) return;
 
@@ -136,6 +158,7 @@ public class EntityLevelingManager implements Listener {
     @EventHandler
     public void onHeal(EntityRegainHealthEvent e) {
         if (!(e.getEntity() instanceof LivingEntity entity)) return;
+        if (entity instanceof Player) return; // 플레이어 제외
         PersistentDataContainer data = entity.getPersistentDataContainer();
         if (!data.has(levelKey, PersistentDataType.INTEGER)) return;
 
@@ -149,6 +172,7 @@ public class EntityLevelingManager implements Listener {
     @EventHandler
     public void onEntityDamage(EntityDamageByEntityEvent event) {
         if (!(event.getDamager() instanceof LivingEntity attacker)) return;
+        if (attacker instanceof Player) return; // 플레이어 제외
         PersistentDataContainer data = attacker.getPersistentDataContainer();
         if (!data.has(levelKey, PersistentDataType.INTEGER)) return;
 
@@ -165,6 +189,7 @@ public class EntityLevelingManager implements Listener {
     @EventHandler
     public void onEntityDeath(EntityDeathEvent event) {
         LivingEntity deadEntity = event.getEntity();
+        if (deadEntity instanceof Player) return; // 플레이어 제외
         PersistentDataContainer data = deadEntity.getPersistentDataContainer();
         if (!data.has(levelKey, PersistentDataType.INTEGER)) return;
 
@@ -187,7 +212,6 @@ public class EntityLevelingManager implements Listener {
     private void updatePlayerNearbyNameTags(Player player) {
         UUID playerUUID = player.getUniqueId();
         Set<UUID> currentlyVisible = visibleEntities.computeIfAbsent(playerUUID, k -> new HashSet<>());
-
         Set<UUID> visibleNow = new HashSet<>();
 
         for (Entity e : player.getNearbyEntities(NAME_TAG_RADIUS, NAME_TAG_RADIUS, NAME_TAG_RADIUS)) {
@@ -196,7 +220,6 @@ public class EntityLevelingManager implements Listener {
             if (!entity.getPersistentDataContainer().has(levelKey, PersistentDataType.INTEGER)) continue;
 
             visibleNow.add(entity.getUniqueId());
-
             if (!currentlyVisible.contains(entity.getUniqueId())) {
                 entity.setCustomNameVisible(true);
                 currentlyVisible.add(entity.getUniqueId());
@@ -204,7 +227,6 @@ public class EntityLevelingManager implements Listener {
         }
 
         LivingEntity targeted = getTargetedEntity(player, TARGET_RANGE, TARGET_RAY_SIZE);
-
         if (targeted != null) {
             if (!currentlyVisible.contains(targeted.getUniqueId())) {
                 targeted.setCustomNameVisible(true);
@@ -236,9 +258,11 @@ public class EntityLevelingManager implements Listener {
         for (Entity entity : world.getNearbyEntities(eyeLocation, range, range, range)) {
             if (!(entity instanceof LivingEntity) || entity.equals(player)) continue;
             EntityType type = entity.getType();
-            if(type == EntityType.FALLING_BLOCK || type == EntityType.ITEM
+            if (type == EntityType.FALLING_BLOCK || type == EntityType.ITEM
                     || type == EntityType.ARMOR_STAND || type == EntityType.VILLAGER
-                    || type == EntityType.BAT || type == EntityType.SQUID || type == EntityType.GLOW_SQUID || type == EntityType.BEE) continue;
+                    || type == EntityType.BAT || type == EntityType.SQUID
+                    || type == EntityType.GLOW_SQUID || type == EntityType.BEE)
+                continue;
 
             RayTraceResult result = world.rayTraceEntities(
                     eyeLocation, direction, range, raySize, e -> e.equals(entity)

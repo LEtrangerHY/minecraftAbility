@@ -125,7 +125,7 @@ public class blueCore extends absCore {
     @EventHandler(priority = EventPriority.NORMAL)
     public void passiveAttackEffect(PlayerInteractEvent event) {
 
-        if(tag.Blue.contains(event.getPlayer())) {
+        if(tag.Blue.contains(event.getPlayer()) && hasProperItems(event.getPlayer())) {
             if (!pAttackUsing.contains(event.getPlayer().getUniqueId())) {
 
                 Player player = event.getPlayer();
@@ -152,12 +152,12 @@ public class blueCore extends absCore {
 
                         if(config.qSoulAbsorb.getOrDefault(player.getUniqueId(), false)){
 
-                            world.spawnParticle(Particle.SMOKE, player.getLocation().add(0, 1.0, 0), 44, 0.4, 0.4, 0.4, 0.64);
+                            world.spawnParticle(Particle.SMOKE, player.getLocation().add(0, 1.0, 0), 66, 0.4, 0.4, 0.4, 0.64);
 
                             if (Math.random() < 0.6) {
-                                world.spawnParticle(Particle.DUST, player.getLocation().add(0, 1.0, 0), 44, 0.4, 0.6, 0.4, 0.64, dustOption_flowerDust_gra);
+                                world.spawnParticle(Particle.DUST, player.getLocation().add(0, 1.0, 0), 66, 0.4, 0.6, 0.4, 0.64, dustOption_flowerDust_gra);
                             }else{
-                                world.spawnParticle(Particle.DUST, player.getLocation().add(0, 1.0, 0), 44, 0.4, 0.6, 0.4, 0.64, dustOption_flowerDust);
+                                world.spawnParticle(Particle.DUST, player.getLocation().add(0, 1.0, 0), 66, 0.4, 0.6, 0.4, 0.64, dustOption_flowerDust);
                             }
 
                             for (Entity entity : world.getNearbyEntities(player.getLocation(), 6.0, 4, 6.0)) {
@@ -188,7 +188,7 @@ public class blueCore extends absCore {
 
                                 for (Entity entity : world.getNearbyEntities(particleLocation, 1.3, 1.3, 1.3)) {
                                     if (entity instanceof LivingEntity target && entity != player) {
-                                        ForceDamage forceDamage = new ForceDamage(target, 3);
+                                        ForceDamage forceDamage = new ForceDamage(target, 2.6);
                                         forceDamage.applyEffect(player);
                                     }
                                 }

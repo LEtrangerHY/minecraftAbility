@@ -38,7 +38,7 @@ public class Blue {
     public HashMap<UUID, Integer> repeatCount = new HashMap<>();
     public long f_Skill_Cool = 66000;
     public double f_Skill_amp = 0.13;
-    public double f_Skill_damage = 0.13;
+    public double f_Skill_damage = 1.3;
 
     public void variableReset(Player player){
 

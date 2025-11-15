@@ -144,7 +144,9 @@ public class R implements SkillBase {
             Material.END_PORTAL,
             Material.NETHER_PORTAL,
             Material.STRUCTURE_BLOCK,
-            Material.JIGSAW
+            Material.JIGSAW,
+            Material.GRASS_BLOCK,
+            Material.DIRT
     );
 
     public void breakBlockSafely(Player player, Block block) {
@@ -160,6 +162,6 @@ public class R implements SkillBase {
                 block.getBlockData()
         );
 
-        block.breakNaturally(new ItemStack(Material.IRON_HOE));
+        block.breakNaturally(new ItemStack(Material.IRON_HOE), false);
     }
 }

@@ -1,5 +1,6 @@
 package org.core.coreProgram.Cores.Bloom.coreSystem;
 
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -20,15 +21,22 @@ public class Bloom {
     public HashMap<UUID, HashSet<Entity>> damaged = new HashMap<>();
 
     //R
-    public long r_Skill_Cool = 10000;
+    public long r_Skill_Cool = 3700;
+    public double r_Skill_damage = 0.43;
+    public double r_Skill_amp = 0.17;
 
     //Q
-    public long q_Skill_Cool = 44000;
-    public double q_Skill_amp = 0.13;
+    public HashMap<UUID, HashSet<Entity>> q_damaged = new HashMap<>();
+    public HashMap<UUID, Integer> repeatCount = new HashMap<>();
+    public long q_Skill_Cool = 7000;
+    public double q_Skill_damage = 3;
+    public double q_Skill_amp = 0.17;
 
     //F
-    public long f_Skill_Cool = 666000;
-    public double f_Skill_amp = 0.2;
+    public HashMap<UUID, Location> treeLoc = new HashMap<>();
+    public long f_Skill_Cool = 30000;
+    public double f_Skill_damage = 0.7;
+    public double f_Skill_amp = 0.17;
 
     public void variableReset(Player player){
 
