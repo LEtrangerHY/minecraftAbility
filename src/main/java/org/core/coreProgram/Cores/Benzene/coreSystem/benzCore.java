@@ -276,7 +276,7 @@ public class benzCore extends absCore {
     private boolean hasProperItems(Player player) {
         ItemStack main = player.getInventory().getItemInMainHand();
         ItemStack off = player.getInventory().getItemInOffHand();
-        return main.getType() == Material.IRON_SWORD && off.getType() == Material.CHAIN;
+        return main.getType() == Material.IRON_SWORD && off.getType() == Material.IRON_CHAIN;
     }
 
     private boolean canUseRSkill(Player player) {
@@ -301,7 +301,7 @@ public class benzCore extends absCore {
     protected boolean isDropRequired(Player player, ItemStack droppedItem){
         ItemStack off = player.getInventory().getItemInOffHand();
         return droppedItem.getType() == Material.IRON_SWORD &&
-                off.getType() == Material.CHAIN;
+                off.getType() == Material.IRON_CHAIN;
     }
 
     @Override

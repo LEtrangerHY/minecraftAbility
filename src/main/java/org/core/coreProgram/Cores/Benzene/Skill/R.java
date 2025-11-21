@@ -67,7 +67,7 @@ public class R implements SkillBase {
 
         Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(111, 111, 111), 0.6f);
         Particle.DustOptions dustOptions_small = new Particle.DustOptions(Color.fromRGB(66, 66, 66), 0.6f);
-        BlockData chain = Material.CHAIN.createBlockData();
+        BlockData chain = Material.IRON_CHAIN.createBlockData();
 
         new BukkitRunnable() {
             private double ticks = 0;

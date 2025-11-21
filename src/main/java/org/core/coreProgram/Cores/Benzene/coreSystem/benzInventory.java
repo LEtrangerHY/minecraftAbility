@@ -53,8 +53,8 @@ public class benzInventory extends absInventory {
     @Override
     protected Material getTotem(Player player, String skill) {
         return switch (skill) {
-            case "R" -> Material.CHAIN;
-            case "Q" -> Material.IRON_BARS;
+            case "R" -> Material.IRON_CHAIN;
+            case "Q" -> Material.OXIDIZED_COPPER_CHAIN;
             case "F" -> Material.ENDER_EYE;
             default -> Material.BARRIER;
         };
