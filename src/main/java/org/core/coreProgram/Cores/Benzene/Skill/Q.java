@@ -44,7 +44,7 @@ public class Q implements SkillBase {
         LivingEntity entity = getTargetedEntity(player, 12, 0.3);
 
         Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(30, 30, 30), 0.6f);
-        BlockData chain = Material.CHAIN.createBlockData();
+        BlockData chain = Material.IRON_CHAIN.createBlockData();
 
         player.getWorld().playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.0f, 1.0f);
 

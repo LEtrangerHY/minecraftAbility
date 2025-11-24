@@ -7,6 +7,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 import org.core.Cool.Cool;
@@ -47,7 +48,7 @@ public class Q implements SkillBase {
         player.setVelocity(upward);
 
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            player.setMetadata("noFallDamage", new FixedMetadataValue(plugin, true));
+            player.getPersistentDataContainer().set(new NamespacedKey(plugin, "noFallDamage"), PersistentDataType.BOOLEAN, true);
         }, 1L);
 
     }

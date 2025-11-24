@@ -130,17 +130,17 @@ public class bambCore extends absCore {
         if (!(event.getEntity() instanceof Player player)) return;
 
         if (event.getCause() == EntityDamageEvent.DamageCause.FALL &&
-                player.hasMetadata("noFallDamage")) {
+                player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "noFallDamage"), PersistentDataType.BOOLEAN, false)) {
             event.setCancelled(true);
-            player.removeMetadata("noFallDamage", plugin);
+            player.getPersistentDataContainer().remove(new NamespacedKey(plugin, "noFallDamage"));
         }
     }
 
     @EventHandler
     public void onGameModeChange(PlayerGameModeChangeEvent event) {
         Player player = event.getPlayer();
-        if (player.hasMetadata("noFallDamage")) {
-            player.removeMetadata("noFallDamage", plugin);
+        if (player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "noFallDamage"), PersistentDataType.BOOLEAN, false)) {
+            player.getPersistentDataContainer().remove(new NamespacedKey(plugin, "noFallDamage"));
         }
     }
 
@@ -148,11 +148,10 @@ public class bambCore extends absCore {
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
 
-        if (player.hasMetadata("noFallDamage") && (player.getLocation().clone().add(0, 0.5, 0).getBlock().getType().isCollidable() || player.getLocation().clone().add(0, 0.5, 0).getBlock().getType() == Material.WATER)) {
-            player.removeMetadata("noFallDamage", plugin);
+        if (player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "noFallDamage"), PersistentDataType.BOOLEAN, false)) {
+            player.getPersistentDataContainer().remove(new NamespacedKey(plugin, "noFallDamage"));
         }
     }
-
 
     @Override
     protected boolean contains(Player player) {

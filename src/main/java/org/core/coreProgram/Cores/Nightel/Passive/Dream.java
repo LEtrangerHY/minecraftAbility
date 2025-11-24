@@ -35,7 +35,7 @@ public class Dream implements Listener {
 
             World world = player.getWorld();
             Location playerLoc = player.getLocation();
-            BlockData chain = Material.CHAIN.createBlockData();
+            BlockData chain = Material.IRON_CHAIN.createBlockData();
 
             int addPoint = (config.dreamSkill.containsKey(player.getUniqueId()) && !config.dreamSkill.getOrDefault(player.getUniqueId(), "").equals(skill)) ? 2 : 1;
 

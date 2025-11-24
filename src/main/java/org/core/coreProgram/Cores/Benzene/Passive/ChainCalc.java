@@ -2,6 +2,7 @@ package org.core.coreProgram.Cores.Benzene.Passive;
 
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -39,12 +40,13 @@ public class ChainCalc {
             updateChainList(player);
         }
 
+        BlockData chain = Material.IRON_CHAIN.createBlockData();
+
         if (playerChain.size() < 6) {
             int chainCount = config.Chain_Count.getOrDefault(player.getUniqueId(), 0) + 1;
             config.Chain_Count.put(player.getUniqueId(), chainCount);
 
-            player.getWorld().spawnParticle(Particle.BLOCK, entity.getLocation().clone().add(0, 1.2, 0), 12, 0.3, 0.3, 0.3,
-                    Material.CHAIN.createBlockData());
+            player.getWorld().spawnParticle(Particle.BLOCK, entity.getLocation().clone().add(0, 1.2, 0), 12, 0.3, 0.3, 0.3, chain);
 
             playerChain.put(chainCount, entity);
 
@@ -61,8 +63,7 @@ public class ChainCalc {
 
             int t = countIndivChain(player, entity);
 
-            player.getWorld().spawnParticle(Particle.BLOCK, entity.getLocation().clone().add(0, t * 0.2, 0), 6, 0.3, 0.3, 0.3,
-                    Material.CHAIN.createBlockData());
+            player.getWorld().spawnParticle(Particle.BLOCK, entity.getLocation().clone().add(0, t * 0.2, 0), 6, 0.3, 0.3, 0.3, chain);
 
             if (!particleUse.containsKey(entity)) {
                 chainParticle(player, entity);
@@ -81,6 +82,7 @@ public class ChainCalc {
 
     public <K, V> void removeFirstEntryFromLinkedHashMap(Map<K, LinkedHashMap<Integer, V>> map, K key, Player player) {
         LinkedHashMap<Integer, V> chainMap = map.get(key);
+        BlockData chain = Material.IRON_CHAIN.createBlockData();
         if (chainMap != null && !chainMap.isEmpty()) {
             Integer firstKey = chainMap.entrySet().iterator().next().getKey();
             Entity firstKeyEntity = config.Chain.getOrDefault(player.getUniqueId(), new LinkedHashMap<>()).get(firstKey);
@@ -97,8 +99,7 @@ public class ChainCalc {
                 Stun stun = new Stun(config.Chain.getOrDefault(player.getUniqueId(), new LinkedHashMap<>()).get(firstKey), 100L * t);
                 stun.applyEffect(player);
 
-                player.getWorld().spawnParticle(Particle.BLOCK, firstKeyEntity.getLocation().clone().add(0, t * 0.2, 0), 12, 0.3, 0.3, 0.3,
-                        Material.CHAIN.createBlockData());
+                player.getWorld().spawnParticle(Particle.BLOCK, firstKeyEntity.getLocation().clone().add(0, t * 0.2, 0), 12, 0.3, 0.3, 0.3, chain);
                 player.getWorld().spawnParticle(Particle.ENCHANTED_HIT, firstKeyEntity.getLocation().add(0, t * 0.2, 0), 12, 0.6, 0, 0.6, 0);
 
             }
