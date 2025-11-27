@@ -265,7 +265,7 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
         Collection<? extends Player> players = Bukkit.getOnlinePlayers();
         int playerCount = players.size();
 
-        getLogger().info("Server shutting down: Starting DB save for " + playerCount + " players...");
+        getLogger().info("Server shutting down : Starting DB save for " + playerCount + " players...");
 
         CountDownLatch latch = new CountDownLatch(playerCount);
 
