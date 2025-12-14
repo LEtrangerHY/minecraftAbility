@@ -3,6 +3,8 @@ package org.core.coreProgram.Cores.VOL1.Dagger.Skill;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.*;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -50,7 +52,13 @@ public class R implements SkillBase {
 
             config.r_damaged.put(player.getUniqueId(), true);
             damagestroker.damageStroke(player, target);
-            ForceDamage forceDamage = new ForceDamage(target, damage);
+
+            DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
+                    .withCausingEntity(player)
+                    .withDirectEntity(player)
+                    .build();
+
+            ForceDamage forceDamage = new ForceDamage(target, damage, source);
             forceDamage.applyEffect(player);
             target.setVelocity(new Vector(0, 0, 0));
             config.r_damaged.remove(player.getUniqueId());

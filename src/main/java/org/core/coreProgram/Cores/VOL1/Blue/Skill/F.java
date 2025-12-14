@@ -1,6 +1,8 @@
 package org.core.coreProgram.Cores.VOL1.Blue.Skill;
 
 import org.bukkit.*;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -60,11 +62,15 @@ public class F implements SkillBase {
         double amp = config.f_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L);
         double damage = config.f_Skill_damage * (1 + amp);
 
+        DamageSource source = DamageSource.builder(DamageType.MAGIC)
+                .withCausingEntity(player)
+                .withDirectEntity(player)
+                .build();
+
         Vector direction = player.getLocation().getDirection().clone().setY(0).normalize();
 
         Particle.DustOptions dustOption_flowerDust = new Particle.DustOptions(Color.AQUA, 0.6f);
         Particle.DustOptions dustOption_flowerDust_gra = new Particle.DustOptions(Color.NAVY, 0.6f);
-        double finalDamage = damage;
 
         world.spawnParticle(Particle.SMOKE, player.getLocation().clone().add(0, 1.3, 0), 20, 2.3, 1.3, 2.3, 0);
 
@@ -134,7 +140,7 @@ public class F implements SkillBase {
                                 PotionEffect wither = new PotionEffect(PotionEffectType.WITHER, (int) maxTicks, 5, false, false);
                                 target.addPotionEffect(wither);
 
-                                ForceDamage forceDamage = new ForceDamage(target, finalDamage);
+                                ForceDamage forceDamage = new ForceDamage(target, damage, source);
                                 forceDamage.applyEffect(player);
                                 target.setVelocity(new Vector(0, 0, 0));
 

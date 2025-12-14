@@ -1,6 +1,8 @@
 package org.core.coreProgram.Cores.VOL1.Swordsman.Skill;
 
 import org.bukkit.*;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -158,7 +160,11 @@ public class F implements SkillBase {
                                 Stun stun = new Stun(entity, config.f_Skill_stun);
                                 stun.applyEffect(player);
 
-                                ForceDamage forceDamage = new ForceDamage(target, damage);
+                                DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
+                                        .withCausingEntity(player)
+                                        .build();
+
+                                ForceDamage forceDamage = new ForceDamage(target, damage, source);
                                 forceDamage.applyEffect(player);
                                 target.setVelocity(new Vector(0, 0, 0));
 
@@ -179,6 +185,10 @@ public class F implements SkillBase {
 
             double amp = config.f_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L);
             double damage = (config.f_Skill_damage / 3) * (1 + amp);
+
+            DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
+                    .withCausingEntity(player)
+                    .build();
 
             laido.Sheath(player);
 
@@ -206,7 +216,7 @@ public class F implements SkillBase {
 
                             world.spawnParticle(Particle.CRIT, target.getLocation().clone().add(0, 1.0, 0), 20, 0.5, 0.5, 0.5, 1);
 
-                            ForceDamage forceDamage = new ForceDamage(target, damage);
+                            ForceDamage forceDamage = new ForceDamage(target, damage, source);
                             forceDamage.applyEffect(player);
                             target.setVelocity(new Vector(0, 0, 0));
                         }

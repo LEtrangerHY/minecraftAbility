@@ -127,18 +127,23 @@ public class bambCore extends absCore {
     public void onFallDamage(EntityDamageEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
 
-        if (event.getCause() == EntityDamageEvent.DamageCause.FALL &&
-                player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "noFallDamage"), PersistentDataType.BOOLEAN, false)) {
-            event.setCancelled(true);
-            player.getPersistentDataContainer().remove(new NamespacedKey(plugin, "noFallDamage"));
+        if(tag.Bambo.contains(player)) {
+            if (event.getCause() == EntityDamageEvent.DamageCause.FALL &&
+                    player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "noFallDamage"), PersistentDataType.BOOLEAN, false)) {
+                event.setCancelled(true);
+                player.getPersistentDataContainer().remove(new NamespacedKey(plugin, "noFallDamage"));
+            }
         }
     }
 
     @EventHandler
     public void onGameModeChange(PlayerGameModeChangeEvent event) {
         Player player = event.getPlayer();
-        if (player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "noFallDamage"), PersistentDataType.BOOLEAN, false)) {
-            player.getPersistentDataContainer().remove(new NamespacedKey(plugin, "noFallDamage"));
+
+        if(tag.Bambo.contains(player)) {
+            if (player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "noFallDamage"), PersistentDataType.BOOLEAN, false)) {
+                player.getPersistentDataContainer().remove(new NamespacedKey(plugin, "noFallDamage"));
+            }
         }
     }
 
@@ -146,8 +151,10 @@ public class bambCore extends absCore {
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
 
-        if (player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "noFallDamage"), PersistentDataType.BOOLEAN, false)) {
-            player.getPersistentDataContainer().remove(new NamespacedKey(plugin, "noFallDamage"));
+        if(tag.Bambo.contains(player)) {
+            if (player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "noFallDamage"), PersistentDataType.BOOLEAN, false)) {
+                player.getPersistentDataContainer().remove(new NamespacedKey(plugin, "noFallDamage"));
+            }
         }
     }
 

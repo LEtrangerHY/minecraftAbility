@@ -3,6 +3,8 @@ package org.core.coreProgram.Cores.VOL1.Bambo.Skill;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -76,6 +78,11 @@ public class R implements SkillBase {
         double amp = config.r_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L);
         double damage = config.r_Skill_damage * (1 + amp);
 
+        DamageSource source = DamageSource.builder(DamageType.MOB_PROJECTILE)
+                .withCausingEntity(player)
+                .withDirectEntity(player)
+                .build();
+
         config.r_damaged.put(player.getUniqueId(), true);
         for (int ticks = 0; ticks < 40; ticks++) {
             Location particleLocation = playerLocation.clone()
@@ -91,7 +98,7 @@ public class R implements SkillBase {
                         && entity != player
                         && !config.damaged.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(entity)) {
 
-                    ForceDamage forceDamage = new ForceDamage(target, damage);
+                    ForceDamage forceDamage = new ForceDamage(target, damage, source);
                     forceDamage.applyEffect(player);
 
                     config.damaged.computeIfAbsent(player.getUniqueId(), k -> new HashSet<>()).add(target);

@@ -3,6 +3,8 @@ package org.core.coreProgram.Cores.VOL1.Commander.Skill;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
@@ -101,11 +103,18 @@ public class Q implements SkillBase {
         double amp = config.q_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L);
         double damage = config.q_Skill_Damage * (1 + amp);
 
+        DamageSource source = DamageSource.builder(DamageType.MAGIC)
+                .withCausingEntity(player)
+                .withDirectEntity(player)
+                .build();
+
         for (Entity entity : world.getNearbyEntities(center, 3.5, 3.5, 3.5)) {
             if (!(entity instanceof LivingEntity)) continue;
 
             if(!entity.equals(player)) {
-                ForceDamage forceDamage = new ForceDamage((LivingEntity) entity, damage);
+
+                ForceDamage forceDamage = new ForceDamage((LivingEntity) entity, damage, source);
+                forceDamage.applyEffect(player);
                 forceDamage.applyEffect(player);
                 entity.setVelocity(new Vector(0, 0, 0));
 

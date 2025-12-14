@@ -33,6 +33,7 @@ import org.core.coreProgram.Cores.VOL1.Nightel.coreSystem.nightLeveling;
 import org.core.coreProgram.Cores.VOL1.Pyro.coreSystem.pyroLeveling;
 import org.core.coreProgram.Cores.VOL1.Saboteur.coreSystem.sabLeveling;
 import org.core.coreProgram.Cores.VOL1.Swordsman.coreSystem.swordLeveling;
+import org.core.coreProgram.Cores.VOL2.Burst.coreSystem.burstLeveling;
 import org.core.playerSettings.persistentPlayerHashMap;
 
 import java.util.*;
@@ -160,6 +161,10 @@ public class LevelingManager implements Listener {
                 case "SABOTEUR" :
                     sabLeveling saboteur = new sabLeveling(plugin, player, exp);
                     saboteur.addExp(player);
+                    break;
+                case "BURST" :
+                    burstLeveling burst = new burstLeveling(plugin, player, exp);
+                    burst.addExp(player);
                     break;
                 default :
                     break;

@@ -3,6 +3,8 @@ package org.core.coreProgram.Cores.VOL1.Commander.Skill;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
@@ -68,6 +70,11 @@ public class R implements SkillBase, Listener{
         double amp = config.r_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L);
         double damage = config.r_Skill_Damage * (1 + amp);
 
+        DamageSource source = DamageSource.builder(DamageType.MAGIC)
+                .withCausingEntity(player)
+                .withDirectEntity(player)
+                .build();
+
         new BukkitRunnable() {
             int life = 8;
 
@@ -106,7 +113,7 @@ public class R implements SkillBase, Listener{
 
                             world.playSound(fb.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
 
-                            ForceDamage forceDamage = new ForceDamage(le, damage);
+                            ForceDamage forceDamage = new ForceDamage(le, damage, source);
                             forceDamage.applyEffect(player);
 
                             le.setVelocity(new Vector(0, 0, 0));

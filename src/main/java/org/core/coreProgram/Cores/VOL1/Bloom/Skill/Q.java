@@ -1,6 +1,8 @@
 package org.core.coreProgram.Cores.VOL1.Bloom.Skill;
 
 import org.bukkit.*;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -53,10 +55,14 @@ public class Q implements SkillBase {
         double amp = config.q_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L);
         double damage = config.q_Skill_damage * (1 + amp);
 
+        DamageSource source = DamageSource.builder(DamageType.MAGIC)
+                .withCausingEntity(player)
+                .withDirectEntity(player)
+                .build();
+
         Vector direction = player.getLocation().getDirection().clone().setY(0).normalize();
 
         Particle.DustOptions pinkDust = new Particle.DustOptions(Color.fromRGB(255, 175, 185), 1.1f);
-        double finalDamage = damage;
 
         new BukkitRunnable() {
             int ticks = 0;
@@ -109,7 +115,8 @@ public class Q implements SkillBase {
 
                                 world.spawnParticle(Particle.EXPLOSION, target.getLocation().add(0, 1.4, 0), 1, 0, 0, 0, 1);
                                 world.spawnParticle(Particle.FALLING_DUST, target.getLocation().add(0, 1.4, 0), 10, 0.5, 0.5, 0.5, Material.PINK_CONCRETE.createBlockData());
-                                ForceDamage forceDamage = new ForceDamage(target, finalDamage);
+
+                                ForceDamage forceDamage = new ForceDamage(target, damage, source);
                                 forceDamage.applyEffect(player);
 
                                 Vector direction = target.getLocation().toVector().subtract(player.getLocation().toVector()).normalize().multiply(1.7);

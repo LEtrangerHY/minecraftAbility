@@ -3,6 +3,8 @@ package org.core.coreProgram.Cores.VOL1.Commander.coreSystem;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -114,6 +116,11 @@ public class comCore extends absCore {
                         Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(220, 150, 100), 1.2f);
                         Particle.DustOptions dustOptions_gra = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 0.7f);
 
+                        DamageSource source = DamageSource.builder(DamageType.MAGIC)
+                                .withCausingEntity(player)
+                                .withDirectEntity(player)
+                                .build();
+
                         new BukkitRunnable() {
                             int ticks = 0;
 
@@ -135,7 +142,7 @@ public class comCore extends absCore {
                                 for (Entity entity : world.getNearbyEntities(particleLocation, 0.5, 0.5, 0.5)) {
                                     if (entity instanceof LivingEntity target && entity != player) {
 
-                                        ForceDamage forceDamage = new ForceDamage(target, 3);
+                                        ForceDamage forceDamage = new ForceDamage(target, 3.0, source);
                                         forceDamage.applyEffect(player);
 
                                         for(FallingBlock fb : config.comBlocks.getOrDefault(player.getUniqueId(), new HashSet<>())){
@@ -171,7 +178,11 @@ public class comCore extends absCore {
 
             entity.getWorld().playSound(entity.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.5f, 1);
 
-            ForceDamage forceDamage = new ForceDamage((LivingEntity) entity, 1);
+            DamageSource source = DamageSource.builder(DamageType.MAGIC)
+                    .withCausingEntity(player)
+                    .build();
+
+            ForceDamage forceDamage = new ForceDamage((LivingEntity) entity, 1.0, source);
             forceDamage.applyEffect(player);
 
             Location start = fb.getLocation().clone().add(0, 0.5, 0);

@@ -4,6 +4,8 @@ import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -125,6 +127,11 @@ public class pyroCore extends absCore {
 
                         config.collision.put(player.getUniqueId(), false);
 
+                        DamageSource source = DamageSource.builder(DamageType.MAGIC)
+                                .withCausingEntity(player)
+                                .withDirectEntity(player)
+                                .build();
+
                         new BukkitRunnable() {
                             int ticks = 0;
 
@@ -167,7 +174,8 @@ public class pyroCore extends absCore {
 
                                 for (Entity entity : world.getNearbyEntities(particleLocation, 0.5, 0.5, 0.5)) {
                                     if (entity instanceof LivingEntity target && entity != player) {
-                                        ForceDamage forceDamage = new ForceDamage(target, 5);
+
+                                        ForceDamage forceDamage = new ForceDamage(target, 5.0, source);
                                         forceDamage.applyEffect(player);
                                         Burst(player, particleLocation);
                                         config.collision.put(player.getUniqueId(), true);
@@ -198,6 +206,10 @@ public class pyroCore extends absCore {
         world.spawnParticle(Particle.FLAME, burstLoction, 21, 0.1, 0.1, 0.1, 0.9);
         world.spawnParticle(Particle.SOUL_FIRE_FLAME, burstLoction, 14, 0.1, 0.1, 0.1, 0.9);
 
+        DamageSource source = DamageSource.builder(DamageType.MAGIC)
+                .withCausingEntity(player)
+                .build();
+
         for (Entity entity : world.getNearbyEntities(burstLoction, 3, 3, 3)) {
             if (entity instanceof LivingEntity target && entity != player) {
 
@@ -206,7 +218,7 @@ public class pyroCore extends absCore {
                     burn.applyEffect(player);
                 }
 
-                ForceDamage forceDamage = new ForceDamage(target, 4);
+                ForceDamage forceDamage = new ForceDamage(target, 4.0, source);
                 forceDamage.applyEffect(player);
 
                 Vector direction = entity.getLocation().toVector().subtract(burstLoction.toVector()).normalize().multiply(0.5);

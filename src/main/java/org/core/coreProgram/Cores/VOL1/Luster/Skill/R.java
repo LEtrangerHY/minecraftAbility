@@ -5,6 +5,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
@@ -62,6 +64,11 @@ public class R implements SkillBase {
             double amp = config.r_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L);
             double damage = config.r_Skill_Damage * (1 + amp);
 
+            DamageSource source = DamageSource.builder(DamageType.MAGIC)
+                    .withCausingEntity(player)
+                    .withDirectEntity(player)
+                    .build();
+
             Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(126, 126, 126), 1.3f);
             Particle.DustOptions dustOptions_gra = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 0.7f);
             BlockData iron = Material.IRON_BLOCK.createBlockData();
@@ -101,7 +108,7 @@ public class R implements SkillBase {
                             world.playSound(fb.getLocation(), Sound.BLOCK_ANVIL_LAND, 1f, 1f);
                             world.playSound(fb.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1f, 1f);
 
-                            ForceDamage forceDamage = new ForceDamage(le, damage);
+                            ForceDamage forceDamage = new ForceDamage(le, damage, source);
                             forceDamage.applyEffect(player);
 
                             Vector knock = le.getLocation().toVector().subtract(player.getLocation().toVector())

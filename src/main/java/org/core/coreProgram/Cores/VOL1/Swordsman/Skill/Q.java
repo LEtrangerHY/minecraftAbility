@@ -1,6 +1,8 @@
 package org.core.coreProgram.Cores.VOL1.Swordsman.Skill;
 
 import org.bukkit.*;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -85,6 +87,10 @@ public class Q implements SkillBase {
         double amp = config.q_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L);
         double damage = config.q_Skill_damage * (1 + amp);
 
+        DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
+                .withCausingEntity(player)
+                .build();
+
         Location origin = player.getEyeLocation().clone().add(0, height, 0);
         Vector direction = player.getLocation().getDirection().clone().setY(0).normalize();
 
@@ -130,7 +136,7 @@ public class Q implements SkillBase {
                             if (entity instanceof LivingEntity target && entity != player
                                     && !config.q_damaged.get(player.getUniqueId()).contains(entity)) {
 
-                                ForceDamage forceDamage = new ForceDamage(target, damage);
+                                ForceDamage forceDamage = new ForceDamage(target, damage, source);
                                 forceDamage.applyEffect(player);
 
                                 target.setVelocity(new Vector(0, 0, 0));

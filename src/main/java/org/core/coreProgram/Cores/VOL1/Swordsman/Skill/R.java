@@ -1,6 +1,8 @@
 package org.core.coreProgram.Cores.VOL1.Swordsman.Skill;
 
 import org.bukkit.*;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -85,6 +87,10 @@ public class R implements SkillBase {
         double amp = config.r_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L);
         double damage = config.r_Skill_damage * (1 + amp);
 
+        DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
+                .withCausingEntity(player)
+                .build();
+
         Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 0.6f);
 
         new BukkitRunnable(){
@@ -107,7 +113,7 @@ public class R implements SkillBase {
                 for (Entity entity : nearbyEntities) {
                     if (entity instanceof LivingEntity target && entity != player && !config.r_damaged.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(entity)) {
 
-                        ForceDamage forceDamage = new ForceDamage(target, damage);
+                        ForceDamage forceDamage = new ForceDamage(target, damage, source);
                         forceDamage.applyEffect(player);
                         target.setVelocity(new Vector(0, 0, 0));
 
@@ -131,9 +137,12 @@ public class R implements SkillBase {
         double amp = config.r_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L);
         double damage = config.r_Skill_damage * (1 + amp);
 
+        DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
+                .withCausingEntity(player)
+                .build();
+
         Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 0.6f);
 
-        double finalDamage = damage;
         new BukkitRunnable() {
             private double ticks = 0;
 
@@ -162,7 +171,7 @@ public class R implements SkillBase {
                         Stun stun = new Stun(entity, config.r_Skill_stun);
                         stun.applyEffect(player);
 
-                        ForceDamage forceDamage = new ForceDamage(target, finalDamage);
+                        ForceDamage forceDamage = new ForceDamage(target, damage, source);
                         forceDamage.applyEffect(player);
                         target.setVelocity(new Vector(0, 0, 0));
 
@@ -188,6 +197,10 @@ public class R implements SkillBase {
             double amp = config.r_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L);
             additional_damage = additional_damage * (1 + amp);
 
+            DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
+                    .withCausingEntity(player)
+                    .build();
+
             Vector path = second.clone().toVector().subtract(first.toVector());
             double distance = path.length();
             path.normalize();
@@ -208,7 +221,7 @@ public class R implements SkillBase {
                         world.spawnParticle(Particle.CRIT, target.getLocation().clone().add(0, 1.0, 0), 20, 0.4, 0.4, 0.4, 1);
                         if (isFirst) world.spawnParticle(Particle.SPIT, target.getLocation().clone().add(0, 1.0, 0), 20, 0.2, 0.3, 0.2, 0.5);
 
-                        ForceDamage forceDamage = new ForceDamage(target, additional_damage);
+                        ForceDamage forceDamage = new ForceDamage(target, additional_damage, source);
                         forceDamage.applyEffect(player);
                         target.setVelocity(new Vector(0, 0, 0));
 

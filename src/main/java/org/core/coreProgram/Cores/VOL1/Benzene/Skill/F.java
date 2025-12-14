@@ -2,6 +2,8 @@ package org.core.coreProgram.Cores.VOL1.Benzene.Skill;
 
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -53,6 +55,11 @@ public class F implements SkillBase {
         double amp = config.f_Skill_Amp * player.getPersistentDataContainer()
                 .getOrDefault(new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L);
         double damage = config.f_Skill_Damage * (1 + amp);
+
+        DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
+                .withCausingEntity(player)
+                .withDirectEntity(player)
+                .build();
 
         Entity target = getTargetedEntity(player, slashLength, 0.3);
         Location origin = player.getEyeLocation().clone().add(0, -0.6, 0);
@@ -149,17 +156,18 @@ public class F implements SkillBase {
                         }
 
                         for (Entity entity : world.getNearbyEntities(particleLocation, 0.6, 0.6, 0.6)) {
-                            if (entity instanceof LivingEntity le && entity != player &&
-                                    !config.damaged.get(player.getUniqueId()).contains(entity)) {
+                            if (entity instanceof LivingEntity target && entity != player && !config.damaged.get(player.getUniqueId()).contains(entity)) {
+
                                 config.damaged.get(player.getUniqueId()).add(entity);
-                                ForceDamage fd = new ForceDamage(le, damage);
-                                fd.applyEffect(player);
-                                le.setVelocity(new Vector(0, 0, 0));
+
+                                ForceDamage forceDamage = new ForceDamage(target, damage, source);
+                                forceDamage.applyEffect(player);
+                                target.setVelocity(new Vector(0, 0, 0));
 
                                 if (config.canBlockBreak.getOrDefault(player.getUniqueId(), false)) {
-                                    if (!le.isDead()) {
-                                        chainCalc.increase(player, le);
-                                        if (le.isDead()) chainCalc.decrease(le);
+                                    if (!target.isDead()) {
+                                        chainCalc.increase(player, target);
+                                        if (target.isDead()) chainCalc.decrease(target);
                                     }
                                 }
                             }
@@ -301,6 +309,11 @@ public class F implements SkillBase {
         double amp = config.f_Skill_Amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L);
         double damage = config.f_Skill_Damage * 3 * (1 + amp);
 
+        DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
+                .withCausingEntity(player)
+                .withDirectEntity(player)
+                .build();
+
         Location origin = player.getEyeLocation().add(0, 0, 0);
         Vector direction = player.getLocation().getDirection().clone().setY(0).normalize();
 
@@ -358,7 +371,7 @@ public class F implements SkillBase {
 
                                 if(!config.damaged.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(entity)) {
 
-                                    ForceDamage forceDamage = new ForceDamage(target, damage);
+                                    ForceDamage forceDamage = new ForceDamage(target, damage, source);
                                     forceDamage.applyEffect(player);
                                     target.setVelocity(new Vector(0, 0, 0));
 

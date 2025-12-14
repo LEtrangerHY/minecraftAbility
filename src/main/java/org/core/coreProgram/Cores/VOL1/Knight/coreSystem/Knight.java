@@ -39,7 +39,6 @@ public class Knight {
     public double f_Skill_Damage = 22;
     public long f_Skill_Cool = 30000;
 
-
     public void variableReset(Player player){
 
         R_COOLDOWN.remove(player.getUniqueId());

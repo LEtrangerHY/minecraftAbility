@@ -1,6 +1,8 @@
 package org.core.coreProgram.Cores.VOL1.Benzene.Passive;
 
 import org.bukkit.*;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -40,6 +42,11 @@ public class DamageShare {
 
         Set<Entity> processedEntities = new HashSet<>();
 
+        DamageSource source = DamageSource.builder(DamageType.MAGIC)
+                .withCausingEntity(player)
+                .withDirectEntity(player)
+                .build();
+
         for (Entity chainedEntity : new ArrayList<>(config.Chain.getOrDefault(player.getUniqueId(), new LinkedHashMap<>()).values())) {
             if (!(chainedEntity instanceof LivingEntity) || chainedEntity == target) continue;
 
@@ -62,7 +69,7 @@ public class DamageShare {
                     shareDamage *= (5.0 / 3);
                 }
 
-                ForceDamage forceDamage = new ForceDamage((LivingEntity) chainedEntity, shareDamage);
+                ForceDamage forceDamage = new ForceDamage((LivingEntity) chainedEntity, shareDamage, source);
                 forceDamage.applyEffect(player);
                 chainedEntity.setVelocity(new Vector(0, 0, 0));
 

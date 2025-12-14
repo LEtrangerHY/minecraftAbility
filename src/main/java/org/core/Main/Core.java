@@ -67,6 +67,9 @@ import org.core.coreProgram.Cores.VOL1.Saboteur.coreSystem.sabInventory;
 import org.core.coreProgram.Cores.VOL1.Swordsman.coreSystem.Swordsman;
 import org.core.coreProgram.Cores.VOL1.Swordsman.coreSystem.swordCore;
 import org.core.coreProgram.Cores.VOL1.Swordsman.coreSystem.swordInventory;
+import org.core.coreProgram.Cores.VOL2.Burst.coreSystem.Burst;
+import org.core.coreProgram.Cores.VOL2.Burst.coreSystem.burstCore;
+import org.core.coreProgram.Cores.VOL2.Burst.coreSystem.burstInventory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -101,6 +104,7 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
     private blueCore blue;
     private swordCore swordsman;
     private sabCore saboteur;
+    private burstCore burst;
 
     private nightInventory nightInv;
     private benzInventory benzInv;
@@ -118,6 +122,7 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
     private blueInventory blueInv;
     private swordInventory swordInv;
     private sabInventory sabInv;
+    private burstInventory burstInv;
 
     private EntityLevelingManager Elevel;
 
@@ -150,6 +155,7 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
         Blue blueConfig = new Blue();
         Swordsman swordConfig = new Swordsman();
         Saboteur sabConfig = new Saboteur();
+        Burst burstConfig = new Burst();
 
         Cool cool = new Cool(this);
 
@@ -234,6 +240,11 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
         Bukkit.getPluginManager().registerEvents(this.saboteur, this);
         this.sabInv = new sabInventory(this, this.config);
         Bukkit.getPluginManager().registerEvents(this.sabInv, this);
+
+        this.burst = new burstCore(this, this.config, burstConfig, cool);
+        Bukkit.getPluginManager().registerEvents(this.burst, this);
+        this.burstInv = new burstInventory(this, this.config);
+        Bukkit.getPluginManager().registerEvents(this.burstInv, this);
 
         this.benz = new benzCore(this, this.config, benzConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.benz, this);
@@ -532,6 +543,7 @@ public final class Core extends JavaPlugin implements Listener, TabCompleter {
                 suggestions.add("blue");
                 suggestions.add("swordsman");
                 suggestions.add("saboteur");
+                suggestions.add("burst");
                 suggestions.add("benzene");
             } else if (args.length == 3) {
                 suggestions.add("true");

@@ -4,6 +4,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -88,6 +90,11 @@ public class Q implements SkillBase {
         double amp = config.q_SKill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L);
         double damage = config.q_Skill_damage * (1 + amp);
 
+        DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
+                .withCausingEntity(player)
+                .withDirectEntity(player)
+                .build();
+
         boolean hit = false;
 
         for (double i = 0; i <= maxDistance; i += step) {
@@ -108,7 +115,7 @@ public class Q implements SkillBase {
                                 world.playSound(target.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f);
                                 world.playSound(target.getLocation(), Sound.ITEM_TRIDENT_HIT_GROUND, 1f, 1f);
 
-                                ForceDamage forceDamage = new ForceDamage(target, damage);
+                                ForceDamage forceDamage = new ForceDamage(target, damage, source);
                                 forceDamage.applyEffect(player);
                                 target.setVelocity(new Vector(0, 0, 0));
 

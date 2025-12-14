@@ -9,6 +9,8 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -22,6 +24,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.core.Cool.Cool;
+import org.core.Effect.ForceDamage;
 import org.core.Main.Core;
 import org.core.Main.coreConfig;
 import org.core.coreProgram.AbsCoreSystem.ConfigWrapper;
@@ -178,6 +181,11 @@ public class sabCore extends absCore {
                         item.setPickupDelay(1000);
                         item.setGravity(true);
 
+                        DamageSource source = DamageSource.builder(DamageType.MOB_PROJECTILE)
+                                .withCausingEntity(player)
+                                .withDirectEntity(item)
+                                .build();
+
                         Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
                             int life = 80;
 
@@ -192,7 +200,9 @@ public class sabCore extends absCore {
 
                                 for (Entity nearby : item.getNearbyEntities(0.5, 0.5, 0.5)) {
                                     if (nearby instanceof LivingEntity target && nearby != player) {
-                                        target.damage(5, player);
+
+                                        ForceDamage forceDamage = new ForceDamage(target, 5.0, source);
+                                        forceDamage.applyEffect(player);
                                         world.playSound(target.getLocation().clone(), Sound.ITEM_TRIDENT_HIT, 1.0f, 1.0f);
                                         world.spawnParticle(Particle.BLOCK, target.getLocation().clone().add(0, 1.2, 0), 14, 0.3, 0.3, 0.3,
                                                 blood);

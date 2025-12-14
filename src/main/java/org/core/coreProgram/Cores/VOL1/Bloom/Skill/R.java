@@ -1,6 +1,8 @@
 package org.core.coreProgram.Cores.VOL1.Bloom.Skill;
 
 import org.bukkit.*;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -65,10 +67,15 @@ public class R implements SkillBase {
         }.runTaskTimer(plugin, 0L, 1L);
     }
 
-    private void spawnTornadoEffect(Player owner, Location center) {
-        double amp = config.r_Skill_amp * owner.getPersistentDataContainer()
+    private void spawnTornadoEffect(Player player, Location center) {
+        double amp = config.r_Skill_amp * player.getPersistentDataContainer()
                 .getOrDefault(new NamespacedKey(plugin, "R"), org.bukkit.persistence.PersistentDataType.LONG, 0L);
         double damage = config.r_Skill_damage * (1 + amp);
+
+        DamageSource source = DamageSource.builder(DamageType.MAGIC)
+                .withCausingEntity(player)
+                .withDirectEntity(player)
+                .build();
 
         center.getWorld().playSound(center, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.4f, 1);
         center.getWorld().playSound(center, Sound.BLOCK_GRASS_PLACE, 1.4f, 1);
@@ -81,7 +88,7 @@ public class R implements SkillBase {
 
             @Override
             public void run() {
-                if (!owner.isOnline() || owner.isDead() || ticks <= 0) {
+                if (!player.isOnline() || player.isDead() || ticks <= 0) {
                     cancel();
                     return;
                 }
@@ -100,12 +107,13 @@ public class R implements SkillBase {
                 center.getWorld().spawnParticle(Particle.CLOUD, center.clone().add(0, maxHeight * (1 - (double) ticks / 20) / 2, 0), 5, 0.3, 0.3, 0.3, 0.01);
 
                 for (Entity e : center.getWorld().getNearbyEntities(center, radius, maxHeight, radius)) {
-                    if (e instanceof LivingEntity le && !le.equals(owner)) {
-                        ForceDamage fd = new ForceDamage(le, damage);
-                        fd.applyEffect(owner);
-                        le.setVelocity(new Vector(0, 0.7, 0));
+                    if (e instanceof LivingEntity target && !target.equals(player)) {
 
-                        center.getWorld().spawnParticle(Particle.FALLING_DUST, le.getLocation().add(0, 1, 0), 10, 0.5, 0.5, 0.5, Material.PINK_CONCRETE.createBlockData());
+                        ForceDamage forceDamage = new ForceDamage(target, damage, source);
+                        forceDamage.applyEffect(player);
+                        target.setVelocity(new Vector(0, 0.7, 0));
+
+                        center.getWorld().spawnParticle(Particle.FALLING_DUST, target.getLocation().add(0, 1, 0), 10, 0.5, 0.5, 0.5, Material.PINK_CONCRETE.createBlockData());
                     }
                 }
 

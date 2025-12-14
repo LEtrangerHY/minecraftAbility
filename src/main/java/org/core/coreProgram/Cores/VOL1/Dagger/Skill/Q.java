@@ -1,6 +1,8 @@
 package org.core.coreProgram.Cores.VOL1.Dagger.Skill;
 
 import org.bukkit.*;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -54,6 +56,11 @@ public class Q implements SkillBase {
         double amp = config.q_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L);
         double damage = config.q_Skill_Damage * (1 + amp);
 
+        DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
+                .withCausingEntity(player)
+                .withDirectEntity(player)
+                .build();
+
         new BukkitRunnable() {
             private double ticks = 0;
 
@@ -75,7 +82,8 @@ public class Q implements SkillBase {
 
                         config.f_damaging.put(player.getUniqueId(), true);
                         damagestroker.damageStroke(player, target);
-                        ForceDamage forceDamage = new ForceDamage(target, damage);
+
+                        ForceDamage forceDamage = new ForceDamage(target, damage, source);
                         forceDamage.applyEffect(player);
                         target.setVelocity(new Vector(0, 0, 0));
                         config.f_damaging.remove(player.getUniqueId());
@@ -119,6 +127,10 @@ public class Q implements SkillBase {
         double amp = config.q_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L);
         double damage = config.q_Skill_Damage * (1 + amp);
 
+        DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
+                .withCausingEntity(player)
+                .build();
+
         new BukkitRunnable() {
             private double ticks = 0;
 
@@ -148,7 +160,8 @@ public class Q implements SkillBase {
 
                         config.f_damaging.put(player.getUniqueId(), true);
                         damagestroker.damageStroke(player, target);
-                        ForceDamage forceDamage = new ForceDamage(target, damage / 2);
+
+                        ForceDamage forceDamage = new ForceDamage(target, damage / 2, source);
                         forceDamage.applyEffect(player);
                         target.setVelocity(new Vector(0, 0, 0));
                         config.f_damaging.remove(player.getUniqueId());

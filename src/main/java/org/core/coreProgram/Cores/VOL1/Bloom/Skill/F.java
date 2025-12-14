@@ -3,6 +3,8 @@ package org.core.coreProgram.Cores.VOL1.Bloom.Skill;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -67,10 +69,17 @@ public class F implements SkillBase {
 
     private void startEffectLogic(Player owner, Location treeCenter, Set<Location> treeBlocks) {
 
+        World world = owner.getWorld();
+
         int radius = 7;
 
         double amp = config.f_Skill_amp * owner.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L);
         double damage = config.f_Skill_damage * (1 + amp);
+
+        DamageSource source = DamageSource.builder(DamageType.MAGIC)
+                .withCausingEntity(owner)
+                .withDirectEntity(owner)
+                .build();
 
         new BukkitRunnable() {
 
@@ -101,17 +110,17 @@ public class F implements SkillBase {
                         continue;
                     }
 
-                    if (entity instanceof LivingEntity living && !living.equals(owner)) {
+                    if (entity instanceof LivingEntity target && !target.equals(owner)) {
 
                         Particle.DustOptions pinkDust = new Particle.DustOptions(Color.fromRGB(255, 175, 185), 1.1f);
 
-                        living.getWorld().spawnParticle(Particle.DUST, living.getLocation().add(0, 1.4, 0), 17, 0.5, 0.5, 0.5, pinkDust);
-                        living.getWorld().spawnParticle(Particle.ENCHANT, living.getLocation().add(0, 1.4, 0), 17, 0.4, 0.7, 0.4, 0.05);
-                        living.getWorld().spawnParticle(Particle.FALLING_DUST, living.getLocation().add(0, 1.4, 0), 17, 0.6, 0.6, 0.6, Material.PINK_CONCRETE.createBlockData());
+                        world.spawnParticle(Particle.DUST, target.getLocation().add(0, 1.4, 0), 17, 0.5, 0.5, 0.5, pinkDust);
+                        world.spawnParticle(Particle.ENCHANT, target.getLocation().add(0, 1.4, 0), 17, 0.4, 0.7, 0.4, 0.05);
+                        world.spawnParticle(Particle.FALLING_DUST, target.getLocation().add(0, 1.4, 0), 17, 0.6, 0.6, 0.6, Material.PINK_CONCRETE.createBlockData());
 
-                        ForceDamage fd = new ForceDamage(living, damage);
-                        fd.applyEffect(owner);
-                        living.setVelocity(new Vector(0, 0, 0));
+                        ForceDamage forceDamage = new ForceDamage(target, damage, source);
+                        forceDamage.applyEffect(owner);
+                        target.setVelocity(new Vector(0, 0, 0));
                     }
                 }
 

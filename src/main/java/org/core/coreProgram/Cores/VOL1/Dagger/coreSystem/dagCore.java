@@ -3,6 +3,8 @@ package org.core.coreProgram.Cores.VOL1.Dagger.coreSystem;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -150,6 +152,11 @@ public class dagCore extends absCore {
 
                 config.f_damaged.put(player.getUniqueId(), new HashSet<>());
 
+                DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
+                        .withCausingEntity(player)
+                        .withDirectEntity(player)
+                        .build();
+
                 player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
                 event.setCancelled(true);
 
@@ -177,9 +184,10 @@ public class dagCore extends absCore {
                                     && !config.f_damaged.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(entity)) {
 
                                 config.f_damaging.put(player.getUniqueId(), true);
-                                ForceDamage forceDamage = new ForceDamage(target, config.f_Skill_Damage);
-                                target.setVelocity(new Vector(0, 0, 0));
+
+                                ForceDamage forceDamage = new ForceDamage(target, config.f_Skill_Damage, source);
                                 forceDamage.applyEffect(player);
+                                target.setVelocity(new Vector(0, 0, 0));
                                 config.f_damaging.remove(player.getUniqueId());
 
                                 config.f_damaged.computeIfAbsent(player.getUniqueId(), k -> new HashSet<>()).add(target);

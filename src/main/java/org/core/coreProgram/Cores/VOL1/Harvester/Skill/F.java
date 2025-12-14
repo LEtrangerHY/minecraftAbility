@@ -2,6 +2,8 @@ package org.core.coreProgram.Cores.VOL1.Harvester.Skill;
 
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -85,6 +87,11 @@ public class F implements SkillBase {
 
         double finalDamage = damage;
 
+        DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
+                .withCausingEntity(player)
+                .withDirectEntity(player)
+                .build();
+
         world.spawnParticle(Particle.SWEEP_ATTACK, playerLoc.clone().add(0, 1.0, 0), 10, 2, 2, 2, 1);
 
         new BukkitRunnable() {
@@ -167,7 +174,7 @@ public class F implements SkillBase {
 
                                 player.heal(finalDamage / 2);
 
-                                ForceDamage forceDamage = new ForceDamage(target, finalDamage);
+                                ForceDamage forceDamage = new ForceDamage(target, damage, source);
                                 forceDamage.applyEffect(player);
                                 target.setVelocity(new Vector(0, 0, 0));
 

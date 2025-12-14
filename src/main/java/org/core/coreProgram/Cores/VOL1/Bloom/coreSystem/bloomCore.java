@@ -3,6 +3,8 @@ package org.core.coreProgram.Cores.VOL1.Bloom.coreSystem;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -108,6 +110,11 @@ public class bloomCore extends absCore {
                         world.playSound(player.getLocation(), Sound.BLOCK_GRASS_PLACE, 1.7f, 1.0f);
                         world.playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.7f, 1.0f);
 
+                        DamageSource source = DamageSource.builder(DamageType.MAGIC)
+                                .withCausingEntity(player)
+                                .withDirectEntity(player)
+                                .build();
+
                         player.heal(2.7);
 
                         Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(77, 255, 77), 0.7f);
@@ -136,7 +143,8 @@ public class bloomCore extends absCore {
 
                                 for (Entity entity : world.getNearbyEntities(particleLocation, 1.7, 1.7, 1.7)) {
                                     if (entity instanceof LivingEntity target && entity != player) {
-                                        ForceDamage forceDamage = new ForceDamage(target, 1.7);
+
+                                        ForceDamage forceDamage = new ForceDamage(target, 1.7, source);
                                         forceDamage.applyEffect(player);
                                     }
                                 }

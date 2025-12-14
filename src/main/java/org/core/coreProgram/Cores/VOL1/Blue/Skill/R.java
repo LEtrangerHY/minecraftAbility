@@ -2,6 +2,8 @@ package org.core.coreProgram.Cores.VOL1.Blue.Skill;
 
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -198,6 +200,11 @@ public class R implements SkillBase {
         double amp = config.r_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L);
         double damage = config.rReuseDamage.getOrDefault(player.getUniqueId(), 0.0) * (1 + amp);
 
+        DamageSource source = DamageSource.builder(DamageType.MAGIC)
+                .withCausingEntity(player)
+                .withDirectEntity(player)
+                .build();
+
         config.r_damaged.putIfAbsent(player.getUniqueId(), new HashSet<>());
 
         new BukkitRunnable() {
@@ -215,7 +222,7 @@ public class R implements SkillBase {
                             PotionEffect slowness = new PotionEffect(PotionEffectType.SLOWNESS, 80, 3, false, false);
                             target.addPotionEffect(slowness);
 
-                            ForceDamage forceDamage = new ForceDamage(target, damage);
+                            ForceDamage forceDamage = new ForceDamage(target, damage, source);
                             forceDamage.applyEffect(player);
                             target.setVelocity(new Vector(0, 0, 0));
 

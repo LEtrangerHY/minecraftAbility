@@ -3,6 +3,8 @@ package org.core.coreProgram.Cores.VOL1.Dagger.Skill;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -130,6 +132,11 @@ public class F implements SkillBase {
         double amp = config.f_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L);
         double damage = config.f_Skill_Damage_2 * (1 + amp);
 
+        DamageSource source = DamageSource.builder(DamageType.GENERIC)
+                .withCausingEntity(player)
+                .withDirectEntity(player)
+                .build();
+
         new BukkitRunnable() {
             private double ticks = 0;
 
@@ -155,7 +162,8 @@ public class F implements SkillBase {
 
                         config.f_damaging.put(player.getUniqueId(), true);
                         damagestroker.damageStroke(player, target);
-                        ForceDamage forceDamage = new ForceDamage(target, damage / config.dash_num.getOrDefault(player.getUniqueId(), 1));
+
+                        ForceDamage forceDamage = new ForceDamage(target, damage / config.dash_num.getOrDefault(player.getUniqueId(), 1), source);
                         forceDamage.applyEffect(player);
                         target.setVelocity(new Vector(0, 0, 0));
                         config.f_damaging.remove(player.getUniqueId());

@@ -4,6 +4,8 @@ import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -178,6 +180,11 @@ public class blazeCore extends absCore {
 
                         double finalDamage = damage;
 
+                        DamageSource source = DamageSource.builder(DamageType.MAGIC)
+                                .withCausingEntity(player)
+                                .withDirectEntity(player)
+                                .build();
+
                         new BukkitRunnable() {
                             double distance = 1.0;
 
@@ -198,10 +205,11 @@ public class blazeCore extends absCore {
                                     double dist = (config.BurstBlaze.getOrDefault(player.getUniqueId(), false)) ? 2 : 0.6;
 
                                     for (Entity entity : world.getNearbyEntities(particleLoc, dist, dist, dist)) {
-                                        if (entity instanceof LivingEntity && entity != player) {
+                                        if (entity instanceof LivingEntity target && entity != player) {
 
-                                            LivingEntity target = (LivingEntity) entity;
-                                            ForceDamage forceDamage = new ForceDamage(target, finalDamage);
+                                            config.damaged.get(player.getUniqueId()).add(entity);
+
+                                            ForceDamage forceDamage = new ForceDamage(target, finalDamage, source);
                                             forceDamage.applyEffect(player);
 
                                             double per = (config.BurstBlaze.getOrDefault(player.getUniqueId(), false)) ? 1.0 : 0.4;

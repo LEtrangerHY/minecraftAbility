@@ -3,6 +3,8 @@ package org.core.coreProgram.Cores.VOL1.Knight.Skill;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -211,6 +213,11 @@ public class R implements SkillBase {
         double amp = config.r_Skill_amplify * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L);
         damage = damage * (1 + amp);
 
+        DamageSource source = DamageSource.builder(DamageType.MAGIC)
+                .withCausingEntity(player)
+                .withDirectEntity(player)
+                .build();
+
         double finalDamage = damage;
         new BukkitRunnable() {
             Vector dir = null;
@@ -244,13 +251,14 @@ public class R implements SkillBase {
                 }
 
                 for (Entity e : sword.getNearbyEntities(0.7, 0.7, 0.7)) {
-                    if (e != player && e instanceof LivingEntity) {
+                    if (e != player && e instanceof LivingEntity le) {
                         player.getWorld().spawnParticle(Particle.ENCHANTED_HIT, e.getLocation().clone().add(0, 1, 0), 21, 0.4, 0.4, 0.4, 1);
                         player.playSound(e.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1);
-                        ForceDamage forceDamage = new ForceDamage((LivingEntity) e, finalDamage);
+
+                        ForceDamage forceDamage = new ForceDamage(le, finalDamage, source);
                         forceDamage.applyEffect(player);
                         PotionEffect darkness = new PotionEffect(PotionEffectType.DARKNESS, 20 * 3, 1, false, false);
-                        ((LivingEntity) e).addPotionEffect(darkness);
+                        le.addPotionEffect(darkness);
                         sword.remove();
                         cancel();
                         break;

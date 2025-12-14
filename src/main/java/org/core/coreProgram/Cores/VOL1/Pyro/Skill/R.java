@@ -3,6 +3,8 @@ package org.core.coreProgram.Cores.VOL1.Pyro.Skill;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -104,6 +106,11 @@ public class R implements SkillBase {
         double amp = config.r_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L);
         double damage = config.r_Skill_Damage * (1 + amp);
 
+        DamageSource source = DamageSource.builder(DamageType.MAGIC)
+                .withCausingEntity(player)
+                .withDirectEntity(player)
+                .build();
+
         player.getWorld().playSound(initiateLoc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1, 1);
         player.getWorld().playSound(initiateLoc, Sound.ENTITY_GENERIC_EXPLODE, 1.0f, 1.0f);
 
@@ -113,7 +120,7 @@ public class R implements SkillBase {
         for (Entity entity : world.getNearbyEntities(initiateLoc, 1, 6, 1)) {
             if (entity instanceof LivingEntity target && entity != player) {
 
-                ForceDamage forceDamage = new ForceDamage(target, damage);
+                ForceDamage forceDamage = new ForceDamage(target, damage, source);
                 forceDamage.applyEffect(player);
                 target.setVelocity(new Vector(0, 0, 0));
 

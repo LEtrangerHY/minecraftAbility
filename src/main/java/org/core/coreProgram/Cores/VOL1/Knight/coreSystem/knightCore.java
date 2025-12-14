@@ -3,6 +3,8 @@ package org.core.coreProgram.Cores.VOL1.Knight.coreSystem;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -185,6 +187,11 @@ public class knightCore extends absCore {
 
                         config.collision.put(player.getUniqueId(), false);
 
+                        DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
+                                .withCausingEntity(player)
+                                .withDirectEntity(player)
+                                .build();
+
                         new BukkitRunnable() {
                             int ticks = 0;
 
@@ -206,7 +213,7 @@ public class knightCore extends absCore {
                                 for (Entity entity : world.getNearbyEntities(particleLocation, 0.7, 0.3, 0.7)) {
                                     if (entity instanceof LivingEntity target && entity != player) {
 
-                                        ForceDamage forceDamage = new ForceDamage(target, 3);
+                                        ForceDamage forceDamage = new ForceDamage(target, 3.0, source);
                                         forceDamage.applyEffect(player);
 
                                         config.collision.put(player.getUniqueId(), true);

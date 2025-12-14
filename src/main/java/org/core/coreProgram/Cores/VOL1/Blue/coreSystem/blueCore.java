@@ -3,6 +3,8 @@ package org.core.coreProgram.Cores.VOL1.Blue.coreSystem;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -147,6 +149,11 @@ public class blueCore extends absCore {
                         Particle.DustOptions dustOption_flowerDust = new Particle.DustOptions(Color.AQUA, 0.6f);
                         Particle.DustOptions dustOption_flowerDust_gra = new Particle.DustOptions(Color.NAVY, 0.6f);
 
+                        DamageSource source = DamageSource.builder(DamageType.MAGIC)
+                                .withCausingEntity(player)
+                                .withDirectEntity(player)
+                                .build();
+
                         if(config.qSoulAbsorb.getOrDefault(player.getUniqueId(), false)){
 
                             world.spawnParticle(Particle.SMOKE, player.getLocation().add(0, 1.0, 0), 66, 0.4, 0.4, 0.4, 0.64);
@@ -159,7 +166,7 @@ public class blueCore extends absCore {
 
                             for (Entity entity : world.getNearbyEntities(player.getLocation(), 6.0, 4, 6.0)) {
                                 if (entity instanceof LivingEntity target && entity != player) {
-                                    ForceDamage forceDamage = new ForceDamage(target, 2.6);
+                                    ForceDamage forceDamage = new ForceDamage(target, 2.6, source);
                                     forceDamage.applyEffect(player);
                                 }
                             }
@@ -185,7 +192,11 @@ public class blueCore extends absCore {
 
                                 for (Entity entity : world.getNearbyEntities(particleLocation, 1.3, 1.3, 1.3)) {
                                     if (entity instanceof LivingEntity target && entity != player) {
-                                        ForceDamage forceDamage = new ForceDamage(target, 2.6);
+                                        DamageSource source = DamageSource.builder(DamageType.MAGIC)
+                                                .withCausingEntity(player)
+                                                .build();
+
+                                        ForceDamage forceDamage = new ForceDamage(target, 2, source);
                                         forceDamage.applyEffect(player);
                                     }
                                 }

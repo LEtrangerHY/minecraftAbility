@@ -1,6 +1,8 @@
 package org.core.coreProgram.Cores.VOL1.Nightel.Skill;
 
 import org.bukkit.*;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -67,6 +69,11 @@ public class R implements SkillBase {
         double amp = config.r_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L);
         damage = damage * (1 + amp);
 
+        DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
+                .withCausingEntity(player)
+                .withDirectEntity(player)
+                .build();
+
         Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 0.6f);
 
         double finalDamage = damage;
@@ -95,7 +102,7 @@ public class R implements SkillBase {
                             world.spawnParticle(Particle.ENCHANTED_HIT, target.getLocation().clone().add(0, 1.2, 0), 33, 0.6, 0.6, 0.6, 1);
                         }
 
-                        ForceDamage forceDamage = new ForceDamage(target, finalDamage);
+                        ForceDamage forceDamage = new ForceDamage(target, finalDamage, source);
                         forceDamage.applyEffect(player);
                         target.setVelocity(new Vector(0, 0, 0));
 

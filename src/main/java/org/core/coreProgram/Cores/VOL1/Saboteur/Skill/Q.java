@@ -4,6 +4,8 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
@@ -168,6 +170,11 @@ public class Q implements SkillBase {
         double amp = config.f_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L);
         damage = damage * (1 + amp);
 
+        DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
+                .withCausingEntity(player)
+                .withDirectEntity(player)
+                .build();
+
         Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 0.6f);
 
         double finalDamage = damage;
@@ -195,7 +202,7 @@ public class Q implements SkillBase {
                 for (Entity entity : nearbyEntities) {
                     if (entity instanceof LivingEntity target && entity != player && !config.q_damaged_Hack.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(entity)) {
 
-                        ForceDamage forceDamage = new ForceDamage(target, finalDamage);
+                        ForceDamage forceDamage = new ForceDamage(target, finalDamage, source);
                         forceDamage.applyEffect(player);
                         target.setVelocity(new Vector(0, 0, 0));
 
@@ -243,6 +250,11 @@ public class Q implements SkillBase {
             item.setPickupDelay(1000);
             item.setGravity(false);
 
+            DamageSource source = DamageSource.builder(DamageType.MOB_PROJECTILE)
+                    .withCausingEntity(player)
+                    .withDirectEntity(item)
+                    .build();
+
             Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
                 int life = 80;
 
@@ -260,9 +272,13 @@ public class Q implements SkillBase {
 
                     for (Entity nearby : item.getNearbyEntities(0.5, 0.5, 0.5)) {
                         if (nearby instanceof LivingEntity target && nearby != player) {
-                            target.damage(damage, player);
+
+                            ForceDamage forceDamage = new ForceDamage(target, damage, source);
+                            forceDamage.applyEffect(player);
+
                             PotionEffect poison = new PotionEffect(PotionEffectType.POISON, 20 * 4, 5, false, true);
                             target.addPotionEffect(poison);
+
                             world.playSound(target.getLocation(), Sound.ITEM_TRIDENT_HIT, 1, 1);
                             world.spawnParticle(Particle.BLOCK, target.getLocation().add(0, 1.2, 0),
                                     14, 0.3, 0.3, 0.3, blood);
@@ -307,6 +323,11 @@ public class Q implements SkillBase {
 
         double amp = config.f_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L);
         double damage = config.r_Skill_Damage_Spike_HACK * (1 + amp);
+
+        DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
+                .withCausingEntity(player)
+                .withDirectEntity(player)
+                .build();
 
         Random rand = new Random();
         int randomTilt = rand.nextInt(6);
@@ -398,7 +419,7 @@ public class Q implements SkillBase {
                                 PotionEffect poison = new PotionEffect(PotionEffectType.POISON, 20 * 4, 5, false, true);
                                 target.addPotionEffect(poison);
 
-                                ForceDamage forceDamage = new ForceDamage(target, damage / 2);
+                                ForceDamage forceDamage = new ForceDamage(target, damage / 2, source);
                                 forceDamage.applyEffect(player);
                                 target.setVelocity(new Vector(0, 0, 0));
 

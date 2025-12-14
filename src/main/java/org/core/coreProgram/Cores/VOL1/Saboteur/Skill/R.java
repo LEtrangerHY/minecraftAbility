@@ -6,6 +6,8 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
@@ -78,6 +80,11 @@ public class R implements SkillBase {
         double amp = config.r_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L);
         double damage = 6 * (1 + amp);
 
+        DamageSource source = DamageSource.builder(DamageType.MOB_PROJECTILE)
+                .withCausingEntity(player)
+                .withDirectEntity(shard)
+                .build();
+
         new BukkitRunnable() {
             int life = 60;
 
@@ -107,7 +114,7 @@ public class R implements SkillBase {
                         Stun stun = new Stun(hit, 2000);
                         stun.applyEffect(player);
 
-                        ForceDamage forceDamage = new ForceDamage(hit, damage);
+                        ForceDamage forceDamage = new ForceDamage(hit, damage, source);
                         forceDamage.applyEffect(player);
                         hit.setVelocity(new Vector(0, 0, 0));
 
@@ -235,6 +242,11 @@ public class R implements SkillBase {
 
         BlockData blood = Material.REDSTONE_BLOCK.createBlockData();
 
+        DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
+                .withCausingEntity(player)
+                .withDirectEntity(player)
+                .build();
+
         new BukkitRunnable() {
 
             int tick = 0;
@@ -288,7 +300,7 @@ public class R implements SkillBase {
                                     target.addPotionEffect(poison);
                                 }
 
-                                ForceDamage forceDamage = new ForceDamage(target, damage);
+                                ForceDamage forceDamage = new ForceDamage(target, damage, source);
                                 forceDamage.applyEffect(player);
                                 target.setVelocity(new Vector(0, 0, 0));
                             }
@@ -326,6 +338,11 @@ public class R implements SkillBase {
         double amp = config.f_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L);
         double damage = config.r_Skill_Damage_Throw_HACK * (1 + amp);
 
+        DamageSource source = DamageSource.builder(DamageType.MOB_PROJECTILE)
+                .withCausingEntity(player)
+                .withDirectEntity(item)
+                .build();
+
         int n = config.q_skillCount_Hack.getOrDefault(player.getUniqueId(), 0);
         if(n < 4) {
             config.q_skillCount_Hack.put(player.getUniqueId(), n + 1);
@@ -348,7 +365,9 @@ public class R implements SkillBase {
 
                 for (Entity nearby : item.getNearbyEntities(0.5, 0.5, 0.5)) {
                     if (nearby instanceof LivingEntity target && nearby != player) {
-                        target.damage(damage, player);
+
+                        ForceDamage forceDamage = new ForceDamage(target, damage, source);
+                        forceDamage.applyEffect(player);
                         world.playSound(target.getLocation().clone(), Sound.ITEM_TRIDENT_HIT, 1.0f, 1.0f);
                         world.spawnParticle(Particle.BLOCK, target.getLocation().clone().add(0, 1.2, 0), 14, 0.3, 0.3, 0.3,
                                 blood);
@@ -395,6 +414,11 @@ public class R implements SkillBase {
 
         double amp = config.f_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L);
         double damage = config.r_Skill_Damage_Spike_HACK * (1 + amp);
+
+        DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
+                .withCausingEntity(player)
+                .withDirectEntity(player)
+                .build();
 
         Random rand = new Random();
         int randomTilt = rand.nextInt(6);
@@ -478,7 +502,7 @@ public class R implements SkillBase {
                                 PotionEffect poison = new PotionEffect(PotionEffectType.POISON, 20 * 4, 5, false, true);
                                 target.addPotionEffect(poison);
 
-                                ForceDamage forceDamage = new ForceDamage(target, damage);
+                                ForceDamage forceDamage = new ForceDamage(target, damage, source);
                                 forceDamage.applyEffect(player);
                                 target.setVelocity(new Vector(0, 0, 0));
 

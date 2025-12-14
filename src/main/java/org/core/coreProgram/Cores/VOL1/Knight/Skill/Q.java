@@ -5,6 +5,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -190,6 +192,11 @@ public class Q implements SkillBase {
         double amp = config.q_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L);
         double damage = config.q_Skill_Damage * (1 + amp);
 
+        DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
+                .withCausingEntity(player)
+                .withDirectEntity(player)
+                .build();
+
         Location origin = player.getEyeLocation().add(0, 0, 0);
         Vector direction = player.getLocation().getDirection().clone();
         Vector rightAxis = direction.clone().crossProduct(new Vector(0, 1, 0)).normalize();
@@ -249,7 +256,7 @@ public class Q implements SkillBase {
                         for (Entity entity : world.getNearbyEntities(particleLocation, 0.7, 0.7, 0.7)) {
                             if (entity instanceof LivingEntity target && entity != player) {
                                 if(!config.damaged.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(entity)) {
-                                    ForceDamage forceDamage = new ForceDamage(target, damage);
+                                    ForceDamage forceDamage = new ForceDamage(target, damage, source);
                                     forceDamage.applyEffect(player);
                                     target.setVelocity(new Vector(0, 0, 0));
                                     config.damaged.get(player.getUniqueId()).add(entity);

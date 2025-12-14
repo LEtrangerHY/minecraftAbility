@@ -3,6 +3,8 @@ package org.core.coreProgram.Cores.VOL1.Dagger.Passive;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -35,7 +37,12 @@ public class DamageStroke {
         player.getWorld().spawnParticle(Particle.BLOCK, entity.getLocation().clone().add(0, 1.2, 0), 13, 0.3, 0.3, 0.3,
                 blood);
 
-        ForceDamage forceDamage = new ForceDamage(entity, entity.getHealth() * 0.13);
+        DamageSource source = DamageSource.builder(DamageType.GENERIC)
+                .withCausingEntity(player)
+                .withDirectEntity(player)
+                .build();
+
+        ForceDamage forceDamage = new ForceDamage(entity, entity.getHealth() * 0.13, source);
         forceDamage.applyEffect(player);
         entity.setVelocity(new Vector(0, 0, 0));
 

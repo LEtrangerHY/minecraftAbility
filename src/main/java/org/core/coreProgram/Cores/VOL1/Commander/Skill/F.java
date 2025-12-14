@@ -3,6 +3,8 @@ package org.core.coreProgram.Cores.VOL1.Commander.Skill;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
@@ -134,7 +136,12 @@ public class F implements SkillBase {
         world.spawnParticle(Particle.EXPLOSION, center, 4, 0.4, 0.4, 0.4, 1.3);
         world.playSound(center, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1, 1);
 
-        ForceDamage forceDamage = new ForceDamage((LivingEntity) entity, damage);
+        DamageSource source = DamageSource.builder(DamageType.MAGIC)
+                .withCausingEntity(player)
+                .withDirectEntity(player)
+                .build();
+
+        ForceDamage forceDamage = new ForceDamage((LivingEntity) entity, damage, source);
         forceDamage.applyEffect(player);
         entity.setVelocity(new Vector(0, 0, 0));
     }

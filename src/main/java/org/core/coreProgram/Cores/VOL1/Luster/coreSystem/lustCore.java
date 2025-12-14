@@ -3,6 +3,8 @@ package org.core.coreProgram.Cores.VOL1.Luster.coreSystem;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.LivingEntity;
@@ -142,6 +144,11 @@ public class lustCore extends absCore {
                         Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(200, 200, 200), 1.7f);
                         Particle.DustOptions dustOptions_gra = new Particle.DustOptions(Color.fromRGB(244, 244, 244), 1.4f);
 
+                        DamageSource source = DamageSource.builder(DamageType.MAGIC)
+                                .withCausingEntity(player)
+                                .withDirectEntity(player)
+                                .build();
+
                         new BukkitRunnable() {
                             int ticks = 0;
 
@@ -165,13 +172,14 @@ public class lustCore extends absCore {
 
                                         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1, 1);
 
-                                        ForceDamage forceDamage = new ForceDamage(target, 4);
+                                        ForceDamage forceDamage = new ForceDamage(target, 4.0, source);
                                         forceDamage.applyEffect(player);
 
                                         if (Math.random() < 0.26) {
                                             player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1);
-                                            ForceDamage additionalForceDamage = new ForceDamage(target, 13);
-                                            additionalForceDamage.applyEffect(player);
+
+                                            ForceDamage addForceDamage = new ForceDamage(target, 13.0, source);
+                                            addForceDamage.applyEffect(player);
                                         }
 
                                         config.collision.put(player.getUniqueId(), true);

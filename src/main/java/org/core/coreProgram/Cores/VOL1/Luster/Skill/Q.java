@@ -3,6 +3,8 @@ package org.core.coreProgram.Cores.VOL1.Luster.Skill;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.*;
 import org.bukkit.persistence.PersistentDataType;
@@ -189,6 +191,11 @@ public class Q implements SkillBase {
         double amp = config.q_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L);
         double damage = config.q_Skill_Damage * (1 + amp);
 
+        DamageSource source = DamageSource.builder(DamageType.MAGIC)
+                .withCausingEntity(player)
+                .withDirectEntity(player)
+                .build();
+
         for (FallingBlock block : liftedBlocks) {
             if (block.isDead()) continue;
 
@@ -215,7 +222,11 @@ public class Q implements SkillBase {
 
                         living.getWorld().playSound(living.getLocation(), Sound.BLOCK_ANVIL_LAND, 1f, 1f);
 
-                        ForceDamage forceDamage = new ForceDamage(living, damage);
+                        DamageSource source = DamageSource.builder(DamageType.MAGIC)
+                                .withCausingEntity(player)
+                                .build();
+
+                        ForceDamage forceDamage = new ForceDamage(living, damage, source);
                         forceDamage.applyEffect(player);
 
                         block.remove();
@@ -247,14 +258,11 @@ public class Q implements SkillBase {
                         if (!(nearby instanceof LivingEntity living)) continue;
                         if (living.equals(player)) continue;
 
-                        living.getWorld().spawnParticle(Particle.BLOCK, living.getLocation().clone().add(0, 1, 0), 6, 0.2, 0.2, 0.2,
-                                iron);
-
+                        living.getWorld().spawnParticle(Particle.BLOCK, living.getLocation().clone().add(0, 1, 0), 6, 0.2, 0.2, 0.2, iron);
                         living.getWorld().spawnParticle(Particle.EXPLOSION, living.getLocation().clone().add(0, 1, 0), 1, 0, 0 ,0, 1);
-
                         living.getWorld().playSound(living.getLocation(), Sound.BLOCK_ANVIL_LAND, 1f, 1f);
 
-                        ForceDamage forceDamage = new ForceDamage(living, damage);
+                        ForceDamage forceDamage = new ForceDamage(living, damage, source);
                         forceDamage.applyEffect(player);
 
                         cancel();

@@ -8,6 +8,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.core.playerSettings.persistentPlayerSet;
 
+import javax.naming.Name;
 import java.util.Set;
 
 public class coreConfig {
@@ -30,6 +31,7 @@ public class coreConfig {
     public Set<Player> Blue;
     public Set<Player> Swordsman;
     public Set<Player> Saboteur;
+    public Set<Player> Burst;
 
     public coreConfig(JavaPlugin plugin) {
         this.plugin = plugin;
@@ -50,6 +52,7 @@ public class coreConfig {
         this.Blue = new persistentPlayerSet(plugin, "setting_blue");
         this.Swordsman = new persistentPlayerSet(plugin, "setting_swordsman");
         this.Saboteur = new persistentPlayerSet(plugin, "setting_saboteur");
+        this.Burst = new persistentPlayerSet(plugin, "setting_burst");
     }
 
     public String getPlayerCore(Player player) {
@@ -69,6 +72,7 @@ public class coreConfig {
         if (Blue.contains(player)) return "BLUE";
         if (Swordsman.contains(player)) return "SWORDSMAN";
         if (Saboteur.contains(player)) return "SABOTEUR";
+        if (Burst.contains(player)) return "BURST";
         return "NONE";
     }
 
@@ -92,6 +96,7 @@ public class coreConfig {
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_blue"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_swordsman"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_saboteur"), PersistentDataType.BYTE, (byte) 0);
+        player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_burst"), PersistentDataType.BYTE, (byte) 0);
     }
 
     public void setSetting(Player player, String setting, boolean value) {
@@ -120,6 +125,7 @@ public class coreConfig {
             case "blue" -> new NamespacedKey(plugin, "setting_blue");
             case "swordsman" -> new NamespacedKey(plugin, "setting_swordsman");
             case "saboteur" -> new NamespacedKey(plugin, "setting_saboteur");
+            case "burst" -> new NamespacedKey(plugin, "setting_burst");
             default -> null;
         };
     }

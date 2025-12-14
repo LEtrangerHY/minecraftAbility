@@ -6,6 +6,8 @@ import org.bukkit.*;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -121,6 +123,11 @@ public class F implements SkillBase {
         double amp = config.f_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L);
         double damage = 0.6 * (1 + amp);
 
+        DamageSource source = DamageSource.builder(DamageType.MAGIC)
+                .withCausingEntity(player)
+                .withDirectEntity(player)
+                .build();
+
         player.spawnParticle(Particle.SOUL_FIRE_FLAME, pollLoc.clone().add(0, 0.6, 0), 20, 0.1, 0.1, 0.1, 0.8);
         player.spawnParticle(Particle.FLAME, pollLoc.clone().add(0, 0.6, 0), 6, 0.1, 0.1, 0.1, 0.8);
 
@@ -162,7 +169,7 @@ public class F implements SkillBase {
                 for (Entity entity : player.getWorld().getNearbyEntities(pollLoc.clone().add(0, 0.2, 0), 1.3, 13, 1.3)) {
                     if (entity instanceof LivingEntity target && entity != player) {
 
-                        ForceDamage forceDamage = new ForceDamage(target, damage);
+                        ForceDamage forceDamage = new ForceDamage(target, damage, source);
                         forceDamage.applyEffect(player);
                         target.setVelocity(new Vector(0, 0, 0));
 

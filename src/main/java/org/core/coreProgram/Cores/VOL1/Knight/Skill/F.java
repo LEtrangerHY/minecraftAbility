@@ -2,6 +2,8 @@ package org.core.coreProgram.Cores.VOL1.Knight.Skill;
 
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -47,6 +49,11 @@ public class F implements SkillBase {
 
         double amp = config.f_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L);
         double damage = config.f_Skill_Damage * (1 + amp);
+
+        DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
+                .withCausingEntity(player)
+                .withDirectEntity(player)
+                .build();
 
         config.damaged.put(player.getUniqueId(), new HashSet<>());
 
@@ -113,7 +120,8 @@ public class F implements SkillBase {
                                     player.getWorld().spawnParticle(Particle.DAMAGE_INDICATOR, target.getLocation().clone().add(0, 1.3, 0), 20, 0.4, 0.4, 0.4, 1);
                                     Stun stun = new Stun(target, 700);
                                     stun.applyEffect(player);
-                                    ForceDamage forceDamage = new ForceDamage(target, damage);
+
+                                    ForceDamage forceDamage = new ForceDamage(target, damage, source);
                                     forceDamage.applyEffect(player);
                                     target.setVelocity(new Vector(0, 0, 0));
                                 }

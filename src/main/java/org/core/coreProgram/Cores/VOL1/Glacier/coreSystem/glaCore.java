@@ -3,6 +3,8 @@ package org.core.coreProgram.Cores.VOL1.Glacier.coreSystem;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -119,6 +121,11 @@ public class glaCore extends absCore {
                         player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(1.25);
                         world.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_BREAK, 1, 1);
 
+                        DamageSource source = DamageSource.builder(DamageType.MAGIC)
+                                .withCausingEntity(player)
+                                .withDirectEntity(player)
+                                .build();
+
                         config.collision.put(player.getUniqueId(), false);
 
                         new BukkitRunnable() {
@@ -145,7 +152,7 @@ public class glaCore extends absCore {
 
                                         world.playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 1);
 
-                                        ForceDamage forceDamage = new ForceDamage(target, 3);
+                                        ForceDamage forceDamage = new ForceDamage(target, 3.0, source);
                                         forceDamage.applyEffect(player);
 
                                         if (Math.random() < 0.6) {

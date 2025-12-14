@@ -3,6 +3,8 @@ package org.core.coreProgram.Cores.VOL1.Carpenter.Skill;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -99,6 +101,11 @@ public class Q implements SkillBase {
         double amp = config.q_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L);
         double damage = config.q_Skill_damage * (1 + amp);
 
+        DamageSource source = DamageSource.builder(DamageType.PLAYER_EXPLOSION)
+                .withCausingEntity(player)
+                .withDirectEntity(player)
+                .build();
+
         Vector direction = player.getEyeLocation().add(0, -0.5, 0).getDirection().normalize();
         Location particleLocation = player.getEyeLocation().clone()
                 .add(direction.clone().multiply(2.6));
@@ -119,13 +126,15 @@ public class Q implements SkillBase {
         world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1, 1);
 
         for (Entity entity : world.getNearbyEntities(particleLocation, radius, radius, radius)) {
-            if (entity instanceof LivingEntity object && entity != player && !config.q_damaged.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(entity)) {
+            if (entity instanceof LivingEntity target && entity != player && !config.q_damaged.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(entity)) {
 
                 config.q_damaging.put(player.getUniqueId(), true);
                 config.q_damaged.getOrDefault(player.getUniqueId(), new HashSet<>()).add(entity);
-                ForceDamage forceDamage = new ForceDamage(object, damage * (1.0 + config.normal_distribution.getOrDefault(player.getUniqueId(), 0.0)));
+
+                ForceDamage forceDamage = new ForceDamage(target, damage, source);
                 forceDamage.applyEffect(player);
                 entity.setVelocity(new Vector(0, 0, 0));
+
                 config.q_damaging.remove(player.getUniqueId());
 
                 entity.setVelocity(new Vector(0, config.q_Skill_jump * (1.0 + config.normal_distribution.getOrDefault(player.getUniqueId(), 0.0)), 0));

@@ -4,6 +4,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -62,6 +64,11 @@ public class R implements SkillBase {
         double amp = config.r_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L);
         double damage = config.r_Skill_damage * (1 + amp);
 
+        DamageSource source = DamageSource.builder(DamageType.GENERIC)
+                .withCausingEntity(player)
+                .withDirectEntity(player)
+                .build();
+
         config.atkCount.put(player.getUniqueId(), 0);
         player.sendActionBar(Component.text("⌬").color(NamedTextColor.GRAY));
 
@@ -94,10 +101,13 @@ public class R implements SkillBase {
                 List<Entity> nearbyEntities = player.getNearbyEntities(1.2, 1.2, 1.2);
                 for (Entity entity : nearbyEntities) {
                     if (entity instanceof LivingEntity target && entity != player && !config.damaged_2.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(entity)) {
-                        ForceDamage forceDamage = new ForceDamage(target, damage);
+
+                        ForceDamage forceDamage = new ForceDamage(target, damage, source);
                         forceDamage.applyEffect(player);
+
                         config.damaged_2.getOrDefault(player.getUniqueId(), new HashSet<>()).add(target);
                         target.setVelocity(new Vector(0, 0, 0));
+
                         if(!target.isDead()){
                             chainCalc.increase(player, target);
                             if(target.isDead()){

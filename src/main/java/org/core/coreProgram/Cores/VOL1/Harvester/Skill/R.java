@@ -4,6 +4,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -65,6 +67,11 @@ public class R implements SkillBase {
         Particle.DustOptions dustOption_slash_gra = new Particle.DustOptions(Color.fromRGB(166, 166, 88), 0.6f);
 
         double finalDamage = damage;
+        DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
+                .withCausingEntity(player)
+                .withDirectEntity(player)
+                .build();
+
         config.rskill_using.put(player.getUniqueId(), true);
 
         new BukkitRunnable() {
@@ -114,7 +121,8 @@ public class R implements SkillBase {
                                     world.spawnParticle(Particle.CRIT, target.getLocation().clone().add(0, 1.3, 0), 26, 0.4, 0.4, 0.4, 1);
                                     world.playSound(target.getLocation().clone().add(0, 1.3, 0), Sound.ENTITY_PLAYER_ATTACK_CRIT, 1, 1);
                                 }
-                                ForceDamage forceDamage = new ForceDamage(target, finalDamage);
+
+                                ForceDamage forceDamage = new ForceDamage(target, finalDamage, source);
                                 forceDamage.applyEffect(player);
                                 target.setVelocity(new Vector(0, 0, 0));
                             }
