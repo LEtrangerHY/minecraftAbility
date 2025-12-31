@@ -43,9 +43,9 @@ public class nightInventory extends absInventory {
     protected Component getName(Player player, String skill) {
 
         return switch (skill) {
-            case "R" -> Component.text("Stimuli");
-            case "Q" -> Component.text("Process");
-            case "F" -> Component.text("ENLIGHTEN");
+            case "R" -> Component.text("Twilight");
+            case "Q" -> Component.text("Whirlwind");
+            case "F" -> Component.text("DISCONNECTION");
             default -> Component.text("???");
         };
     }
@@ -53,7 +53,7 @@ public class nightInventory extends absInventory {
     @Override
     protected Material getTotem(Player player, String skill) {
         return switch (skill) {
-            case "R" -> Material.FEATHER;
+            case "R" -> Material.COPPER_CHAIN;
             case "Q" -> Material.WIND_CHARGE;
             case "F" -> Material.ENDER_PEARL;
             default -> Material.BARRIER;

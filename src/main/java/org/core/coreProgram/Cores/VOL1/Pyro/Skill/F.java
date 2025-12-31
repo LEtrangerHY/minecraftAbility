@@ -51,8 +51,6 @@ public class F implements SkillBase {
             Location playerLocation = player.getLocation();
             Vector direction = playerLocation.getDirection().normalize().multiply(1.3);
 
-            config.F_collision.put(player.getUniqueId(), false);
-
             new BukkitRunnable() {
                 int ticks = 0;
 
@@ -64,21 +62,15 @@ public class F implements SkillBase {
                             .add(0, 1.4, 0);
 
                     if (ticks >= 14) {
-                        if(config.F_collision.getOrDefault(player.getUniqueId(), true)) {
-                            config.F_collision.remove(player.getUniqueId());
-                            this.cancel();
-                            return;
-                        }else{
-                            config.F_collision.remove(player.getUniqueId());
-                            Delay(player, particleLocation);
-                            this.cancel();
-                            return;
-                        }
+                        Delay(player, particleLocation);
+                        this.cancel();
+                        return;
                     }
 
                     if(!particleLocation.getBlock().isPassable()){
                         Delay(player, particleLocation);
-                        config.F_collision.put(player.getUniqueId(), true);
+                        this.cancel();
+                        return;
                     }
 
                     player.getWorld().spawnParticle(Particle.FLAME, particleLocation, 3, 0.1, 0.1, 0.1, 0);
@@ -87,8 +79,8 @@ public class F implements SkillBase {
                     for (Entity entity : world.getNearbyEntities(particleLocation, 0.5, 0.5, 0.5)) {
                         if (entity instanceof LivingEntity target && entity != player) {
                             Delay(player, particleLocation);
-                            config.F_collision.put(player.getUniqueId(), true);
-                            break;
+                            this.cancel();
+                            return;
                         }
                     }
 
@@ -157,11 +149,11 @@ public class F implements SkillBase {
             }
         }
 
-        float power = 10.0f;
+        float power = 13.0f;
         boolean setFire = true;
         boolean breakBlocks = true;
 
-        player.getWorld().createExplosion(burstLoction, power, setFire, breakBlocks);
+        world.createExplosion(burstLoction, power, setFire, breakBlocks);
     }
 
 }

@@ -58,8 +58,11 @@ public class DamageShare {
             double distance = loc1.distance(loc2);
 
             if (distance <= 22 && !config.damageTimes.getOrDefault(target, new LinkedHashMap<>()).containsValue(times)) {
+
+                World world = chainedEntity.getWorld();
+
                 player.getWorld().playSound(player.getLocation(), Sound.BLOCK_CHAIN_PLACE, 1.0f, 1.0f);
-                chainedEntity.getWorld().playSound(player.getLocation(), Sound.BLOCK_CHAIN_PLACE, 1.0f, 1.0f);
+                world.playSound(player.getLocation(), Sound.BLOCK_CHAIN_PLACE, 1.0f, 1.0f);
 
                 config.damageTimes.putIfAbsent(chainedEntity, new LinkedHashMap<>());
                 config.damageTimes.get(chainedEntity).put(target, times);
@@ -74,11 +77,10 @@ public class DamageShare {
                 chainedEntity.setVelocity(new Vector(0, 0, 0));
 
                 Location effectLoc = chainedEntity.getLocation().add(0, 1.2, 0);
-                chainedEntity.getWorld().spawnParticle(Particle.SWEEP_ATTACK, effectLoc, 1, 0.1, 0.1, 0.1, 1);
-                chainedEntity.getWorld().spawnParticle(Particle.ENCHANTED_HIT, effectLoc, 10, 0.4, 0, 0.4, 1);
-                chainedEntity.getWorld().playSound(effectLoc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.0f, 1.0f);
-                chainedEntity.getWorld().playSound(effectLoc, Sound.ITEM_TRIDENT_HIT_GROUND, 1.0f, 1.0f);
-
+                world.spawnParticle(Particle.SWEEP_ATTACK, effectLoc, 1, 0.1, 0.1, 0.1, 1);
+                world.spawnParticle(Particle.ENCHANTED_HIT, effectLoc, 10, 0.4, 0, 0.4, 1);
+                world.playSound(effectLoc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.0f, 1.0f);
+                world.playSound(effectLoc, Sound.ITEM_TRIDENT_HIT_GROUND, 1.0f, 1.0f);
             }
 
             Map<Entity, Long> timesMap = config.damageTimes.getOrDefault(chainedEntity, new LinkedHashMap<>());

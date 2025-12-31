@@ -68,10 +68,10 @@ public class Q implements SkillBase {
 
                     if (rangeTarget == player) {
                         ((Player) rangeTarget).heal(player.getHealth() / 2);
+                    }else {
+                        Burn burn = new Burn(target, 3000L);
+                        burn.applyEffect(player);
                     }
-
-                    Burn burn = new Burn(target, 3000L);
-                    burn.applyEffect(player);
                 }
             }
 

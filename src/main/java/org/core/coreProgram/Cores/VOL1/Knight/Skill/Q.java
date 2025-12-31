@@ -43,24 +43,21 @@ public class Q implements SkillBase {
 
         if(!config.isFocusing.getOrDefault(player.getUniqueId(), false)) {
 
-            Entity target = getTargetedEntity(player, 7, 0.3);
+            LivingEntity target = getTargetedEntity(player, 7, 0.3);
 
             if(target != null && !target.isDead()) {
 
-                if (target instanceof LivingEntity ltarget) {
+                config.isFocusing.put(player.getUniqueId(), true);
 
-                    config.isFocusing.put(player.getUniqueId(), true);
+                AttributeInstance maxHealth = target.getAttribute(Attribute.MAX_HEALTH);
+                if (maxHealth == null) return;
+                config.targetMaxHealth.put(player.getUniqueId(), maxHealth.getBaseValue());
 
-                    AttributeInstance maxHealth = ltarget.getAttribute(Attribute.MAX_HEALTH);
-                    if (maxHealth == null) return;
 
-                    double originalMax = maxHealth.getBaseValue();
+                player.playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1, 1);
+                cool.setCooldown(player, 2000L, "Focus");
+                Focus(player, target);
 
-                    player.playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1, 1);
-                    cool.setCooldown(player, 2000L, "Focus");
-                    Focus(player, ltarget, originalMax);
-
-                }
             }else{
                 player.sendActionBar(Component.text("not designated").color(NamedTextColor.BLACK));
                 player.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_LEATHER, 1, 1);
@@ -73,11 +70,15 @@ public class Q implements SkillBase {
         }
     }
 
-    public void Focus(Player player, LivingEntity target, double originalMax) {
+    public void Focus(Player player, LivingEntity target) {
 
         World world = player.getWorld();
 
         config.isFocusCancel.remove(player.getUniqueId());
+
+        AttributeInstance maxHealth = target.getAttribute(Attribute.MAX_HEALTH);
+        if (maxHealth == null) return;
+        double originalMax = config.targetMaxHealth.getOrDefault(player.getUniqueId(), maxHealth.getBaseValue());
 
         new BukkitRunnable() {
             int ticks = 0;
@@ -274,14 +275,7 @@ public class Q implements SkillBase {
         AttributeInstance maxHealth = target.getAttribute(Attribute.MAX_HEALTH);
 
         if (maxHealth != null && !target.isDead()) {
-            double newMax = Math.max(1.0, originalMax - 1);
-            maxHealth.setBaseValue(newMax);
-
-            target.heal(4);
-
-            if (target.getHealth() > newMax) {
-                target.setHealth(newMax);
-            }
+            if(originalMax >= maxHealth.getBaseValue()) maxHealth.setBaseValue(originalMax);
         }
     }
 

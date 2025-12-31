@@ -34,16 +34,13 @@ public class Pyro {
     public long q_Skill_Cool = 17000;
 
     //F
-    public long f_Skill_Cool = 100000;
-    public HashMap<UUID, Boolean> F_collision = new HashMap<>();
+    public long f_Skill_Cool = 130000;
 
     public void variableReset(Player player){
 
         R_COOLDOWN.remove(player.getUniqueId());
         Q_COOLDOWN.remove(player.getUniqueId());
         F_COOLDOWN.remove(player.getUniqueId());
-
-        F_collision.remove(player.getUniqueId());
 
     }
 }

@@ -15,8 +15,8 @@ public class Nightel {
     public long frozenCool = 10000;
 
     //passive
-    public HashMap<UUID, Integer> dreamPoint = new HashMap<>();
-    public HashMap<UUID, String> dreamSkill = new HashMap<>();
+    public HashMap<UUID, Integer> hexaPoint = new HashMap<>();
+    public HashMap<UUID, String> hexaSkill = new HashMap<>();
 
     //R
     public HashMap<UUID, HashSet<Entity>> damaged = new HashMap<>();
@@ -49,8 +49,8 @@ public class Nightel {
         damaged_2.remove(player.getUniqueId());
         damaged_3.remove(player.getUniqueId());
 
-        dreamPoint.remove(player.getUniqueId());
-        dreamSkill.remove(player.getUniqueId());
+        hexaPoint.remove(player.getUniqueId());
+        hexaSkill.remove(player.getUniqueId());
 
         rskill_using.remove(player.getUniqueId());
         fskill_using.remove(player.getUniqueId());

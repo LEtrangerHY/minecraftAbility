@@ -27,6 +27,7 @@ public class Knight {
 
     //Q
     public HashMap<UUID, Boolean> q_Skill_Using = new HashMap<>();
+    public HashMap<UUID, Double> targetMaxHealth = new HashMap<>();
     public HashMap<UUID, Boolean> isFocusing = new HashMap<>();
     public HashMap<UUID, Boolean> isFocusCancel = new HashMap<>();
     public double q_Skill_amp = 0.14;

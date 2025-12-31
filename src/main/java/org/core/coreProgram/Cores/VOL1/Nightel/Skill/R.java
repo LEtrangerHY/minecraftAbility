@@ -14,7 +14,7 @@ import org.core.Cool.Cool;
 import org.core.Effect.ForceDamage;
 import org.core.Effect.Invulnerable;
 import org.core.coreProgram.AbsCoreSystem.SkillBase;
-import org.core.coreProgram.Cores.VOL1.Nightel.Passive.Dream;
+import org.core.coreProgram.Cores.VOL1.Nightel.Passive.Hexa;
 import org.core.coreProgram.Cores.VOL1.Nightel.coreSystem.Nightel;
 
 import java.util.HashSet;
@@ -25,21 +25,21 @@ public class R implements SkillBase {
     private final Nightel config;
     private final JavaPlugin plugin;
     private final Cool cool;
-    private final Dream dream;
+    private final Hexa hexa;
 
-    public R(Nightel config, JavaPlugin plugin, Cool cool, Dream dream) {
+    public R(Nightel config, JavaPlugin plugin, Cool cool, Hexa hexa) {
         this.config = config;
         this.plugin = plugin;
         this.cool = cool;
-        this.dream = dream;
+        this.hexa = hexa;
     }
 
     @Override
     public void Trigger(Player player) {
 
-        boolean diff = (config.dreamSkill.containsKey(player.getUniqueId()) && !config.dreamSkill.getOrDefault(player.getUniqueId(), "").equals("R"));
+        boolean diff = (config.hexaSkill.containsKey(player.getUniqueId()) && !config.hexaSkill.getOrDefault(player.getUniqueId(), "").equals("R"));
 
-        dream.dreamPoint(player, config.r_Skill_Cool, "R");
+        hexa.hexaPoint(player, config.r_Skill_Cool, "R");
 
         player.swingMainHand();
 

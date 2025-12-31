@@ -11,22 +11,22 @@ import org.core.Cool.Cool;
 import org.core.Main.coreConfig;
 import org.core.coreProgram.Cores.VOL1.Nightel.coreSystem.Nightel;
 
-public class Dream implements Listener {
+public class Hexa implements Listener {
 
     private final Nightel config;
     private final JavaPlugin plugin;
     private final Cool cool;
     private final coreConfig tag;
 
-    public Dream(Nightel config, coreConfig tag, JavaPlugin plugin, Cool cool) {
+    public Hexa(Nightel config, coreConfig tag, JavaPlugin plugin, Cool cool) {
         this.config = config;
         this.plugin = plugin;
         this.cool = cool;
         this.tag = tag;
     }
 
-    public void dreamPoint(Player player, long coolTime, String skill) {
-        int point = config.dreamPoint.getOrDefault(player.getUniqueId(), 0);
+    public void hexaPoint(Player player, long coolTime, String skill) {
+        int point = config.hexaPoint.getOrDefault(player.getUniqueId(), 0);
 
         long cools = (long) Math.min(coolTime * Math.pow(3, point), 6000);
         cool.updateCooldown(player, skill, cools);
@@ -37,11 +37,11 @@ public class Dream implements Listener {
             Location playerLoc = player.getLocation();
             BlockData chain = Material.IRON_CHAIN.createBlockData();
 
-            int addPoint = (config.dreamSkill.containsKey(player.getUniqueId()) && !config.dreamSkill.getOrDefault(player.getUniqueId(), "").equals(skill)) ? 2 : 1;
+            int addPoint = (config.hexaSkill.containsKey(player.getUniqueId()) && !config.hexaSkill.getOrDefault(player.getUniqueId(), "").equals(skill)) ? 2 : 1;
 
             for(int i = 0; i < addPoint; i++) {
-                if(config.dreamPoint.getOrDefault(player.getUniqueId(), 0) < 6) {
-                    config.dreamPoint.put(player.getUniqueId(), config.dreamPoint.getOrDefault(player.getUniqueId(), 0) + 1);
+                if(config.hexaPoint.getOrDefault(player.getUniqueId(), 0) < 6) {
+                    config.hexaPoint.put(player.getUniqueId(), config.hexaPoint.getOrDefault(player.getUniqueId(), 0) + 1);
                 }else{
                     break;
                 }
@@ -54,14 +54,16 @@ public class Dream implements Listener {
                 world.spawnParticle(Particle.ENCHANTED_HIT, playerLoc.clone().add(0, 1.2, 0), 33, 0.6, 0.6, 0.6, 1);
             }
 
-            if (config.dreamPoint.getOrDefault(player.getUniqueId(), 0) < 6) {
-                player.sendActionBar(Component.text("Dreams : " + config.dreamPoint.getOrDefault(player.getUniqueId(), 0)).color(NamedTextColor.GRAY));
+            if (config.hexaPoint.getOrDefault(player.getUniqueId(), 0) < 6) {
+                int displayCount = config.hexaPoint.getOrDefault(player.getUniqueId(), 0);
+                String hex = "⬡ ".repeat(displayCount).trim();
+                player.sendActionBar(Component.text(hex).color(NamedTextColor.GRAY));
             } else {
-                player.sendActionBar(Component.text("Enlighten").color(NamedTextColor.DARK_GRAY));
+                player.sendActionBar(Component.text("⌬ ⌬ ⌬ ⌬ ⌬ ⌬").color(NamedTextColor.DARK_GRAY));
             }
         }
 
-        config.dreamSkill.put(player.getUniqueId(), skill);
+        config.hexaSkill.put(player.getUniqueId(), skill);
 
     }
 
@@ -71,13 +73,13 @@ public class Dream implements Listener {
         cool.updateCooldown(player, "R", cools);
         cool.updateCooldown(player, "Q", cools);
 
-        long coolOfF = Math.max(config.dreamPoint.getOrDefault(player.getUniqueId(), 0) * 1000, 600);
+        long coolOfF = Math.max(config.hexaPoint.getOrDefault(player.getUniqueId(), 0) * 1000, 600);
         cool.updateCooldown(player, "F", coolOfF);
 
-        config.dreamPoint.remove(player.getUniqueId());
-        config.dreamSkill.remove(player.getUniqueId());
+        config.hexaPoint.remove(player.getUniqueId());
+        config.hexaSkill.remove(player.getUniqueId());
 
-        player.sendActionBar(Component.text("Dreams : " + config.dreamPoint.getOrDefault(player.getUniqueId(), 0)).color(NamedTextColor.GRAY));
+        player.sendActionBar(Component.text("⌬").color(NamedTextColor.GRAY));
 
     }
 }

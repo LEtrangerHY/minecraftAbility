@@ -21,8 +21,8 @@ public class Burst {
     public HashMap<UUID, Boolean> collision = new HashMap<>();
 
     //R
-    public double r_Skill_amp = 0.2;
-    public double r_Skill_Damage = 6;
+    public double r_Skill_amp = 0.14;
+    public double r_Skill_Damage = 4;
     public long r_Skill_Cool = 600;
 
     //Q
@@ -34,9 +34,10 @@ public class Burst {
 
     //F
     public double f_Skill_amp = 0.2;
-    public double f_Skill_Jump = 1.3;
-    public double f_Skill_dash = 2.0;
-    public long f_Skill_Cool = 30000;
+    public double f_Skill_Jump = 1.6;
+    public double f_Skill_dash = 1.8;
+    public double f_Skill_Damage = 4;
+    public long f_Skill_Cool = 66000;
 
 
     public void variableReset(Player player){

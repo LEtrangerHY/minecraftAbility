@@ -130,6 +130,7 @@ public class R implements SkillBase {
                 if (target.isDead()) {
                     swords.forEach(ArmorStand::remove);
                     if(config.swordCount.getOrDefault(player.getUniqueId(), 0) > 0) {
+                        player.heal(damage * 3);
                         config.swordCount.put(player.getUniqueId(), config.swordCount.getOrDefault(player.getUniqueId(), 0) - 1);
                         player.sendActionBar(Component.text((3 - config.swordCount.getOrDefault(player.getUniqueId(), 0)) + " set").color(NamedTextColor.GRAY));
                         if (config.swordCount.getOrDefault(player.getUniqueId(), 0) == 0) {
@@ -173,10 +174,10 @@ public class R implements SkillBase {
                 }
 
                 ticks++;
-                if (ticks >= 20 * 7) {
-                    this.cancel();
 
+                if (ticks >= 20 * 7) {
                     if(config.swordCount.getOrDefault(player.getUniqueId(), 0) > 0) {
+                        player.heal(damage);
                         config.swordCount.put(player.getUniqueId(), config.swordCount.getOrDefault(player.getUniqueId(), 0) - 1);
                         player.sendActionBar(Component.text((3 - config.swordCount.getOrDefault(player.getUniqueId(), 0)) + " set").color(NamedTextColor.GRAY));
                         if (config.swordCount.getOrDefault(player.getUniqueId(), 0) == 0) {
@@ -187,6 +188,8 @@ public class R implements SkillBase {
                         launchSwordProjectile(player, sword, target, projectileSpeed, damage, plugin);
                         player.playSound(target.getLocation(), Sound.ITEM_TRIDENT_THROW, 1, 1);
                     }
+                    this.cancel();
+                    return;
                 }
             }
         }.runTaskTimer(plugin, 0L, 1L);

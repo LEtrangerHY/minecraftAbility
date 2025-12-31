@@ -16,7 +16,7 @@ import org.bukkit.util.Vector;
 import org.core.Cool.Cool;
 import org.core.Effect.ForceDamage;
 import org.core.coreProgram.AbsCoreSystem.SkillBase;
-import org.core.coreProgram.Cores.VOL1.Nightel.Passive.Dream;
+import org.core.coreProgram.Cores.VOL1.Nightel.Passive.Hexa;
 import org.core.coreProgram.Cores.VOL1.Nightel.coreSystem.Nightel;
 
 import java.util.HashSet;
@@ -26,13 +26,13 @@ public class Q implements SkillBase {
     private final Nightel config;
     private final JavaPlugin plugin;
     private final Cool cool;
-    private final Dream dream;
+    private final Hexa hexa;
 
-    public Q(Nightel config, JavaPlugin plugin, Cool cool, Dream dream) {
+    public Q(Nightel config, JavaPlugin plugin, Cool cool, Hexa hexa) {
         this.config = config;
         this.plugin = plugin;
         this.cool = cool;
-        this.dream = dream;
+        this.hexa = hexa;
     }
 
     @Override
@@ -57,16 +57,16 @@ public class Q implements SkillBase {
 
         if (feetBlock.isPassable() && headBlock.isPassable()) {
 
-            dream.dreamPoint(player, config.q_Skill_Cool, "Q");
+            hexa.hexaPoint(player, config.q_Skill_Cool, "Q");
 
             Location finalLocation = targetLocation.clone();
             finalLocation.setDirection(start.toVector().subtract(targetLocation.toVector()));
 
             player.teleport(finalLocation);
 
-            world.spawnParticle(Particle.SPIT, player.getLocation().clone(), 33, 0.2, 0.3, 0.2, 1);
+            world.spawnParticle(Particle.SPIT, player.getLocation().clone(), 33, 0.2, 0.3, 0.2, 0.6);
 
-            int atk = Math.min(config.dreamPoint.getOrDefault(player.getUniqueId(), 1) + 3, 6);
+            int atk = Math.min(config.hexaPoint.getOrDefault(player.getUniqueId(), 1) + 3, 6);
 
             TeleportSlash(player, maxDistance, start, direction, atk);
 

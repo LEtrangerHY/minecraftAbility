@@ -17,7 +17,7 @@ import org.core.Cool.Cool;
 import org.core.Effect.ForceDamage;
 import org.core.Effect.Invulnerable;
 import org.core.coreProgram.AbsCoreSystem.SkillBase;
-import org.core.coreProgram.Cores.VOL1.Nightel.Passive.Dream;
+import org.core.coreProgram.Cores.VOL1.Nightel.Passive.Hexa;
 import org.core.coreProgram.Cores.VOL1.Nightel.coreSystem.Nightel;
 
 import java.util.*;
@@ -27,13 +27,13 @@ public class F implements SkillBase {
     private final Nightel config;
     private final JavaPlugin plugin;
     private final Cool cool;
-    private final Dream dream;
+    private final Hexa hexa;
 
-    public F(Nightel config, JavaPlugin plugin, Cool cool, Dream dream) {
+    public F(Nightel config, JavaPlugin plugin, Cool cool, Hexa hexa) {
         this.config = config;
         this.plugin = plugin;
         this.cool = cool;
-        this.dream = dream;
+        this.hexa = hexa;
     }
 
     @Override
@@ -51,7 +51,7 @@ public class F implements SkillBase {
         if(target != null){
             world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1.0f, 1.0f);
             world.spawnParticle(Particle.ENCHANTED_HIT, target.getLocation().clone().add(0, 1.2, 0), 22, 0.6, 0.6, 0.6, 1);
-            Special_Attack(player, firstLocation, playerGameMode, target, config.dreamPoint.getOrDefault(player.getUniqueId(), 0));
+            Special_Attack(player, firstLocation, playerGameMode, target, config.hexaPoint.getOrDefault(player.getUniqueId(), 0));
         }else{
             world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_WEAK, 1, 1);
             long cools = 250L;
@@ -110,7 +110,7 @@ public class F implements SkillBase {
                     player.setGameMode(playerGameMode);
 
                     if(!justTeleport) {
-                        dream.removePoint(player);
+                        hexa.removePoint(player);
                     }
 
                     this.cancel();
@@ -213,7 +213,7 @@ public class F implements SkillBase {
                         for (Entity entity : world.getNearbyEntities(particleLocation, 1.2, 1.2, 1.2)) {
                             if (entity instanceof LivingEntity target && entity != player && !config.damaged_2.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(entity)) {
 
-                                ForceDamage forceDamage = new ForceDamage(target, damage * (config.dreamPoint.getOrDefault(player.getUniqueId(), 1)), source);
+                                ForceDamage forceDamage = new ForceDamage(target, damage * (config.hexaPoint.getOrDefault(player.getUniqueId(), 1)), source);
                                 forceDamage.applyEffect(player);
                                 target.setVelocity(new Vector(0, 0, 0));
 
