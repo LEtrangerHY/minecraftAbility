@@ -1,0 +1,143 @@
+package org.core.coreSystem.cores.VOL1.Nightel.Skill;
+
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.*;
+import org.bukkit.block.Block;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
+import org.core.cool.Cool;
+import org.core.effect.crowdControl.ForceDamage;
+import org.core.coreSystem.absCoreSystem.SkillBase;
+import org.core.coreSystem.cores.VOL1.Nightel.Passive.Hexa;
+import org.core.coreSystem.cores.VOL1.Nightel.coreSystem.Nightel;
+
+import java.util.HashSet;
+
+public class Q implements SkillBase {
+
+    private final Nightel config;
+    private final JavaPlugin plugin;
+    private final Cool cool;
+    private final Hexa hexa;
+
+    public Q(Nightel config, JavaPlugin plugin, Cool cool, Hexa hexa) {
+        this.config = config;
+        this.plugin = plugin;
+        this.cool = cool;
+        this.hexa = hexa;
+    }
+
+    @Override
+    public void Trigger(Player player) {
+
+        TeleportPos(player, 0);
+
+    }
+
+    public void TeleportPos(Player player, double loop){
+
+        World world = player.getWorld();
+
+        Location start = player.getLocation().clone();
+        Vector direction = start.getDirection().normalize();
+        double maxDistance = 6 - loop;
+
+        Location targetLocation = start.clone().add(direction.clone().multiply(maxDistance));
+
+        Block feetBlock = targetLocation.getBlock();
+        Block headBlock = targetLocation.clone().add(0, 1, 0).getBlock();
+
+        if (feetBlock.isPassable() && headBlock.isPassable()) {
+
+            hexa.hexaPoint(player, config.q_Skill_Cool, "Q");
+
+            Location finalLocation = targetLocation.clone();
+            finalLocation.setDirection(start.toVector().subtract(targetLocation.toVector()));
+
+            player.teleport(finalLocation);
+
+            world.spawnParticle(Particle.SPIT, player.getLocation().clone(), 33, 0.2, 0.3, 0.2, 0.6);
+
+            int atk = Math.min(config.hexaPoint.getOrDefault(player.getUniqueId(), 1) + 3, 6);
+
+            TeleportSlash(player, maxDistance, start, direction, atk);
+
+        } else {
+            if(maxDistance < 0){
+                world.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_LEATHER, 1f, 1f);
+                player.sendActionBar(Component.text("failed").color(NamedTextColor.RED));
+            }else{
+                TeleportPos(player, loop + 0.2);
+            }
+        }
+    }
+
+    public void TeleportSlash(Player player, double maxDistance, Location start, Vector direction, int atk){
+
+        World world = player.getWorld();
+
+        double step = 0.5;
+        config.damaged_2.put(player.getUniqueId(), new HashSet<>());
+
+        double amp = config.q_SKill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L);
+        double damage = config.q_Skill_damage * (1 + amp);
+
+        DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
+                .withCausingEntity(player)
+                .withDirectEntity(player)
+                .build();
+
+        boolean hit = false;
+
+        for (double i = 0; i <= maxDistance; i += step) {
+            Location point = start.clone().add(direction.clone().multiply(i));
+            for (Entity entity : world.getNearbyEntities(point, 1.2, 1.2, 1.2)) {
+                if (entity instanceof LivingEntity target && entity != player) {
+                    if (!config.damaged_2.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(target)) {
+                        hit = true;
+                        new BukkitRunnable() {
+                            int tick = 0;
+
+                            @Override
+                            public void run() {
+                                if (tick >= atk || player.isDead()) {
+                                    this.cancel();
+                                    return;
+                                }
+                                world.playSound(target.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f);
+                                world.playSound(target.getLocation(), Sound.ITEM_TRIDENT_HIT_GROUND, 1f, 1f);
+
+                                ForceDamage forceDamage = new ForceDamage(target, damage, source);
+                                forceDamage.applyEffect(player);
+                                target.setVelocity(new Vector(0, 0, 0));
+
+                                world.spawnParticle(Particle.SWEEP_ATTACK, target.getLocation().clone().add(0, 1.2, 0), 3, 0.6, 0.6, 0.6, 1);
+                                world.spawnParticle(Particle.ENCHANTED_HIT, target.getLocation().clone().add(0, 1.2, 0), 11, 0.6, 0.6, 0.6, 1);
+
+                                tick++;
+                            }
+                        }.runTaskTimer(plugin, 0L, 2L);
+
+                        config.damaged_2.getOrDefault(player.getUniqueId(), new HashSet<>()).add(target);
+                    }
+                }
+            }
+        }
+
+        if (hit) {
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                world.playSound(start, Sound.ENTITY_WITHER_SHOOT, 1f, 1f);
+            }, atk * 2L + 1);
+        } else {
+            world.playSound(start, Sound.ENTITY_WITHER_SHOOT, 1f, 1f);
+        }
+    }
+}
