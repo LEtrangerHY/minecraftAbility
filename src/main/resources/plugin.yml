@@ -5,19 +5,19 @@ api-version: '1.21.10'
 commands:
   core:
     description: "능력 설정"
-    usage: "/core"
+    usage: "/core [플레이어] [능력] <true|false>"
   coreclear:
     description: "능력 초기화"
-    usage: "/coreclear"
+    usage: "/coreclear [플레이어]"
   corecheck:
     description: "소유한 능력 확인"
-    usage: "/corecheck"
+    usage: "/corecheck [플레이어]"
   corelevelreset:
     description: "레벨 초기화"
-    usage: "/corelevelreset"
+    usage: "/corelevelreset [플레이어]"
   corelevelset:
     description: "레벨 설정"
-    usage: "/corelevelset"
+    usage: "/corelevelset [플레이어] [레벨] [경험치]"
   coredbpaste:
     description: "데이터베이스 붙여넣기(데이터 소실 방지)"
     usage: "/coredbpaste"

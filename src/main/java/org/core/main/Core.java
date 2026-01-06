@@ -6,7 +6,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.core.command.*; // 커맨드 클래스들이 위치한 패키지 임포트
+import org.core.command.*;
 import org.core.cool.Cool;
 import org.core.database.dbConnect;
 import org.core.level.LevelingManager;
@@ -251,49 +251,42 @@ public final class Core extends JavaPlugin implements Listener {
             getCommand("core").setTabCompleter(cmd);
         }
 
-        // 2. /corecheck (확인)
         if (getCommand("corecheck") != null) {
             cmdCheck cmd = new cmdCheck(this.config);
             getCommand("corecheck").setExecutor(cmd);
             getCommand("corecheck").setTabCompleter(cmd);
         }
 
-        // 3. /coreclear (초기화)
         if (getCommand("coreclear") != null) {
             cmdClear cmd = new cmdClear(this.config, this.level);
             getCommand("coreclear").setExecutor(cmd);
             getCommand("coreclear").setTabCompleter(cmd);
         }
 
-        // 4. /corelevelreset (레벨 리셋)
         if (getCommand("corelevelreset") != null) {
             cmdLevelReset cmd = new cmdLevelReset(this, this.level);
             getCommand("corelevelreset").setExecutor(cmd);
             getCommand("corelevelreset").setTabCompleter(cmd);
         }
 
-        // 5. /corelevelset (레벨 설정)
         if (getCommand("corelevelset") != null) {
             cmdLevelSet cmd = new cmdLevelSet(this, this.level);
             getCommand("corelevelset").setExecutor(cmd);
             getCommand("corelevelset").setTabCompleter(cmd);
         }
 
-        // 6. /gc (가비지 컬렉션)
         if (getCommand("gc") != null) {
             cmdGC cmd = new cmdGC();
             getCommand("gc").setExecutor(cmd);
             getCommand("gc").setTabCompleter(cmd);
         }
 
-        // 7. /coredbpaste (DB 붙여넣기)
         if (getCommand("coredbpaste") != null) {
             cmdDBPaste cmd = new cmdDBPaste(this.dbConn, this.level);
             getCommand("coredbpaste").setExecutor(cmd);
             getCommand("coredbpaste").setTabCompleter(cmd);
         }
 
-        // 8. /coredbupdate (DB 업데이트)
         if (getCommand("coredbupdate") != null) {
             cmdDBUpdate cmd = new cmdDBUpdate(this.dbConn);
             getCommand("coredbupdate").setExecutor(cmd);

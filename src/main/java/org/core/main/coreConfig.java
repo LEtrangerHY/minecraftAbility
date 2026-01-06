@@ -31,6 +31,7 @@ public class coreConfig {
     public Set<Player> Swordsman;
     public Set<Player> Saboteur;
     public Set<Player> Burst;
+    public Set<Player> Lavender;
 
     public coreConfig(JavaPlugin plugin) {
         this.plugin = plugin;
@@ -52,6 +53,7 @@ public class coreConfig {
         this.Swordsman = new persistentPlayerSet(plugin, "setting_swordsman");
         this.Saboteur = new persistentPlayerSet(plugin, "setting_saboteur");
         this.Burst = new persistentPlayerSet(plugin, "setting_burst");
+        this.Lavender = new persistentPlayerSet(plugin, "setting_lavender");
     }
 
     public String getPlayerCore(Player player) {
@@ -72,6 +74,7 @@ public class coreConfig {
         if (Swordsman.contains(player)) return "SWORDSMAN";
         if (Saboteur.contains(player)) return "SABOTEUR";
         if (Burst.contains(player)) return "BURST";
+        if (Lavender.contains(player)) return "LAVENDER";
         return "NONE";
     }
 
@@ -96,6 +99,7 @@ public class coreConfig {
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_swordsman"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_saboteur"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_burst"), PersistentDataType.BYTE, (byte) 0);
+        player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_lavender"), PersistentDataType.BYTE, (byte) 0);
     }
 
     public void setSetting(Player player, String setting, boolean value) {
@@ -125,6 +129,7 @@ public class coreConfig {
             case "swordsman" -> new NamespacedKey(plugin, "setting_swordsman");
             case "saboteur" -> new NamespacedKey(plugin, "setting_saboteur");
             case "burst" -> new NamespacedKey(plugin, "setting_burst");
+            case "lavender" -> new NamespacedKey(plugin, "setting_lavender");
             default -> null;
         };
     }

@@ -16,6 +16,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.*;
+import org.core.coreProgram.Cores.VOL2.Lavender.coreSystem.lavLeveling;
 import org.core.main.coreConfig;
 import org.core.coreProgram.Cores.VOL1.Bambo.coreSystem.bambLeveling;
 import org.core.coreProgram.Cores.VOL1.Benzene.coreSystem.benzLeveling;
@@ -165,6 +166,10 @@ public class LevelingManager implements Listener {
                 case "BURST" :
                     burstLeveling burst = new burstLeveling(plugin, player, exp);
                     burst.addExp(player);
+                    break;
+                case "LAVENDER" :
+                    lavLeveling lavender = new lavLeveling(plugin, player, exp);
+                    lavender.addExp(player);
                     break;
                 default :
                     break;
