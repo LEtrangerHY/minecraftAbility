@@ -1,4 +1,4 @@
-package org.core.Command;
+package org.core.command;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -13,11 +13,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CmdCheck implements CommandExecutor, TabCompleter {
+public class cmdCheck implements CommandExecutor, TabCompleter {
 
     private final coreConfig config;
 
-    public CmdCheck(coreConfig config) {
+    public cmdCheck(coreConfig config) {
         this.config = config;
     }
 

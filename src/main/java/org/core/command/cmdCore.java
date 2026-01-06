@@ -1,4 +1,4 @@
-package org.core.Command;
+package org.core.command;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -14,12 +14,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CmdCore implements CommandExecutor, TabCompleter {
+public class cmdCore implements CommandExecutor, TabCompleter {
 
     private final coreConfig config;
     private final LevelingManager level;
 
-    public CmdCore(coreConfig config, LevelingManager level) {
+    public cmdCore(coreConfig config, LevelingManager level) {
         this.config = config;
         this.level = level;
     }

@@ -1,4 +1,4 @@
-package org.core.Command;
+package org.core.command;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -13,11 +13,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CmdDBUpdate implements CommandExecutor, TabCompleter {
+public class cmdDBUpdate implements CommandExecutor, TabCompleter {
 
     private final dbConnect dbConn;
 
-    public CmdDBUpdate(dbConnect dbConn) {
+    public cmdDBUpdate(dbConnect dbConn) {
         this.dbConn = dbConn;
     }
 

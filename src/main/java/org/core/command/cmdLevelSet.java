@@ -1,4 +1,4 @@
-package org.core.Command;
+package org.core.command;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -18,12 +18,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CmdLevelSet implements CommandExecutor, TabCompleter {
+public class cmdLevelSet implements CommandExecutor, TabCompleter {
 
     private final Core plugin;
     private final LevelingManager level;
 
-    public CmdLevelSet(Core plugin, LevelingManager level) {
+    public cmdLevelSet(Core plugin, LevelingManager level) {
         this.plugin = plugin;
         this.level = level;
     }

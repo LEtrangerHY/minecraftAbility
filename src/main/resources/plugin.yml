@@ -4,25 +4,25 @@ main: org.core.main.Core
 api-version: '1.21.10'
 commands:
   core:
-    description: "core"
+    description: "능력 설정"
     usage: "/core"
   coreclear:
-    description: "coreclear"
+    description: "능력 초기화"
     usage: "/coreclear"
   corecheck:
-    description: "coreclear"
-    usage: "/coreclear"
+    description: "소유한 능력 확인"
+    usage: "/corecheck"
   corelevelreset:
-    description: "corelevelreset"
+    description: "레벨 초기화"
     usage: "/corelevelreset"
   corelevelset:
-    description: "corelevelset"
+    description: "레벨 설정"
     usage: "/corelevelset"
   coredbpaste:
-    description: "coredbpaste"
+    description: "데이터베이스 붙여넣기(데이터 소실 방지)"
     usage: "/coredbpaste"
   coredbupdate:
-    description: "coredbupdate"
+    description: "데이터베이스 업데이트(저장)"
     usage: "/coredbupdate"
   gc:
     description: "gc"

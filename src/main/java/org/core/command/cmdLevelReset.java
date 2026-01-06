@@ -1,26 +1,30 @@
-package org.core.Command;
+package org.core.command;
 
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
-import org.core.database.dbConnect;
+import org.bukkit.persistence.PersistentDataType;
 import org.core.level.LevelingManager;
+import org.core.main.Core;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CmdDBPaste implements CommandExecutor, TabCompleter {
+public class cmdLevelReset implements CommandExecutor, TabCompleter {
 
-    private final dbConnect dbConn;
+    private final Core plugin;
     private final LevelingManager level;
 
-    public CmdDBPaste(dbConnect dbConn, LevelingManager level) {
-        this.dbConn = dbConn;
+    public cmdLevelReset(Core plugin, LevelingManager level) {
+        this.plugin = plugin;
         this.level = level;
     }
 
@@ -38,13 +42,22 @@ public class CmdDBPaste implements CommandExecutor, TabCompleter {
             if (!(sender instanceof Player player)) return true;
             target = player;
         } else {
-            sender.sendMessage("§c사용법: /coredbpaste <플레이어 닉네임|공백>");
+            sender.sendMessage("§c사용법: /corelevelreset <플레이어 닉네임|공백>");
             return true;
         }
 
-        dbConn.db_PastePlayerInfo(target);
-        level.applyLevelHealth(target, true);
-        sender.sendMessage("§a" + target.getName() + " 소유의 core를 데이터베이스 수치로 붙여넣었습니다.");
+        AttributeInstance maxHealth = target.getAttribute(Attribute.MAX_HEALTH);
+        if (maxHealth != null) {
+            maxHealth.setBaseValue(20.0);
+            target.setHealth(20.0);
+        }
+        target.getPersistentDataContainer().set(new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L);
+        target.getPersistentDataContainer().set(new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L);
+        target.getPersistentDataContainer().set(new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L);
+        target.getPersistentDataContainer().set(new NamespacedKey(plugin, "exp"), PersistentDataType.LONG, 0L);
+        target.getPersistentDataContainer().set(new NamespacedKey(plugin, "level"), PersistentDataType.LONG, 0L);
+
+        sender.sendMessage("§a" + target.getName() + " 경험치, 레벨 리셋 : " + level.Exp.getOrDefault(target, 0L) + ", " + level.Level.getOrDefault(target, 0L));
         return true;
     }
 

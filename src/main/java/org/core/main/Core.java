@@ -6,7 +6,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.core.Command.*; // 커맨드 클래스들이 위치한 패키지 임포트
+import org.core.command.*; // 커맨드 클래스들이 위치한 패키지 임포트
 import org.core.cool.Cool;
 import org.core.database.dbConnect;
 import org.core.level.LevelingManager;
@@ -68,7 +68,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
-public final class Core extends JavaPlugin implements Listener { // TabCompleter 제거됨
+public final class Core extends JavaPlugin implements Listener {
 
     private static Core instance;
 
@@ -246,56 +246,56 @@ public final class Core extends JavaPlugin implements Listener { // TabCompleter
 
 
         if (getCommand("core") != null) {
-            CmdCore cmd = new CmdCore(this.config, this.level);
+            cmdCore cmd = new cmdCore(this.config, this.level);
             getCommand("core").setExecutor(cmd);
             getCommand("core").setTabCompleter(cmd);
         }
 
         // 2. /corecheck (확인)
         if (getCommand("corecheck") != null) {
-            CmdCheck cmd = new CmdCheck(this.config);
+            cmdCheck cmd = new cmdCheck(this.config);
             getCommand("corecheck").setExecutor(cmd);
             getCommand("corecheck").setTabCompleter(cmd);
         }
 
         // 3. /coreclear (초기화)
         if (getCommand("coreclear") != null) {
-            CmdClear cmd = new CmdClear(this.config, this.level);
+            cmdClear cmd = new cmdClear(this.config, this.level);
             getCommand("coreclear").setExecutor(cmd);
             getCommand("coreclear").setTabCompleter(cmd);
         }
 
         // 4. /corelevelreset (레벨 리셋)
         if (getCommand("corelevelreset") != null) {
-            CmdLevelReset cmd = new CmdLevelReset(this, this.level);
+            cmdLevelReset cmd = new cmdLevelReset(this, this.level);
             getCommand("corelevelreset").setExecutor(cmd);
             getCommand("corelevelreset").setTabCompleter(cmd);
         }
 
         // 5. /corelevelset (레벨 설정)
         if (getCommand("corelevelset") != null) {
-            CmdLevelSet cmd = new CmdLevelSet(this, this.level);
+            cmdLevelSet cmd = new cmdLevelSet(this, this.level);
             getCommand("corelevelset").setExecutor(cmd);
             getCommand("corelevelset").setTabCompleter(cmd);
         }
 
         // 6. /gc (가비지 컬렉션)
         if (getCommand("gc") != null) {
-            CmdGC cmd = new CmdGC();
+            cmdGC cmd = new cmdGC();
             getCommand("gc").setExecutor(cmd);
             getCommand("gc").setTabCompleter(cmd);
         }
 
         // 7. /coredbpaste (DB 붙여넣기)
         if (getCommand("coredbpaste") != null) {
-            CmdDBPaste cmd = new CmdDBPaste(this.dbConn, this.level);
+            cmdDBPaste cmd = new cmdDBPaste(this.dbConn, this.level);
             getCommand("coredbpaste").setExecutor(cmd);
             getCommand("coredbpaste").setTabCompleter(cmd);
         }
 
         // 8. /coredbupdate (DB 업데이트)
         if (getCommand("coredbupdate") != null) {
-            CmdDBUpdate cmd = new CmdDBUpdate(this.dbConn);
+            cmdDBUpdate cmd = new cmdDBUpdate(this.dbConn);
             getCommand("coredbupdate").setExecutor(cmd);
             getCommand("coredbupdate").setTabCompleter(cmd);
         }
