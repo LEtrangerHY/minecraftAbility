@@ -1,16 +1,26 @@
 package org.core.coreSystem.cores.VOL2.Lavender.coreSystem;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.RayTraceResult;
+import org.bukkit.util.Vector;
 import org.core.cool.Cool;
 import org.core.coreSystem.absCoreSystem.ConfigWrapper;
 import org.core.coreSystem.absCoreSystem.SkillBase;
@@ -18,6 +28,7 @@ import org.core.coreSystem.absCoreSystem.absCore;
 import org.core.coreSystem.cores.VOL2.Lavender.Skill.F;
 import org.core.coreSystem.cores.VOL2.Lavender.Skill.Q;
 import org.core.coreSystem.cores.VOL2.Lavender.Skill.R;
+import org.core.effect.crowdControl.ForceDamage;
 import org.core.main.Core;
 import org.core.main.coreConfig;
 
@@ -36,7 +47,7 @@ public class lavCore extends absCore {
         this.config = config;
 
         this.Rskill = new R(config, plugin, cool);
-        this.Qskill = new Q(config, plugin, cool);
+        this.Qskill = new Q(config, plugin, cool, Rskill);
         this.Fskill = new F(config, plugin, cool);
 
         plugin.getLogger().info("Lavender downloaded...");
@@ -79,9 +90,71 @@ public class lavCore extends absCore {
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
-    public void passiveAttackEffect(PlayerInteractEvent event) {
-        if(tag.Nightel.contains(event.getPlayer())){
-            if (pAttackUsing.contains(event.getPlayer().getUniqueId())) {
+    public void passiveAttackRange(PlayerInteractEvent event) {
+
+        if(tag.Lavender.contains(event.getPlayer())) {
+
+            if (!pAttackUsing.contains(event.getPlayer().getUniqueId())) {
+
+                Player player = event.getPlayer();
+
+                if (hasProperItems(player)) {
+                    if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
+
+                        World world = player.getWorld();
+
+                        boolean coolSet = player.getAttackCooldown() >= 1.0;
+                        double extendedRange = coolSet ? 9.9 : 6.6;
+                        double damage = coolSet ? 6.0 : 3.0;
+
+                        RayTraceResult result =
+                                player.getWorld().rayTrace(player.getEyeLocation(), player.getEyeLocation().getDirection(),
+                                        extendedRange, FluidCollisionMode.NEVER, true, 0.6,
+                                        entity -> entity != player && entity instanceof LivingEntity);
+
+                        if (result != null && result.getHitEntity() != null) {
+                            LivingEntity target = (LivingEntity) result.getHitEntity();
+
+                            BlockData amethyst = Material.AMETHYST_BLOCK.createBlockData();
+
+                            double distance = player.getLocation().distance(target.getLocation());
+
+                            if (distance <= 3.5) return;
+
+                            DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
+                                    .withCausingEntity(player)
+                                    .withDirectEntity(player)
+                                    .build();
+
+                            target.damage(damage, source);
+
+                            ItemStack mainHand = player.getInventory().getItemInMainHand();
+                            ItemMeta meta = mainHand.getItemMeta();
+                            if (meta instanceof Damageable && mainHand.getType().getMaxDurability() > 0) {
+                                Damageable damageable = (Damageable) meta;
+                                int newDamage = damageable.getDamage() + 1;
+                                damageable.setDamage(newDamage);
+                                mainHand.setItemMeta(meta);
+
+                                if (newDamage >= mainHand.getType().getMaxDurability()) {
+                                    player.getInventory().setItemInMainHand(null);
+                                }
+                            }
+
+                            if(coolSet) {
+                                world.spawnParticle(Particle.BLOCK, target.getLocation().clone().add(0, 1.2, 0), 12, 0.6, 0.6, 0.6, amethyst);
+                                world.spawnParticle(Particle.SWEEP_ATTACK, target.getLocation().clone().add(0, 1.2, 0), 1, 0, 0, 0, 1);
+                                world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.0f, 1.0f);
+                                world.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_BREAK, 1.0f, 1.0f);
+                            }else{
+                                world.spawnParticle(Particle.BLOCK, target.getLocation().clone().add(0, 1.2, 0), 6, 0.6, 0.6, 0.6, amethyst);
+                                world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_WEAK, 1.0f, 1.0f);
+                                world.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1.6f, 1.0f);
+                            }
+                        }
+                    }
+                }
+            } else {
                 pAttackUsing.remove(event.getPlayer().getUniqueId());
             }
         }
@@ -110,7 +183,7 @@ public class lavCore extends absCore {
     private boolean hasProperItems(Player player) {
         ItemStack main = player.getInventory().getItemInMainHand();
         ItemStack off = player.getInventory().getItemInOffHand();
-        return main.getType() == Material.IRON_SWORD && off.getType() == Material.AIR;
+        return main.getType() == Material.IRON_SWORD && off.getType() == Material.AMETHYST_SHARD;
     }
 
     private boolean canUseRSkill(Player player) {
@@ -134,7 +207,7 @@ public class lavCore extends absCore {
     protected boolean isDropRequired(Player player, ItemStack droppedItem){
         ItemStack off = player.getInventory().getItemInOffHand();
         return droppedItem.getType() == Material.IRON_SWORD &&
-                off.getType() == Material.AIR;
+                off.getType() == Material.AMETHYST_SHARD;
     }
 
     @Override

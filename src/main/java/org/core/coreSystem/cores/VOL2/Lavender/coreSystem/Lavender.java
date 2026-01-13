@@ -15,15 +15,16 @@ public class Lavender {
     public long frozenCool = 10000;
 
     //R
-    public double r_Skill_dash = 1.6;
     public double r_Skill_amp = 0.2;
     public double r_Skill_damage = 2;
     public long r_Skill_Cool = 600;
+    public long r_re_Skill_Cool = 6000;
 
     //Q
+    public double q_Skill_dash = 1.5;
     public double q_SKill_amp = 0.2;
-    public double q_Skill_damage = 1;
-    public long q_Skill_Cool = 600;
+    public double q_Skill_damage = 3;
+    public long q_Skill_Cool = 500;
 
     //F
     public double f_Skill_amp = 0.2;

@@ -48,8 +48,9 @@ public class Frost implements Debuffs{
                         player.sendActionBar(Component.text(" "));
                         removeEffect(player);
                         cancel();
+                    }else {
+                        target.sendActionBar(Component.text("Frost").color(NamedTextColor.AQUA));
                     }
-                    target.sendActionBar(Component.text("Frost").color(NamedTextColor.AQUA));
                 }
 
                 if (System.currentTimeMillis() >= endTime || target.isDead()) {

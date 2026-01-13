@@ -17,6 +17,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.*;
 import org.core.coreSystem.cores.VOL2.Lavender.coreSystem.lavLeveling;
+import org.core.coreSystem.cores.VOL2.Rose.coreSystem.roseLeveling;
 import org.core.main.coreConfig;
 import org.core.coreSystem.cores.VOL1.Bambo.coreSystem.bambLeveling;
 import org.core.coreSystem.cores.VOL1.Benzene.coreSystem.benzLeveling;
@@ -170,6 +171,10 @@ public class LevelingManager implements Listener {
                 case "LAVENDER" :
                     lavLeveling lavender = new lavLeveling(plugin, player, exp);
                     lavender.addExp(player);
+                    break;
+                case "ROSE" :
+                    roseLeveling rose = new roseLeveling(plugin, player, exp);
+                    rose.addExp(player);
                     break;
                 default :
                     break;

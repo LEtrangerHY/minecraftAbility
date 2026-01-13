@@ -268,10 +268,10 @@ public class F implements SkillBase {
                     return;
                 }
 
+                teleportBehind(player, playerGameMode, entity, -5.0);
+
                 world.playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1, 1);
                 world.spawnParticle(Particle.ENCHANTED_HIT, entity.getLocation().clone().add(0, 1.2, 0), 22, 0.6, 0.6, 0.6, 1);
-
-                teleportBehind(player, playerGameMode, entity, -5.0);
 
                 double height = - 0.2 * tick;
 

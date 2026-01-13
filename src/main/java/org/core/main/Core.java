@@ -11,6 +11,9 @@ import org.core.cool.Cool;
 import org.core.coreSystem.cores.VOL2.Lavender.coreSystem.Lavender;
 import org.core.coreSystem.cores.VOL2.Lavender.coreSystem.lavCore;
 import org.core.coreSystem.cores.VOL2.Lavender.coreSystem.lavInventory;
+import org.core.coreSystem.cores.VOL2.Rose.coreSystem.Rose;
+import org.core.coreSystem.cores.VOL2.Rose.coreSystem.roseCore;
+import org.core.coreSystem.cores.VOL2.Rose.coreSystem.roseInventory;
 import org.core.database.dbConnect;
 import org.core.level.LevelingManager;
 import org.core.coreEntity.absEntityLeveling.EntityLevelingManager;
@@ -99,6 +102,7 @@ public final class Core extends JavaPlugin implements Listener {
     private sabCore saboteur;
     private burstCore burst;
     private lavCore lavender;
+    private roseCore rose;
 
     private nightInventory nightInv;
     private benzInventory benzInv;
@@ -118,6 +122,7 @@ public final class Core extends JavaPlugin implements Listener {
     private sabInventory sabInv;
     private burstInventory burstInv;
     private lavInventory lavInv;
+    private roseInventory roseInv;
 
     private EntityLevelingManager Elevel;
 
@@ -152,6 +157,7 @@ public final class Core extends JavaPlugin implements Listener {
         Saboteur sabConfig = new Saboteur();
         Burst burstConfig = new Burst();
         Lavender lavConfig = new Lavender();
+        Rose roseConfig = new Rose();
 
         Cool cool = new Cool(this);
 
@@ -246,6 +252,11 @@ public final class Core extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(this.lavender, this);
         this.lavInv = new lavInventory(this, this.config);
         Bukkit.getPluginManager().registerEvents(this.lavInv, this);
+
+        this.rose = new roseCore(this, this.config, roseConfig, cool);
+        Bukkit.getPluginManager().registerEvents(this.rose, this);
+        this.roseInv = new roseInventory(this, this.config);
+        Bukkit.getPluginManager().registerEvents(this.roseInv, this);
 
         this.benz = new benzCore(this, this.config, benzConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.benz, this);

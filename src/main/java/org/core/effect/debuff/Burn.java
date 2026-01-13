@@ -43,8 +43,9 @@ public class Burn implements Debuffs{
                         player.sendActionBar(Component.text(" "));
                         removeEffect(player);
                         cancel();
+                    }else {
+                        target.sendActionBar(Component.text("Burn").color(NamedTextColor.RED));
                     }
-                    target.sendActionBar(Component.text("Burn").color(NamedTextColor.RED));
                 }
 
                 if (System.currentTimeMillis() >= endTime || target.isDead()) {

@@ -31,21 +31,21 @@ public class lavInventory extends absInventory {
 
     @Override
     protected boolean contains(Player player) {
-        return tag.Burst.contains(player);
+        return tag.Lavender.contains(player);
     }
 
     @Override
     protected boolean isCoreItemClicked(Player player, ItemStack clicked){
-        return clicked.getType() == Material.REDSTONE;
+        return clicked.getType() == Material.IRON_SWORD;
     }
 
     @Override
     protected Component getName(Player player, String skill) {
 
         return switch (skill) {
-            case "R" -> Component.text("Groundburst");
-            case "Q" -> Component.text("Burstrush");
-            case "F" -> Component.text("SATURATIONBOMB");
+            case "R" -> Component.text("Delusion");
+            case "Q" -> Component.text("Rush");
+            case "F" -> Component.text("Flowering");
             default -> Component.text("???");
         };
     }
@@ -53,9 +53,9 @@ public class lavInventory extends absInventory {
     @Override
     protected Material getTotem(Player player, String skill) {
         return switch (skill) {
-            case "R" -> Material.TNT;
-            case "Q" -> Material.WIND_CHARGE;
-            case "F" -> Material.GLOWSTONE;
+            case "R" -> Material.AMETHYST_BLOCK;
+            case "Q" -> Material.FEATHER;
+            case "F" -> Material.AMETHYST_CLUSTER;
             default -> Material.BARRIER;
         };
     }
@@ -87,7 +87,7 @@ public class lavInventory extends absInventory {
                 lore.add(Component.text("시스템 : 지정형").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("지정 : 지정한 위치를 4초 후 기폭시킨다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("전방으로 찌르기 공격을 시전한다.").color(NamedTextColor.GREEN));
                 break;
             case "Q":
                 requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfQ.get((int) level)) : Component.text("Require EXP : MAX");
