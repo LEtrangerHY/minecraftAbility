@@ -30,14 +30,9 @@ public class Stiff implements Effects, Listener {
     @Override
     public void applyEffect(Entity entity) {
         if (!(entity instanceof LivingEntity)) return;
-        LivingEntity livingTarget = (LivingEntity) target;
-
         if (target.isInvulnerable()) return;
 
         long endTime = System.currentTimeMillis() + duration;
-
-        livingTarget.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, (int) (duration / 50 * 20), 255, false, false));
-        livingTarget.addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, (int) (duration / 50 * 20), 128, false, false));
 
         stiffEntities.put(target, endTime);
 
@@ -53,14 +48,15 @@ public class Stiff implements Effects, Listener {
                     return;
                 }
 
-                if (entity instanceof Player player) {
+                if (target instanceof Player player) {
                     if (System.currentTimeMillis() >= endTime || player.isDead() || !player.isOnline()) {
                         player.sendActionBar(Component.text(" "));
                         removeEffect(player);
                         cancel();
                         return;
+                    }else {
+                        player.sendActionBar(Component.text("Stiff").color(NamedTextColor.YELLOW));
                     }
-                    target.sendActionBar(Component.text("Stiff").color(NamedTextColor.LIGHT_PURPLE));
                 } else {
                     if (System.currentTimeMillis() >= endTime || target.isDead()) {
                         removeEffect(target);
@@ -68,30 +64,17 @@ public class Stiff implements Effects, Listener {
                         return;
                     }
                 }
-
-                target.setVelocity(new Vector(0, 0, 0));
             }
         }.runTaskTimer(Objects.requireNonNull(Bukkit.getPluginManager().getPlugin("Core")), 0L, 1L);
     }
 
     @Override
     public void removeEffect(Entity entity) {
-        if (entity instanceof LivingEntity livingEntity) {
-            if (livingEntity.hasPotionEffect(PotionEffectType.SLOWNESS))
-                livingEntity.removePotionEffect(PotionEffectType.SLOWNESS);
-            if (livingEntity.hasPotionEffect(PotionEffectType.JUMP_BOOST))
-                livingEntity.removePotionEffect(PotionEffectType.JUMP_BOOST);
-        }
         stiffEntities.remove(entity);
     }
 
     public static void breakStiff(Entity entity) {
         stiffEntities.remove(entity);
-
-        if (entity instanceof LivingEntity livingEntity) {
-            livingEntity.removePotionEffect(PotionEffectType.SLOWNESS);
-            livingEntity.removePotionEffect(PotionEffectType.JUMP_BOOST);
-        }
     }
 
     public static boolean isStiff(Entity entity) {

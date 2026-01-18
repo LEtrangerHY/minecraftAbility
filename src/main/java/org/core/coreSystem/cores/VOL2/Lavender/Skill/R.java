@@ -1,12 +1,6 @@
 package org.core.coreSystem.cores.VOL2.Lavender.Skill;
 
-import org.bukkit.Color;
-import org.bukkit.FluidCollisionMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.damage.DamageSource;
@@ -14,8 +8,8 @@ import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -64,16 +58,25 @@ public class R implements SkillBase {
     public void Ballistic(Player player) {
         World world = player.getWorld();
 
+        config.r_Skill_using.put(player.getUniqueId(), true);
+        config.bladeShoot.put(player.getUniqueId(), true);
+
         Stiff stiff = new Stiff(player, 3000L);
         stiff.applyEffect(player);
 
+        world.playSound(player.getLocation(), Sound.ITEM_TRIDENT_THROW, 1f, 1f);
+
         List<Location> pathPoints = calculateReflectionPath(player);
+
+        int bounceCount = Math.max(0, pathPoints.size() - 1);
+        config.bladeBallistic.put(player.getUniqueId(), bounceCount);
 
         SwordData data = new SwordData(pathPoints);
 
         BukkitTask task = new BukkitRunnable() {
             int tickCount = 0;
             int drawnSegments = 0;
+            boolean isStopped = false;
 
             @Override
             public void run() {
@@ -90,6 +93,9 @@ public class R implements SkillBase {
                         world.playSound(hitLoc, Sound.BLOCK_AMETHYST_BLOCK_BREAK, 1.6f, 1f);
                         BlockData amethyst = Material.AMETHYST_BLOCK.createBlockData();
                         world.spawnParticle(Particle.BLOCK, hitLoc, 9, 0.3, 0.3, 0.3, amethyst);
+                    } else if (!isStopped) {
+                        config.bladeShoot.put(player.getUniqueId(), false);
+                        isStopped = true;
                     }
                 }
 
@@ -119,8 +125,6 @@ public class R implements SkillBase {
         }.runTaskLater(plugin, 60L);
 
         data.setAutoRetractTask(autoRetract);
-
-        world.playSound(player.getLocation(), Sound.ITEM_TRIDENT_THROW, 1f, 1f);
     }
 
     public void Retract(Player player) {
@@ -130,6 +134,9 @@ public class R implements SkillBase {
         SwordData data = activeSwords.get(uid);
         cancelActiveTasks(data);
         data.isRetracting = true;
+
+        config.bladeShoot.put(player.getUniqueId(), true);
+
         startRetractionAnimation(player, data);
     }
 
@@ -145,6 +152,9 @@ public class R implements SkillBase {
     }
 
     private void startRetractionAnimation(Player player, SwordData data) {
+        player.getWorld().playSound(player.getLocation(), Sound.ITEM_TRIDENT_RETURN, 1f, 1f);
+        cool.updateCooldown(player, "R", config.r_re_Skill_Cool);
+
         new BukkitRunnable() {
             int currentSegment = data.lastDrawnIndex;
 
@@ -161,20 +171,23 @@ public class R implements SkillBase {
                 currentSegment--;
                 drawSwordParticles(data.path, currentSegment);
             }
-        }.runTaskTimer(plugin, 0L, 2L);
+        }.runTaskTimer(plugin, 0L, 3L);
     }
 
     private void finishRetraction(Player player) {
-        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f);
         activeSwords.remove(player.getUniqueId());
+        config.r_Skill_using.remove(player.getUniqueId());
+        config.bladeShoot.remove(player.getUniqueId());
+        config.bladeBallistic.remove(player.getUniqueId());
     }
 
     private void forceCleanup(Player player) {
         if(activeSwords.containsKey(player.getUniqueId())) {
             SwordData data = activeSwords.get(player.getUniqueId());
             cancelActiveTasks(data);
-            player.removePotionEffect(PotionEffectType.SLOWNESS);
             activeSwords.remove(player.getUniqueId());
+            config.r_Skill_using.remove(player.getUniqueId());
+            config.bladeShoot.remove(player.getUniqueId());
         }
     }
 
@@ -249,10 +262,17 @@ public class R implements SkillBase {
     private void checkCollision(List<Location> points, int maxSegments, Player player, SwordData data) {
         if (points.size() < 2) return;
 
+        World world = player.getWorld();
+
         DamageSource source = DamageSource.builder(DamageType.MAGIC)
                 .withCausingEntity(player)
                 .withDirectEntity(player)
                 .build();
+
+        BlockData ironDust = Material.IRON_BARS.createBlockData();
+
+        double amp = config.r_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L);
+        double damage = config.r_Skill_damage * (1 + amp);
 
         for (int i = 0; i < maxSegments; i++) {
             if (i >= points.size() - 1) break;
@@ -276,10 +296,14 @@ public class R implements SkillBase {
                 if (hit != null) {
                     Set<Integer> hitSegments = data.segmentHits.computeIfAbsent(target.getUniqueId(), k -> new HashSet<>());
                     if (!hitSegments.contains(i)) {
-                        ForceDamage forceDamage = new ForceDamage(target, 3.0, source);
+                        world.spawnParticle(Particle.BLOCK, entity.getLocation().clone().add(0, 1.2, 0), 9, 0.6, 0.6, 0.6, ironDust);
+
+                        ForceDamage forceDamage = new ForceDamage(target, damage, source);
                         forceDamage.applyEffect(player);
+
                         Stun stun = new Stun(target, 3000L);
                         stun.applyEffect(player);
+
                         hitSegments.add(i);
                     }
                 }
@@ -290,10 +314,17 @@ public class R implements SkillBase {
     private void checkRetractionHit(List<Location> points, int segmentIndex, Player player) {
         if (segmentIndex < 0 || segmentIndex >= points.size() - 1) return;
 
+        World world = player.getWorld();
+
         Location start = points.get(segmentIndex);
         Location end = points.get(segmentIndex + 1);
         Vector direction = end.toVector().subtract(start.toVector());
         double dist = direction.length();
+
+        double amp = config.r_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L);
+        double damage = config.r_Skill_damage * (1 + amp);
+
+        BlockData blood = Material.REDSTONE_BLOCK.createBlockData();
 
         DamageSource source = DamageSource.builder(DamageType.MAGIC)
                 .withCausingEntity(player)
@@ -311,9 +342,13 @@ public class R implements SkillBase {
             RayTraceResult hit = targetBox.rayTrace(start.toVector(), direction.normalize(), dist);
 
             if (hit != null) {
-                ForceDamage forceDamage = new ForceDamage(target, 3.0, source);
+                world.playSound(player.getLocation(), Sound.ITEM_TRIDENT_HIT, 1f, 1f);
+
+                world.spawnParticle(Particle.BLOCK, entity.getLocation().clone().add(0, 1.2, 0), 9, 0.6, 0.6, 0.6, blood);
+                world.spawnParticle(Particle.SWEEP_ATTACK, entity.getLocation().clone().add(0, 1.2, 0), 1, 0, 0, 0, 1);
+
+                ForceDamage forceDamage = new ForceDamage(target, damage * 3, source);
                 forceDamage.applyEffect(player);
-                target.removePotionEffect(PotionEffectType.SLOWNESS);
             }
         }
     }

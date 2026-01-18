@@ -10,7 +10,7 @@ import java.util.Map;
 public class EffectManager implements Listener {
     private final Map<Entity, Map<Class<? extends Effects>, Effects>> activeEffects = new HashMap<>();
 
-    public void addEffect(Entity entity, Effects effect) {
+    public void applyEffect(Entity entity, Effects effect) {
         activeEffects.computeIfAbsent(entity, k -> new HashMap<>())
                 .put(effect.getClass(), effect);
         effect.applyEffect(entity);

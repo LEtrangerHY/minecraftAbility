@@ -1,9 +1,11 @@
 package org.core.main;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.core.command.*;
@@ -15,6 +17,8 @@ import org.core.coreSystem.cores.VOL2.Rose.coreSystem.Rose;
 import org.core.coreSystem.cores.VOL2.Rose.coreSystem.roseCore;
 import org.core.coreSystem.cores.VOL2.Rose.coreSystem.roseInventory;
 import org.core.database.dbConnect;
+import org.core.effect.crowdControl.Stiff;
+import org.core.effect.effectPlugin.moveCancelManager;
 import org.core.level.LevelingManager;
 import org.core.coreEntity.absEntityLeveling.EntityLevelingManager;
 import org.core.coreSystem.cores.VOL1.Bambo.coreSystem.Bambo;
@@ -266,6 +270,7 @@ public final class Core extends JavaPlugin implements Listener {
         this.Elevel = new EntityLevelingManager(this);
         Bukkit.getPluginManager().registerEvents(this.Elevel, this);
 
+        getServer().getPluginManager().registerEvents(new moveCancelManager(), this);
 
         if (getCommand("core") != null) {
             cmdCore cmd = new cmdCore(this.config, this.level);
@@ -361,5 +366,26 @@ public final class Core extends JavaPlugin implements Listener {
         player.setInvulnerable(false);
 
         dbConn.insertMember(player);
+    }
+
+    @EventHandler
+    public void onPlayerMove(PlayerMoveEvent e) {
+        Player player = e.getPlayer();
+
+        if (Stiff.isStiff(player)) {
+            Location from = e.getFrom();
+            Location to = e.getTo();
+
+            if (to == null) return;
+
+            if (from.getX() != to.getX() || from.getY() != to.getY() || from.getZ() != to.getZ()) {
+
+                Location fixedLocation = from.clone();
+                fixedLocation.setYaw(to.getYaw());
+                fixedLocation.setPitch(to.getPitch());
+
+                e.setTo(fixedLocation);
+            }
+        }
     }
 }

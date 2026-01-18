@@ -33,12 +33,12 @@ public class damageShare {
         long times = Bukkit.getServer().getCurrentTick();
 
         if(!config.damageTimes.getOrDefault(target, new LinkedHashMap<>()).containsValue(times)) {
-            damageShare(player, target, damage, times);
+            dShare(player, target, damage, times);
         }
 
     }
 
-    private void damageShare(Player player, Entity target, double damage, long times) {
+    private void dShare(Player player, Entity target, double damage, long times) {
 
         Set<Entity> processedEntities = new HashSet<>();
 

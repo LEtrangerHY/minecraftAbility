@@ -25,7 +25,7 @@ public class burstLeveling implements Levels {
         this.exp = exp;
     }
 
-    public Set<Long> requireExp = Set.of(66L, 144L, 244L, 466L, 944L, 1164L, 2244L, 3364L, 4446L, 6064L);
+    public Set<Long> requireExp = Set.of(88L, 188L, 288L, 488L, 988L, 1088L, 2048L, 3888L, 4468L, 6088L);
 
     @Override
     public void addLV(Entity entity){

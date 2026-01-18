@@ -1,5 +1,6 @@
 package org.core.coreSystem.absCoreSystem;
 
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -54,10 +55,9 @@ public abstract class absCore implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void passiveEffect(EntityDamageByEntityEvent event) {
+        Entity entity = event.getDamager();
 
-        if (!(event.getDamager() instanceof Player player)) return;
-
-        if(Stun.isStunned(player)) event.setCancelled(true);
+        if(Stun.isStunned(entity)) event.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.HIGH)

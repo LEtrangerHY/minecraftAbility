@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL2.Lavender.Skill;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -28,14 +29,16 @@ public class Q implements SkillBase {
 
     @Override
     public void Trigger(Player player){
-        r.Retract(player);
-        Stiff.breakStiff(player);
+        int balIndex = config.bladeBallistic.getOrDefault(player.getUniqueId(), 0);
 
-        player.swingMainHand();
+        r.Retract(player);
+        cool.updateCooldown(player, "Q", config.q_Skill_Cool - 1000L * balIndex);
+        cool.updateCooldown(player, "R", 0L);
+        Stiff.breakStiff(player);
 
         Location startLocation = player.getLocation();
 
-        Vector direction = startLocation.getDirection().normalize().multiply(config.q_Skill_dash);
+        Vector direction = startLocation.getDirection().normalize().multiply(config.q_Skill_dash + balIndex * 0.1);
 
         player.setVelocity(direction);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.0f, 1.0f);

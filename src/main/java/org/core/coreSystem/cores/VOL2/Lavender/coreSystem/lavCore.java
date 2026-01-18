@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -48,7 +49,7 @@ public class lavCore extends absCore {
 
         this.Rskill = new R(config, plugin, cool);
         this.Qskill = new Q(config, plugin, cool, Rskill);
-        this.Fskill = new F(config, plugin, cool);
+        this.Fskill = new F(config, plugin, cool, Rskill);
 
         plugin.getLogger().info("Lavender downloaded...");
     }
@@ -89,23 +90,29 @@ public class lavCore extends absCore {
         }
     }
 
+    @EventHandler
+    public void onBlockBreak(BlockBreakEvent event) {
+        if (config.activeWalls.containsKey(event.getBlock().getLocation())) {
+            event.setCancelled(true);
+        }
+    }
+
     @EventHandler(priority = EventPriority.NORMAL)
     public void passiveAttackRange(PlayerInteractEvent event) {
 
         if(tag.Lavender.contains(event.getPlayer())) {
-
             if (!pAttackUsing.contains(event.getPlayer().getUniqueId())) {
 
                 Player player = event.getPlayer();
 
-                if (hasProperItems(player)) {
+                if (hasProperItems(player) && !config.r_Skill_using.containsKey(player.getUniqueId())) {
                     if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
 
                         World world = player.getWorld();
 
                         boolean coolSet = player.getAttackCooldown() >= 1.0;
-                        double extendedRange = coolSet ? 9.9 : 6.6;
-                        double damage = coolSet ? 6.0 : 3.0;
+                        double extendedRange = coolSet ? 9.0 : 6.6;
+                        double damage = coolSet ? 4.0 : 2.0;
 
                         RayTraceResult result =
                                 player.getWorld().rayTrace(player.getEyeLocation(), player.getEyeLocation().getDirection(),
@@ -187,15 +194,15 @@ public class lavCore extends absCore {
     }
 
     private boolean canUseRSkill(Player player) {
-        return true;
+        return !config.bladeShoot.getOrDefault(player.getUniqueId(), false);
     }
 
     private boolean canUseQSkill(Player player) {
-        return true;
+        return !config.bladeShoot.getOrDefault(player.getUniqueId(), false);
     }
 
     private boolean canUseFSkill(Player player) {
-        return true;
+        return !config.bladeShoot.getOrDefault(player.getUniqueId(), false);
     }
 
     @Override

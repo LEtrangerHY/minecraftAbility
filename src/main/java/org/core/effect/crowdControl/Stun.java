@@ -29,7 +29,6 @@ public class Stun implements Effects, Listener {
     @Override
     public void applyEffect(Entity entity) {
         if (!(entity instanceof LivingEntity)) return;
-
         if(target.isInvulnerable()) return;
 
         LivingEntity livingEntity = (LivingEntity) target;
@@ -42,13 +41,13 @@ public class Stun implements Effects, Listener {
             @Override
             public void run() {
 
-                if (entity instanceof Player player) {
+                if (target instanceof Player player) {
                     if(System.currentTimeMillis() >= endTime || player.isDead() || !player.isOnline()){
                         player.sendActionBar(Component.text(" "));
                         removeEffect(player);
                         cancel();
                     }
-                    target.sendActionBar(Component.text("Stunned").color(NamedTextColor.YELLOW));
+                    player.sendActionBar(Component.text("Stunned").color(NamedTextColor.YELLOW));
                 }
 
                 if (System.currentTimeMillis() >= endTime || target.isDead()) {

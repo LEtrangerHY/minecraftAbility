@@ -83,7 +83,7 @@ public class Q implements SkillBase {
 
         }else{
             world.spawnParticle(Particle.DUST, player.getLocation().add(0, 0.6, 0), 222, 3, 0, 3, 0, dustOptions);
-            player.getWorld().playSound(player.getLocation(), Sound.ITEM_TRIDENT_HIT_GROUND, 1.0f, 1.0f);
+            world.playSound(player.getLocation(), Sound.ITEM_TRIDENT_HIT_GROUND, 1.0f, 1.0f);
 
             for (Entity rangeTarget : world.getNearbyEntities(player.getLocation(), 6.0, 6.0, 6.0)) {
                 if (rangeTarget instanceof LivingEntity target && rangeTarget != player) {
@@ -95,7 +95,7 @@ public class Q implements SkillBase {
                     chain_qSkill_Particle_Effect(player, rangeTarget, 40);
 
                     Grounding grounding = new Grounding(rangeTarget, 2000);
-                    grounding.applyEffect(rangeTarget);
+                    grounding.applyEffect(player);
                     target.setVelocity(new Vector(0, 0, 0));
 
                     PotionEffect glow = new PotionEffect(PotionEffectType.GLOWING, 40, 2, false, false);

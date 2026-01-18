@@ -39,7 +39,7 @@ public class Grounding implements Effects, Listener {
             @Override
             public void run() {
 
-                if (entity instanceof Player player) {
+                if (target instanceof Player player) {
                     if(System.currentTimeMillis() >= endTime || player.isDead() || !player.isOnline()){
                         player.sendActionBar(Component.text(" "));
                         removeEffect(player);

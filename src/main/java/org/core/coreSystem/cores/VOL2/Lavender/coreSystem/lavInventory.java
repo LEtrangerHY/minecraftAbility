@@ -53,9 +53,9 @@ public class lavInventory extends absInventory {
     @Override
     protected Material getTotem(Player player, String skill) {
         return switch (skill) {
-            case "R" -> Material.AMETHYST_BLOCK;
+            case "R" -> Material.AMETHYST_CLUSTER;
             case "Q" -> Material.FEATHER;
-            case "F" -> Material.AMETHYST_CLUSTER;
+            case "F" -> Material.AMETHYST_BLOCK;
             default -> Material.BARRIER;
         };
     }
@@ -84,10 +84,13 @@ public class lavInventory extends absInventory {
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
                 lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("시스템 : 지정형").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("대상 : 적 오브젝트/지형").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("전방으로 찌르기 공격을 시전한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("전방으로 찌르기 공격을 시전하며 칼날을 전개한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("전개되는 칼날이 벽에 충돌할 시 최대 6회까지 반사되며, 3초 후 전개된 칼날이 회수된다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("칼날에 피격된 적에게 피해를 가하고 3초간 기절시킨다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("재사용 : 전개되어있던 칼날을 회수한다").color(NamedTextColor.GREEN));
                 break;
             case "Q":
                 requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfQ.get((int) level)) : Component.text("Require EXP : MAX");
@@ -96,20 +99,22 @@ public class lavInventory extends absInventory {
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
                 lore.add(Component.text("타입 : 효과").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("대상 : -").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("위로 도약한 뒤, 바라보는 방향으로 돌진해 도달한 위치를 기폭시킨다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("전방으로 돌진하며, R 스킬 쿨타임을 초기화한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("칼날이 전개되어 있다면, 칼날의 회수하며 칼날이 반사된 횟수만큼 해당 스킬의 쿨타임을 감소한다.").color(NamedTextColor.GREEN));
                 break;
             case "F":
                 requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfF.get((int) level)) : Component.text("Require EXP : MAX");
                 lore.add(requireXp.color(NamedTextColor.AQUA));
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("타입 : 효과").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("돌진하며 지나간 거리에 차지된 TNT를 떨어트린다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("전방으로 돌진한 후 자신을 중심으로 6초 동안 유지되는 3*3*3 공간을 형성한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("공간 형성 후 자신 중심 반경 3칸 내의 대상을 자신의 좌표로 순간이동 시키고 3초간 고정시킨다.").color(NamedTextColor.GREEN));
                 break;
             default:
                 break;

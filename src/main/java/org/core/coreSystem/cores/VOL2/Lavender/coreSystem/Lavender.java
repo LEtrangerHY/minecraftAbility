@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL2.Lavender.coreSystem;
 
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -15,21 +16,24 @@ public class Lavender {
     public long frozenCool = 10000;
 
     //R
-    public double r_Skill_amp = 0.2;
-    public double r_Skill_damage = 2;
+    public HashMap<UUID, Boolean> r_Skill_using = new HashMap<>();
+    public HashMap<UUID, Integer> bladeBallistic = new HashMap<>();
+    public HashMap<UUID, Boolean> bladeShoot = new HashMap<>();
+    public double r_Skill_amp = 0.1;
+    public double r_Skill_damage = 1;
     public long r_Skill_Cool = 600;
     public long r_re_Skill_Cool = 6000;
 
     //Q
-    public double q_Skill_dash = 1.5;
-    public double q_SKill_amp = 0.2;
-    public double q_Skill_damage = 3;
-    public long q_Skill_Cool = 500;
+    public double q_Skill_dash = 1.4;
+    public long q_Skill_Cool = 6000;
 
     //F
-    public double f_Skill_amp = 0.2;
-    public double f_Skill_damage = 1;
-    public long f_Skill_Cool = 600;
+    public HashMap<Location, UUID> activeWalls = new HashMap<>();
+    public HashMap<UUID, Location> transportPos = new HashMap<>();
+    public long f_Skill_ground = 3000;
+    public double f_Skill_dash = 1.6;
+    public long f_Skill_Cool = 33000;
 
     public void variableReset(Player player){
 
