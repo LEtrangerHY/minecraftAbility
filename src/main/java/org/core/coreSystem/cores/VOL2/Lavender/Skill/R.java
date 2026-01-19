@@ -45,8 +45,17 @@ public class R implements SkillBase {
             SwordData data = activeSwords.get(player.getUniqueId());
             if (!data.isRetracting) {
                 player.swingMainHand();
-                Stiff.breakStiff(player);
+
+                int balIndex = config.bladeBallistic.getOrDefault(player.getUniqueId(), 0);
+
+                long currentLeft = cool.getRemainCooldown(player, "Q");
+                long reducedTime = Math.max(0, currentLeft - (1000L * balIndex));
+
+                cool.updateCooldown(player, "Q", reducedTime);
+
                 cool.updateCooldown(player, "R", config.r_re_Skill_Cool);
+
+                Stiff.breakStiff(player);
                 Retract(player);
             }
         } else {

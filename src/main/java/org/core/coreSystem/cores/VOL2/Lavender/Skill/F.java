@@ -66,6 +66,11 @@ public class F implements SkillBase {
             }, 10L);
 
         } else if (config.transportPos.containsKey(player.getUniqueId())) {
+            r.Retract(player);
+            cool.updateCooldown(player, "Q", 0L);
+            cool.updateCooldown(player, "R", 0L);
+            Stiff.breakStiff(player);
+            
             World world = player.getWorld();
             BlockData amethyst = Material.AMETHYST_BLOCK.createBlockData();
 

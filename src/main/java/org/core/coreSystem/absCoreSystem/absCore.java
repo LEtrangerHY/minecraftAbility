@@ -7,6 +7,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.core.cool.Cool;
@@ -42,13 +43,19 @@ public abstract class absCore implements Listener {
     @EventHandler
     public void variableQuitDelete(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        getConfigWrapper().variableReset(player);
+        if(contains(player)) getConfigWrapper().variableReset(player);
+    }
+
+    @EventHandler
+    public void variableDeathDelete(PlayerDeathEvent event) {
+        Player player = event.getPlayer();
+        if(contains(player)) getConfigWrapper().variableReset(player);
     }
 
     @EventHandler
     public void cooldownReset(PlayerJoinEvent event){
         Player player = event.getPlayer();
-        getConfigWrapper().cooldownReset(player);
+        if(contains(player)) getConfigWrapper().cooldownReset(player);
     }
 
     public static HashSet<UUID> pAttackUsing = new HashSet<>();

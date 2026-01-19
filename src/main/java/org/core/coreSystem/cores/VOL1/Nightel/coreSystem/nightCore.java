@@ -4,11 +4,15 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.core.cool.Cool;
@@ -21,6 +25,8 @@ import org.core.coreSystem.cores.VOL1.Nightel.Passive.Chain;
 import org.core.coreSystem.cores.VOL1.Nightel.Skill.F;
 import org.core.coreSystem.cores.VOL1.Nightel.Skill.Q;
 import org.core.coreSystem.cores.VOL1.Nightel.Skill.R;
+
+import java.util.LinkedHashMap;
 
 public class nightCore extends absCore {
     private final Core plugin;
@@ -53,6 +59,8 @@ public class nightCore extends absCore {
 
         Player player = event.getPlayer();
         applyAdditionalHealth(player, false);
+
+        chain.updateChainList(player);
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
@@ -63,6 +71,8 @@ public class nightCore extends absCore {
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             applyAdditionalHealth(player, true);
         }, 1L);
+
+        chain.updateChainList(player);
     }
 
     private void applyAdditionalHealth(Player player, boolean healFull) {
@@ -89,6 +99,41 @@ public class nightCore extends absCore {
             if (pAttackUsing.contains(event.getPlayer().getUniqueId())) {
                 pAttackUsing.remove(event.getPlayer().getUniqueId());
             }
+        }
+    }
+
+    @EventHandler
+    public void rSkillPassive(PlayerMoveEvent event){
+
+        Player player = event.getPlayer();
+
+        if (tag.Nightel.contains(player)) {
+            if (config.chainCount.getOrDefault(player.getUniqueId(), 0) != 6 && Math.abs(player.getWalkSpeed() - 0.2f) > 0.0001f) {
+                player.setWalkSpeed(0.2f);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onEnvironmentalDamage(EntityDamageEvent event) {
+        if (!(event.getEntity() instanceof Player)) return;
+
+        Player player = (Player) event.getEntity();
+
+        if (!tag.Nightel.contains(player) && !player.isDead()) return;
+
+        int chainCount = config.chainCount.getOrDefault(player.getUniqueId(), 0);
+
+        if(chainCount == 6) {
+            double reductionPercentage = 0.66;
+
+            double originalDamage = event.getDamage();
+            double reductionAmount = originalDamage * reductionPercentage;
+            double newDamage = originalDamage - reductionAmount;
+
+            if (newDamage < 0) newDamage = 0;
+
+            event.setDamage(newDamage);
         }
     }
 
@@ -167,6 +212,8 @@ public class nightCore extends absCore {
 
             @Override
             public void cooldownReset(Player player) {
+                chain.updateChainList(player);
+
                 cool.setCooldown(player, config.frozenCool, "R");
                 cool.setCooldown(player, config.frozenCool, "Q");
                 cool.setCooldown(player, config.frozenCool, "F");

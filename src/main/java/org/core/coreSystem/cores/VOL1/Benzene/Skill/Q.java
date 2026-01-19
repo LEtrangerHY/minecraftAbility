@@ -79,7 +79,8 @@ public class Q implements SkillBase {
             }.runTaskTimer(plugin, 0L, 1L);
 
             config.atkCount.put(player.getUniqueId(), 3);
-            player.sendActionBar(Component.text("⌬ ⌬ ⌬").color(NamedTextColor.DARK_GRAY));
+            cool.updateCooldown(player, "R", 0L);
+            cool.resumeCooldown(player, "R");
 
         }else{
             world.spawnParticle(Particle.DUST, player.getLocation().add(0, 0.6, 0), 222, 3, 0, 3, 0, dustOptions);
@@ -104,16 +105,21 @@ public class Q implements SkillBase {
                     config.q_Skill_effect_2.put(player.getUniqueId(), rangeTarget);
 
                     int count = config.atkCount.getOrDefault(player.getUniqueId(), 0);
-                    config.atkCount.put(player.getUniqueId(), count + 1);
 
-                    if (config.atkCount.getOrDefault(player.getUniqueId(), 0) == 3) {
-                        player.sendActionBar(Component.text("⌬ ⌬ ⌬").color(NamedTextColor.DARK_GRAY));
-                    } else if (config.atkCount.getOrDefault(player.getUniqueId(), 0) == 2){
-                        player.sendActionBar(Component.text("⬡ ⬡").color(NamedTextColor.GRAY));
-                    } else if (config.atkCount.getOrDefault(player.getUniqueId(), 0) == 1){
-                        player.sendActionBar(Component.text("⬡").color(NamedTextColor.GRAY));
+                    if(count < 3) {
+                        config.atkCount.put(player.getUniqueId(), count + 1);
+
+                        if (config.atkCount.getOrDefault(player.getUniqueId(), 0) == 3) {
+                            cool.updateCooldown(player, "R", 0L);
+                            cool.resumeCooldown(player, "R");
+                        } else if (config.atkCount.getOrDefault(player.getUniqueId(), 0) == 2) {
+                            cool.updateCooldown(player, "R", 100L);
+                            cool.pauseCooldown(player, "R");
+                        } else if (config.atkCount.getOrDefault(player.getUniqueId(), 0) == 1) {
+                            cool.updateCooldown(player, "R", 200L);
+                            cool.pauseCooldown(player, "R");
+                        }
                     }
-
                 }
             }
         }

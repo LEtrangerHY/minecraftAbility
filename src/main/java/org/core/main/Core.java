@@ -165,7 +165,7 @@ public final class Core extends JavaPlugin implements Listener {
 
         Cool cool = new Cool(this);
 
-        this.config = new coreConfig(this);
+        this.config = new coreConfig(this, cool);
 
         this.dbConn = new dbConnect(config, this);
 

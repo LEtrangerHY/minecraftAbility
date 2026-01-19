@@ -17,6 +17,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.*;
@@ -46,7 +47,7 @@ public class benzCore extends absCore {
     private final Core plugin;
     private final Benzene config;
 
-    private final chainResonance chaincalc;
+    private final chainResonance chainResonance;
     private final org.core.coreSystem.cores.VOL1.Benzene.Passive.damageAmplify damageAmplify;
     private final org.core.coreSystem.cores.VOL1.Benzene.Passive.damageShare damageShare;
 
@@ -60,13 +61,13 @@ public class benzCore extends absCore {
         this.plugin = plugin;
         this.config = config;
 
-        this.chaincalc = new chainResonance(tag, config, plugin, cool);
+        this.chainResonance = new chainResonance(tag, config, plugin, cool);
         this.damageAmplify = new damageAmplify(config);
         this.damageShare = new damageShare(config, plugin, cool);
 
-        this.Rskill = new R(config, plugin, cool, chaincalc);
+        this.Rskill = new R(config, plugin, cool, chainResonance);
         this.Qskill = new Q(config, plugin, cool);
-        this.Fskill = new F(config, plugin, cool, chaincalc);
+        this.Fskill = new F(config, plugin, cool, chainResonance);
 
         plugin.getLogger().info("Benzene downloaded...");
     }
@@ -77,6 +78,8 @@ public class benzCore extends absCore {
 
         Player player = event.getPlayer();
         applyAdditionalHealth(player, false);
+
+        chainResonance.updateChainResList(player);
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
@@ -87,6 +90,8 @@ public class benzCore extends absCore {
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             applyAdditionalHealth(player, true);
         }, 1L);
+
+        chainResonance.updateChainResList(player);
     }
 
     private void applyAdditionalHealth(Player player, boolean healFull) {
@@ -125,11 +130,11 @@ public class benzCore extends absCore {
 
         if (!event.isSneaking() || cool.isReloading(player, "F") || !hasProperItems(player) || !tag.Benzene.contains(player)) return;
 
-        long lvLock = player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L);
+        long lv = player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L);
 
-        if(lvLock < 3) return;
+        if(lv < 3) return;
 
-        long durationTicks = 60L;
+        long durationTicks = 60L - lv * 12L + 36L;
 
         if (activeChargeTasks.containsKey(player.getUniqueId())) {
             activeChargeTasks.get(player.getUniqueId()).cancel();
@@ -185,19 +190,40 @@ public class benzCore extends absCore {
         activeChargeTasks.put(player.getUniqueId(), task);
     }
 
-
     @EventHandler
     public void rSkillPassive(PlayerMoveEvent event){
 
         Player player = event.getPlayer();
 
-        if(tag.Benzene.contains(player)){
-            if(config.atkCount.getOrDefault(player.getUniqueId(), 0) < 3) {
-                player.setWalkSpeed((float) 0.2 * ((float) 4 / 3));
-            }else{
-                player.setWalkSpeed((float) 0.2);
+        if (tag.Benzene.contains(player)) {
+            if (Math.abs(player.getWalkSpeed() - 0.2f * (4f / 3f)) > 0.0001f) {
+                player.setWalkSpeed(0.2f * (4f / 3f));
             }
         }
+    }
+
+    @EventHandler
+    public void onEnvironmentalDamage(EntityDamageEvent event) {
+        if (!(event.getEntity() instanceof Player)) return;
+
+        Player player = (Player) event.getEntity();
+
+        if (event instanceof EntityDamageByEntityEvent) return;
+
+        if (!tag.Benzene.contains(player) && !player.isDead()) return;
+
+        LinkedHashMap<Integer, Entity> playerChain = config.chainRes.getOrDefault(player.getUniqueId(), new LinkedHashMap<>());
+        int count = playerChain.size();
+
+        double reductionPercentage = 0.66 - 0.11 * count;
+
+        double originalDamage = event.getDamage();
+        double reductionAmount = originalDamage * reductionPercentage;
+        double newDamage = originalDamage - reductionAmount;
+
+        if (newDamage < 0) newDamage = 0;
+
+        event.setDamage(newDamage);
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -206,25 +232,35 @@ public class benzCore extends absCore {
         if (!(event.getDamager() instanceof Player player)) return;
         if (!(event.getEntity() instanceof LivingEntity target)) return;
 
+        if (!tag.Benzene.contains(player)) return;
+
         Location loc1 = player.getLocation().add(0, player.getHeight() / 2 + 0.2, 0);
         Location loc2 = target.getLocation().add(0, target.getHeight() / 2 + 0.2, 0);
         double distance = loc1.distance(loc2);
 
-        if(tag.Benzene.contains(player) && !config.rskill_using.getOrDefault(player.getUniqueId(), false) && config.atkCount.getOrDefault(player.getUniqueId(), 0) < 3) {
-            config.atkCount.put(player.getUniqueId(), config.atkCount.getOrDefault(player.getUniqueId(), 0) + 1);
-        }
+        boolean isRUsing = config.rskill_using.getOrDefault(player.getUniqueId(), false);
+        int currentAtkCount = config.atkCount.getOrDefault(player.getUniqueId(), 0);
 
-        if(tag.Benzene.contains(player) && !config.rskill_using.getOrDefault(player.getUniqueId(), false)) {
-            if (config.atkCount.getOrDefault(player.getUniqueId(), 0) == 3) {
-                player.sendActionBar(Component.text("⌬ ⌬ ⌬").color(NamedTextColor.DARK_GRAY));
-            } else if (config.atkCount.getOrDefault(player.getUniqueId(), 0) == 2){
-                player.sendActionBar(Component.text("⬡ ⬡").color(NamedTextColor.GRAY));
+        if (!isRUsing && currentAtkCount < 3) {
+            currentAtkCount++;
+            config.atkCount.put(player.getUniqueId(), currentAtkCount);
+
+            if (currentAtkCount == 3) {
+                cool.updateCooldown(player, "R", 0L);
+                cool.resumeCooldown(player, "R");
+            } else if (currentAtkCount == 2){
+                cool.updateCooldown(player, "R", 100L);
+                cool.pauseCooldown(player, "R");
+            } else if (currentAtkCount == 1){
+                cool.updateCooldown(player, "R", 200L);
+                cool.pauseCooldown(player, "R");
             } else {
-                player.sendActionBar(Component.text("⬡").color(NamedTextColor.GRAY));
+                cool.updateCooldown(player, "R", 300L);
+                cool.pauseCooldown(player, "R");
             }
         }
 
-        if(tag.Benzene.contains(player) && config.chainRes.getOrDefault(player.getUniqueId(), new LinkedHashMap<>()).containsValue(target) && distance <= 24){
+        if(config.chainRes.getOrDefault(player.getUniqueId(), new LinkedHashMap<>()).containsValue(target) && distance <= 22){
             double originalDamage = event.getDamage();
             double amplifiedDamage = damageAmplify.Amplify(player, target, originalDamage);
 
@@ -238,7 +274,7 @@ public class benzCore extends absCore {
     public void chainDelete(EntityDeathEvent event) {
         Entity death = event.getEntity();
 
-        chaincalc.decrease(death);
+        chainResonance.decrease(death);
 
         if(event.getEntity() instanceof Player player && tag.Benzene.contains(player)){
             config.variableReset(player);
@@ -249,7 +285,7 @@ public class benzCore extends absCore {
     public void chainedCreeperExplode(EntityExplodeEvent event) {
         Entity ex = event.getEntity();
 
-        chaincalc.decrease(ex);
+        chainResonance.decrease(ex);
     }
 
     @Override
@@ -328,11 +364,15 @@ public class benzCore extends absCore {
 
             @Override
             public void cooldownReset(Player player) {
-                cool.setCooldown(player, config.frozenCool, "R");
+                chainResonance.updateChainResList(player);
+
+                cool.setCooldown(player, 300L, "R");
+                cool.pauseCooldown(player, "R");
                 cool.setCooldown(player, config.frozenCool, "Q");
                 cool.setCooldown(player, config.frozenCool, "F");
 
-                cool.updateCooldown(player, "R", config.frozenCool);
+                cool.updateCooldown(player, "R", 300L);
+                cool.pauseCooldown(player, "R");
                 cool.updateCooldown(player, "Q", config.frozenCool);
                 cool.updateCooldown(player, "F", config.frozenCool);
             }

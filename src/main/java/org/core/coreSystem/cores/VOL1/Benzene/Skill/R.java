@@ -39,6 +39,8 @@ public class R implements SkillBase {
 
     @Override
     public void Trigger(Player player) {
+        cool.updateCooldown(player, "R", 300L);
+        cool.pauseCooldown(player, "R");
 
         player.swingMainHand();
 
@@ -49,7 +51,7 @@ public class R implements SkillBase {
         player.setVelocity(direction);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.0f, 1.0f);
 
-        Invulnerable invulnerable = new Invulnerable(player, 600);
+        Invulnerable invulnerable = new Invulnerable(player, 300);
         invulnerable.applyEffect(player);
 
         detect(player);
@@ -57,6 +59,8 @@ public class R implements SkillBase {
     }
 
     public void detect(Player player){
+
+        config.atkCount.put(player.getUniqueId(), 0);
 
         config.rskill_using.put(player.getUniqueId(), true);
         config.damaged_1.put(player.getUniqueId(), new HashSet<>());
@@ -68,9 +72,6 @@ public class R implements SkillBase {
                 .withCausingEntity(player)
                 .withDirectEntity(player)
                 .build();
-
-        config.atkCount.put(player.getUniqueId(), 0);
-        player.sendActionBar(Component.text("⌬").color(NamedTextColor.GRAY));
 
         Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(111, 111, 111), 0.6f);
         Particle.DustOptions dustOptions_small = new Particle.DustOptions(Color.fromRGB(66, 66, 66), 0.6f);

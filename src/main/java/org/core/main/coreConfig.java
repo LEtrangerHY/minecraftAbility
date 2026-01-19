@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.core.cool.Cool;
 import org.core.playerSettings.persistentPlayerSet;
 
 import java.util.Set;
@@ -13,6 +14,7 @@ import java.util.Set;
 public class coreConfig {
 
     private final JavaPlugin plugin;
+    private final Cool cool;
 
     public Set<Player> Nightel;
     public Set<Player> Benzene;
@@ -34,8 +36,9 @@ public class coreConfig {
     public Set<Player> Lavender;
     public Set<Player> Rose;
 
-    public coreConfig(JavaPlugin plugin) {
+    public coreConfig(JavaPlugin plugin, Cool cool) {
         this.plugin = plugin;
+        this.cool = cool;
 
         this.Nightel = new persistentPlayerSet(plugin, "setting_nightel");
         this.Benzene = new persistentPlayerSet(plugin, "setting_benzene");
@@ -85,6 +88,18 @@ public class coreConfig {
         player.setWalkSpeed(0.2f);
         player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(4.0);
         player.setInvisible(false);
+        player.setInvulnerable(false);
+
+        cool.setCooldown(player, 10000L, "R");
+        cool.setCooldown(player, 10000L, "Q");
+        cool.setCooldown(player, 10000L, "F");
+
+        cool.resumeCooldown(player, "R");
+        cool.updateCooldown(player, "R", 10000L);
+        cool.resumeCooldown(player, "Q");
+        cool.updateCooldown(player, "Q", 10000L);
+        cool.resumeCooldown(player, "F");
+        cool.updateCooldown(player, "F", 10000L);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_nightel"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_benzene"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_bambo"), PersistentDataType.BYTE, (byte) 0);

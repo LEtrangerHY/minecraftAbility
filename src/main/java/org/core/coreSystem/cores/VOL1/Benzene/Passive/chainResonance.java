@@ -1,6 +1,7 @@
 package org.core.coreSystem.cores.VOL1.Benzene.Passive;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
@@ -30,29 +31,24 @@ public class chainResonance {
     }
 
     public void increase(Player player, Entity entity) {
-        if (config.chainRes.getOrDefault(player.getUniqueId(), new LinkedHashMap<>()).isEmpty()) {
-            config.chainRes.put(player.getUniqueId(), new LinkedHashMap<>());
-        }
+        config.chainRes.computeIfAbsent(player.getUniqueId(), k -> new LinkedHashMap<>());
 
         LinkedHashMap<Integer, Entity> playerChain = config.chainRes.get(player.getUniqueId());
+        int count = playerChain.size();
 
-        if(playerChain.isEmpty()){
-            updateChainList(player);
+        if(!activeTasks.containsKey(player.getUniqueId())){
+            updateChainResList(player);
         }
 
         BlockData chain = Material.IRON_CHAIN.createBlockData();
 
-        if (playerChain.size() < 6) {
+        if (count < 6) {
             int chainCount = config.crCount.getOrDefault(player.getUniqueId(), 0) + 1;
             config.crCount.put(player.getUniqueId(), chainCount);
 
             player.getWorld().spawnParticle(Particle.BLOCK, entity.getLocation().clone().add(0, 1.2, 0), 12, 0.3, 0.3, 0.3, chain);
 
             playerChain.put(chainCount, entity);
-
-            if (!particleUse.containsKey(entity)) {
-                chainParticle(player, entity);
-            }
 
         } else {
             removeFirstEntryFromLinkedHashMap(config.chainRes, player.getUniqueId(), player);
@@ -65,18 +61,42 @@ public class chainResonance {
 
             player.getWorld().spawnParticle(Particle.BLOCK, entity.getLocation().clone().add(0, t * 0.2, 0), 6, 0.3, 0.3, 0.3, chain);
 
-            if (!particleUse.containsKey(entity)) {
-                chainParticle(player, entity);
-            }
+        }
+
+        int currentSize = config.chainRes.get(player.getUniqueId()).size();
+
+        if (currentSize < 6) {
+            String hex = "⌬ ".repeat(6 - currentSize).trim();
+            player.sendActionBar(Component.text(hex).color(NamedTextColor.DARK_GRAY));
+        } else {
+            player.sendActionBar(Component.text("⌬").color(NamedTextColor.GRAY));
+        }
+
+        if (!particleUse.containsKey(entity)) {
+            chainParticle(player, entity);
         }
     }
 
     public void decrease(Entity targetEntity) {
 
         config.chainRes.forEach((uuid, entityMap) -> {
-            entityMap.values().removeIf(entity -> entity.equals(targetEntity));
-        });
+            boolean isRemoved = entityMap.values().removeIf(entity -> entity.equals(targetEntity));
 
+            if (isRemoved) {
+                Player player = Bukkit.getPlayer(uuid);
+
+                if (player != null && player.isOnline()) {
+                    int currentSize = entityMap.size();
+
+                    if (currentSize < 6) {
+                        String hex = "⌬ ".repeat(Math.max(0, 6 - currentSize)).trim();
+                        player.sendActionBar(Component.text(hex).color(NamedTextColor.DARK_GRAY));
+                    } else {
+                        player.sendActionBar(Component.text("⌬").color(NamedTextColor.GRAY));
+                    }
+                }
+            }
+        });
         config.chainRes.entrySet().removeIf(entry -> entry.getValue().isEmpty());
     }
 
@@ -106,7 +126,7 @@ public class chainResonance {
 
             chainMap.remove(firstKey);
 
-            updateChainList(player);
+            updateChainResList(player);
         }
     }
 
@@ -201,29 +221,33 @@ public class chainResonance {
 
     private final Map<UUID, BukkitRunnable> activeTasks = new HashMap<>();
 
-    public void updateChainList(Player player) {
+    public void updateChainResList(Player player) {
         UUID playerUUID = player.getUniqueId();
 
-        if (activeTasks.containsKey(playerUUID) || !tag.Benzene.contains(player)) {
+        if (!tag.Benzene.contains(player)) {
             return;
+        }
+
+        if (activeTasks.containsKey(playerUUID)) {
+            activeTasks.get(playerUUID).cancel();
+            activeTasks.remove(playerUUID);
         }
 
         BukkitRunnable task = new BukkitRunnable() {
             @Override
             public void run() {
-                if (!player.isOnline() || !tag.Benzene.contains(player) || player.isDead()) {
+                if (!player.isOnline() || !tag.Benzene.contains(player)) {
 
-                    config.chainRes.remove(player.getUniqueId());
-                    config.crCount.remove(player.getUniqueId());
-
+                    config.variableReset(player);
                     activeTasks.remove(playerUUID);
+
                     player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
                     this.cancel();
                     return;
                 }
 
                 Scoreboard scoreboard = player.getScoreboard();
-                if (scoreboard == null || scoreboard == Bukkit.getScoreboardManager().getMainScoreboard()) {
+                if (scoreboard == Bukkit.getScoreboardManager().getMainScoreboard()) {
                     scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
                     player.setScoreboard(scoreboard);
                 }
@@ -236,10 +260,14 @@ public class chainResonance {
 
                 int startScore = 7;
 
-                if (!config.chainRes.getOrDefault(player.getUniqueId(), new LinkedHashMap<>()).isEmpty()) {
+                LinkedHashMap<Integer, Entity> playerChain = config.chainRes.computeIfAbsent(player.getUniqueId(), k -> new LinkedHashMap<>());
+                int count = playerChain.size();
+                String benzene = (count >= 6) ? "§7" + "⌬" : "⌬ ".repeat(6 - count).trim();
 
-                    Score score1 = objective.getScore("⏣⌬⌬⌬⌬⌬⌬⌬⌬⌬⌬⌬⌬⌬");
-                    score1.setScore(startScore--);
+                Score score1 = objective.getScore(benzene);
+                score1.setScore(startScore--);
+
+                if (!config.chainRes.getOrDefault(player.getUniqueId(), new LinkedHashMap<>()).isEmpty()) {
 
                     Map<UUID, LinkedHashMap<UUID, Integer>> index = new LinkedHashMap<>();
                     Map<UUID, ArrayList<String>> names = new LinkedHashMap<>();
@@ -291,7 +319,7 @@ public class chainResonance {
                     k.put(player.getUniqueId(), 0);
 
                     for (UUID entityUuid : index.get(player.getUniqueId()).keySet()) {
-                        con.get(player.getUniqueId()).add(diff.get(player.getUniqueId()).get(k.get(player.getUniqueId())) + "*".repeat(index.get(player.getUniqueId()).get(entityUuid)));
+                        con.get(player.getUniqueId()).add(diff.get(player.getUniqueId()).get(k.get(player.getUniqueId())) + "⏣".repeat(index.get(player.getUniqueId()).get(entityUuid)));
                         lastDist.get(player.getUniqueId()).add(distances.get(player.getUniqueId()).get(k.get(player.getUniqueId())));
                         for (int i = 0; i < index.get(player.getUniqueId()).get(entityUuid); i++) {
                             k.put(player.getUniqueId(), k.get(player.getUniqueId()) + 1);
@@ -303,14 +331,11 @@ public class chainResonance {
 
                     for (String displayName : con.get(player.getUniqueId())) {
                         Score score = (lastDist.get(player.getUniqueId()).get(j.get(player.getUniqueId())) <= 22)
-                                ? objective.getScore(displayName)
-                                : objective.getScore("§7" + displayName);
+                                ? objective.getScore("§7" + displayName)
+                                : objective.getScore("§8" + "§m" + displayName);
                         score.setScore(startScore--);
                         j.put(player.getUniqueId(), j.get(player.getUniqueId()) + 1);
                     }
-
-                    Score score2 = objective.getScore("⌬⌬⌬⌬⌬⌬⌬⌬⌬⌬⌬⌬⌬⏣");
-                    score2.setScore(startScore);
                 }
 
                 player.setScoreboard(scoreboard);
@@ -320,5 +345,4 @@ public class chainResonance {
         activeTasks.put(playerUUID, task);
         task.runTaskTimer(plugin, 0, 1L);
     }
-
 }
