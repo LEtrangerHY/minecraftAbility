@@ -331,8 +331,8 @@ public class chainResonance {
 
                     for (String displayName : con.get(player.getUniqueId())) {
                         Score score = (lastDist.get(player.getUniqueId()).get(j.get(player.getUniqueId())) <= 22)
-                                ? objective.getScore("§7" + displayName)
-                                : objective.getScore("§8" + "§m" + displayName);
+                                ? objective.getScore(displayName)
+                                : objective.getScore("§7" + "§m" + displayName);
                         score.setScore(startScore--);
                         j.put(player.getUniqueId(), j.get(player.getUniqueId()) + 1);
                     }

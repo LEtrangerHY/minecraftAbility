@@ -5,12 +5,11 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.Plugin; // Import 추가
 import org.core.main.Core;
 import org.core.main.coreConfig;
 import org.core.coreSystem.absInventorySystem.InventoryWrapper;
@@ -25,8 +24,12 @@ public class nightInventory extends absInventory {
 
     public nightInventory(Core plugin, coreConfig config) {
         super(config);
-
         this.plugin = plugin;
+    }
+
+    @Override
+    protected Plugin getPlugin() {
+        return this.plugin;
     }
 
     @Override
@@ -41,7 +44,6 @@ public class nightInventory extends absInventory {
 
     @Override
     protected Component getName(Player player, String skill) {
-
         return switch (skill) {
             case "R" -> Component.text("Dusk");
             case "Q" -> Component.text("Whirlwind");
@@ -62,7 +64,6 @@ public class nightInventory extends absInventory {
 
     @Override
     protected List<Component> getTotemLore(Player player, String skill) {
-
         List<Component> lore = new ArrayList<>();
         long level = getSkillLevel(player, skill);
         long playerLevel = player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "level"), PersistentDataType.LONG, 0L);
@@ -77,11 +78,11 @@ public class nightInventory extends absInventory {
 
         Component requireXp;
 
+        // 반복되는 로직이 많지만, 요청하신 대로 기존 로직 유지
         switch (skill) {
             case "R":
                 requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfR.get((int) level)) : Component.text("Require EXP : MAX");
                 lore.add(requireXp.color(NamedTextColor.AQUA));
-
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
                 lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
@@ -92,7 +93,6 @@ public class nightInventory extends absInventory {
             case "Q":
                 requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfQ.get((int) level)) : Component.text("Require EXP : MAX");
                 lore.add(requireXp.color(NamedTextColor.AQUA));
-
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
                 lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
@@ -103,7 +103,6 @@ public class nightInventory extends absInventory {
             case "F":
                 requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfF.get((int) level)) : Component.text("Require EXP : MAX");
                 lore.add(requireXp.color(NamedTextColor.AQUA));
-
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
                 lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("시스템 : 지정형").color(NamedTextColor.LIGHT_PURPLE));
@@ -138,26 +137,19 @@ public class nightInventory extends absInventory {
 
         long level = player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "level"), PersistentDataType.LONG, 0L);
 
+        // 레벨 제한 체크
         if (skillLevel == 3 && level < 6L){
             player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.5f, 1);
-            player.sendMessage(
-                    Component.text("승급 필요 : CORE LEVEL -> 6")
-                            .color(NamedTextColor.RED)
-            );
+            player.sendMessage(Component.text("승급 필요 : CORE LEVEL -> 6").color(NamedTextColor.RED));
             return;
         }
-
         if (skillLevel == 5 && level < 10L){
             player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.5f, 1);
-            player.sendMessage(
-                    Component.text("승급 필요 : CORE LEVEL -> 10")
-                            .color(NamedTextColor.RED)
-            );
+            player.sendMessage(Component.text("승급 필요 : CORE LEVEL -> 10").color(NamedTextColor.RED));
             return;
         }
 
-        long current = player.getPersistentDataContainer()
-                .getOrDefault(new NamespacedKey(plugin, skill), PersistentDataType.LONG, 0L);
+        long current = player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, skill), PersistentDataType.LONG, 0L);
 
         List<Long> requireExpList;
         switch (skill) {
@@ -181,29 +173,14 @@ public class nightInventory extends absInventory {
 
             player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.5f, 1);
             player.playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.5f, 1);
+
+            // 강화 성공 후 GUI 갱신 (이미 열려있는 창이므로 runTask 불필요)
             customInvReroll(player, customInv);
-            player.sendMessage(
-                    Component.text("스킬 레벨업 성공!")
-                            .color(NamedTextColor.GREEN)
-            );
+
+            player.sendMessage(Component.text("스킬 레벨업 성공!").color(NamedTextColor.GREEN));
         } else {
             player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.5f, 1);
-            player.sendMessage(
-                    Component.text("경험치(Minecraft EXP) 부족 " + requiredExp + "Exp 필요")
-                            .color(NamedTextColor.RED)
-            );
-        }
-    }
-
-    private void applyAdditionalHealth(Player player, long addHP) {
-
-        AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
-        if (maxHealth != null) {
-            double current = maxHealth.getBaseValue();
-            double newMax = current + addHP;
-
-            maxHealth.setBaseValue(newMax);
-
+            player.sendMessage(Component.text("경험치(Minecraft EXP) 부족 " + requiredExp + "Exp 필요").color(NamedTextColor.RED));
         }
     }
 
@@ -233,11 +210,8 @@ public class nightInventory extends absInventory {
         else return 9 * level - 158;
     }
 
-
     @Override
     protected InventoryWrapper getInventoryWrapper() {
-        return new InventoryWrapper() {
-
-        };
+        return new InventoryWrapper() {};
     }
 }

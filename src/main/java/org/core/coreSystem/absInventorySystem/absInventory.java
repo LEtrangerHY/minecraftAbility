@@ -11,6 +11,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.Plugin;
 import org.core.main.coreConfig;
 
 import java.util.List;
@@ -22,6 +23,8 @@ abstract public class absInventory implements Listener {
     public absInventory(coreConfig tag) {
         this.tag = tag;
     }
+
+    protected abstract Plugin getPlugin();
 
     protected abstract boolean contains(Player player);
     protected abstract boolean isCoreItemClicked(Player player, ItemStack clicked);
@@ -54,41 +57,36 @@ abstract public class absInventory implements Listener {
             if (event.isRightClick()) {
                 if (clicked.getType() == getTotem(player, "R")) {
                     reinforceSkill(player, "R", getSkillLevel(player, "R"), event.getView().getTopInventory());
-                    customInvReroll(player, event.getView().getTopInventory());
                     return;
                 }
-
                 if (clicked.getType() == getTotem(player, "Q")) {
                     reinforceSkill(player, "Q", getSkillLevel(player, "Q"), event.getView().getTopInventory());
-                    customInvReroll(player, event.getView().getTopInventory());
                     return;
                 }
-
                 if (clicked.getType() == getTotem(player, "F")) {
                     reinforceSkill(player, "F", getSkillLevel(player, "F"), event.getView().getTopInventory());
-                    customInvReroll(player, event.getView().getTopInventory());
                     return;
                 }
-
-                return;
             }
+            return;
         }
 
         if (clicked != null && event.isRightClick() && isCoreItemClicked(player, clicked)) {
 
             event.setCancelled(true);
 
-            Inventory customInv = Bukkit.createInventory(null, 27, Component.text("CORE MENU").color(NamedTextColor.LIGHT_PURPLE));
+            coreMenuHolder holder = new coreMenuHolder(player);
 
-            coreMenuHolder holder = new coreMenuHolder(player, customInv);
+            Inventory customInv = Bukkit.createInventory(holder, 27, Component.text("CORE MENU").color(NamedTextColor.LIGHT_PURPLE));
 
-            customInv = Bukkit.createInventory(holder, 27, Component.text("CORE MENU").color(NamedTextColor.LIGHT_PURPLE));
+            holder.setInventory(customInv);
 
             customInvReroll(player, customInv);
 
-            player.openInventory(customInv);
+            Bukkit.getScheduler().runTask(getPlugin(), () -> {
+                player.openInventory(customInv);
+            });
         }
-
     }
 
     public void customInvReroll(Player player, Inventory customInv){
@@ -116,5 +114,4 @@ abstract public class absInventory implements Listener {
         customInv.setItem(13, QSkillTotem);
         customInv.setItem(16, FSkillTotem);
     }
-
 }

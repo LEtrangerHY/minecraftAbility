@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.Plugin;
 import org.core.coreSystem.absInventorySystem.InventoryWrapper;
 import org.core.coreSystem.absInventorySystem.absInventory;
 import org.core.main.Core;
@@ -27,6 +28,11 @@ public class roseInventory extends absInventory {
         super(config);
 
         this.plugin = plugin;
+    }
+
+    @Override
+    protected Plugin getPlugin() {
+        return this.plugin;
     }
 
     @Override

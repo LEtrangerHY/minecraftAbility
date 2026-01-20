@@ -10,15 +10,18 @@ import java.util.UUID;
 public class coreMenuHolder implements InventoryHolder {
 
     private final UUID owner;
-    private final Inventory inventory;
+    private Inventory inventory;
 
-    public coreMenuHolder(Player player, Inventory inventory) {
+    public coreMenuHolder(Player player) {
         this.owner = player.getUniqueId();
-        this.inventory = inventory;
     }
 
     public UUID getOwner() {
         return owner;
+    }
+
+    public void setInventory(Inventory inventory) {
+        this.inventory = inventory;
     }
 
     @Override
