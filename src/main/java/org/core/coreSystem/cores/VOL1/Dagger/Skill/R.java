@@ -14,7 +14,7 @@ import org.core.cool.Cool;
 import org.core.effect.crowdControl.ForceDamage;
 import org.core.effect.crowdControl.Stun;
 import org.core.coreSystem.absCoreSystem.SkillBase;
-import org.core.coreSystem.cores.VOL1.Dagger.Passive.DamageStroke;
+import org.core.coreSystem.cores.VOL1.Dagger.Passive.bloodStroke;
 import org.core.coreSystem.cores.VOL1.Dagger.coreSystem.Dagger;
 
 import java.util.ArrayList;
@@ -25,13 +25,13 @@ public class R implements SkillBase {
     private final Dagger config;
     private final JavaPlugin plugin;
     private final Cool cool;
-    private final DamageStroke damagestroker;
+    private final bloodStroke bloodStroker;
 
-    public R(Dagger config, JavaPlugin plugin, Cool cool, DamageStroke damagestroker) {
+    public R(Dagger config, JavaPlugin plugin, Cool cool, bloodStroke bloodStroker) {
         this.config = config;
         this.plugin = plugin;
         this.cool = cool;
-        this.damagestroker = damagestroker;
+        this.bloodStroker = bloodStroker;
     }
 
     @Override
@@ -51,7 +51,7 @@ public class R implements SkillBase {
             stun.applyEffect(player);
 
             config.r_damaged.put(player.getUniqueId(), true);
-            damagestroker.damageStroke(player, target);
+            bloodStroker.damageStroke(player, target);
 
             DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
                     .withCausingEntity(player)

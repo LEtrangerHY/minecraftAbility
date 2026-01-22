@@ -27,7 +27,7 @@ public class Swordsman {
     public double r_Skill_damage = 3;
     public double r_Skill_amp = 0.1;
     public double r_Skill_dash = 1.6;
-    public double r_Skill_add_damage = 12;
+    public double r_Skill_add_damage = 9;
     public long r_Skill_stun = 2000;
 
     //Q

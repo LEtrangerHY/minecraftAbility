@@ -11,10 +11,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.core.cool.Cool;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.cores.VOL1.Glacier.coreSystem.Glacier;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class F implements SkillBase {
 
@@ -37,14 +41,13 @@ public class F implements SkillBase {
             World world = player.getWorld();
             Location center = player.getLocation().clone();
 
-            SetBiome(world, center, 15);
+            processBiomeChangeDistributed(world, center, 15);
 
             Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(0, 255, 255), 0.6f);
-            world.spawnParticle(Particle.DUST, center.add(0, 1, 0), 1000, 8, 8, 8, 0, dustOptions);
+            world.spawnParticle(Particle.DUST, center.clone().add(0, 1, 0), 1000, 8, 8, 8, 0, dustOptions);
 
             world.playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.0f, 1.0f);
             world.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_BREAK, 1, 1);
-
             world.playSound(player.getLocation(), Sound.ENTITY_BREEZE_SHOOT, 1.0f, 1.0f);
 
             for (Entity entity : world.getNearbyEntities(center, 4, 4, 4)) {
@@ -63,7 +66,7 @@ public class F implements SkillBase {
             }, 6);
 
             offhandItem.setAmount(offhandItem.getAmount() - 20);
-        }else{
+        } else {
             player.getWorld().playSound(player.getLocation(), Sound.BLOCK_GLASS_PLACE, 1, 1);
             player.sendActionBar(Component.text("Blue Ice needed").color(NamedTextColor.RED));
             long cools = 100L;
@@ -72,42 +75,69 @@ public class F implements SkillBase {
 
     }
 
-    public void SetBiome(World world, Location center, int radius) {
-        int cx = center.getBlockX();
-        int cy = center.getBlockY();
-        int cz = center.getBlockZ();
+    private void processBiomeChangeDistributed(World world, Location center, int radius) {
+        final int cx = center.getBlockX();
+        final int cy = center.getBlockY();
+        final int cz = center.getBlockZ();
+        final int radiusSquared = radius * radius;
+        final int minY = Math.max(world.getMinHeight(), cy - radius);
+        final int maxY = Math.min(world.getMaxHeight(), cy + radius);
 
-        int radiusSquared = radius * radius;
+        new BukkitRunnable() {
+            int currentX = cx - radius;
+            final int endX = cx + radius;
+            final int blocksPerTick = 2500;
 
-        for (int x = cx - radius; x <= cx + radius; x++) {
-            for (int y = cy - radius; y <= cy + radius; y++) {
-                for (int z = cz - radius; z <= cz + radius; z++) {
-                    int dx = x - cx;
-                    int dy = y - cy;
-                    int dz = z - cz;
-                    if (dx * dx + dy * dy + dz * dz <= radiusSquared) {
-                        world.setBiome(x, y, z, Biome.SNOWY_PLAINS);
+            final Set<Chunk> modifiedChunks = new HashSet<>();
+
+            @Override
+            public void run() {
+                int blocksProcessed = 0;
+
+                while (currentX <= endX) {
+                    for (int y = minY; y <= maxY; y++) {
+                        for (int z = cz - radius; z <= cz + radius; z++) {
+
+                            int dx = currentX - cx;
+                            int dy = y - cy;
+                            int dz = z - cz;
+
+                            if (dx * dx + dy * dy + dz * dz > radiusSquared) continue;
+
+                            blocksProcessed++;
+
+                            world.setBiome(currentX, y, z, Biome.SNOWY_PLAINS);
+
+                            if (blocksProcessed % 64 == 0) {
+                                modifiedChunks.add(world.getBlockAt(currentX, y, z).getChunk());
+                            }
+                        }
+                    }
+                    currentX++;
+
+                    if (blocksProcessed >= blocksPerTick) {
+                        return;
                     }
                 }
-            }
-        }
 
-        for (Player cplayer : world.getNearbyPlayers(center, radius + 16)) {
-            int chunkX = cplayer.getLocation().getBlockX() >> 4;
-            int chunkZ = cplayer.getLocation().getBlockZ() >> 4;
-            world.refreshChunk(chunkX, chunkZ);
-        }
+                for (Chunk chunk : modifiedChunks) {
+                    world.refreshChunk(chunk.getX(), chunk.getZ());
+                }
+                cancel();
+            }
+        }.runTaskTimer(plugin, 0L, 1L);
     }
 
     public void FreezeEntity(Player player, Location center, int radius) {
         World world = player.getWorld();
         int radiusSquared = radius * radius;
 
+        Set<Block> blocksToFreeze = new HashSet<>();
+
         for (Entity rangeTarget : world.getNearbyEntities(player.getLocation(), 15.0, 15.0, 15.0)) {
             if (rangeTarget instanceof LivingEntity target && rangeTarget != player) {
 
-                Location TLoc = target.getLocation().clone();
-
+                Location TLoc = target.getLocation();
                 int cx = TLoc.getBlockX();
                 int cy = TLoc.getBlockY();
                 int cz = TLoc.getBlockZ();
@@ -121,18 +151,20 @@ public class F implements SkillBase {
                             Block block = world.getBlockAt(cx + x, cy + y, cz + z);
 
                             if (block.isPassable() || block.getType() == Material.AIR) {
-                                block.setType(Material.BLUE_ICE);
+                                blocksToFreeze.add(block);
                             }
                         }
                     }
                 }
-
             }
+        }
+
+        for (Block block : blocksToFreeze) {
+            block.setType(Material.BLUE_ICE, false);
         }
 
         world.playSound(center, Sound.BLOCK_GLASS_BREAK, 1.0f, 1.1f);
         world.playSound(center, Sound.BLOCK_AMETHYST_BLOCK_BREAK, 1.0f, 1.1f);
         world.spawnParticle(Particle.SNOWFLAKE, center, 80, 1.5, 1.5, 1.5, 0.1);
     }
-
 }

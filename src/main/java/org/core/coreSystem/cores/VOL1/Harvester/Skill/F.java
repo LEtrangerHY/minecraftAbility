@@ -29,6 +29,18 @@ public class F implements SkillBase {
     private final JavaPlugin plugin;
     private final Cool cool;
 
+    private static final Set<Material> UNBREAKABLE_BLOCKS = Set.of(
+            Material.BEDROCK, Material.BARRIER, Material.COMMAND_BLOCK,
+            Material.CHAIN_COMMAND_BLOCK, Material.REPEATING_COMMAND_BLOCK,
+            Material.END_PORTAL_FRAME, Material.END_PORTAL, Material.NETHER_PORTAL,
+            Material.STRUCTURE_BLOCK, Material.JIGSAW, Material.GRASS_BLOCK
+    );
+
+    private static final Set<Material> BREAKABLE_PLANTS = Set.of(
+            Material.SHORT_GRASS, Material.TALL_GRASS, Material.WHEAT,
+            Material.POTATOES, Material.CARROTS, Material.BEETROOTS
+    );
+
     public F(Harvester config, JavaPlugin plugin, Cool cool){
         this.config = config;
         this.plugin = plugin;
@@ -58,6 +70,8 @@ public class F implements SkillBase {
         double maxAngle = Math.toRadians(105);
         double maxTicks = 6;
         double innerRadius = 2.2;
+
+        double hitThreshold = Math.cos(maxAngle + 0.1);
 
         config.f_damaged.put(player.getUniqueId(), new HashSet<>());
         config.fskill_using.put(player.getUniqueId(), true);
@@ -114,8 +128,8 @@ public class F implements SkillBase {
 
                     if(r < config.grass.getOrDefault(player.getUniqueId(), 0) / 2 && player.isOnline()) {
                         Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                        config.repeat.put(player.getUniqueId(), r + 1);
-                        Slash(player, playerLoc.clone());
+                            config.repeat.put(player.getUniqueId(), r + 1);
+                            Slash(player, playerLoc.clone());
                         }, 2L);
                     }else{
                         config.fskill_using.remove(player.getUniqueId());
@@ -128,15 +142,44 @@ public class F implements SkillBase {
                 }
 
                 double progress = (ticks + 1) * (maxAngle * 2 / maxTicks) - maxAngle;
+
                 Vector rotatedDir = direction.clone().rotateAroundY(progress);
+
+                for (Entity entity : world.getNearbyEntities(playerLoc, slashLength + 0.5, slashLength + 0.5, slashLength + 0.5)) {
+                    if (!(entity instanceof LivingEntity target) || entity == player) continue;
+                    if (config.f_damaged.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(entity)) continue;
+
+                    Vector toTarget = target.getLocation().toVector().subtract(playerLoc.toVector());
+
+                    if (toTarget.lengthSquared() > (slashLength + 0.5) * (slashLength + 0.5)) continue;
+
+                    Vector toTargetDir = toTarget.clone().setY(0).normalize();
+                    double dotProduct = rotatedDir.dot(toTargetDir);
+
+                    if (dotProduct >= hitThreshold) {
+
+                        world.spawnParticle(Particle.CRIT, target.getLocation().clone().add(0, 1.3, 0), 20, 0.4, 0.4, 0.4, 1);
+
+                        PotionEffect slowness = new PotionEffect(PotionEffectType.SLOWNESS, (int) maxTicks, 5, false, false);
+                        target.addPotionEffect(slowness);
+
+                        player.heal(finalDamage / 2);
+
+                        ForceDamage forceDamage = new ForceDamage(target, damage, source);
+                        forceDamage.applyEffect(player);
+                        target.setVelocity(new Vector(0, 0, 0));
+
+                        config.f_damaged.get(player.getUniqueId()).add(entity);
+                    }
+                }
+
+                double cosTilt = Math.cos(tiltAngle);
+                double sinTilt = Math.sin(tiltAngle);
 
                 for (double length = 0; length <= slashLength; length += 0.2) {
                     for (double angle = -maxAngle; angle <= maxAngle; angle += Math.toRadians(4)) {
                         Vector angleDir = rotatedDir.clone().rotateAroundY(angle);
                         Vector particleOffset = angleDir.clone().multiply(length);
-
-                        double cosTilt = Math.cos(tiltAngle);
-                        double sinTilt = Math.sin(tiltAngle);
 
                         double tiltedY_Z = particleOffset.getY() * cosTilt - particleOffset.getZ() * sinTilt;
                         double tiltedZ_Y = particleOffset.getY() * sinTilt + particleOffset.getZ() * cosTilt;
@@ -154,9 +197,7 @@ public class F implements SkillBase {
 
                         Location particleLocation = playerLoc.clone().add(particleOffset);
 
-                        double distanceFromOrigin = particleLocation.distance(playerLoc);
-
-                        if (distanceFromOrigin >= innerRadius) {
+                        if (length >= innerRadius) {
                             if (Math.random() < 0.26) {
                                 world.spawnParticle(Particle.DUST, particleLocation, 1, 0, 0, 0, 0, dustOption_slash);
                             } else {
@@ -164,40 +205,12 @@ public class F implements SkillBase {
                             }
                         }
 
-                        for (Entity entity : world.getNearbyEntities(particleLocation, 0.4, 0.4, 0.4)) {
-                            if (entity instanceof LivingEntity target && entity != player && !config.f_damaged.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(entity)) {
-
-                                world.spawnParticle(Particle.CRIT, target.getLocation().clone().add(0, 1.3, 0), 20, 0.4, 0.4, 0.4, 1);
-
-                                PotionEffect slowness = new PotionEffect(PotionEffectType.SLOWNESS, (int) maxTicks, 5, false, false);
-                                target.addPotionEffect(slowness);
-
-                                player.heal(finalDamage / 2);
-
-                                ForceDamage forceDamage = new ForceDamage(target, damage, source);
-                                forceDamage.applyEffect(player);
-                                target.setVelocity(new Vector(0, 0, 0));
-
-                                config.f_damaged.getOrDefault(player.getUniqueId(), new HashSet<>()).add(entity);
-                            }
-                        }
-
                         Block blockDown = particleLocation.clone().getBlock();
                         Block blockUp = particleLocation.clone().add(0, 1, 0).getBlock();
-                        if (blockDown.getType() == Material.SHORT_GRASS || blockDown.getType() == Material.TALL_GRASS || blockDown.getType() == Material.WHEAT || blockDown.getType() == Material.POTATOES || blockDown.getType() == Material.CARROTS || blockDown.getType() == Material.BEETROOTS) {
-                            breakBlockSafely(player, blockDown);
-                            if(config.grass.getOrDefault(player.getUniqueId(), 0) < 26){
-                                int g = config.grass.getOrDefault(player.getUniqueId(), 0);
-                                config.grass.put(player.getUniqueId(), g + 1);
-                            }
-                        }
-                        if (blockUp.getType() == Material.SHORT_GRASS || blockUp.getType() == Material.TALL_GRASS || blockUp.getType() == Material.WHEAT || blockUp.getType() == Material.POTATOES || blockUp.getType() == Material.CARROTS || blockUp.getType() == Material.BEETROOTS) {
-                            breakBlockSafely(player, blockDown);
-                            if(config.grass.getOrDefault(player.getUniqueId(), 0) < 26){
-                                int g = config.grass.getOrDefault(player.getUniqueId(), 0);
-                                config.grass.put(player.getUniqueId(), g + 1);
-                            }
-                        }
+
+                        checkAndBreakPlant(player, blockDown);
+                        checkAndBreakPlant(player, blockUp);
+
                     }
                 }
                 ticks++;
@@ -205,19 +218,15 @@ public class F implements SkillBase {
         }.runTaskTimer(plugin, 0L, 1L);
     }
 
-    private static final Set<Material> UNBREAKABLE_BLOCKS = Set.of(
-            Material.BEDROCK,
-            Material.BARRIER,
-            Material.COMMAND_BLOCK,
-            Material.CHAIN_COMMAND_BLOCK,
-            Material.REPEATING_COMMAND_BLOCK,
-            Material.END_PORTAL_FRAME,
-            Material.END_PORTAL,
-            Material.NETHER_PORTAL,
-            Material.STRUCTURE_BLOCK,
-            Material.JIGSAW,
-            Material.GRASS_BLOCK
-    );
+    private void checkAndBreakPlant(Player player, Block block) {
+        if (BREAKABLE_PLANTS.contains(block.getType())) {
+            breakBlockSafely(player, block);
+            if(config.grass.getOrDefault(player.getUniqueId(), 0) < 26){
+                int g = config.grass.getOrDefault(player.getUniqueId(), 0);
+                config.grass.put(player.getUniqueId(), g + 1);
+            }
+        }
+    }
 
     public void breakBlockSafely(Player player, Block block) {
         if (UNBREAKABLE_BLOCKS.contains(block.getType())) {

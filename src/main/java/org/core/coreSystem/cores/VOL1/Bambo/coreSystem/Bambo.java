@@ -24,7 +24,7 @@ public class Bambo {
     public HashMap<UUID, HashSet<Entity>> damaged = new HashMap<>();
     public HashMap<UUID, Boolean> r_damaged = new HashMap<>();
     public double r_Skill_amp = 0.12;
-    public double r_Skill_damage = 15;
+    public double r_Skill_damage = 12;
     public long r_Skill_Cool = 7000;
 
     //Q

@@ -14,7 +14,7 @@ import org.core.cool.Cool;
 import org.core.effect.crowdControl.ForceDamage;
 import org.core.effect.crowdControl.Invulnerable;
 import org.core.coreSystem.absCoreSystem.SkillBase;
-import org.core.coreSystem.cores.VOL1.Dagger.Passive.DamageStroke;
+import org.core.coreSystem.cores.VOL1.Dagger.Passive.bloodStroke;
 import org.core.coreSystem.cores.VOL1.Dagger.coreSystem.Dagger;
 
 import java.util.HashSet;
@@ -24,13 +24,13 @@ public class Q implements SkillBase {
     private final Dagger config;
     private final JavaPlugin plugin;
     private final Cool cool;
-    private final DamageStroke damagestroker;
+    private final bloodStroke bloodStroker;
 
-    public Q(Dagger config, JavaPlugin plugin, Cool cool, DamageStroke damagestroker) {
+    public Q(Dagger config, JavaPlugin plugin, Cool cool, bloodStroke bloodStroker) {
         this.config = config;
         this.plugin = plugin;
         this.cool = cool;
-        this.damagestroker = damagestroker;
+        this.bloodStroker = bloodStroker;
     }
 
     @Override
@@ -81,7 +81,7 @@ public class Q implements SkillBase {
                     if (entity instanceof LivingEntity target && entity != player && !config.f_damaged_2.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(entity)) {
 
                         config.f_damaging.put(player.getUniqueId(), true);
-                        damagestroker.damageStroke(player, target);
+                        bloodStroker.damageStroke(player, target);
 
                         ForceDamage forceDamage = new ForceDamage(target, damage, source);
                         forceDamage.applyEffect(player);
@@ -160,7 +160,7 @@ public class Q implements SkillBase {
                     if (entity instanceof LivingEntity target && entity != player && !config.q_damaged.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(entity)) {
 
                         config.f_damaging.put(player.getUniqueId(), true);
-                        damagestroker.damageStroke(player, target);
+                        bloodStroker.damageStroke(player, target);
 
                         ForceDamage forceDamage = new ForceDamage(target, damage / 2, source);
                         forceDamage.applyEffect(player);

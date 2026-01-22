@@ -25,7 +25,7 @@ import org.core.main.coreConfig;
 import org.core.coreSystem.absCoreSystem.ConfigWrapper;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.absCoreSystem.absCore;
-import org.core.coreSystem.cores.VOL1.Dagger.Passive.DamageStroke;
+import org.core.coreSystem.cores.VOL1.Dagger.Passive.bloodStroke;
 import org.core.coreSystem.cores.VOL1.Dagger.Skill.F;
 import org.core.coreSystem.cores.VOL1.Dagger.Skill.Q;
 import org.core.coreSystem.cores.VOL1.Dagger.Skill.R;
@@ -38,7 +38,7 @@ public class dagCore extends absCore {
     private final Core plugin;
     private final Dagger config;
 
-    private final DamageStroke damagestroker;
+    private final bloodStroke bloodStroker;
 
     private final R Rskill;
     private final Q Qskill;
@@ -50,11 +50,11 @@ public class dagCore extends absCore {
         this.plugin = plugin;
         this.config = config;
 
-        this.damagestroker = new DamageStroke(tag, config, plugin, cool);
+        this.bloodStroker = new bloodStroke(tag, config, plugin, cool);
 
-        this.Rskill = new R(config, plugin, cool, damagestroker);
-        this.Qskill = new Q(config, plugin, cool, damagestroker);
-        this.Fskill = new F(config, plugin, cool, damagestroker);
+        this.Rskill = new R(config, plugin, cool, bloodStroker);
+        this.Qskill = new Q(config, plugin, cool, bloodStroker);
+        this.Fskill = new F(config, plugin, cool, bloodStroker);
 
         plugin.getLogger().info("Dagger downloaded...");
     }
@@ -131,6 +131,8 @@ public class dagCore extends absCore {
 
         Player player = event.getPlayer();
         Action action = event.getAction();
+
+        if(!tag.Dagger.contains(player)) return;
 
         if(!cool.isReloading(player, "X_slash") && config.f_using.getOrDefault(player.getUniqueId(), false) && config.f_slash.getOrDefault(player.getUniqueId(), 0) < 2) {
 

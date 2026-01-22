@@ -16,7 +16,7 @@ import org.core.cool.Cool;
 import org.core.effect.crowdControl.ForceDamage;
 import org.core.effect.crowdControl.Invulnerable;
 import org.core.coreSystem.absCoreSystem.SkillBase;
-import org.core.coreSystem.cores.VOL1.Dagger.Passive.DamageStroke;
+import org.core.coreSystem.cores.VOL1.Dagger.Passive.bloodStroke;
 import org.core.coreSystem.cores.VOL1.Dagger.coreSystem.Dagger;
 
 import java.util.HashSet;
@@ -27,13 +27,13 @@ public class F implements SkillBase {
     private final Dagger config;
     private final JavaPlugin plugin;
     private final Cool cool;
-    private final DamageStroke damagestroker;
+    private final bloodStroke bloodStroker;
 
-    public F(Dagger config, JavaPlugin plugin, Cool cool, DamageStroke damagestroker) {
+    public F(Dagger config, JavaPlugin plugin, Cool cool, bloodStroke bloodStroker) {
         this.config = config;
         this.plugin = plugin;
         this.cool = cool;
-        this.damagestroker = damagestroker;
+        this.bloodStroker = bloodStroker;
     }
 
     @Override
@@ -148,6 +148,13 @@ public class F implements SkillBase {
                         config.dash_num.remove(player.getUniqueId());
                     }
 
+                    if(config.f_damaged_2.getOrDefault(player.getUniqueId(), new HashSet<>()).isEmpty()) {
+                        config.dash_object.remove(player.getUniqueId());
+                        config.f_dash.remove(player.getUniqueId());
+                        player.sendActionBar(Component.text("over").color(NamedTextColor.DARK_RED));
+                        cool.updateCooldown(player, "F", 10000L);
+                    }
+
                     config.f_damaged_2.remove(player.getUniqueId());
                     this.cancel();
                     return;
@@ -161,7 +168,7 @@ public class F implements SkillBase {
                     if (entity instanceof LivingEntity target && entity != player && !config.f_damaged_2.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(entity)) {
 
                         config.f_damaging.put(player.getUniqueId(), true);
-                        damagestroker.damageStroke(player, target);
+                        bloodStroker.damageStroke(player, target);
 
                         ForceDamage forceDamage = new ForceDamage(target, damage / config.dash_num.getOrDefault(player.getUniqueId(), 1), source);
                         forceDamage.applyEffect(player);

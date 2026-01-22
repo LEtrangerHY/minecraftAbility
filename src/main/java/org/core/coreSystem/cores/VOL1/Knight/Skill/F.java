@@ -27,6 +27,13 @@ public class F implements SkillBase {
     private final JavaPlugin plugin;
     private final Cool cool;
 
+    private static final Set<Material> UNBREAKABLE_BLOCKS = Set.of(
+            Material.BEDROCK, Material.BARRIER, Material.COMMAND_BLOCK,
+            Material.CHAIN_COMMAND_BLOCK, Material.REPEATING_COMMAND_BLOCK,
+            Material.END_PORTAL_FRAME, Material.END_PORTAL, Material.NETHER_PORTAL,
+            Material.STRUCTURE_BLOCK, Material.JIGSAW, Material.AIR, Material.WATER, Material.LAVA
+    );
+
     public F(Knight config, JavaPlugin plugin, Cool cool) {
         this.config = config;
         this.plugin = plugin;
@@ -46,6 +53,8 @@ public class F implements SkillBase {
         long tickDelay = 0L;
         int maxTicks = 5;
         double innerRadius = 3.3;
+
+        double hitThreshold = Math.cos(maxAngle + 0.1);
 
         double amp = config.f_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L);
         double damage = config.f_Skill_Damage * (1 + amp);
@@ -72,8 +81,7 @@ public class F implements SkillBase {
                 if (ticks >= maxTicks || player.isDead()) {
                     ItemStack mainHand = player.getInventory().getItemInMainHand();
                     ItemMeta meta = mainHand.getItemMeta();
-                    if (meta instanceof org.bukkit.inventory.meta.Damageable && mainHand.getType().getMaxDurability() > 0) {
-                        org.bukkit.inventory.meta.Damageable damageable = (org.bukkit.inventory.meta.Damageable) meta;
+                    if (meta instanceof org.bukkit.inventory.meta.Damageable damageable && mainHand.getType().getMaxDurability() > 0) {
                         int newDamage = damageable.getDamage() + 77;
                         damageable.setDamage(newDamage);
                         mainHand.setItemMeta(meta);
@@ -87,44 +95,55 @@ public class F implements SkillBase {
                 }
 
                 double progress = (ticks + 1) * (maxAngle * 2 / maxTicks) - maxAngle;
+
                 Vector rotatedDir = direction.clone().rotateAroundY(progress);
 
-                for (double length = 0; length <= slashLength; length += 0.1) {
+                for (Entity entity : world.getNearbyEntities(origin, slashLength, slashLength, slashLength)) {
+                    if (!(entity instanceof LivingEntity target) || entity == player) continue;
+                    if (config.damaged.get(player.getUniqueId()).contains(entity)) continue;
+
+                    Vector toTarget = target.getLocation().toVector().subtract(origin.toVector());
+                    toTarget.setY(0);
+
+                    if (toTarget.lengthSquared() > slashLength * slashLength) continue;
+
+                    Vector dirToTargetNormal = toTarget.normalize();
+                    double dotProduct = rotatedDir.dot(dirToTargetNormal);
+
+                    if (dotProduct >= hitThreshold) {
+                        config.damaged.get(player.getUniqueId()).add(entity);
+
+                        world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_STRONG, 1, 1);
+                        world.playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_HURT, 1, 1);
+                        player.getWorld().spawnParticle(Particle.DAMAGE_INDICATOR, target.getLocation().add(0, 1.3, 0), 20, 0.4, 0.4, 0.4, 1);
+
+                        Stun stun = new Stun(target, 700);
+                        stun.applyEffect(player);
+
+                        ForceDamage forceDamage = new ForceDamage(target, damage, source);
+                        forceDamage.applyEffect(player);
+                        target.setVelocity(new Vector(0, 0, 0));
+                    }
+                }
+
+                for (double length = 0; length <= slashLength; length += 0.2) {
                     for (double angle = -maxAngle; angle <= maxAngle; angle += Math.toRadians(2)) {
                         Vector angleDir = rotatedDir.clone().rotateAroundY(angle);
                         Vector particleOffset = angleDir.clone().multiply(length);
-
                         Location particleLocation = origin.clone().add(particleOffset);
-
-                        double distanceFromOrigin = particleLocation.distance(origin);
 
                         for(int i = -1; i < 2; i++) {
                             Block block = particleLocation.clone().add(0, i, 0).getBlock();
-                            if(block.getType() != Material.AIR && block.getType() != Material.WATER && block.getType() != Material.LAVA) {
+                            if(!UNBREAKABLE_BLOCKS.contains(block.getType())) {
                                 breakBlockSafely(player, block);
                             }
                         }
 
-                        if (distanceFromOrigin >= innerRadius) {
+                        if (length >= innerRadius) {
                             if(Math.random() < 0.17){
                                 world.spawnParticle(Particle.DUST, particleLocation, 1, 0, 0, 0, 0, dustOptions_gra);
-                            }else{
+                            } else {
                                 world.spawnParticle(Particle.DUST, particleLocation, 1, 0, 0, 0, 0, dustOptions);
-                            }
-
-                            for (Entity entity : world.getNearbyEntities(particleLocation, 0.7, 0.7, 0.7)) {
-                                if (entity instanceof LivingEntity target && entity != player && !config.damaged.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(entity)) {
-                                    config.damaged.getOrDefault(player.getUniqueId(), new HashSet<>()).add(entity);
-                                    world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_STRONG, 1, 1);
-                                    world.playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_HURT, 1, 1);
-                                    player.getWorld().spawnParticle(Particle.DAMAGE_INDICATOR, target.getLocation().clone().add(0, 1.3, 0), 20, 0.4, 0.4, 0.4, 1);
-                                    Stun stun = new Stun(target, 700);
-                                    stun.applyEffect(player);
-
-                                    ForceDamage forceDamage = new ForceDamage(target, damage, source);
-                                    forceDamage.applyEffect(player);
-                                    target.setVelocity(new Vector(0, 0, 0));
-                                }
                             }
                         }
                     }
@@ -133,19 +152,6 @@ public class F implements SkillBase {
             }
         }.runTaskTimer(plugin, tickDelay, 1L);
     }
-
-    private static final Set<Material> UNBREAKABLE_BLOCKS = Set.of(
-            Material.BEDROCK,
-            Material.BARRIER,
-            Material.COMMAND_BLOCK,
-            Material.CHAIN_COMMAND_BLOCK,
-            Material.REPEATING_COMMAND_BLOCK,
-            Material.END_PORTAL_FRAME,
-            Material.END_PORTAL,
-            Material.NETHER_PORTAL,
-            Material.STRUCTURE_BLOCK,
-            Material.JIGSAW
-    );
 
     public void breakBlockSafely(Player player, Block block) {
         if (UNBREAKABLE_BLOCKS.contains(block.getType())) {

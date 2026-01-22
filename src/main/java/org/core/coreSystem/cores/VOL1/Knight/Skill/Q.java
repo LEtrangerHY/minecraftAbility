@@ -190,6 +190,8 @@ public class Q implements SkillBase {
         int maxTicks = 3;
         double innerRadius = 2.7;
 
+        double hitThreshold = Math.cos(maxAngle + 0.1);
+
         double amp = config.q_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L);
         double damage = config.q_Skill_Damage * (1 + amp);
 
@@ -209,11 +211,9 @@ public class Q implements SkillBase {
             public void run() {
 
                 if (ticks >= maxTicks || player.isDead()) {
-
                     ItemStack mainHand = player.getInventory().getItemInMainHand();
                     ItemMeta meta = mainHand.getItemMeta();
-                    if (meta instanceof org.bukkit.inventory.meta.Damageable && mainHand.getType().getMaxDurability() > 0) {
-                        org.bukkit.inventory.meta.Damageable damageable = (org.bukkit.inventory.meta.Damageable) meta;
+                    if (meta instanceof org.bukkit.inventory.meta.Damageable damageable && mainHand.getType().getMaxDurability() > 0) {
                         int newDamage = damageable.getDamage() + 1;
                         damageable.setDamage(newDamage);
                         mainHand.setItemMeta(meta);
@@ -222,27 +222,53 @@ public class Q implements SkillBase {
                             player.getInventory().setItemInMainHand(null);
                         }
                     }
-
                     this.cancel();
                     return;
                 }
 
                 double progress = (ticks + 1) * (maxAngle * 2 / maxTicks) - maxAngle;
-                Vector rotatedDir;
+                Vector centerDir;
 
                 if (atkType == 0) {
-                    rotatedDir = direction.clone().setY(0).normalize().rotateAroundY(progress);
+                    centerDir = direction.clone().setY(0).normalize().rotateAroundY(progress);
                 } else {
-                    rotatedDir = direction.clone().rotateAroundAxis(rightAxis, progress);
+                    centerDir = direction.clone().rotateAroundAxis(rightAxis, progress);
+                }
+
+                for (Entity entity : world.getNearbyEntities(origin, slashLength, slashLength, slashLength)) {
+                    if (!(entity instanceof LivingEntity target) || entity == player) continue;
+                    if (config.damaged.get(player.getUniqueId()).contains(entity)) continue;
+
+                    Vector toTarget = target.getLocation().toVector().subtract(origin.toVector());
+
+                    if (toTarget.lengthSquared() > slashLength * slashLength) continue;
+
+                    Vector targetDir = toTarget.normalize();
+                    double dotProduct;
+
+                    if (atkType == 0) {
+                        Vector flatToTarget = toTarget.clone().setY(0).normalize();
+                        dotProduct = centerDir.dot(flatToTarget);
+                    } else {
+                        dotProduct = centerDir.dot(targetDir);
+                    }
+
+                    if (dotProduct >= hitThreshold) {
+                        config.damaged.get(player.getUniqueId()).add(entity);
+
+                        ForceDamage forceDamage = new ForceDamage(target, damage, source);
+                        forceDamage.applyEffect(player);
+                        target.setVelocity(new Vector(0, 0, 0));
+                    }
                 }
 
                 for (double length = innerRadius; length <= slashLength; length += 0.1) {
                     for (double angle = -maxAngle; angle <= maxAngle; angle += Math.toRadians(1)) {
                         Vector angleDir;
                         if (atkType == 0) {
-                            angleDir = rotatedDir.clone().rotateAroundY(angle);
+                            angleDir = centerDir.clone().rotateAroundY(angle);
                         } else {
-                            angleDir = rotatedDir.clone().rotateAroundAxis(rightAxis, angle);
+                            angleDir = centerDir.clone().rotateAroundAxis(rightAxis, angle);
                         }
 
                         Vector particleOffset = angleDir.clone().multiply(length);
@@ -254,16 +280,6 @@ public class Q implements SkillBase {
                         );
                         world.spawnParticle(Particle.DUST, particleLocation, 1, 0, 0, 0, 0, dustOptions);
 
-                        for (Entity entity : world.getNearbyEntities(particleLocation, 0.7, 0.7, 0.7)) {
-                            if (entity instanceof LivingEntity target && entity != player) {
-                                if(!config.damaged.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(entity)) {
-                                    ForceDamage forceDamage = new ForceDamage(target, damage, source);
-                                    forceDamage.applyEffect(player);
-                                    target.setVelocity(new Vector(0, 0, 0));
-                                    config.damaged.get(player.getUniqueId()).add(entity);
-                                }
-                            }
-                        }
                     }
                 }
                 ticks++;

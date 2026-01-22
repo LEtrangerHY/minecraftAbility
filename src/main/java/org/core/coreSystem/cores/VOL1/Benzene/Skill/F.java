@@ -31,6 +31,20 @@ public class F implements SkillBase {
     private final Cool cool;
     private final chainResonance chainResonance;
 
+    private static final Particle.DustOptions DUST_SLASH = new Particle.DustOptions(Color.fromRGB(66, 66, 66), 0.5f);
+    private static final Particle.DustOptions DUST_SLASH_GRA = new Particle.DustOptions(Color.fromRGB(111, 111, 111), 0.5f);
+
+    private static final Particle.DustOptions DUST_OPT_1 = new Particle.DustOptions(Color.fromRGB(111, 111, 111), 0.3f);
+    private static final Particle.DustOptions DUST_OPT_2 = new Particle.DustOptions(Color.fromRGB(101, 101, 101), 0.4f);
+    private static final Particle.DustOptions DUST_OPT_3 = new Particle.DustOptions(Color.fromRGB(99, 99, 99), 0.5f);
+    private static final Particle.DustOptions DUST_OPT_GRA = new Particle.DustOptions(Color.fromRGB(66, 66, 66), 0.6f);
+
+    private static final Set<Material> UNBREAKABLE_BLOCKS = Set.of(
+            Material.BEDROCK, Material.BARRIER, Material.COMMAND_BLOCK, Material.CHAIN_COMMAND_BLOCK,
+            Material.REPEATING_COMMAND_BLOCK, Material.END_PORTAL_FRAME, Material.END_PORTAL,
+            Material.NETHER_PORTAL, Material.STRUCTURE_BLOCK, Material.JIGSAW, Material.AIR, Material.WATER, Material.LAVA
+    );
+
     public F(Benzene config, JavaPlugin plugin, Cool cool, chainResonance chainResonance) {
         this.config = config;
         this.plugin = plugin;
@@ -40,7 +54,6 @@ public class F implements SkillBase {
 
     @Override
     public void Trigger(Player player) {
-
         player.swingMainHand();
         World world = player.getWorld();
         world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
@@ -49,6 +62,8 @@ public class F implements SkillBase {
         double maxAngle = Math.toRadians(45);
         int maxTicks = 3;
         double innerRadius = 2.6;
+
+        double hitThreshold = Math.cos(maxAngle + 0.2);
 
         config.damaged_2.put(player.getUniqueId(), new HashSet<>());
 
@@ -61,8 +76,9 @@ public class F implements SkillBase {
                 .withDirectEntity(player)
                 .build();
 
-        Entity target = getTargetedEntity(player, 5.0, 0.3);
-        Location origin = player.getEyeLocation().clone().add(0, -0.6, 0);
+        Entity initialTarget = getTargetedEntity(player, 5.0, 0.3);
+        Location eyeLoc = player.getEyeLocation();
+        Location origin = eyeLoc.clone().add(0, -0.6, 0);
 
         Vector forward = player.getLocation().getDirection().normalize();
         Vector worldUp = new Vector(0, 1, 0);
@@ -70,15 +86,12 @@ public class F implements SkillBase {
         Vector right = forward.clone().crossProduct(worldUp).normalize();
         Vector up = right.clone().crossProduct(forward).normalize();
 
-        Particle.DustOptions dustOption_slash = new Particle.DustOptions(Color.fromRGB(66, 66, 66), 0.6f);
-        Particle.DustOptions dustOption_slash_gra = new Particle.DustOptions(Color.fromRGB(111, 111, 111), 0.6f);
-
-        if (target != null) {
+        if (initialTarget != null) {
             world.playSound(player.getLocation(), Sound.ITEM_TRIDENT_HIT_GROUND, 1.6f, 1.0f);
-            world.spawnParticle(Particle.ENCHANTED_HIT, target.getLocation().clone().add(0, 1, 0), 22, 0.6, 0, 0.6, 1);
-            if (!target.isDead()) {
-                chainResonance.increase(player, target);
-                if (target.isDead()) chainResonance.decrease(target);
+            world.spawnParticle(Particle.ENCHANTED_HIT, initialTarget.getLocation().add(0, 1, 0), 22, 0.6, 0, 0.6, 1);
+            if (!initialTarget.isDead()) {
+                chainResonance.increase(player, initialTarget);
+                if (initialTarget.isDead()) chainResonance.decrease(initialTarget);
             }
         }
 
@@ -87,33 +100,11 @@ public class F implements SkillBase {
 
             @Override
             public void run() {
-
                 if (ticks < 2)
                     world.playSound(player.getLocation(), Sound.BLOCK_CHAIN_BREAK, 1.6f, 1.0f);
 
                 if (ticks > maxTicks || player.isDead()) {
-                    int chainNum = config.chainRes.getOrDefault(player.getUniqueId(), new LinkedHashMap<>()).size();
-                    config.damaged_2.remove(player.getUniqueId());
-
-                    if (target != null && chainNum >= 2) {
-                        Special_Attack(player, player.getLocation(), player.getGameMode(), target, chainNum);
-                    }
-
-                    if (config.blockBreak.getOrDefault(player.getUniqueId(), false)) {
-                        ItemStack mainHand = player.getInventory().getItemInMainHand();
-                        ItemMeta meta = mainHand.getItemMeta();
-                        if (meta instanceof org.bukkit.inventory.meta.Damageable dm) {
-                            int newDamage = dm.getDamage() + 6;
-                            dm.setDamage(newDamage);
-                            mainHand.setItemMeta(meta);
-                            if (newDamage >= mainHand.getType().getMaxDurability())
-                                player.getInventory().setItemInMainHand(null);
-                        }
-                        config.blockBreak.remove(player.getUniqueId());
-                    }
-
-                    config.canBlockBreak.remove(player.getUniqueId());
-
+                    finishSkill(player, initialTarget);
                     this.cancel();
                     return;
                 }
@@ -125,91 +116,103 @@ public class F implements SkillBase {
                 double endAngle = -maxAngle;
                 double step = -Math.toRadians(2);
 
-                for (double length = 0; length <= slashLength; length += 0.1) {
-                    for (double angle = startAngle; angle >= endAngle; angle += step) {
+                boolean canBreakBlock = config.canBlockBreak.getOrDefault(player.getUniqueId(), false);
+                Set<Entity> damagedEntities = config.damaged_2.get(player.getUniqueId());
 
-                        double xOffset = Math.sin(angle + progressAngle) * length;
-                        double zOffset = Math.cos(angle + progressAngle) * length;
-                        double yOffset = 0;
+                Vector currentTickDirection = forward.clone().rotateAroundAxis(up, progressAngle);
 
-                        Vector local = right.clone().multiply(xOffset)
-                                .add(forward.clone().multiply(zOffset))
-                                .add(up.clone().multiply(yOffset));
+                for (Entity entity : world.getNearbyEntities(origin, slashLength, slashLength, slashLength)) {
+                    if (!(entity instanceof LivingEntity target) || entity == player || damagedEntities.contains(entity)) continue;
 
-                        Location particleLocation = origin.clone().add(local);
-                        double distanceFromOrigin = particleLocation.distance(origin);
+                    Vector toEntity = target.getLocation().add(0, target.getHeight() / 2.0, 0).toVector().subtract(origin.toVector());
+                    double distSq = toEntity.lengthSquared();
 
-                        if (config.canBlockBreak.getOrDefault(player.getUniqueId(), false)) {
-                            Block blockDown = particleLocation.clone().getBlock();
-                            Block blockUp = particleLocation.clone().add(0, 1, 0).getBlock();
-                            if (blockDown.getType() != Material.AIR && blockDown.getType() != Material.WATER && blockDown.getType() != Material.LAVA)
-                                breakBlockSafely(player, blockDown);
-                            if (blockUp.getType() != Material.AIR && blockUp.getType() != Material.WATER && blockUp.getType() != Material.LAVA)
-                                breakBlockSafely(player, blockUp);
-                        }
+                    if (distSq > (slashLength + 1.0) * (slashLength + 1.0)) continue;
 
-                        if (distanceFromOrigin >= innerRadius) {
-                            if (Math.random() < 0.11)
-                                world.spawnParticle(Particle.DUST, particleLocation, 1, 0, 0, 0, 0, dustOption_slash);
-                            else
-                                world.spawnParticle(Particle.DUST, particleLocation, 1, 0, 0, 0, 0, dustOption_slash_gra);
-                        }
+                    Vector toEntityDir = toEntity.normalize();
+                    double dotProduct = currentTickDirection.dot(toEntityDir);
 
-                        for (Entity entity : world.getNearbyEntities(particleLocation, 0.6, 0.6, 0.6)) {
-                            if (entity instanceof LivingEntity target && entity != player && !config.damaged_2.get(player.getUniqueId()).contains(entity)) {
+                    if (dotProduct > hitThreshold) {
+                        damagedEntities.add(entity);
 
-                                config.damaged_2.get(player.getUniqueId()).add(entity);
+                        ForceDamage forceDamage = new ForceDamage(target, damage, source);
+                        forceDamage.applyEffect(player);
+                        target.setVelocity(new Vector(0, 0, 0));
 
-                                ForceDamage forceDamage = new ForceDamage(target, damage, source);
-                                forceDamage.applyEffect(player);
-                                target.setVelocity(new Vector(0, 0, 0));
-
-                                if (config.canBlockBreak.getOrDefault(player.getUniqueId(), false)) {
-                                    if (!target.isDead()) {
-                                        chainResonance.increase(player, target);
-                                        if (target.isDead()) chainResonance.decrease(target);
-                                    }
-                                }
+                        if (canBreakBlock) {
+                            if (!target.isDead()) {
+                                chainResonance.increase(player, target);
+                                if (target.isDead()) chainResonance.decrease(target);
                             }
                         }
                     }
                 }
 
+                int particleCount = 0;
+
+                for (double angle = startAngle; angle >= endAngle; angle += step) {
+                    double sinA = Math.sin(angle + progressAngle);
+                    double cosA = Math.cos(angle + progressAngle);
+
+                    double dirX = right.getX() * sinA + forward.getX() * cosA;
+                    double dirY = right.getY() * sinA + forward.getY() * cosA;
+                    double dirZ = right.getZ() * sinA + forward.getZ() * cosA;
+
+                    for (double length = 0; length <= slashLength; length += 0.1) {
+                        double x = origin.getX() + dirX * length;
+                        double y = origin.getY() + dirY * length;
+                        double z = origin.getZ() + dirZ * length;
+
+                        if (canBreakBlock && length >= 1.0 && particleCount % 5 == 0) {
+                            Block block = new Location(world, x, y, z).getBlock();
+                            if (!UNBREAKABLE_BLOCKS.contains(block.getType())) breakBlockSafely(player, block);
+                            Block blockUp = block.getRelative(0, 1, 0);
+                            if (!UNBREAKABLE_BLOCKS.contains(blockUp.getType())) breakBlockSafely(player, blockUp);
+                        }
+
+                        if (length >= innerRadius) {
+                            Particle.DustOptions opt = (Math.random() < 0.11) ? DUST_SLASH : DUST_SLASH_GRA;
+                            world.spawnParticle(Particle.DUST, x, y, z, 1, 0, 0, 0, 0, opt);
+                        }
+                        particleCount++;
+                    }
+                }
                 ticks++;
+            }
+
+            private void finishSkill(Player player, Entity target) {
+                int chainNum = config.chainRes.getOrDefault(player.getUniqueId(), new LinkedHashMap<>()).size();
+                config.damaged_2.remove(player.getUniqueId());
+
+                if (target != null && chainNum >= 2) {
+                    Special_Attack(player, player.getLocation(), player.getGameMode(), target, chainNum);
+                }
+
+                if (config.blockBreak.getOrDefault(player.getUniqueId(), false)) {
+                    ItemStack mainHand = player.getInventory().getItemInMainHand();
+                    ItemMeta meta = mainHand.getItemMeta();
+                    if (meta instanceof org.bukkit.inventory.meta.Damageable dm) {
+                        int newDamage = dm.getDamage() + 6;
+                        dm.setDamage(newDamage);
+                        mainHand.setItemMeta(meta);
+                        if (newDamage >= mainHand.getType().getMaxDurability())
+                            player.getInventory().setItemInMainHand(null);
+                    }
+                    config.blockBreak.remove(player.getUniqueId());
+                }
+                config.canBlockBreak.remove(player.getUniqueId());
             }
         }.runTaskTimer(plugin, 0L, 1L);
     }
 
-    private static final Set<Material> UNBREAKABLE_BLOCKS = Set.of(
-            Material.BEDROCK,
-            Material.BARRIER,
-            Material.COMMAND_BLOCK,
-            Material.CHAIN_COMMAND_BLOCK,
-            Material.REPEATING_COMMAND_BLOCK,
-            Material.END_PORTAL_FRAME,
-            Material.END_PORTAL,
-            Material.NETHER_PORTAL,
-            Material.STRUCTURE_BLOCK,
-            Material.JIGSAW
-    );
-
     public void breakBlockSafely(Player player, Block block) {
-        if (UNBREAKABLE_BLOCKS.contains(block.getType())) {
-            return;
-        }
+        if (UNBREAKABLE_BLOCKS.contains(block.getType())) return;
 
-        if(!config.blockBreak.getOrDefault(player.getUniqueId(), false)) {
+        if (!config.blockBreak.getOrDefault(player.getUniqueId(), false)) {
             config.blockBreak.put(player.getUniqueId(), true);
         }
 
-        block.getWorld().spawnParticle(
-                Particle.BLOCK,
-                block.getLocation().add(0.5, 0.5, 0.5),
-                6,
-                0.3, 0.3, 0.3,
-                block.getBlockData()
-        );
-
+        block.getWorld().spawnParticle(Particle.BLOCK, block.getLocation().add(0.5, 0.5, 0.5), 6, 0.3, 0.3, 0.3, block.getBlockData());
         block.breakNaturally(new ItemStack(Material.IRON_SWORD));
     }
 
@@ -218,23 +221,13 @@ public class F implements SkillBase {
         Location eyeLocation = player.getEyeLocation();
         Vector direction = eyeLocation.getDirection();
 
-        List<LivingEntity> candidates = new ArrayList<>();
+        RayTraceResult result = world.rayTraceEntities(eyeLocation, direction, range, raySize,
+                e -> e instanceof LivingEntity && !e.equals(player));
 
-        for (Entity entity : world.getNearbyEntities(eyeLocation, range, range, range)) {
-            if (!(entity instanceof LivingEntity) || entity.equals(player) || entity.isInvulnerable()) continue;
-
-            RayTraceResult result = world.rayTraceEntities(
-                    eyeLocation, direction, range, raySize, e -> e.equals(entity)
-            );
-
-            if (result != null) {
-                candidates.add((LivingEntity) entity);
-            }
+        if (result != null && result.getHitEntity() instanceof LivingEntity target) {
+            return target;
         }
-
-        return candidates.stream()
-                .min(Comparator.comparingDouble(Damageable::getHealth))
-                .orElse(null);
+        return null;
     }
 
     public void Special_Attack(Player player, Location firstLocation, GameMode playerGameMode, Entity entity, int chainNum) {
@@ -283,7 +276,6 @@ public class F implements SkillBase {
     }
 
     public void Slash(Player player, double height) {
-
         config.damaged_2.put(player.getUniqueId(), new HashSet<>());
 
         player.swingMainHand();
@@ -291,13 +283,15 @@ public class F implements SkillBase {
         world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
 
         double slashLength = 5.4;
-        double maxAngle = Math.toRadians(36);
-        int maxTicks = 3;
+        double maxAngleDeg = 36.0;
+        double maxAngleRad = Math.toRadians(maxAngleDeg);
         double innerRadius = 5.0;
+        int maxTicks = 3;
+
+        double angleThreshold = Math.cos(maxAngleRad);
 
         Random rand = new Random();
         int random = rand.nextInt(4);
-
         double tiltAngle = switch (random) {
             case 0 -> Math.toRadians(6);
             case 1 -> Math.toRadians(-6);
@@ -314,22 +308,16 @@ public class F implements SkillBase {
                 .withDirectEntity(player)
                 .build();
 
-        Location origin = player.getEyeLocation().add(0, 0, 0);
-        Vector direction = player.getLocation().getDirection().clone().setY(0).normalize();
-
-        Particle.DustOptions dustOptions1 = new Particle.DustOptions(Color.fromRGB(111, 111, 111), 0.4f);
-        Particle.DustOptions dustOptions2 = new Particle.DustOptions(Color.fromRGB(101, 101, 101), 0.5f);
-        Particle.DustOptions dustOptions3 = new Particle.DustOptions(Color.fromRGB(99, 99, 99), 0.6f);
-        Particle.DustOptions dustOptions_gra = new Particle.DustOptions(Color.fromRGB(66, 66, 66), 0.6f);
+        Location origin = player.getEyeLocation();
+        Vector direction = player.getLocation().getDirection().setY(0).normalize();
 
         new BukkitRunnable() {
             int ticks = 0;
 
             @Override
             public void run() {
-
-                if(ticks < 1){
-                    player.getWorld().playSound(player.getLocation(), Sound.BLOCK_CHAIN_BREAK, 1.2f, 1.0f);
+                if (ticks < 1) {
+                    world.playSound(player.getLocation(), Sound.BLOCK_CHAIN_BREAK, 1.2f, 1.0f);
                 }
 
                 if (ticks >= maxTicks || player.isDead()) {
@@ -337,11 +325,34 @@ public class F implements SkillBase {
                     return;
                 }
 
-                double progress = (ticks + 1) * (maxAngle * 2 / maxTicks) - maxAngle;
+                for (Entity entity : world.getNearbyEntities(player.getLocation(), slashLength, slashLength, slashLength)) {
+
+                    if (!(entity instanceof LivingEntity target) || entity == player) continue;
+                    if (config.damaged_2.get(player.getUniqueId()).contains(entity)) continue;
+
+                    Vector toTarget = target.getLocation().toVector().subtract(player.getLocation().toVector());
+                    toTarget.setY(0);
+
+                    if (toTarget.lengthSquared() > slashLength * slashLength) continue;
+
+                    Vector directionToTarget = toTarget.normalize();
+                    double dotProduct = direction.dot(directionToTarget);
+
+                    if (dotProduct >= angleThreshold) {
+                        ForceDamage forceDamage = new ForceDamage(target, damage, source);
+                        forceDamage.applyEffect(player);
+                        target.setVelocity(new Vector(0, 0, 0));
+
+                        config.damaged_2.get(player.getUniqueId()).add(entity);
+                    }
+                }
+
+                double progress = (ticks + 1) * (maxAngleRad * 2 / maxTicks) - maxAngleRad;
                 Vector rotatedDir = direction.clone().rotateAroundY(progress);
 
                 for (double length = innerRadius; length <= slashLength; length += 0.1) {
-                    for (double angle = -maxAngle; angle <= maxAngle; angle += Math.toRadians(1)) {
+                    for (double angle = -maxAngleRad; angle <= maxAngleRad; angle += Math.toRadians(1)) {
+
                         Vector angleDir = rotatedDir.clone().rotateAroundY(angle);
                         Vector particleOffset = angleDir.clone().multiply(length);
 
@@ -352,31 +363,17 @@ public class F implements SkillBase {
                         particleOffset.setY(tiltedY);
                         particleOffset.setZ(tiltedZ);
 
-                        Location particleLocation = origin.clone().add(particleOffset).clone().add(0, height, 0);
+                        Location particleLocation = origin.clone().add(particleOffset).add(0, height, 0);
 
-                        if(length < innerRadius + 0.2){
-                            world.spawnParticle(Particle.DUST, particleLocation, 1, 0, 0, 0, 0, dustOptions1);
-                        }else if(length < innerRadius + 0.3){
-                            world.spawnParticle(Particle.DUST, particleLocation, 1, 0, 0, 0, 0, dustOptions2);
-                        }else{
-                            if(Math.random() <= 0.66){
-                                world.spawnParticle(Particle.DUST, particleLocation, 1, 0, 0, 0, 0, dustOptions3);
-                            }else{
-                                world.spawnParticle(Particle.DUST, particleLocation, 1, 0, 0, 0, 0, dustOptions_gra);
-                            }
-                        }
-
-                        for (Entity entity : world.getNearbyEntities(particleLocation, 1.2, 1.2, 1.2)) {
-                            if (entity instanceof LivingEntity target && entity != player) {
-
-                                if(!config.damaged_2.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(entity)) {
-
-                                    ForceDamage forceDamage = new ForceDamage(target, damage, source);
-                                    forceDamage.applyEffect(player);
-                                    target.setVelocity(new Vector(0, 0, 0));
-
-                                    config.damaged_2.getOrDefault(player.getUniqueId(), new HashSet<>()).add(entity);
-                                }
+                        if (length < innerRadius + 0.2) {
+                            world.spawnParticle(Particle.DUST, particleLocation, 1, 0, 0, 0, 0, DUST_OPT_1);
+                        } else if (length < innerRadius + 0.3) {
+                            world.spawnParticle(Particle.DUST, particleLocation, 1, 0, 0, 0, 0, DUST_OPT_2);
+                        } else {
+                            if (Math.random() <= 0.66) {
+                                world.spawnParticle(Particle.DUST, particleLocation, 1, 0, 0, 0, 0, DUST_OPT_3);
+                            } else {
+                                world.spawnParticle(Particle.DUST, particleLocation, 1, 0, 0, 0, 0, DUST_OPT_GRA);
                             }
                         }
                     }
@@ -387,7 +384,6 @@ public class F implements SkillBase {
     }
 
     public static void teleportBehind(Player player, GameMode playerGameMode, Entity target, double distance) {
-
         Location enemyLocation = target.getLocation();
         Location playerLocation = player.getLocation();
 
@@ -410,7 +406,6 @@ public class F implements SkillBase {
 
     private static boolean isSafe(Location loc) {
         Block aboveHead = loc.clone().add(0, 1, 0).getBlock();
-
         return !aboveHead.getType().isSolid();
     }
 

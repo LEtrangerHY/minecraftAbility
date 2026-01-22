@@ -3,35 +3,32 @@ package org.core.coreSystem.cores.VOL2.Rose.coreSystem;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.damage.DamageSource;
-import org.bukkit.damage.DamageType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.Damageable;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.util.RayTraceResult;
+import org.bukkit.persistence.PersistentDataType;
 import org.core.cool.Cool;
 import org.core.coreSystem.absCoreSystem.ConfigWrapper;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.absCoreSystem.absCore;
+import org.core.coreSystem.cores.VOL2.Rose.Passive.bloodPetal;
 import org.core.coreSystem.cores.VOL2.Rose.Skill.F;
 import org.core.coreSystem.cores.VOL2.Rose.Skill.Q;
 import org.core.coreSystem.cores.VOL2.Rose.Skill.R;
-import org.core.coreSystem.cores.VOL2.Rose.coreSystem.Rose;
 import org.core.main.Core;
 import org.core.main.coreConfig;
 
 public class roseCore extends absCore {
     private final Core plugin;
     private final Rose config;
+
+    private final bloodPetal petal;
 
     private final R Rskill;
     private final Q Qskill;
@@ -43,9 +40,11 @@ public class roseCore extends absCore {
         this.plugin = plugin;
         this.config = config;
 
-        this.Rskill = new R(config, plugin, cool);
+        this.petal = new bloodPetal(config, tag, plugin, cool);
+
+        this.Rskill = new R(config, plugin, cool, petal);
         this.Qskill = new Q(config, plugin, cool);
-        this.Fskill = new F(config, plugin, cool);
+        this.Fskill = new F(config, plugin, cool, petal);
 
         plugin.getLogger().info("Rose downloaded...");
     }
@@ -86,34 +85,71 @@ public class roseCore extends absCore {
         }
     }
 
-    @EventHandler(priority = EventPriority.NORMAL)
-    public void passiveAttackEffect(PlayerInteractEvent event) {
-        if(tag.Nightel.contains(event.getPlayer())){
-            if (pAttackUsing.contains(event.getPlayer().getUniqueId())) {
-                pAttackUsing.remove(event.getPlayer().getUniqueId());
+    @EventHandler
+    public void passiveDamage(EntityDamageByEntityEvent event) {
+
+        if (!(event.getDamager() instanceof Player player)) return;
+        if (!(event.getEntity() instanceof LivingEntity target)) return;
+
+        if(tag.Rose.contains(player) && hasProperItems(player)){
+            if(config.atk.getOrDefault(player.getUniqueId(), "").equals("R") ||
+                    config.atk.getOrDefault(player.getUniqueId(), "").equals("P") ||
+                    config.atk.getOrDefault(player.getUniqueId(), "").equals("S")) return;
+
+            if(config.atkType.getOrDefault(player.getUniqueId(), "").equals("R")){
+                petal.dropPetal(player, target, event.getFinalDamage());
+            }
+
+            player.getWorld().spawnParticle(Particle.BLOCK, target.getLocation().add(0, 1, 0), 4, 0.3, 0.3, 0.3, Bukkit.createBlockData(Material.REDSTONE_BLOCK));
+            config.atkType.put(player.getUniqueId(), "L");
+        }
+    }
+
+    @EventHandler
+    public void onPickup(EntityPickupItemEvent event) {
+        ItemStack stack = event.getItem().getItemStack();
+
+        NamespacedKey keyId = new NamespacedKey(plugin, "bloodPetal");
+        NamespacedKey keyHeal = new NamespacedKey(plugin, "bloodHealAmount");
+
+        if (stack.hasItemMeta() && stack.getItemMeta().getPersistentDataContainer().has(keyId, PersistentDataType.STRING)) {
+
+            if (event.getEntity() instanceof Player player) {
+
+                if (tag.Rose.contains(player)) {
+                    event.setCancelled(true);
+
+                    Double healAmount = stack.getItemMeta().getPersistentDataContainer().get(keyHeal, PersistentDataType.DOUBLE);
+                    if (healAmount == null) healAmount = 0.0;
+
+                    event.getItem().remove();
+
+                    player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1.0f, 1.0f);
+                    petal.Sweep(player, healAmount);
+
+                } else {
+                    event.setCancelled(true);
+                }
+
+            } else {
+                event.setCancelled(true);
             }
         }
     }
 
     @Override
     protected boolean contains(Player player) {
-        return tag.Lavender.contains(player);
+        return tag.Rose.contains(player);
     }
 
     @Override
-    protected SkillBase getRSkill() {
-        return Rskill;
-    }
+    protected SkillBase getRSkill() { return Rskill; }
 
     @Override
-    protected SkillBase getQSkill() {
-        return Qskill;
-    }
+    protected SkillBase getQSkill() { return Qskill; }
 
     @Override
-    protected SkillBase getFSkill() {
-        return Fskill;
-    }
+    protected SkillBase getFSkill() { return Fskill; }
 
     private boolean hasProperItems(Player player) {
         ItemStack main = player.getInventory().getItemInMainHand();
@@ -121,17 +157,9 @@ public class roseCore extends absCore {
         return main.getType() == Material.COPPER_SWORD && off.getType() == Material.COPPER_SWORD;
     }
 
-    private boolean canUseRSkill(Player player) {
-        return true;
-    }
-
-    private boolean canUseQSkill(Player player) {
-        return true;
-    }
-
-    private boolean canUseFSkill(Player player) {
-        return true;
-    }
+    private boolean canUseRSkill(Player player) { return true; }
+    private boolean canUseQSkill(Player player) { return true; }
+    private boolean canUseFSkill(Player player) { return true; }
 
     @Override
     protected boolean isItemRequired(Player player){
@@ -146,19 +174,13 @@ public class roseCore extends absCore {
     }
 
     @Override
-    protected boolean isRCondition(Player player) {
-        return canUseRSkill(player);
-    }
+    protected boolean isRCondition(Player player) { return canUseRSkill(player); }
 
     @Override
-    protected boolean isQCondition(Player player) {
-        return canUseQSkill(player);
-    }
+    protected boolean isQCondition(Player player) { return canUseQSkill(player); }
 
     @Override
-    protected boolean isFCondition(Player player) {
-        return canUseFSkill(player);
-    }
+    protected boolean isFCondition(Player player) { return canUseFSkill(player); }
 
     @Override
     protected ConfigWrapper getConfigWrapper() {
@@ -170,11 +192,11 @@ public class roseCore extends absCore {
 
             @Override
             public void cooldownReset(Player player) {
-                cool.setCooldown(player, config.frozenCool, "R");
+                cool.setCooldown(player, 0L, "R");
                 cool.setCooldown(player, config.frozenCool, "Q");
                 cool.setCooldown(player, config.frozenCool, "F");
 
-                cool.updateCooldown(player, "R", config.frozenCool);
+                cool.updateCooldown(player, "R", 0L);
                 cool.updateCooldown(player, "Q", config.frozenCool);
                 cool.updateCooldown(player, "F", config.frozenCool);
             }

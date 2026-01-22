@@ -15,7 +15,7 @@ import org.core.effect.crowdControl.ForceDamage;
 import org.core.main.coreConfig;
 import org.core.coreSystem.cores.VOL1.Dagger.coreSystem.Dagger;
 
-public class DamageStroke {
+public class bloodStroke {
 
     private final coreConfig tag;
     private final Dagger config;
@@ -23,7 +23,7 @@ public class DamageStroke {
     private final Cool cool;
     private EffectManager effectManager = new EffectManager();
 
-    public DamageStroke(coreConfig tag, Dagger config, JavaPlugin plugin, Cool cool) {
+    public bloodStroke(coreConfig tag, Dagger config, JavaPlugin plugin, Cool cool) {
         this.tag = tag;
         this.config = config;
         this.plugin = plugin;

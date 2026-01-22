@@ -42,35 +42,30 @@ import java.util.UUID;
 public class sabCore extends absCore {
     private final Core plugin;
     private final Saboteur config;
-
     private final TrapType trapType;
-
     private final R Rskill;
     private final Q Qskill;
     private final F Fskill;
 
+    private static final BlockData BLOOD_BLOCK = Material.REDSTONE_BLOCK.createBlockData();
+    private static final BlockData IRON_BLOCK = Material.IRON_BLOCK.createBlockData();
+
     public sabCore(Core plugin, coreConfig tag, Saboteur config, Cool cool) {
         super(tag, cool);
-
         this.plugin = plugin;
         this.config = config;
-
         this.trapType = new TrapType(tag, config, plugin, cool);
-
         this.Rskill = new R(config, plugin, cool);
         this.Qskill = new Q(config, plugin, cool);
         this.Fskill = new F(config, plugin, cool);
-
         plugin.getLogger().info("Saboteur downloaded...");
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
     public void onJoin(PlayerJoinEvent event) {
         if(!contains(event.getPlayer())) return;
-
         Player player = event.getPlayer();
         applyAdditionalHealth(player, false);
-
         if(tag.Saboteur.contains(player)){
             trapType.trapTypeBoard(player);
         }
@@ -79,30 +74,22 @@ public class sabCore extends absCore {
     @EventHandler(priority = EventPriority.NORMAL)
     public void onRespawn(PlayerRespawnEvent event) {
         if(!contains(event.getPlayer())) return;
-
         Player player = event.getPlayer();
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             applyAdditionalHealth(player, true);
         }, 1L);
-
         if(tag.Saboteur.contains(player)){
             trapType.trapTypeBoard(player);
         }
     }
 
     private void applyAdditionalHealth(Player player, boolean healFull) {
-        long addHP = 0;
-
         AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
         if (maxHealth != null) {
             double current = maxHealth.getBaseValue();
-            double newMax = current + addHP;
-
+            double newMax = current;
             maxHealth.setBaseValue(newMax);
-
-            if (healFull) {
-                player.setHealth(newMax);
-            } else if (player.getHealth() > newMax) {
+            if (healFull || player.getHealth() > newMax) {
                 player.setHealth(newMax);
             }
         }
@@ -119,28 +106,20 @@ public class sabCore extends absCore {
 
     @EventHandler
     public void passiveDamage(EntityDamageByEntityEvent event) {
-
         if (!(event.getDamager() instanceof Player player)) return;
         if (!(event.getEntity() instanceof LivingEntity target)) return;
 
         if(tag.Saboteur.contains(player) && hasProperItems(player)){
             if(!skillUsing(player) && config.trapType.getOrDefault(player.getUniqueId(), 1) == 1) {
+                player.spawnParticle(Particle.SWEEP_ATTACK, target.getLocation().add(0, 1.2, 0), 1, 0, 0, 0, 0);
+                player.playSound(target.getLocation().add(0, 1.2, 0), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
 
-                player.spawnParticle(Particle.SWEEP_ATTACK, target.getLocation().clone().add(0, 1.2, 0), 1, 0, 0, 0, 0);
-
-                player.playSound(target.getLocation().clone().add(0, 1.2, 0), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
-
-                Location loc1 = player.getLocation().add(0, player.getHeight() / 2 + 0.2, 0);
-                Location loc2 = target.getLocation().add(0, target.getHeight() / 2 + 0.2, 0);
-
-                double distance = loc1.distance(loc2);
-
-                if(distance > 3) {
+                double distanceSq = player.getLocation().distanceSquared(target.getLocation());
+                if(distanceSq > 9) {
                     event.setDamage(event.getDamage() * 3);
-                }else {
+                } else {
                     event.setDamage(event.getDamage() * 5);
                 }
-
             }
             if(config.isHackAway.getOrDefault(player.getUniqueId(), false)) player.heal(1);
         }
@@ -148,16 +127,11 @@ public class sabCore extends absCore {
 
     @EventHandler(priority = EventPriority.NORMAL)
     public void passiveThrow(PlayerInteractEvent event) {
-
         if (tag.Saboteur.contains(event.getPlayer())) {
-            if (!pAttackUsing.contains(event.getPlayer().getUniqueId()) &&
-                    !skillUsing(event.getPlayer())) {
-
+            if (!pAttackUsing.contains(event.getPlayer().getUniqueId()) && !skillUsing(event.getPlayer())) {
                 Player player = event.getPlayer();
 
-                if (hasProperItems(player) &&
-                        config.trapType.getOrDefault(event.getPlayer().getUniqueId(), 1) == 2) {
-
+                if (hasProperItems(player) && config.trapType.getOrDefault(event.getPlayer().getUniqueId(), 1) == 2) {
                     if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
 
                         if (cool.isReloading(player, "throw")) {
@@ -166,10 +140,6 @@ public class sabCore extends absCore {
                         }
 
                         cool.setCooldown(player, 1000L, "throw");
-
-                        BlockData blood = Material.REDSTONE_BLOCK.createBlockData();
-                        BlockData iron = Material.IRON_BLOCK.createBlockData();
-
                         World world = player.getWorld();
                         Location playerLocation = player.getLocation().add(0, 1.5, 0);
                         Vector direction = playerLocation.getDirection().normalize().multiply(2.3);
@@ -187,13 +157,13 @@ public class sabCore extends absCore {
                                 .withDamageLocation(player.getLocation())
                                 .build();
 
-                        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+                        new BukkitRunnable() {
                             int life = 80;
 
                             @Override
                             public void run() {
                                 if (item.isDead() || !item.isValid()) {
-                                    Bukkit.getScheduler().cancelTask(this.hashCode());
+                                    cancel();
                                     return;
                                 }
 
@@ -201,34 +171,30 @@ public class sabCore extends absCore {
 
                                 for (Entity nearby : item.getNearbyEntities(0.5, 0.5, 0.5)) {
                                     if (nearby instanceof LivingEntity target && nearby != player) {
-
-                                        ForceDamage forceDamage = new ForceDamage(target, 5.0, source);
-                                        forceDamage.applyEffect(player);
-                                        world.playSound(target.getLocation().clone(), Sound.ITEM_TRIDENT_HIT, 1.0f, 1.0f);
-                                        world.spawnParticle(Particle.BLOCK, target.getLocation().clone().add(0, 1.2, 0), 14, 0.3, 0.3, 0.3,
-                                                blood);
+                                        new ForceDamage(target, 5.0, source).applyEffect(player);
+                                        world.playSound(target.getLocation(), Sound.ITEM_TRIDENT_HIT, 1.0f, 1.0f);
+                                        world.spawnParticle(Particle.BLOCK, target.getLocation().add(0, 1.2, 0), 14, 0.3, 0.3, 0.3, BLOOD_BLOCK);
 
                                         item.remove();
-                                        Bukkit.getScheduler().cancelTask(this.hashCode());
+                                        cancel();
                                         return;
                                     }
                                 }
 
                                 if (!loc.clone().add(direction).getBlock().isPassable()) {
-                                    world.playSound(loc.clone(), Sound.ITEM_TRIDENT_HIT_GROUND, 1.0f, 1.0f);
-                                    world.spawnParticle(Particle.BLOCK,loc.clone(), 14, 0.3, 0.3, 0.3,
-                                            iron);
+                                    world.playSound(loc, Sound.ITEM_TRIDENT_HIT_GROUND, 1.0f, 1.0f);
+                                    world.spawnParticle(Particle.BLOCK, loc, 14, 0.3, 0.3, 0.3, IRON_BLOCK);
                                     item.remove();
-                                    Bukkit.getScheduler().cancelTask(this.hashCode());
+                                    cancel();
                                     return;
                                 }
 
                                 if (life-- <= 0) {
                                     item.remove();
-                                    Bukkit.getScheduler().cancelTask(this.hashCode());
+                                    cancel();
                                 }
                             }
-                        }, 1L, 1L);
+                        }.runTaskTimer(plugin, 1L, 1L);
 
                         event.setCancelled(true);
                     }
@@ -248,44 +214,44 @@ public class sabCore extends absCore {
 
         if (!event.isSneaking() || !hasProperItems(player) || !tag.Saboteur.contains(player) || skillUsing(player)) return;
 
-        long durationTicks =(config.isHackAway.getOrDefault(player.getUniqueId(), false)) ? 4L : 10L;
+        UUID uuid = player.getUniqueId();
+        long durationTicks = (config.isHackAway.getOrDefault(uuid, false)) ? 4L : 10L;
 
-        if (activeChargeTasks.containsKey(player.getUniqueId())) {
-            activeChargeTasks.get(player.getUniqueId()).cancel();
-            activeChargeTasks.remove(player.getUniqueId());
+        if (activeChargeTasks.containsKey(uuid)) {
+            activeChargeTasks.get(uuid).cancel();
+            activeChargeTasks.remove(uuid);
         }
-        if (activeChargeBars.containsKey(player.getUniqueId())) {
-            activeChargeBars.get(player.getUniqueId()).removeAll();
-            activeChargeBars.remove(player.getUniqueId());
+        if (activeChargeBars.containsKey(uuid)) {
+            activeChargeBars.get(uuid).removeAll();
+            activeChargeBars.remove(uuid);
         }
 
         BossBar bossBar = Bukkit.createBossBar("trap change", BarColor.PURPLE, BarStyle.SOLID);
         bossBar.setProgress(0.0);
         bossBar.addPlayer(player);
-        activeChargeBars.put(player.getUniqueId(), bossBar);
+        activeChargeBars.put(uuid, bossBar);
 
         BukkitRunnable task = new BukkitRunnable() {
             long ticks = 0;
 
             @Override
             public void run() {
-                if (!player.isSneaking() || !hasProperItems(player)
-                        || skillUsing(player)) {
+                if (!player.isSneaking() || !hasProperItems(player) || skillUsing(player)) {
                     cleanup();
                     return;
                 }
 
                 if (ticks < durationTicks) {
                     ticks++;
-                    double progress = (double) ticks / durationTicks;
-                    bossBar.setProgress(progress);
+                    bossBar.setProgress((double) ticks / durationTicks);
                 } else {
                     bossBar.setProgress(1.0);
-                    int trap = (config.trapType.getOrDefault(player.getUniqueId(), 1) == 1) ? 2 : 1;
-                    config.trapType.put(player.getUniqueId(), trap);
-                    if(config.trapType.getOrDefault(player.getUniqueId(), 1) == 1) {
+                    int trap = (config.trapType.getOrDefault(uuid, 1) == 1) ? 2 : 1;
+                    config.trapType.put(uuid, trap);
+
+                    if(trap == 1) {
                         player.sendActionBar(Component.text("Spike").color(NamedTextColor.GREEN));
-                    }else{
+                    } else {
                         player.sendActionBar(Component.text("Throw").color(NamedTextColor.GREEN));
                     }
 
@@ -296,33 +262,29 @@ public class sabCore extends absCore {
 
             private void cleanup() {
                 bossBar.removeAll();
-                activeChargeBars.remove(player.getUniqueId());
-                activeChargeTasks.remove(player.getUniqueId());
+                activeChargeBars.remove(uuid);
+                activeChargeTasks.remove(uuid);
                 cancel();
             }
         };
 
         task.runTaskTimer(plugin, 0L, 1L);
-        activeChargeTasks.put(player.getUniqueId(), task);
+        activeChargeTasks.put(uuid, task);
     }
 
-    @Override
-    protected boolean contains(Player player) {
+    @Override protected boolean contains(Player player) {
         return tag.Saboteur.contains(player);
     }
 
-    @Override
-    protected SkillBase getRSkill() {
+    @Override protected SkillBase getRSkill() {
         return Rskill;
     }
 
-    @Override
-    protected SkillBase getQSkill() {
+    @Override protected SkillBase getQSkill() {
         return Qskill;
     }
 
-    @Override
-    protected SkillBase getFSkill() {
+    @Override protected SkillBase getFSkill() {
         return Fskill;
     }
 
@@ -337,7 +299,6 @@ public class sabCore extends absCore {
                 || config.r_skillUsing_Hack.getOrDefault(player.getUniqueId(), false) || config.r_skillUsing_Sweep_Hack.getOrDefault(player.getUniqueId(), false)
                 || config.q_skillUsing_Hack.getOrDefault(player.getUniqueId(), false) || config.q_skillUsing_Sweep_Hack.getOrDefault(player.getUniqueId(), false));
     }
-
     private boolean canUseRSkill(Player player) {
         return !skillUsing(player);
     }
@@ -350,66 +311,32 @@ public class sabCore extends absCore {
         return !skillUsing(player);
     }
 
-    @Override
-    protected boolean isItemRequired(Player player){
-        return hasProperItems(player);
-    }
+    @Override protected boolean isItemRequired(Player player){ return hasProperItems(player); }
 
-    @Override
-    protected boolean isDropRequired(Player player, ItemStack droppedItem){
+    @Override protected boolean isDropRequired(Player player, ItemStack droppedItem){
         ItemStack off = player.getInventory().getItemInOffHand();
-        return droppedItem.getType() == Material.SHEARS &&
-                off.getType() == Material.AIR;
+        return droppedItem.getType() == Material.SHEARS && off.getType() == Material.AIR;
     }
+    @Override protected boolean isRCondition(Player player) { return canUseRSkill(player); }
 
-    @Override
-    protected boolean isRCondition(Player player) {
-        return canUseRSkill(player);
-    }
+    @Override protected boolean isQCondition(Player player) { return canUseQSkill(player); }
 
-    @Override
-    protected boolean isQCondition(Player player) {
-        return canUseQSkill(player);
-    }
+    @Override protected boolean isFCondition(Player player) { return canUseFSkill(player); }
 
-    @Override
-    protected boolean isFCondition(Player player) {
-        return canUseFSkill(player);
-    }
-
-    @Override
-    protected ConfigWrapper getConfigWrapper() {
+    @Override protected ConfigWrapper getConfigWrapper() {
         return new ConfigWrapper() {
-            @Override
-            public void variableReset(Player player) {
-                config.variableReset(player);
-            }
-
-            @Override
-            public void cooldownReset(Player player) {
+            @Override public void variableReset(Player player) { config.variableReset(player); }
+            @Override public void cooldownReset(Player player) {
                 cool.setCooldown(player, config.frozenCool, "R");
                 cool.setCooldown(player, config.frozenCool, "Q");
                 cool.setCooldown(player, config.frozenCool, "F");
-
                 cool.updateCooldown(player, "R", config.frozenCool);
                 cool.updateCooldown(player, "Q", config.frozenCool);
                 cool.updateCooldown(player, "F", config.frozenCool);
             }
-
-            @Override
-            public long getRcooldown(Player player) {
-                return config.R_COOLDOWN.getOrDefault(player.getUniqueId(), config.r_Skill_Cool);
-            }
-
-            @Override
-            public long getQcooldown(Player player) {
-                return config.Q_COOLDOWN.getOrDefault(player.getUniqueId(), config.q_Skill_Cool);
-            }
-
-            @Override
-            public long getFcooldown(Player player) {
-                return config.F_COOLDOWN.getOrDefault(player.getUniqueId(), config.f_Skill_Cool);
-            }
+            @Override public long getRcooldown(Player player) { return config.R_COOLDOWN.getOrDefault(player.getUniqueId(), config.r_Skill_Cool); }
+            @Override public long getQcooldown(Player player) { return config.Q_COOLDOWN.getOrDefault(player.getUniqueId(), config.q_Skill_Cool); }
+            @Override public long getFcooldown(Player player) { return config.F_COOLDOWN.getOrDefault(player.getUniqueId(), config.f_Skill_Cool); }
         };
     }
 }

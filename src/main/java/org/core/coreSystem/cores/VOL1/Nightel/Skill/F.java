@@ -28,40 +28,43 @@ public class F implements SkillBase {
     private final JavaPlugin plugin;
     private final Cool cool;
     private final Chain chain;
+    private final NamespacedKey keyF;
+
+    private static final Particle.DustOptions DUST_1 = new Particle.DustOptions(Color.fromRGB(199, 199, 199), 0.3f);
+    private static final Particle.DustOptions DUST_2 = new Particle.DustOptions(Color.fromRGB(222, 222, 222), 0.4f);
+    private static final Particle.DustOptions DUST_3 = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 0.5f);
 
     public F(Nightel config, JavaPlugin plugin, Cool cool, Chain chain) {
         this.config = config;
         this.plugin = plugin;
         this.cool = cool;
         this.chain = chain;
+        this.keyF = new NamespacedKey(plugin, "F");
     }
 
     @Override
     public void Trigger(Player player) {
-
         player.swingMainHand();
         World world = player.getWorld();
 
-        Entity target = getTargetedEntity(player,4.8, 0.3);
+        LivingEntity target = getTargetedEntity(player, 4.8, 0.3);
 
-        if(target != null){
-
+        if (target != null) {
             Location firstLocation = player.getLocation();
             GameMode playerGameMode = player.getGameMode();
 
             world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1.0f, 1.0f);
-            world.spawnParticle(Particle.ENCHANTED_HIT, target.getLocation().clone().add(0, 1.2, 0), 22, 0.6, 0.6, 0.6, 1);
+            world.spawnParticle(Particle.ENCHANTED_HIT, target.getLocation().add(0, 1.2, 0), 22, 0.6, 0.6, 0.6, 1);
 
             int slashCount = config.chainCount.getOrDefault(player.getUniqueId(), 0);
 
             boolean justTeleport = !(slashCount > 1.0);
-            if(slashCount < 6 && !justTeleport) chain.removePoint(player);
+            if (slashCount < 6 && !justTeleport) chain.removePoint(player);
 
             Special_Attack(player, firstLocation, playerGameMode, target, slashCount, justTeleport);
-        }else{
+        } else {
             world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_WEAK, 1, 1);
-            long cools = 250L;
-            cool.updateCooldown(player, "F", cools);
+            cool.updateCooldown(player, "F", 250L);
         }
     }
 
@@ -70,30 +73,19 @@ public class F implements SkillBase {
         Location eyeLocation = player.getEyeLocation();
         Vector direction = eyeLocation.getDirection();
 
-        List<LivingEntity> candidates = new ArrayList<>();
+        RayTraceResult result = world.rayTraceEntities(eyeLocation, direction, range, raySize,
+                e -> e instanceof LivingEntity && !e.equals(player));
 
-        for (Entity entity : world.getNearbyEntities(eyeLocation, range, range, range)) {
-            if (!(entity instanceof LivingEntity) || entity.equals(player) || entity.isInvulnerable()) continue;
-
-            RayTraceResult result = world.rayTraceEntities(
-                    eyeLocation, direction, range, raySize, e -> e.equals(entity)
-            );
-
-            if (result != null) {
-                candidates.add((LivingEntity) entity);
-            }
+        if (result != null && result.getHitEntity() instanceof LivingEntity target) {
+            return target;
         }
-
-        return candidates.stream()
-                .min(Comparator.comparingDouble(Damageable::getHealth))
-                .orElse(null);
+        return null;
     }
 
     public void Special_Attack(Player player, Location firstLocation, GameMode playerGameMode, Entity entity, int slashCount, boolean justTeleport) {
-
         World world = player.getWorld();
 
-        if(!justTeleport) config.fskill_using.put(player.getUniqueId(), true);
+        if (!justTeleport) config.fskill_using.put(player.getUniqueId(), true);
 
         Invulnerable invulnerable = new Invulnerable(player, 150L * slashCount);
         invulnerable.applyEffect(player);
@@ -104,10 +96,10 @@ public class F implements SkillBase {
             @Override
             public void run() {
                 if (tick >= slashCount || player.isDead()) {
-                    config.damaged.remove(player.getUniqueId());
+                    config.damaged_2.remove(player.getUniqueId());
                     config.fskill_using.remove(player.getUniqueId());
 
-                    if(!isSafe(player.getLocation())) player.teleport(firstLocation);
+                    if (!isSafe(player.getLocation())) player.teleport(firstLocation);
 
                     player.setGameMode(playerGameMode);
 
@@ -117,16 +109,17 @@ public class F implements SkillBase {
 
                 teleportBehind(player, playerGameMode, entity, -5.0);
 
-                if(slashCount == 6) {
-                    world.spawnParticle(Particle.ENCHANTED_HIT, entity.getLocation().clone().add(0, 1.2, 0), 22, 0.6, 0.6, 0.6, 1);
+                Location targetLoc = entity.getLocation().add(0, 1.2, 0);
+                if (slashCount == 6) {
+                    world.spawnParticle(Particle.ENCHANTED_HIT, targetLoc, 22, 0.6, 0.6, 0.6, 1);
                     world.playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1, 1);
-                }else{
-                    world.spawnParticle(Particle.CRIT, entity.getLocation().clone().add(0, 1.2, 0), 22, 0.6, 0.6, 0.6, 1);
+                } else {
+                    world.spawnParticle(Particle.CRIT, targetLoc, 22, 0.6, 0.6, 0.6, 1);
                     world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_CRIT, 1, 1);
                 }
 
-                double height = - 0.2 * tick;
-                if(!justTeleport) Slash(player, height, slashCount);
+                double height = -0.2 * tick;
+                if (!justTeleport) Slash(player, height, slashCount);
 
                 tick++;
             }
@@ -134,7 +127,6 @@ public class F implements SkillBase {
     }
 
     public void Slash(Player player, double height, int slashCount) {
-
         config.damaged_2.put(player.getUniqueId(), new HashSet<>());
 
         player.swingMainHand();
@@ -143,9 +135,7 @@ public class F implements SkillBase {
 
         double slashLength = 5.4;
         double maxAngle = Math.toRadians(36);
-        long tickDelay = 0L;
         int maxTicks = 3;
-
         double innerRadius = 5.0;
 
         Random rand = new Random();
@@ -159,8 +149,11 @@ public class F implements SkillBase {
             default -> Math.toRadians(0);
         };
 
+        double cosTilt = Math.cos(tiltAngle);
+        double sinTilt = Math.sin(tiltAngle);
+
         double baseDamage = (slashCount == 6) ? 6 : config.f_Skill_damage;
-        double amp = config.f_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L);
+        double amp = config.f_Skill_amp * player.getPersistentDataContainer().getOrDefault(keyF, PersistentDataType.LONG, 0L);
         double damage = baseDamage * (1 + amp);
 
         DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
@@ -168,19 +161,14 @@ public class F implements SkillBase {
                 .withDirectEntity(player)
                 .build();
 
-        Location origin = player.getEyeLocation().add(0, 0, 0);
-        Vector direction = player.getLocation().getDirection().clone().setY(0).normalize();
-
-        Particle.DustOptions dustOptions1 = new Particle.DustOptions(Color.fromRGB(199, 199, 199), 0.4f);
-        Particle.DustOptions dustOptions2 = new Particle.DustOptions(Color.fromRGB(222, 222, 222), 0.5f);
-        Particle.DustOptions dustOptions3 = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 0.6f);
+        Location origin = player.getEyeLocation();
+        Vector direction = player.getLocation().getDirection().setY(0).normalize();
 
         new BukkitRunnable() {
             int ticks = 0;
 
             @Override
             public void run() {
-
                 if (ticks >= maxTicks || player.isDead()) {
                     this.cancel();
                     return;
@@ -189,47 +177,74 @@ public class F implements SkillBase {
                 double progress = (ticks + 1) * (maxAngle * 2 / maxTicks) - maxAngle;
                 Vector rotatedDir = direction.clone().rotateAroundY(progress);
 
-                for (double length = innerRadius; length <= slashLength; length += 0.1) {
-                    for (double angle = -maxAngle; angle <= maxAngle; angle += Math.toRadians(1)) {
-                        Vector angleDir = rotatedDir.clone().rotateAroundY(angle);
-                        Vector particleOffset = angleDir.clone().multiply(length);
+                Set<Entity> damagedEntities = config.damaged_2.get(player.getUniqueId());
 
-                        double cosTilt = Math.cos(tiltAngle);
-                        double sinTilt = Math.sin(tiltAngle);
-                        double tiltedY = particleOffset.getY() * cosTilt - particleOffset.getZ() * sinTilt;
-                        double tiltedZ = particleOffset.getY() * sinTilt + particleOffset.getZ() * cosTilt;
-                        particleOffset.setY(tiltedY);
-                        particleOffset.setZ(tiltedZ);
-
-                        Location particleLocation = origin.clone().add(particleOffset);
-
-                        if(length < innerRadius + 0.2){
-                            world.spawnParticle(Particle.DUST, particleLocation.add(0, height, 0), 1, 0, 0, 0, 0, dustOptions1);
-                        }else if(length < innerRadius + 0.3){
-                            world.spawnParticle(Particle.DUST, particleLocation.add(0, height, 0), 1, 0, 0, 0, 0, dustOptions2);
-                        }else{
-                            world.spawnParticle(Particle.DUST, particleLocation.add(0, height, 0), 1, 0, 0, 0, 0, dustOptions3);
+                List<LivingEntity> potentialTargets = new ArrayList<>();
+                for (Entity entity : world.getNearbyEntities(origin, slashLength, slashLength, slashLength)) {
+                    if (entity instanceof LivingEntity target && entity != player) {
+                        if (damagedEntities == null || !damagedEntities.contains(target)) {
+                            potentialTargets.add(target);
                         }
+                    }
+                }
 
-                        for (Entity entity : world.getNearbyEntities(particleLocation, 1.2, 1.2, 1.2)) {
-                            if (entity instanceof LivingEntity target && entity != player && !config.damaged_2.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(entity)) {
+                if (!potentialTargets.isEmpty()) {
+                    Iterator<LivingEntity> iterator = potentialTargets.iterator();
+                    while (iterator.hasNext()) {
+                        LivingEntity target = iterator.next();
+                        Vector toEntity = target.getLocation().toVector().subtract(origin.toVector());
+                        double distSq = toEntity.lengthSquared();
+
+                        if (distSq <= (slashLength + 0.5) * (slashLength + 0.5)) {
+                            Vector toEntityDir = toEntity.clone().normalize();
+                            double angle = rotatedDir.angle(toEntityDir);
+
+                            if (angle < maxAngle + 0.3) {
+                                if (damagedEntities != null) damagedEntities.add(target);
 
                                 ForceDamage forceDamage = new ForceDamage(target, damage, source);
                                 forceDamage.applyEffect(player);
                                 target.setVelocity(new Vector(0, 0, 0));
-
-                                config.damaged_2.getOrDefault(player.getUniqueId(), new HashSet<>()).add(entity);
+                                iterator.remove();
                             }
                         }
                     }
                 }
+
+                Location particleLocation = origin.clone();
+                double originX = origin.getX();
+                double originY = origin.getY();
+                double originZ = origin.getZ();
+
+                for (double length = innerRadius; length <= slashLength; length += 0.1) {
+                    for (double angle = -maxAngle; angle <= maxAngle; angle += Math.toRadians(1)) {
+                        Vector angleDir = rotatedDir.clone().rotateAroundY(angle);
+
+                        double valX = angleDir.getX() * length;
+                        double valY = angleDir.getY() * length;
+                        double valZ = angleDir.getZ() * length;
+
+                        double tiltedY = valY * cosTilt - valZ * sinTilt;
+                        double tiltedZ = valY * sinTilt + valZ * cosTilt;
+
+                        particleLocation.setX(originX + valX);
+                        particleLocation.setY(originY + tiltedY + height);
+                        particleLocation.setZ(originZ + tiltedZ);
+
+                        Particle.DustOptions opt;
+                        if (length < innerRadius + 0.2) opt = DUST_1;
+                        else if (length < innerRadius + 0.3) opt = DUST_2;
+                        else opt = DUST_3;
+
+                        world.spawnParticle(Particle.DUST, particleLocation, 1, 0, 0, 0, 0, opt);
+                    }
+                }
                 ticks++;
             }
-        }.runTaskTimer(plugin, tickDelay, 1L);
+        }.runTaskTimer(plugin, 0L, 1L);
     }
 
     public static void teleportBehind(Player player, GameMode playerGameMode, Entity target, double distance) {
-
         Location enemyLocation = target.getLocation();
         Location playerLocation = player.getLocation();
 
@@ -243,16 +258,15 @@ public class F implements SkillBase {
 
         player.teleport(teleportLocation);
 
-        if(isSafe(teleportLocation)){
+        if (isSafe(teleportLocation)) {
             player.setGameMode(playerGameMode);
-        }else{
+        } else {
             player.setGameMode(GameMode.SPECTATOR);
         }
     }
 
     private static boolean isSafe(Location loc) {
         Block aboveHead = loc.clone().add(0, 1, 0).getBlock();
-
         return !aboveHead.getType().isSolid();
     }
 

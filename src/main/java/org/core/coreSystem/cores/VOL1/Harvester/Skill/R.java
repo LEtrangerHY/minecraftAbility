@@ -28,6 +28,13 @@ public class R implements SkillBase {
     private final JavaPlugin plugin;
     private final Cool cool;
 
+    private static final Set<Material> UNBREAKABLE_BLOCKS = Set.of(
+            Material.BEDROCK, Material.BARRIER, Material.COMMAND_BLOCK,
+            Material.CHAIN_COMMAND_BLOCK, Material.REPEATING_COMMAND_BLOCK,
+            Material.END_PORTAL_FRAME, Material.END_PORTAL, Material.NETHER_PORTAL,
+            Material.STRUCTURE_BLOCK, Material.JIGSAW, Material.GRASS_BLOCK, Material.DIRT
+    );
+
     public R(Harvester config, JavaPlugin plugin, Cool cool){
         this.config = config;
         this.plugin = plugin;
@@ -44,16 +51,18 @@ public class R implements SkillBase {
         world.playSound(player.getLocation(), Sound.ITEM_TRIDENT_THROW, 1, 1);
 
         Boolean invisibility = player.isInvisible();
-        double slashLength = (player.isInvisible()) ? 4 : 6.4;
-        double maxAngle = (player.isInvisible()) ? Math.toRadians(100) : Math.toRadians(24);
-        double maxTicks = (player.isInvisible()) ? 6 : 4;
+        double slashLength = (invisibility) ? 4 : 6.4;
+        double maxAngle = (invisibility) ? Math.toRadians(100) : Math.toRadians(24);
+        double maxTicks = (invisibility) ? 6 : 4;
         double innerRadius = 2;
+
+        double hitThreshold = Math.cos(maxAngle + 0.1);
 
         config.damaged.put(player.getUniqueId(), new HashSet<>());
 
         double amp = config.r_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L);
-        double damage = config.r_Skill_damage * (1 + amp);
-        damage = (player.isInvisible()) ? damage * 4 : damage;
+        double rawDamage = config.r_Skill_damage * (1 + amp);
+        double finalDamage = (invisibility) ? rawDamage * 2 : rawDamage;
 
         Location origin = player.getEyeLocation().add(0, -0.7, 0);
 
@@ -66,7 +75,6 @@ public class R implements SkillBase {
         Particle.DustOptions dustOption_slash = new Particle.DustOptions(Color.fromRGB(108, 108, 44), 0.6f);
         Particle.DustOptions dustOption_slash_gra = new Particle.DustOptions(Color.fromRGB(166, 166, 88), 0.6f);
 
-        double finalDamage = damage;
         DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
                 .withCausingEntity(player)
                 .withDirectEntity(player)
@@ -91,6 +99,37 @@ public class R implements SkillBase {
 
                 double progress = ((ticks) * (maxAngle * 2 / maxTicks)) - maxAngle;
 
+                double sinP = Math.sin(progress);
+                double cosP = Math.cos(progress);
+
+                Vector sweepCenterDir = right.clone().multiply(sinP).add(forward.clone().multiply(cosP)).normalize();
+
+                for (Entity entity : world.getNearbyEntities(origin, slashLength + 0.5, slashLength + 0.5, slashLength + 0.5)) {
+                    if (!(entity instanceof LivingEntity target) || entity == player) continue;
+                    if (config.damaged.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(target)) continue;
+
+                    Vector toTarget = target.getLocation().toVector().subtract(origin.toVector());
+
+                    if (toTarget.lengthSquared() > (slashLength + 0.5) * (slashLength + 0.5)) continue;
+
+                    Vector toTargetPlanar = toTarget.clone().subtract(up.clone().multiply(toTarget.dot(up))).normalize();
+
+                    double dotProduct = sweepCenterDir.dot(toTargetPlanar);
+
+                    if (dotProduct >= hitThreshold) {
+                        config.damaged.get(player.getUniqueId()).add(target);
+
+                        if (invisibility) {
+                            world.spawnParticle(Particle.CRIT, target.getLocation().clone().add(0, 1.3, 0), 26, 0.4, 0.4, 0.4, 1);
+                            world.playSound(target.getLocation().clone().add(0, 1.3, 0), Sound.ENTITY_PLAYER_ATTACK_CRIT, 1, 1);
+                        }
+
+                        ForceDamage forceDamage = new ForceDamage(target, finalDamage, source);
+                        forceDamage.applyEffect(player);
+                        target.setVelocity(new Vector(0, 0, 0));
+                    }
+                }
+
                 for (double length = 0; length <= slashLength; length += 0.1) {
                     for (double angle = -maxAngle; angle <= maxAngle; angle += Math.toRadians(2)) {
 
@@ -103,28 +142,12 @@ public class R implements SkillBase {
                                 .add(up.clone().multiply(yOffset));
 
                         Location particleLocation = origin.clone().add(local);
-                        double distanceFromOrigin = particleLocation.distance(origin);
 
-                        if (distanceFromOrigin >= innerRadius) {
+                        if (length >= innerRadius) {
                             if (Math.random() < 0.26) {
                                 world.spawnParticle(Particle.DUST, particleLocation, 1, 0, 0, 0, 0, dustOption_slash);
                             } else {
                                 world.spawnParticle(Particle.DUST, particleLocation, 1, 0, 0, 0, 0, dustOption_slash_gra);
-                            }
-                        }
-
-                        for (Entity entity : world.getNearbyEntities(particleLocation, 0.4, 0.4, 0.4)) {
-                            if (entity instanceof LivingEntity target && entity != player &&
-                                    !config.damaged.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(target)) {
-                                config.damaged.get(player.getUniqueId()).add(target);
-                                if (invisibility) {
-                                    world.spawnParticle(Particle.CRIT, target.getLocation().clone().add(0, 1.3, 0), 26, 0.4, 0.4, 0.4, 1);
-                                    world.playSound(target.getLocation().clone().add(0, 1.3, 0), Sound.ENTITY_PLAYER_ATTACK_CRIT, 1, 1);
-                                }
-
-                                ForceDamage forceDamage = new ForceDamage(target, finalDamage, source);
-                                forceDamage.applyEffect(player);
-                                target.setVelocity(new Vector(0, 0, 0));
                             }
                         }
 
@@ -160,20 +183,4 @@ public class R implements SkillBase {
 
         block.breakNaturally(new ItemStack(Material.IRON_HOE), false);
     }
-
-
-    private static final Set<Material> UNBREAKABLE_BLOCKS = Set.of(
-            Material.BEDROCK,
-            Material.BARRIER,
-            Material.COMMAND_BLOCK,
-            Material.CHAIN_COMMAND_BLOCK,
-            Material.REPEATING_COMMAND_BLOCK,
-            Material.END_PORTAL_FRAME,
-            Material.END_PORTAL,
-            Material.NETHER_PORTAL,
-            Material.STRUCTURE_BLOCK,
-            Material.JIGSAW,
-            Material.GRASS_BLOCK,
-            Material.DIRT
-    );
 }

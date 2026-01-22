@@ -23,6 +23,18 @@ public class chainResonance {
     private final JavaPlugin plugin;
     private final Cool cool;
 
+    private static final BlockData CHAIN_DATA = Material.IRON_CHAIN.createBlockData();
+    private static final Particle.DustOptions DUST_NEAR = new Particle.DustOptions(Color.fromRGB(66, 66, 66), 0.5f);
+    private static final Particle.DustOptions DUST_FAR = new Particle.DustOptions(Color.fromRGB(0, 0, 0), 0.5f);
+    private static final Component ICON_FULL = Component.text("⌬").color(NamedTextColor.GRAY);
+    private static final String[] BENZENE_ICONS = new String[7];
+
+    static {
+        for (int i = 0; i <= 6; i++) {
+            BENZENE_ICONS[i] = "⌬ ".repeat(Math.max(0, 6 - i)).trim();
+        }
+    }
+
     public chainResonance(coreConfig tag, Benzene config, JavaPlugin plugin, Cool cool) {
         this.tag = tag;
         this.config = config;
@@ -31,22 +43,18 @@ public class chainResonance {
     }
 
     public void increase(Player player, Entity entity) {
-        config.chainRes.computeIfAbsent(player.getUniqueId(), k -> new LinkedHashMap<>());
-
-        LinkedHashMap<Integer, Entity> playerChain = config.chainRes.get(player.getUniqueId());
+        LinkedHashMap<Integer, Entity> playerChain = config.chainRes.computeIfAbsent(player.getUniqueId(), k -> new LinkedHashMap<>());
         int count = playerChain.size();
 
-        if(!activeTasks.containsKey(player.getUniqueId())){
+        if (!activeTasks.containsKey(player.getUniqueId())) {
             updateChainResList(player);
         }
-
-        BlockData chain = Material.IRON_CHAIN.createBlockData();
 
         if (count < 6) {
             int chainCount = config.crCount.getOrDefault(player.getUniqueId(), 0) + 1;
             config.crCount.put(player.getUniqueId(), chainCount);
 
-            player.getWorld().spawnParticle(Particle.BLOCK, entity.getLocation().clone().add(0, 1.2, 0), 12, 0.3, 0.3, 0.3, chain);
+            player.getWorld().spawnParticle(Particle.BLOCK, entity.getLocation().add(0, 1.2, 0), 12, 0.3, 0.3, 0.3, CHAIN_DATA);
 
             playerChain.put(chainCount, entity);
 
@@ -59,18 +67,10 @@ public class chainResonance {
 
             int t = countIndivChain(player, entity);
 
-            player.getWorld().spawnParticle(Particle.BLOCK, entity.getLocation().clone().add(0, t * 0.2, 0), 6, 0.3, 0.3, 0.3, chain);
-
+            player.getWorld().spawnParticle(Particle.BLOCK, entity.getLocation().add(0, t * 0.2, 0), 6, 0.3, 0.3, 0.3, CHAIN_DATA);
         }
 
-        int currentSize = config.chainRes.get(player.getUniqueId()).size();
-
-        if (currentSize < 6) {
-            String hex = "⌬ ".repeat(6 - currentSize).trim();
-            player.sendActionBar(Component.text(hex).color(NamedTextColor.DARK_GRAY));
-        } else {
-            player.sendActionBar(Component.text("⌬").color(NamedTextColor.GRAY));
-        }
+        sendActionBar(player, config.chainRes.get(player.getUniqueId()).size());
 
         if (!particleUse.containsKey(entity)) {
             chainParticle(player, entity);
@@ -78,126 +78,124 @@ public class chainResonance {
     }
 
     public void decrease(Entity targetEntity) {
-
         config.chainRes.forEach((uuid, entityMap) -> {
             boolean isRemoved = entityMap.values().removeIf(entity -> entity.equals(targetEntity));
 
             if (isRemoved) {
                 Player player = Bukkit.getPlayer(uuid);
-
                 if (player != null && player.isOnline()) {
-                    int currentSize = entityMap.size();
-
-                    if (currentSize < 6) {
-                        String hex = "⌬ ".repeat(Math.max(0, 6 - currentSize)).trim();
-                        player.sendActionBar(Component.text(hex).color(NamedTextColor.DARK_GRAY));
-                    } else {
-                        player.sendActionBar(Component.text("⌬").color(NamedTextColor.GRAY));
-                    }
+                    sendActionBar(player, entityMap.size());
                 }
             }
         });
         config.chainRes.entrySet().removeIf(entry -> entry.getValue().isEmpty());
     }
 
+    private void sendActionBar(Player player, int currentSize) {
+        if (currentSize < 6) {
+            String hex = BENZENE_ICONS[currentSize];
+            player.sendActionBar(Component.text(hex).color(NamedTextColor.DARK_GRAY));
+        } else {
+            player.sendActionBar(ICON_FULL);
+        }
+    }
+
     public <K, V> void removeFirstEntryFromLinkedHashMap(Map<K, LinkedHashMap<Integer, V>> map, K key, Player player) {
         LinkedHashMap<Integer, V> chainMap = map.get(key);
-        BlockData chain = Material.IRON_CHAIN.createBlockData();
+
         if (chainMap != null && !chainMap.isEmpty()) {
-            Integer firstKey = chainMap.entrySet().iterator().next().getKey();
+            Integer firstKey = chainMap.keySet().iterator().next();
             Entity firstKeyEntity = config.chainRes.getOrDefault(player.getUniqueId(), new LinkedHashMap<>()).get(firstKey);
 
-            Location loc1 = player.getLocation().add(0, player.getHeight() / 2 + 0.2, 0);
-            Location loc2 = firstKeyEntity.getLocation().add(0, firstKeyEntity.getHeight() / 2 + 0.2, 0);
-
-            double distance = loc1.distance(loc2);
+            Location pLoc = player.getLocation();
+            Location eLoc = firstKeyEntity.getLocation();
+            double distSq = distanceSquared(pLoc, eLoc, player.getHeight(), firstKeyEntity.getHeight());
 
             int t = countIndivChain(player, firstKeyEntity);
 
-            if(distance <= 22) {
-
-                Stun stun = new Stun(config.chainRes.getOrDefault(player.getUniqueId(), new LinkedHashMap<>()).get(firstKey), 100L * t);
+            if (distSq <= 484) {
+                Stun stun = new Stun(firstKeyEntity, 100L * t);
                 stun.applyEffect(player);
 
-                player.getWorld().spawnParticle(Particle.BLOCK, firstKeyEntity.getLocation().clone().add(0, t * 0.2, 0), 12, 0.3, 0.3, 0.3, chain);
-                player.getWorld().spawnParticle(Particle.ENCHANTED_HIT, firstKeyEntity.getLocation().add(0, t * 0.2, 0), 12, 0.6, 0, 0.6, 0);
-
+                player.getWorld().spawnParticle(Particle.BLOCK, eLoc.clone().add(0, t * 0.2, 0), 12, 0.3, 0.3, 0.3, CHAIN_DATA);
+                player.getWorld().spawnParticle(Particle.ENCHANTED_HIT, eLoc.clone().add(0, t * 0.2, 0), 12, 0.6, 0, 0.6, 0);
             }
 
             chainMap.remove(firstKey);
-
             updateChainResList(player);
         }
+    }
+
+    private double distanceSquared(Location l1, Location l2, double h1, double h2) {
+        double x = l1.getX() - l2.getX();
+        double y = (l1.getY() + h1 / 2 + 0.2) - (l2.getY() + h2 / 2 + 0.2);
+        double z = l1.getZ() - l2.getZ();
+        return x * x + y * y + z * z;
     }
 
     private final Map<Entity, BukkitRunnable> particleUse = new HashMap<>();
 
     public void chainParticle(Player player, Entity target) {
         BukkitRunnable particle = new BukkitRunnable() {
+            final double tiltAngle = Math.toRadians(16);
+            final double cosTilt = Math.cos(tiltAngle);
+            final double sinTilt = Math.sin(tiltAngle);
+
             @Override
             public void run() {
-
-                int t = countIndivChain(player, target);
-
-                Location loc1 = player.getLocation().add(0, player.getHeight() / 2 + 0.2, 0);
-                Location loc2 = target.getLocation().add(0, target.getHeight() / 2 + 0.2, 0);
-                double distance = loc1.distance(loc2);
-
-                if (target.isDead() || !config.chainRes.getOrDefault(player.getUniqueId(), new LinkedHashMap<>()).containsValue(target) || !player.isOnline()) {
-
+                LinkedHashMap<Integer, Entity> chainMap = config.chainRes.get(player.getUniqueId());
+                if (target.isDead() || !player.isOnline() || chainMap == null || !chainMap.containsValue(target)) {
                     particleUse.remove(target);
-
                     this.cancel();
                     return;
                 }
 
+                int t = countIndivChain(player, target);
+
+                Location pLoc = player.getLocation();
+                Location tLoc = target.getLocation();
+                double distSq = distanceSquared(pLoc, tLoc, player.getHeight(), target.getHeight());
+
+                Particle.DustOptions currentDust = (distSq <= 484) ? DUST_NEAR : DUST_FAR;
+
                 int points = 6;
                 double radius = 0.6;
-                double yBase = target.getY() + t * 0.2;
+                double yBase = tLoc.getY() + t * 0.2;
+                double tX = tLoc.getX();
+                double tZ = tLoc.getZ();
+                World world = tLoc.getWorld();
 
-                double tiltAngle = Math.toRadians(16);
+                double startLocalX = radius;
+                double startLocalZ = 0;
+                double startYOffset = -startLocalZ * sinTilt;
+                double startZOffset = startLocalZ * cosTilt;
 
-                Particle.DustOptions dustOption_chain = (distance <= 22) ? new Particle.DustOptions(Color.fromRGB(66, 66, 66), 0.6f) : new Particle.DustOptions(Color.fromRGB(0, 0, 0), 0.6f);
+                Location start = new Location(world, tX + startLocalX, yBase + startYOffset, tZ + startZOffset);
 
-                List<Location> vertices = new ArrayList<>();
-
-                for (int i = 0; i < points; i++) {
-                    double angle = (2 * Math.PI / points) * i;
+                for (int i = 1; i <= points; i++) {
+                    double angle = (2 * Math.PI / points) * (i % points);
 
                     double localX = radius * Math.cos(angle);
                     double localZ = radius * Math.sin(angle);
-                    double localY = 0;
 
-                    double cosTilt = Math.cos(tiltAngle);
-                    double sinTilt = Math.sin(tiltAngle);
+                    double tiltedY = -localZ * sinTilt;
+                    double tiltedZ = localZ * cosTilt;
 
-                    double tiltedY = localY * cosTilt - localZ * sinTilt;
-                    double tiltedZ = localY * sinTilt + localZ * cosTilt;
-
-                    Location vertex = new Location(
-                            target.getWorld(),
-                            target.getX() + localX,
-                            yBase + tiltedY,
-                            target.getZ() + tiltedZ
-                    );
-                    vertices.add(vertex);
-                }
-
-                for (int i = 0; i < vertices.size(); i++) {
-                    Location start = vertices.get(i);
-                    Location end = vertices.get((i + 1) % vertices.size());
+                    Location end = new Location(world, tX + localX, yBase + tiltedY, tZ + tiltedZ);
 
                     Vector direction = end.toVector().subtract(start.toVector());
                     double length = direction.length();
-                    direction.normalize();
+                    direction.normalize().multiply(0.05);
 
-                    double step = 0.05;
-                    int steps = (int) (length / step);
+                    int steps = (int) (length / 0.05);
 
+                    Location drawLoc = start.clone();
                     for (int j = 0; j < steps; j++) {
-                        Location point = start.clone().add(direction.clone().multiply(j * step));
-                        target.getWorld().spawnParticle(Particle.DUST, point, 1, 0, 0, 0, 0.08, dustOption_chain);
+                        drawLoc.add(direction);
+                        world.spawnParticle(Particle.DUST, drawLoc, 1, 0, 0, 0, 0.08, currentDust);
                     }
+
+                    start = end;
                 }
             }
         };
@@ -206,16 +204,16 @@ public class chainResonance {
         particle.runTaskTimer(plugin, 0L, 3L);
     }
 
-    public int countIndivChain(Player player, Entity target){
-
+    public int countIndivChain(Player player, Entity target) {
         int t = 0;
+        LinkedHashMap<Integer, Entity> map = config.chainRes.get(player.getUniqueId());
+        if (map == null) return 0;
 
-        for (Entity chainedEntity : new ArrayList<>(config.chainRes.getOrDefault(player.getUniqueId(), new LinkedHashMap<>()).values())) {
+        for (Entity chainedEntity : map.values()) {
             if (chainedEntity == target) {
                 t++;
             }
         }
-
         return t;
     }
 
@@ -237,10 +235,8 @@ public class chainResonance {
             @Override
             public void run() {
                 if (!player.isOnline() || !tag.Benzene.contains(player)) {
-
                     config.variableReset(player);
                     activeTasks.remove(playerUUID);
-
                     player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
                     this.cancel();
                     return;
@@ -262,82 +258,45 @@ public class chainResonance {
 
                 LinkedHashMap<Integer, Entity> playerChain = config.chainRes.computeIfAbsent(player.getUniqueId(), k -> new LinkedHashMap<>());
                 int count = playerChain.size();
-                String benzene = (count >= 6) ? "§7" + "⌬" : "⌬ ".repeat(6 - count).trim();
+                String benzene = (count >= 6) ? "§7⌬" : BENZENE_ICONS[count];
 
                 Score score1 = objective.getScore(benzene);
                 score1.setScore(startScore--);
 
-                if (!config.chainRes.getOrDefault(player.getUniqueId(), new LinkedHashMap<>()).isEmpty()) {
+                if (!playerChain.isEmpty()) {
+                    List<Entity> rawEntities = new ArrayList<>(playerChain.values());
 
-                    Map<UUID, LinkedHashMap<UUID, Integer>> index = new LinkedHashMap<>();
-                    Map<UUID, ArrayList<String>> names = new LinkedHashMap<>();
-                    Map<UUID, ArrayList<Double>> distances = new LinkedHashMap<>();
-
-                    index.put(player.getUniqueId(), new LinkedHashMap<>());
-                    names.put(player.getUniqueId(), new ArrayList<>());
-                    distances.put(player.getUniqueId(), new ArrayList<>());
-
-                    for (Entity entity : config.chainRes.getOrDefault(player.getUniqueId(), new LinkedHashMap<>()).sequencedValues()) {
-                        Location loc1 = player.getLocation().add(0, player.getHeight() / 2 + 0.2, 0);
-                        Location loc2 = entity.getLocation().add(0, entity.getHeight() / 2 + 0.2, 0);
-
-                        distances.get(player.getUniqueId()).add(loc1.distance(loc2));
-
-                        UUID uuid = entity.getUniqueId();
-                        String baseName = (entity instanceof Player)
-                                ? entity.getName()
-                                : entity.getType().name();
-
-                        int globalCount = index.get(player.getUniqueId()).getOrDefault(uuid, 0) + 1;
-                        index.get(player.getUniqueId()).put(uuid, globalCount);
-
-                        names.get(player.getUniqueId()).add(baseName);
+                    Map<UUID, Integer> groupFrequencies = new LinkedHashMap<>();
+                    for (Entity e : rawEntities) {
+                        groupFrequencies.put(e.getUniqueId(), groupFrequencies.getOrDefault(e.getUniqueId(), 0) + 1);
                     }
 
-                    Map<UUID, ArrayList<String>> diff = new HashMap<>();
-                    Map<UUID, Integer> n = new HashMap<>();
-                    Map<UUID, Integer> m = new HashMap<>();
+                    int globalIndex = 0;
+                    int groupCounter = 1;
 
-                    diff.put(player.getUniqueId(), new ArrayList<>());
-                    n.put(player.getUniqueId(), 0);
-                    m.put(player.getUniqueId(), 0);
+                    for (Integer freq : groupFrequencies.values()) {
+                        String rings = "⏣".repeat(freq);
 
-                    for (UUID entityUuid : index.get(player.getUniqueId()).keySet()) {
-                        for (int i = 0; i < index.get(player.getUniqueId()).get(entityUuid); i++) {
-                            diff.get(player.getUniqueId()).add(names.get(player.getUniqueId()).get(m.get(player.getUniqueId())) + (n.get(player.getUniqueId()) + 1));
-                            m.put(player.getUniqueId(), m.get(player.getUniqueId()) + 1);
+                        for (int i = 0; i < freq; i++) {
+                            Entity currentEntity = rawEntities.get(globalIndex);
+
+                            Location pLoc = player.getLocation();
+                            Location eLoc = currentEntity.getLocation();
+                            double distSq = distanceSquared(pLoc, eLoc, player.getHeight(), currentEntity.getHeight());
+
+                            String baseName = (currentEntity instanceof Player) ? currentEntity.getName() : currentEntity.getType().name();
+                            String finalDisplay = baseName + groupCounter + rings;
+
+                            Score score = (distSq <= 484)
+                                    ? objective.getScore(finalDisplay)
+                                    : objective.getScore("§7§m" + finalDisplay);
+                            score.setScore(startScore--);
+
+                            globalIndex++;
                         }
-                        n.put(player.getUniqueId(), n.get(player.getUniqueId()) + 1);
-                    }
-
-                    Map<UUID, ArrayList<String>> con = new HashMap<>();
-                    Map<UUID, ArrayList<Double>> lastDist = new HashMap<>();
-                    Map<UUID, Integer> k = new HashMap<>();
-
-                    con.put(player.getUniqueId(), new ArrayList<>());
-                    lastDist.put(player.getUniqueId(), new ArrayList<>());
-                    k.put(player.getUniqueId(), 0);
-
-                    for (UUID entityUuid : index.get(player.getUniqueId()).keySet()) {
-                        con.get(player.getUniqueId()).add(diff.get(player.getUniqueId()).get(k.get(player.getUniqueId())) + "⏣".repeat(index.get(player.getUniqueId()).get(entityUuid)));
-                        lastDist.get(player.getUniqueId()).add(distances.get(player.getUniqueId()).get(k.get(player.getUniqueId())));
-                        for (int i = 0; i < index.get(player.getUniqueId()).get(entityUuid); i++) {
-                            k.put(player.getUniqueId(), k.get(player.getUniqueId()) + 1);
-                        }
-                    }
-
-                    Map<UUID, Integer> j = new HashMap<>();
-                    j.put(player.getUniqueId(), 0);
-
-                    for (String displayName : con.get(player.getUniqueId())) {
-                        Score score = (lastDist.get(player.getUniqueId()).get(j.get(player.getUniqueId())) <= 22)
-                                ? objective.getScore(displayName)
-                                : objective.getScore("§7" + "§m" + displayName);
-                        score.setScore(startScore--);
-                        j.put(player.getUniqueId(), j.get(player.getUniqueId()) + 1);
+                        groupCounter++;
                     }
                 }
-
                 player.setScoreboard(scoreboard);
             }
         };
