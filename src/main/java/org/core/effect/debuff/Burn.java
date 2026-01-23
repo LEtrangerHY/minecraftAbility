@@ -11,9 +11,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.UUID;
 
-public class Burn implements Debuffs{
-    private static final HashMap<Entity, Long> burnedEntities = new HashMap();
+public class Burn implements Debuffs {
+    private static final HashMap<UUID, Long> burnedEntities = new HashMap<>();
 
     private final Entity target;
     private final long duration;
@@ -25,32 +26,49 @@ public class Burn implements Debuffs{
 
     @Override
     public void applyEffect(Entity entity) {
-        if (!(entity instanceof LivingEntity)) return;
+        if (!(target instanceof LivingEntity)) return;
+        if (target.isInvulnerable()) return;
 
-        if(target.isInvulnerable()) return;
+        long currentTime = System.currentTimeMillis();
+        UUID targetId = target.getUniqueId();
 
-        long endTime = System.currentTimeMillis() + duration;
+        if (burnedEntities.containsKey(targetId)) {
+            long currentEndTime = burnedEntities.get(targetId);
+            if (currentEndTime > currentTime) {
+                burnedEntities.put(targetId, currentEndTime + duration);
+                return;
+            }
+        }
+
+        long endTime = currentTime + duration;
+        burnedEntities.put(targetId, endTime);
 
         new BukkitRunnable() {
             @Override
             public void run() {
-                burnedEntities.put(target, endTime);
-                entity.getWorld().spawnParticle(Particle.SOUL_FIRE_FLAME, target.getLocation().clone().add(0, 1.3, 0), 7, 0.5, 0.5, 0.5, 0);
-                target.setFireTicks(25);
-
-                if (entity instanceof Player player) {
-                    if(System.currentTimeMillis() >= endTime || player.isDead() || !player.isOnline()){
-                        player.sendActionBar(Component.text(" "));
-                        removeEffect(player);
-                        cancel();
-                    }else {
-                        target.sendActionBar(Component.text("Burn").color(NamedTextColor.RED));
-                    }
-                }
-
-                if (System.currentTimeMillis() >= endTime || target.isDead()) {
+                if (!burnedEntities.containsKey(targetId) || target.isDead()) {
                     removeEffect(target);
                     cancel();
+                    return;
+                }
+
+                long currentEndTime = burnedEntities.get(targetId);
+                if (System.currentTimeMillis() >= currentEndTime) {
+                    removeEffect(target);
+                    cancel();
+                    return;
+                }
+
+                target.getWorld().spawnParticle(Particle.SOUL_FIRE_FLAME, target.getLocation().clone().add(0, 1.3, 0), 7, 0.5, 0.5, 0.5, 0);
+                target.setFireTicks(25);
+
+                if (target instanceof Player player) {
+                    if (!player.isOnline()) {
+                        removeEffect(player);
+                        cancel();
+                        return;
+                    }
+                    player.sendActionBar(Component.text("Burn").color(NamedTextColor.RED));
                 }
             }
         }.runTaskTimer(Objects.requireNonNull(Bukkit.getPluginManager().getPlugin("Core")), 0L, 20L);
@@ -58,11 +76,14 @@ public class Burn implements Debuffs{
 
     @Override
     public void removeEffect(Entity entity) {
-        burnedEntities.remove(entity);
+        burnedEntities.remove(entity.getUniqueId());
+        if (entity instanceof Player player) {
+            player.sendActionBar(Component.text(" "));
+        }
     }
 
     public static boolean isBurning(Entity entity) {
-        Long endTime = burnedEntities.get(entity);
+        Long endTime = burnedEntities.get(entity.getUniqueId());
         return endTime != null && System.currentTimeMillis() < endTime;
     }
 }

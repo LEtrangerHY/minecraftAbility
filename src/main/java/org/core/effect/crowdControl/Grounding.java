@@ -13,9 +13,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 public class Grounding implements Effects, Listener {
-    public static Map<Entity, Long> groundedEntities = new HashMap();
+    public static Map<UUID, Long> groundedEntities = new HashMap<>();
 
     private final Entity target;
     private final long duration;
@@ -28,37 +29,56 @@ public class Grounding implements Effects, Listener {
     @Override
     public void applyEffect(Entity entity) {
         if (!(entity instanceof LivingEntity)) return;
+        if (target.isInvulnerable()) return;
 
-        if(target.isInvulnerable()) return;
+        UUID targetId = target.getUniqueId();
+        long currentTime = System.currentTimeMillis();
+        long newEndTime = currentTime + duration;
 
-        long endTime = System.currentTimeMillis() + duration;
+        if (groundedEntities.containsKey(targetId)) {
+            long currentEndTime = groundedEntities.get(targetId);
+            if (currentEndTime > currentTime) {
+                if (newEndTime > currentEndTime) {
+                    groundedEntities.put(targetId, newEndTime);
+                }
+                return;
+            }
+        }
+
+        groundedEntities.put(targetId, newEndTime);
 
         new BukkitRunnable() {
             Location groundLoc = target.getLocation();
 
             @Override
             public void run() {
+                if (!groundedEntities.containsKey(targetId) || target.isDead()) {
+                    removeEffect(target);
+                    cancel();
+                    return;
+                }
+
+                long endTime = groundedEntities.get(targetId);
+
+                if (System.currentTimeMillis() >= endTime) {
+                    removeEffect(target);
+                    cancel();
+                    return;
+                }
 
                 if (target instanceof Player player) {
-                    if(System.currentTimeMillis() >= endTime || player.isDead() || !player.isOnline()){
-                        player.sendActionBar(Component.text(" "));
+                    if (!player.isOnline()) {
                         removeEffect(player);
                         cancel();
+                        return;
                     }
                     target.sendActionBar(Component.text("Grounded").color(NamedTextColor.YELLOW));
                 }
 
-                if (System.currentTimeMillis() >= endTime || target.isDead()) {
-                    removeEffect(target);
-                    cancel();
-                }
-
-                groundedEntities.put(target, endTime);
-
                 Location fixed = new Location(target.getWorld(), target.getX(), groundLoc.getY(), target.getZ(), target.getYaw(), target.getPitch());
-                if(fixed.getY() < target.getY()) {
+                if (fixed.getY() < target.getY()) {
                     target.teleport(fixed);
-                }else if(fixed.getY() > target.getY()){
+                } else if (fixed.getY() > target.getY()) {
                     groundLoc = target.getLocation();
                 }
             }
@@ -67,12 +87,14 @@ public class Grounding implements Effects, Listener {
 
     @Override
     public void removeEffect(Entity entity) {
-        groundedEntities.remove(entity);
+        groundedEntities.remove(entity.getUniqueId());
+        if (entity instanceof Player player && player.isOnline()) {
+            player.sendActionBar(Component.text(" "));
+        }
     }
 
     public static boolean isGrounded(Entity entity) {
-        Long endTime = groundedEntities.get(entity);
+        Long endTime = groundedEntities.get(entity.getUniqueId());
         return endTime != null && System.currentTimeMillis() < endTime;
     }
-
 }

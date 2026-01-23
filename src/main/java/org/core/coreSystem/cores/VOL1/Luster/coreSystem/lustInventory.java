@@ -49,9 +49,9 @@ public class lustInventory extends absInventory {
     protected Component getName(Player player, String skill) {
 
         return switch (skill) {
-            case "R" -> Component.text("Lustercannon");
+            case "R" -> Component.text("LusterCannon");
             case "Q" -> Component.text("Electromotive");
-            case "F" -> Component.text("IRONJUDGEMENT");
+            case "F" -> Component.text("IRON JUDGEMENT");
             default -> Component.text("???");
         };
     }

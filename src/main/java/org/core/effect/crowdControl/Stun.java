@@ -14,9 +14,10 @@ import org.bukkit.util.Vector;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 public class Stun implements Effects, Listener {
-    public static Map<Entity, Long> stunnedEntities = new HashMap();
+    public static Map<UUID, Long> stunnedEntities = new HashMap<>();
 
     private final Entity target;
     private final long duration;
@@ -29,33 +30,51 @@ public class Stun implements Effects, Listener {
     @Override
     public void applyEffect(Entity entity) {
         if (!(entity instanceof LivingEntity)) return;
-        if(target.isInvulnerable()) return;
+        if (target.isInvulnerable()) return;
 
-        LivingEntity livingEntity = (LivingEntity) target;
+        UUID targetId = target.getUniqueId();
+        long currentTime = System.currentTimeMillis();
+        long newEndTime = currentTime + duration;
 
-        long endTime = System.currentTimeMillis() + duration;
+        if (stunnedEntities.containsKey(targetId)) {
+            long currentEndTime = stunnedEntities.get(targetId);
 
+            if (currentEndTime > currentTime) {
+                if (newEndTime > currentEndTime) {
+                    stunnedEntities.put(targetId, newEndTime);
+                }
+                return;
+            }
+        }
+
+        stunnedEntities.put(targetId, newEndTime);
         Location stunPos = target.getLocation();
 
         new BukkitRunnable() {
             @Override
             public void run() {
+                if (!stunnedEntities.containsKey(targetId) || target.isDead()) {
+                    removeEffect(target);
+                    cancel();
+                    return;
+                }
+
+                long endTime = stunnedEntities.get(targetId);
+
+                if (System.currentTimeMillis() >= endTime) {
+                    removeEffect(target);
+                    cancel();
+                    return;
+                }
 
                 if (target instanceof Player player) {
-                    if(System.currentTimeMillis() >= endTime || player.isDead() || !player.isOnline()){
-                        player.sendActionBar(Component.text(" "));
+                    if (!player.isOnline()) {
                         removeEffect(player);
                         cancel();
+                        return;
                     }
                     player.sendActionBar(Component.text("Stunned").color(NamedTextColor.YELLOW));
                 }
-
-                if (System.currentTimeMillis() >= endTime || target.isDead()) {
-                    removeEffect(target);
-                    cancel();
-                }
-
-                stunnedEntities.put(target, endTime);
 
                 target.teleport(stunPos);
                 target.setVelocity(new Vector(0, 0, 0));
@@ -65,14 +84,16 @@ public class Stun implements Effects, Listener {
 
     @Override
     public void removeEffect(Entity entity) {
-        if (!(entity instanceof LivingEntity livingEntity)) return;
+        if (!(entity instanceof LivingEntity)) return;
+        stunnedEntities.remove(entity.getUniqueId());
 
-        stunnedEntities.remove(entity);
+        if (entity instanceof Player player && player.isOnline()) {
+            player.sendActionBar(Component.text(" "));
+        }
     }
 
     public static boolean isStunned(Entity entity) {
-        Long endTime = stunnedEntities.get(entity);
+        Long endTime = stunnedEntities.get(entity.getUniqueId());
         return endTime != null && System.currentTimeMillis() < endTime;
     }
-
 }

@@ -12,9 +12,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.UUID;
 
-public class Frost implements Debuffs{
-    private static final HashMap<Entity, Long> frostbiteEntities = new HashMap();
+public class Frost implements Debuffs {
+    private static final HashMap<UUID, Long> frostbiteEntities = new HashMap<>();
 
     private final Entity target;
     private final long duration;
@@ -26,37 +27,53 @@ public class Frost implements Debuffs{
 
     @Override
     public void applyEffect(Entity entity) {
-        if (!(entity instanceof LivingEntity)) return;
+        if (!(target instanceof LivingEntity)) return;
+        if (target.isInvulnerable()) return;
 
-        if(target.isInvulnerable()) return;
+        long currentTime = System.currentTimeMillis();
+        UUID targetId = target.getUniqueId();
 
-        long endTime = System.currentTimeMillis() + duration;
+        if (frostbiteEntities.containsKey(targetId)) {
+            long currentEndTime = frostbiteEntities.get(targetId);
+            if (currentEndTime > currentTime) {
+                frostbiteEntities.put(targetId, currentEndTime + duration);
+                return;
+            }
+        }
+
+        long endTime = currentTime + duration;
+        frostbiteEntities.put(targetId, endTime);
 
         new BukkitRunnable() {
             @Override
             public void run() {
-                frostbiteEntities.put(target, endTime);
-                entity.getWorld().spawnParticle(Particle.SNOWFLAKE, target.getLocation().clone().add(0, 1.3, 0), 6, 0.5, 0.5, 0.5, 0);
-
-                Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(0, 255, 255), 0.6f);
-                entity.getWorld().spawnParticle(Particle.DUST, target.getLocation().clone().add(0, 1.3, 0), 3, 0.4, 0.4, 0.4, 0, dustOptions);
-
-                target.setFreezeTicks((int) duration / 50);
-
-                if (entity instanceof Player player) {
-                    if(System.currentTimeMillis() >= endTime || player.isDead() || !player.isOnline()){
-                        player.sendActionBar(Component.text(" "));
-                        removeEffect(player);
-                        cancel();
-                    }else {
-                        target.sendActionBar(Component.text("Frost").color(NamedTextColor.AQUA));
-                    }
-                }
-
-                if (System.currentTimeMillis() >= endTime || target.isDead()) {
-                    target.setFreezeTicks(0);
+                if (!frostbiteEntities.containsKey(targetId) || target.isDead()) {
                     removeEffect(target);
                     cancel();
+                    return;
+                }
+
+                long currentEndTime = frostbiteEntities.get(targetId);
+                if (System.currentTimeMillis() >= currentEndTime) {
+                    removeEffect(target);
+                    cancel();
+                    return;
+                }
+
+                target.getWorld().spawnParticle(Particle.SNOWFLAKE, target.getLocation().clone().add(0, 1.3, 0), 6, 0.5, 0.5, 0.5, 0);
+
+                Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(0, 255, 255), 0.6f);
+                target.getWorld().spawnParticle(Particle.DUST, target.getLocation().clone().add(0, 1.3, 0), 3, 0.4, 0.4, 0.4, 0, dustOptions);
+
+                target.setFreezeTicks(140);
+
+                if (target instanceof Player player) {
+                    if (!player.isOnline()) {
+                        removeEffect(player);
+                        cancel();
+                        return;
+                    }
+                    player.sendActionBar(Component.text("Frost").color(NamedTextColor.AQUA));
                 }
             }
         }.runTaskTimer(Objects.requireNonNull(Bukkit.getPluginManager().getPlugin("Core")), 0L, 20L);
@@ -64,11 +81,15 @@ public class Frost implements Debuffs{
 
     @Override
     public void removeEffect(Entity entity) {
-        frostbiteEntities.remove(entity);
+        frostbiteEntities.remove(entity.getUniqueId());
+        entity.setFreezeTicks(0);
+        if (entity instanceof Player player) {
+            player.sendActionBar(Component.text(" "));
+        }
     }
 
     public static boolean isFrostbite(Entity entity) {
-        Long endTime = frostbiteEntities.get(entity);
+        Long endTime = frostbiteEntities.get(entity.getUniqueId());
         return endTime != null && System.currentTimeMillis() < endTime;
     }
 }

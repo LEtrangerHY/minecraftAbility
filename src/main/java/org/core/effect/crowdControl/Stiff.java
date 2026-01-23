@@ -7,17 +7,15 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 public class Stiff implements Effects, Listener {
-    public static Map<Entity, Long> stiffEntities = new HashMap<>();
+    public static Map<UUID, Long> stiffEntities = new HashMap<>();
 
     private final Entity target;
     private final long duration;
@@ -32,37 +30,46 @@ public class Stiff implements Effects, Listener {
         if (!(entity instanceof LivingEntity)) return;
         if (target.isInvulnerable()) return;
 
-        long endTime = System.currentTimeMillis() + duration;
+        UUID targetId = target.getUniqueId();
+        long currentTime = System.currentTimeMillis();
+        long newEndTime = currentTime + duration;
 
-        stiffEntities.put(target, endTime);
+        if (stiffEntities.containsKey(targetId)) {
+            long currentEndTime = stiffEntities.get(targetId);
+            if (currentEndTime > currentTime) {
+                if (newEndTime > currentEndTime) {
+                    stiffEntities.put(targetId, newEndTime);
+                }
+                return;
+            }
+        }
+
+        stiffEntities.put(targetId, newEndTime);
 
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (!stiffEntities.containsKey(target)) {
-                    if (target instanceof Player player) {
-                        player.sendActionBar(Component.text(" "));
-                    }
+                if (!stiffEntities.containsKey(targetId)) {
+                    removeEffect(target);
+                    cancel();
+                    return;
+                }
+
+                long endTime = stiffEntities.get(targetId);
+
+                if (System.currentTimeMillis() >= endTime || target.isDead()) {
                     removeEffect(target);
                     cancel();
                     return;
                 }
 
                 if (target instanceof Player player) {
-                    if (System.currentTimeMillis() >= endTime || player.isDead() || !player.isOnline()) {
-                        player.sendActionBar(Component.text(" "));
+                    if (!player.isOnline()) {
                         removeEffect(player);
                         cancel();
                         return;
-                    }else {
-                        player.sendActionBar(Component.text("Stiff").color(NamedTextColor.YELLOW));
                     }
-                } else {
-                    if (System.currentTimeMillis() >= endTime || target.isDead()) {
-                        removeEffect(target);
-                        cancel();
-                        return;
-                    }
+                    player.sendActionBar(Component.text("Stiff").color(NamedTextColor.YELLOW));
                 }
             }
         }.runTaskTimer(Objects.requireNonNull(Bukkit.getPluginManager().getPlugin("Core")), 0L, 1L);
@@ -70,15 +77,18 @@ public class Stiff implements Effects, Listener {
 
     @Override
     public void removeEffect(Entity entity) {
-        stiffEntities.remove(entity);
+        stiffEntities.remove(entity.getUniqueId());
+        if (entity instanceof Player player && player.isOnline()) {
+            player.sendActionBar(Component.text(" "));
+        }
     }
 
     public static void breakStiff(Entity entity) {
-        stiffEntities.remove(entity);
+        stiffEntities.remove(entity.getUniqueId());
     }
 
     public static boolean isStiff(Entity entity) {
-        Long endTime = stiffEntities.get(entity);
+        Long endTime = stiffEntities.get(entity.getUniqueId());
         return endTime != null && System.currentTimeMillis() < endTime;
     }
 }

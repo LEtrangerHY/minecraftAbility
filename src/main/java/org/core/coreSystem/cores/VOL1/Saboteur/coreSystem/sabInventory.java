@@ -51,7 +51,7 @@ public class sabInventory extends absInventory {
         return switch (skill) {
             case "R" -> Component.text("TrapSet");
             case "Q" -> Component.text("Trigger");
-            case "F" -> Component.text("LASTRESORT");
+            case "F" -> Component.text("LAST RESORT");
             default -> Component.text("???");
         };
     }

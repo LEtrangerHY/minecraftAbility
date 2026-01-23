@@ -46,8 +46,8 @@ public class nightInventory extends absInventory {
     protected Component getName(Player player, String skill) {
         return switch (skill) {
             case "R" -> Component.text("Dusk");
-            case "Q" -> Component.text("Whirlwind");
-            case "F" -> Component.text("CHAINRESONANCE");
+            case "Q" -> Component.text("WhirlWind");
+            case "F" -> Component.text("CHAIN RESONANCE");
             default -> Component.text("???");
         };
     }
@@ -78,7 +78,6 @@ public class nightInventory extends absInventory {
 
         Component requireXp;
 
-        // 반복되는 로직이 많지만, 요청하신 대로 기존 로직 유지
         switch (skill) {
             case "R":
                 requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfR.get((int) level)) : Component.text("Require EXP : MAX");

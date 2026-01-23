@@ -17,6 +17,8 @@ import org.core.coreSystem.cores.VOL2.Rose.Passive.bloodPetal;
 import org.core.coreSystem.cores.VOL2.Rose.coreSystem.Rose;
 import org.core.effect.crowdControl.ForceDamage;
 
+import java.util.concurrent.ThreadLocalRandom; // 랜덤 생성을 위한 임포트
+
 public class F implements SkillBase {
 
     private final Rose config;
@@ -59,14 +61,21 @@ public class F implements SkillBase {
                     return;
                 }
 
+                double randomX = (ThreadLocalRandom.current().nextDouble() * 6.0) - 3.0;
+                double randomZ = (ThreadLocalRandom.current().nextDouble() * 6.0) - 3.0;
+
+                Location scatterLoc = player.getLocation().add(randomX, 0.5 + ThreadLocalRandom.current().nextDouble(), randomZ);
+
                 world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.0f, 1.0f);
+                world.playSound(player.getLocation(), Sound.ITEM_TRIDENT_THROW, 1.0f, 1.0f);
                 world.spawnParticle(Particle.SWEEP_ATTACK, player.getLocation().clone().add(0, 1.0, 0), 7, 2, 2, 2, 1);
-                world.spawnParticle(Particle.DUST, player.getLocation().clone().add(0, 1.0, 0), 44, 2, 2, 2, 0, DUST_BLOOD);
-                world.spawnParticle(Particle.DUST, player.getLocation().clone().add(0, 1.0, 0), 22, 2, 2, 2, 0, DUST_DARK);
 
-                petal.dropPetal(player, player, damage);
+                world.spawnParticle(Particle.DUST, scatterLoc, 10, 0.2, 0.2, 0.2, 0, DUST_BLOOD);
+                world.spawnParticle(Particle.DUST, scatterLoc, 5, 0.2, 0.2, 0.2, 0, DUST_DARK);
 
-                for (Entity entity : player.getNearbyEntities(5, 5, 5)) {
+                petal.dropPetal(player, scatterLoc, damage);
+
+                for (Entity entity : player.getNearbyEntities(4, 4, 4)) {
                     if (entity instanceof LivingEntity target && entity != player) {
                         world.spawnParticle(Particle.CRIT, target.getLocation().clone().add(0, 1.0, 0), 4, 0.5, 0.5, 0.5, 1);
                         world.spawnParticle(Particle.BLOCK, entity.getLocation().clone().add(0, 1.2, 0), 4, 0.3, 0.3, 0.3, blood);

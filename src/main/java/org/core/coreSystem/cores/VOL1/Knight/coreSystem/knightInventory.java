@@ -49,9 +49,9 @@ public class knightInventory extends absInventory {
     protected Component getName(Player player, String skill) {
 
         return switch (skill) {
-            case "R" -> Component.text("Blingswords");
-            case "Q" -> Component.text("Flashsevering");
-            case "F" -> Component.text("BURSTSEVERING");
+            case "R" -> Component.text("BlingSwords");
+            case "Q" -> Component.text("FlashSevering");
+            case "F" -> Component.text("BURST SEVERING");
             default -> Component.text("???");
         };
     }

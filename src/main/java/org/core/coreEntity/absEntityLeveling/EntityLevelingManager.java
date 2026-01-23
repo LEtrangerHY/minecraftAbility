@@ -59,7 +59,7 @@ public class EntityLevelingManager implements Listener {
     @EventHandler
     public void onEntitySpawn(EntitySpawnEvent event) {
         if (!(event.getEntity() instanceof LivingEntity entity)) return;
-        if (isExcludedEntity(entity)) return; // 플레이어 제외 포함
+        if (isExcludedEntity(entity)) return;
         spawnQueue.add(entity);
     }
 
@@ -67,7 +67,7 @@ public class EntityLevelingManager implements Listener {
     public void onChunkLoad(ChunkLoadEvent event) {
         for (Entity e : event.getChunk().getEntities()) {
             if (!(e instanceof LivingEntity entity)) continue;
-            if (isExcludedEntity(entity)) continue; // 플레이어 제외 포함
+            if (isExcludedEntity(entity)) continue;
             PersistentDataContainer data = entity.getPersistentDataContainer();
             if (!data.has(levelKey, PersistentDataType.INTEGER)) {
                 spawnQueue.add(entity);
@@ -88,7 +88,7 @@ public class EntityLevelingManager implements Listener {
         LivingEntity entity;
         while ((entity = spawnQueue.poll()) != null) {
             if (!entity.isValid()) continue;
-            if (entity instanceof Player) continue; // 안전하게 플레이어 제외
+            if (entity instanceof Player) continue;
 
             PersistentDataContainer data = entity.getPersistentDataContainer();
             if (data.has(levelKey, PersistentDataType.INTEGER)) continue;
@@ -104,7 +104,8 @@ public class EntityLevelingManager implements Listener {
             data.set(levelKey, PersistentDataType.INTEGER, level);
 
             NamedTextColor color = levelColorCache.computeIfAbsent(level, l -> {
-                if (l <= 2) return NamedTextColor.WHITE;
+                if (l <= 0) return NamedTextColor.GRAY;
+                else if (l <= 2) return NamedTextColor.WHITE;
                 else if (l <= 5) return NamedTextColor.GREEN;
                 else if (l <= 8) return NamedTextColor.GOLD;
                 else return NamedTextColor.RED;
@@ -112,13 +113,15 @@ public class EntityLevelingManager implements Listener {
 
             String readableName = getReadableName(entity);
 
-            AttributeInstance healthAttr = entity.getAttribute(Attribute.MAX_HEALTH);
-            if (healthAttr != null) {
-                double baseHealth = healthAttr.getBaseValue();
-                double p = (0.005 * level * level + 0.055 * level) * 1.44;
-                double newHealth = baseHealth * (1 + p);
-                healthAttr.setBaseValue(newHealth);
-                entity.setHealth(newHealth);
+            if (level > 0) {
+                AttributeInstance healthAttr = entity.getAttribute(Attribute.MAX_HEALTH);
+                if (healthAttr != null) {
+                    double baseHealth = healthAttr.getBaseValue();
+                    double p = (0.005 * level * level + 0.055 * level) * 1.44;
+                    double newHealth = baseHealth * (1 + p);
+                    healthAttr.setBaseValue(newHealth);
+                    entity.setHealth(newHealth);
+                }
             }
 
             entity.setCustomNameVisible(false);
@@ -144,7 +147,7 @@ public class EntityLevelingManager implements Listener {
     @EventHandler
     public void onDamage(EntityDamageEvent e) {
         if (!(e.getEntity() instanceof LivingEntity entity)) return;
-        if (entity instanceof Player) return; // 플레이어 제외
+        if (entity instanceof Player) return;
         PersistentDataContainer data = entity.getPersistentDataContainer();
         if (!data.has(levelKey, PersistentDataType.INTEGER)) return;
 
@@ -158,7 +161,21 @@ public class EntityLevelingManager implements Listener {
     @EventHandler
     public void onHeal(EntityRegainHealthEvent e) {
         if (!(e.getEntity() instanceof LivingEntity entity)) return;
-        if (entity instanceof Player) return; // 플레이어 제외
+        if (entity instanceof Player) return;
+        PersistentDataContainer data = entity.getPersistentDataContainer();
+        if (!data.has(levelKey, PersistentDataType.INTEGER)) return;
+
+        int level = data.get(levelKey, PersistentDataType.INTEGER);
+        String name = getReadableName(entity);
+        NamedTextColor color = levelColorCache.getOrDefault(level, NamedTextColor.WHITE);
+
+        Bukkit.getScheduler().runTaskLater(plugin, () -> updateHealthName(entity, name, level, color), 1L);
+    }
+
+    @EventHandler
+    public void onPotionEffect(EntityPotionEffectEvent e) {
+        if (!(e.getEntity() instanceof LivingEntity entity)) return;
+        if (entity instanceof Player) return;
         PersistentDataContainer data = entity.getPersistentDataContainer();
         if (!data.has(levelKey, PersistentDataType.INTEGER)) return;
 
@@ -172,11 +189,13 @@ public class EntityLevelingManager implements Listener {
     @EventHandler
     public void onEntityDamage(EntityDamageByEntityEvent event) {
         if (!(event.getDamager() instanceof LivingEntity attacker)) return;
-        if (attacker instanceof Player) return; // 플레이어 제외
+        if (attacker instanceof Player) return;
         PersistentDataContainer data = attacker.getPersistentDataContainer();
         if (!data.has(levelKey, PersistentDataType.INTEGER)) return;
 
         int level = data.get(levelKey, PersistentDataType.INTEGER);
+        if (level <= 0) return;
+
         double p = (0.005 * level * level + 0.055 * level);
         double originalDamage = event.getDamage();
         double amplifiedDamage = (originalDamage * (1 + p) >= 20)
@@ -189,7 +208,7 @@ public class EntityLevelingManager implements Listener {
     @EventHandler
     public void onEntityDeath(EntityDeathEvent event) {
         LivingEntity deadEntity = event.getEntity();
-        if (deadEntity instanceof Player) return; // 플레이어 제외
+        if (deadEntity instanceof Player) return;
         PersistentDataContainer data = deadEntity.getPersistentDataContainer();
         if (!data.has(levelKey, PersistentDataType.INTEGER)) return;
 
@@ -217,22 +236,38 @@ public class EntityLevelingManager implements Listener {
         for (Entity e : player.getNearbyEntities(NAME_TAG_RADIUS, NAME_TAG_RADIUS, NAME_TAG_RADIUS)) {
             if (!(e instanceof LivingEntity entity)) continue;
             if (entity instanceof Player) continue;
-            if (!entity.getPersistentDataContainer().has(levelKey, PersistentDataType.INTEGER)) continue;
+            PersistentDataContainer data = entity.getPersistentDataContainer();
+            if (!data.has(levelKey, PersistentDataType.INTEGER)) continue;
 
             visibleNow.add(entity.getUniqueId());
+
             if (!currentlyVisible.contains(entity.getUniqueId())) {
                 entity.setCustomNameVisible(true);
                 currentlyVisible.add(entity.getUniqueId());
             }
+
+            int level = data.get(levelKey, PersistentDataType.INTEGER);
+            NamedTextColor color = levelColorCache.getOrDefault(level, NamedTextColor.WHITE);
+            String name = getReadableName(entity);
+            updateHealthName(entity, name, level, color);
         }
 
         LivingEntity targeted = getTargetedEntity(player, TARGET_RANGE, TARGET_RAY_SIZE);
         if (targeted != null) {
-            if (!currentlyVisible.contains(targeted.getUniqueId())) {
-                targeted.setCustomNameVisible(true);
-                currentlyVisible.add(targeted.getUniqueId());
+            PersistentDataContainer data = targeted.getPersistentDataContainer();
+            if (data.has(levelKey, PersistentDataType.INTEGER)) {
+
+                if (!currentlyVisible.contains(targeted.getUniqueId())) {
+                    targeted.setCustomNameVisible(true);
+                    currentlyVisible.add(targeted.getUniqueId());
+                }
+                visibleNow.add(targeted.getUniqueId());
+
+                int level = data.get(levelKey, PersistentDataType.INTEGER);
+                NamedTextColor color = levelColorCache.getOrDefault(level, NamedTextColor.WHITE);
+                String name = getReadableName(targeted);
+                updateHealthName(targeted, name, level, color);
             }
-            visibleNow.add(targeted.getUniqueId());
         }
 
         Iterator<UUID> iter = currentlyVisible.iterator();

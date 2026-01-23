@@ -44,22 +44,29 @@ public class bloodPetal implements Listener {
     }
 
     public void dropPetal(Player player, Entity entity, double damage){
-        World world = player.getWorld();
         Location entityLoc = entity.getLocation().clone().add(0, 1.4, 0);
+        dropPetal(player, entityLoc, damage);
+    }
+
+    public void dropPetal(Player player, Location location, double damage){
+        World world = location.getWorld();
 
         ItemStack itemStack = new ItemStack(Material.RED_DYE);
         ItemMeta meta = itemStack.getItemMeta();
 
         meta.getPersistentDataContainer().set(keyId, PersistentDataType.STRING, UUID.randomUUID().toString());
 
-        double healAmount = damage * 0.44;
+        double amp = config.r_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L);
+        double finalAmount = damage * (1 + amp);
+        double healAmount = finalAmount * 0.44;
+
         meta.getPersistentDataContainer().set(keyHeal, PersistentDataType.DOUBLE, healAmount);
 
         meta.lore(List.of(Component.text("Heal: " + String.format("%.2f", healAmount)).color(NamedTextColor.RED)));
 
         itemStack.setItemMeta(meta);
 
-        Item item = world.dropItem(entityLoc, itemStack);
+        Item item = world.dropItem(location, itemStack);
         item.setPickupDelay(14);
         item.setGravity(true);
     }

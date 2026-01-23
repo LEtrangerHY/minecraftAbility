@@ -51,7 +51,7 @@ public class blueInventory extends absInventory {
         return switch (skill) {
             case "R" -> Component.text("Wither");
             case "Q" -> Component.text("Absorb");
-            case "F" -> Component.text("SOULBREAKER");
+            case "F" -> Component.text("SOUL BREAKER");
             default -> Component.text("???");
         };
     }

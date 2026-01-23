@@ -50,7 +50,7 @@ public class blazeInventory extends absInventory {
 
         return switch (skill) {
             case "R" -> Component.text("Shooter");
-            case "Q" -> Component.text("Burstblazer");
+            case "Q" -> Component.text("BurstBlazer");
             case "F" -> Component.text("DIABOLICA");
             default -> Component.text("???");
         };

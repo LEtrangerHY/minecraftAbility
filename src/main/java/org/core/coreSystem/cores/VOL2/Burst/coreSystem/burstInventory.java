@@ -49,9 +49,9 @@ public class burstInventory extends absInventory {
     protected Component getName(Player player, String skill) {
 
         return switch (skill) {
-            case "R" -> Component.text("Groundburst");
-            case "Q" -> Component.text("Burstrush");
-            case "F" -> Component.text("SATURATIONBOMB");
+            case "R" -> Component.text("GroundBurst");
+            case "Q" -> Component.text("BurstRush");
+            case "F" -> Component.text("SATURATION BOMB");
             default -> Component.text("???");
         };
     }

@@ -26,7 +26,7 @@ public class roseLeveling implements Levels {
         this.exp = exp;
     }
 
-    public Set<Long> requireExp = Set.of(66L, 144L, 244L, 466L, 944L, 1164L, 2244L, 3364L, 4446L, 6064L);
+    public Set<Long> requireExp = Set.of(77L, 177L, 277L, 477L, 744L, 1204L, 2344L, 3477L, 4777L, 5777L);
 
     @Override
     public void addLV(Entity entity){

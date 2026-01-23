@@ -49,9 +49,9 @@ public class roseInventory extends absInventory {
     protected Component getName(Player player, String skill) {
 
         return switch (skill) {
-            case "R" -> Component.text("Delusion");
-            case "Q" -> Component.text("Rush");
-            case "F" -> Component.text("Flowering");
+            case "R" -> Component.text("BloodPetal");
+            case "Q" -> Component.text("BloodBanquet");
+            case "F" -> Component.text("DANCE OF THE CRIMSON NIGHT");
             default -> Component.text("???");
         };
     }
@@ -59,9 +59,9 @@ public class roseInventory extends absInventory {
     @Override
     protected Material getTotem(Player player, String skill) {
         return switch (skill) {
-            case "R" -> Material.AMETHYST_BLOCK;
-            case "Q" -> Material.FEATHER;
-            case "F" -> Material.AMETHYST_CLUSTER;
+            case "R" -> Material.RED_DYE;
+            case "Q" -> Material.REDSTONE;
+            case "F" -> Material.REDSTONE_BLOCK;
             default -> Material.BARRIER;
         };
     }
@@ -90,21 +90,24 @@ public class roseInventory extends absInventory {
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
                 lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("시스템 : 지정형").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("지정 : 지정한 위치를 4초 후 기폭시킨다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("왼손의 무기로도 일반 공격 시전이 가능하다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("오른손, 왼손 번갈아 적 피격 시, 가한 피해의 44%의 수치가 저장된 선혈 꽃잎을 적으로부터 드랍한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("드랍된 선혈 꽃잎을 주울 시 전방으로 참격을 가하며 저장된 수치만큼 체력과 배고픔을 회복한다.").color(NamedTextColor.GREEN));
                 break;
             case "Q":
                 requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfQ.get((int) level)) : Component.text("Require EXP : MAX");
                 lore.add(requireXp.color(NamedTextColor.AQUA));
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("타입 : 효과").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("위로 도약한 뒤, 바라보는 방향으로 돌진해 도달한 위치를 기폭시킨다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("전방으로 돌진하며 경로 내 대상들을 베어낸다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("돌진 중 선혈 꽃잎을 주울 시 참격의 범위가 360°로 확장된다.").color(NamedTextColor.GREEN));
                 break;
             case "F":
                 requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfF.get((int) level)) : Component.text("Require EXP : MAX");
@@ -115,7 +118,7 @@ public class roseInventory extends absInventory {
                 lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("돌진하며 지나간 거리에 차지된 TNT를 떨어트린다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("0.7초동안 범위 내 대상들에게 총 7번의 피해를 가하며 0.1초 간격으로 선혈 꽃잎을 드랍한다.").color(NamedTextColor.GREEN));
                 break;
             default:
                 break;

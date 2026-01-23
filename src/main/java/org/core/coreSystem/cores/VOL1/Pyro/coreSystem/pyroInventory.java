@@ -49,9 +49,9 @@ public class pyroInventory extends absInventory {
     protected Component getName(Player player, String skill) {
 
         return switch (skill) {
-            case "R" -> Component.text("Firepoll");
-            case "Q" -> Component.text("Purgatorium");
-            case "F" -> Component.text("GLOWBURST");
+            case "R" -> Component.text("FirePoll");
+            case "Q" -> Component.text("Purgatory");
+            case "F" -> Component.text("GLOW BURST");
             default -> Component.text("???");
         };
     }

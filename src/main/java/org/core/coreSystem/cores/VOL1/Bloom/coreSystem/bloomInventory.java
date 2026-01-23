@@ -49,8 +49,8 @@ public class bloomInventory extends absInventory {
     protected Component getName(Player player, String skill) {
 
         return switch (skill) {
-            case "R" -> Component.text("Blossomrise");
-            case "Q" -> Component.text("Petalblizzard");
+            case "R" -> Component.text("BlossomRise");
+            case "Q" -> Component.text("PetalBlizzard");
             case "F" -> Component.text("WONDERLAND");
             default -> Component.text("???");
         };

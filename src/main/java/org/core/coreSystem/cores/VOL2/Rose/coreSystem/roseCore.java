@@ -92,16 +92,35 @@ public class roseCore extends absCore {
         if (!(event.getEntity() instanceof LivingEntity target)) return;
 
         if(tag.Rose.contains(player) && hasProperItems(player)){
-            if(config.atk.getOrDefault(player.getUniqueId(), "").equals("R") ||
-                    config.atk.getOrDefault(player.getUniqueId(), "").equals("P") ||
-                    config.atk.getOrDefault(player.getUniqueId(), "").equals("S")) return;
 
-            if(config.atkType.getOrDefault(player.getUniqueId(), "").equals("R")){
-                petal.dropPetal(player, target, event.getFinalDamage());
+            String attackTag = config.atk.getOrDefault(player.getUniqueId(), "");
+
+            if(attackTag.equals("P") || attackTag.equals("S")) return;
+
+            String currentHand = attackTag.isEmpty() ? "MAIN" : (attackTag.equals("SKILL_R") ? "OFF" : null);
+
+            if (currentHand == null) return;
+
+            String lastHand = config.atkType.get(player.getUniqueId());
+
+            boolean procPetal = false;
+
+            if (lastHand == null) {
+            } else {
+                if (!lastHand.equals(currentHand)) {
+                    procPetal = true;
+                }
             }
 
-            player.getWorld().spawnParticle(Particle.BLOCK, target.getLocation().add(0, 1, 0), 4, 0.3, 0.3, 0.3, Bukkit.createBlockData(Material.REDSTONE_BLOCK));
-            config.atkType.put(player.getUniqueId(), "L");
+            config.atkType.put(player.getUniqueId(), currentHand);
+
+            if (procPetal) {
+                double finalDamage = event.getFinalDamage();
+
+                petal.dropPetal(player, target, finalDamage);
+
+                player.getWorld().spawnParticle(Particle.BLOCK, target.getLocation().add(0, 1, 0), 4, 0.3, 0.3, 0.3, Bukkit.createBlockData(Material.REDSTONE_BLOCK));
+            }
         }
     }
 

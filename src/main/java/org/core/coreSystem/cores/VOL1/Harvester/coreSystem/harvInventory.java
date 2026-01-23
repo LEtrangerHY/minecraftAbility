@@ -51,7 +51,7 @@ public class harvInventory extends absInventory {
         return switch (skill) {
             case "R" -> Component.text("Reap");
             case "Q" -> Component.text("Cultivate");
-            case "F" -> Component.text("Harvest");
+            case "F" -> Component.text("HARVEST");
             default -> Component.text("???");
         };
     }

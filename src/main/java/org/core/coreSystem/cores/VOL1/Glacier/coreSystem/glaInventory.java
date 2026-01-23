@@ -50,7 +50,7 @@ public class glaInventory extends absInventory {
 
         return switch (skill) {
             case "R" -> Component.text("Freeze");
-            case "Q" -> Component.text("Snowscape");
+            case "Q" -> Component.text("SnowScape");
             case "F" -> Component.text("FROSTBITE");
             default -> Component.text("???");
         };

@@ -21,6 +21,7 @@ public class Rose {
     public HashMap<UUID, Integer> petals = new HashMap<>();
 
     //R
+    public double r_Skill_amp = 0.1;
     public long r_Skill_Cool = 0;
 
     //Q

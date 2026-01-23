@@ -50,7 +50,7 @@ public class comInventory extends absInventory {
         return switch (skill) {
             case "R" -> Component.text("com-Summon");
             case "Q" -> Component.text("com-Slow");
-            case "F" -> Component.text("com-GRAVITY");
+            case "F" -> Component.text("COM-GRAVITY");
             default -> Component.text("???");
         };
     }
