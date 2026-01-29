@@ -224,6 +224,7 @@ public class Q implements SkillBase {
 
                         DamageSource source = DamageSource.builder(DamageType.MAGIC)
                                 .withCausingEntity(player)
+                                .withDirectEntity(player)
                                 .build();
 
                         ForceDamage forceDamage = new ForceDamage(living, damage, source, false);

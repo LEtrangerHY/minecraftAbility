@@ -42,9 +42,6 @@ public class Cool {
         }
     }
 
-    /**
-     * 모든 온라인 플레이어의 쿨타임(액션바 + 보스바)을 갱신하는 글로벌 태스크
-     */
     private void startGlobalTickerTask() {
         new BukkitRunnable() {
             @Override
@@ -53,10 +50,8 @@ public class Cool {
                     UUID uuid = player.getUniqueId();
                     if (cooldowns.containsKey(uuid)) {
 
-                        // 1. 보스바 업데이트 및 완료된 쿨타임 정리
                         updateBossBarsAndCleanup(player);
 
-                        // 2. 액션바 전송
                         sendActionBarDisplay(player);
                     }
                 }

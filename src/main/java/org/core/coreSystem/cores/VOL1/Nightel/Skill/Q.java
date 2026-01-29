@@ -54,6 +54,7 @@ public class Q implements SkillBase {
 
         double safeDistance = -1;
 
+        // 거리 검사 (뒤에서부터 검사하여 가장 먼 안전한 위치 확보)
         for (double d = 6.0; d >= 0; d -= 0.2) {
 
             double x = eyeLoc.getX() + direction.getX() * d;
@@ -66,9 +67,27 @@ public class Q implements SkillBase {
             Block headBlock = checkHeadLoc.getBlock();
             Block feetBlock = checkFeetLoc.getBlock();
 
-            if (headBlock.isPassable() && feetBlock.isPassable()) {
-                safeDistance = d;
-                break;
+            // 1. 머리 위치는 무조건 통과 가능해야 함
+            if (headBlock.isPassable()) {
+                boolean isFeetSafe = false;
+
+                // 2. 발 위치 검사 개선
+                if (feetBlock.isPassable()) {
+                    // 발 위치가 공기나 통과 가능한 블록이면 안전
+                    isFeetSafe = true;
+                } else {
+                    // 발 위치가 고체 블록이더라도, 플레이어가 그 블록 '위'에 서 있는 높이라면 안전 판정
+                    BoundingBox bb = feetBlock.getBoundingBox();
+                    // 현재 검사하는 발 높이(y)가 블록의 윗면(MaxY)보다 높거나 같으면 (약간의 오차 허용) 통과
+                    if (checkFeetLoc.getY() >= bb.getMaxY() - 0.05) {
+                        isFeetSafe = true;
+                    }
+                }
+
+                if (isFeetSafe) {
+                    safeDistance = d;
+                    break;
+                }
             }
         }
 
@@ -104,8 +123,6 @@ public class Q implements SkillBase {
 
             player.teleport(targetFeetLoc);
             world.spawnParticle(Particle.SPIT, player.getLocation(), 33, 0.2, 0.3, 0.2, 0.6);
-        } else {
-            world.playSound(player.getLocation(), Sound.BLOCK_FIRE_EXTINGUISH, 0.5f, 2.0f);
         }
 
         performSlash(player, actualMoveDistance, feetLoc, direction, same);
