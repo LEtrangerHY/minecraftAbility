@@ -134,7 +134,7 @@ public class dagCore extends absCore {
 
         if(!tag.Dagger.contains(player)) return;
 
-        if(!cool.isReloading(player, "X_slash") && config.f_using.getOrDefault(player.getUniqueId(), false) && config.f_slash.getOrDefault(player.getUniqueId(), 0) < 2) {
+        if(!cool.isReloading(player, "slash") && config.f_using.getOrDefault(player.getUniqueId(), false) && config.f_slash.getOrDefault(player.getUniqueId(), 0) < 2) {
 
             World world = player.getWorld();
 
@@ -186,9 +186,8 @@ public class dagCore extends absCore {
 
                                 config.f_damaging.put(player.getUniqueId(), true);
 
-                                ForceDamage forceDamage = new ForceDamage(target, config.f_Skill_Damage, source);
+                                ForceDamage forceDamage = new ForceDamage(target, config.f_Skill_Damage, source, true);
                                 forceDamage.applyEffect(player);
-                                target.setVelocity(new Vector(0, 0, 0));
                                 config.f_damaging.remove(player.getUniqueId());
 
                                 config.f_damaged.computeIfAbsent(player.getUniqueId(), k -> new HashSet<>()).add(target);
@@ -202,7 +201,7 @@ public class dagCore extends absCore {
                 }.runTaskTimer(plugin, 0L, 1L);
             }
 
-            cool.setCooldown(player, 400L, "X_slash");
+            cool.setCooldown(player, 400L, "slash", "boss");
         }
     }
 

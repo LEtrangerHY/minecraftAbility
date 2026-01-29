@@ -2,6 +2,7 @@ package org.core.coreSystem.cores.VOL1.Harvester.Skill;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.title.Title;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.damage.DamageSource;
@@ -19,6 +20,7 @@ import org.core.effect.crowdControl.ForceDamage;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.cores.VOL1.Harvester.coreSystem.Harvester;
 
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -88,7 +90,14 @@ public class R implements SkillBase {
             @Override
             public void run() {
 
-                if (invisibility) player.sendActionBar(Component.text("Invisible shot!").color(NamedTextColor.YELLOW));
+                if (invisibility) {
+                    Title title = Title.title(
+                            Component.empty(),
+                            Component.text("Invisible shot!").color(NamedTextColor.YELLOW),
+                            Title.Times.times(Duration.ZERO, Duration.ofMillis(800), Duration.ofMillis(200))
+                    );
+                    player.showTitle(title);
+                }
 
                 if (ticks > maxTicks || player.isDead()) {
                     config.rskill_using.remove(player.getUniqueId());
@@ -124,9 +133,8 @@ public class R implements SkillBase {
                             world.playSound(target.getLocation().clone().add(0, 1.3, 0), Sound.ENTITY_PLAYER_ATTACK_CRIT, 1, 1);
                         }
 
-                        ForceDamage forceDamage = new ForceDamage(target, finalDamage, source);
+                        ForceDamage forceDamage = new ForceDamage(target, finalDamage, source, true);
                         forceDamage.applyEffect(player);
-                        target.setVelocity(new Vector(0, 0, 0));
                     }
                 }
 

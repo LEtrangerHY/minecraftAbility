@@ -142,7 +142,7 @@ public class comCore extends absCore {
                                 for (Entity entity : world.getNearbyEntities(particleLocation, 0.5, 0.5, 0.5)) {
                                     if (entity instanceof LivingEntity target && entity != player) {
 
-                                        ForceDamage forceDamage = new ForceDamage(target, 3.0, source);
+                                        ForceDamage forceDamage = new ForceDamage(target, 3.0, source, false);
                                         forceDamage.applyEffect(player);
 
                                         for(FallingBlock fb : config.comBlocks.getOrDefault(player.getUniqueId(), new HashSet<>())){
@@ -183,7 +183,7 @@ public class comCore extends absCore {
                     .withDirectEntity(player)
                     .build();
 
-            ForceDamage forceDamage = new ForceDamage((LivingEntity) entity, 1.0, source);
+            ForceDamage forceDamage = new ForceDamage((LivingEntity) entity, 1.0, source, false);
             forceDamage.applyEffect(player);
 
             Location start = fb.getLocation().clone().add(0, 0.5, 0);

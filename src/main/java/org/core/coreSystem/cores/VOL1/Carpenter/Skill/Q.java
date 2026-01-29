@@ -131,9 +131,8 @@ public class Q implements SkillBase {
                 config.q_damaging.put(player.getUniqueId(), true);
                 config.q_damaged.getOrDefault(player.getUniqueId(), new HashSet<>()).add(entity);
 
-                ForceDamage forceDamage = new ForceDamage(target, damage, source);
+                ForceDamage forceDamage = new ForceDamage(target, damage, source, true);
                 forceDamage.applyEffect(player);
-                entity.setVelocity(new Vector(0, 0, 0));
 
                 config.q_damaging.remove(player.getUniqueId());
 

@@ -118,9 +118,8 @@ public class F implements SkillBase {
                         world.spawnParticle(Particle.ENCHANT, target.getLocation().add(0, 1.4, 0), 17, 0.4, 0.7, 0.4, 0.05);
                         world.spawnParticle(Particle.FALLING_DUST, target.getLocation().add(0, 1.4, 0), 17, 0.6, 0.6, 0.6, Material.PINK_CONCRETE.createBlockData());
 
-                        ForceDamage forceDamage = new ForceDamage(target, damage, source);
+                        ForceDamage forceDamage = new ForceDamage(target, damage, source, false);
                         forceDamage.applyEffect(owner);
-                        target.setVelocity(new Vector(0, 0, 0));
                     }
                 }
 

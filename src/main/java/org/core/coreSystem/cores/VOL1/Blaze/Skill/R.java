@@ -2,6 +2,7 @@ package org.core.coreSystem.cores.VOL1.Blaze.Skill;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.title.Title;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -16,6 +17,8 @@ import org.core.cool.Cool;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.cores.VOL1.Blaze.Passive.BlueFlame;
 import org.core.coreSystem.cores.VOL1.Blaze.coreSystem.Blaze;
+
+import java.time.Duration;
 
 public class R implements SkillBase{
     private final Blaze config;
@@ -70,8 +73,15 @@ public class R implements SkillBase{
 
         }else{
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 1, 1);
-            player.sendActionBar(Component.text("Soul needed").color(NamedTextColor.RED));
-            long cools = 100L;
+
+            Title title = Title.title(
+                    Component.empty(),
+                    Component.text("Soul needed").color(NamedTextColor.RED),
+                    Title.Times.times(Duration.ZERO, Duration.ofMillis(300), Duration.ofMillis(200))
+            );
+            player.showTitle(title);
+
+            long cools = 500L;
             cool.updateCooldown(player, "R", cools);
         }
     }

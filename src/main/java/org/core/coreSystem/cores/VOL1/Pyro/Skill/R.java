@@ -2,6 +2,7 @@ package org.core.coreSystem.cores.VOL1.Pyro.Skill;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.title.Title;
 import org.bukkit.*;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
@@ -23,6 +24,7 @@ import org.core.effect.crowdControl.Stun;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.cores.VOL1.Pyro.coreSystem.Pyro;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -67,8 +69,13 @@ public class R implements SkillBase {
 
         }else{
             player.getWorld().playSound(player.getLocation(), Sound.ITEM_FLINTANDSTEEL_USE, 1, 1);
-            player.sendActionBar(Component.text("powder needed").color(NamedTextColor.RED));
-            long cools = 100L;
+            Title title = Title.title(
+                    Component.empty(),
+                    Component.text("powder needed").color(NamedTextColor.RED),
+                    Title.Times.times(Duration.ZERO, Duration.ofMillis(300), Duration.ofMillis(200))
+            );
+            player.showTitle(title);
+            long cools = 500L;
             cool.updateCooldown(player, "R", cools);
         }
 
@@ -120,9 +127,8 @@ public class R implements SkillBase {
         for (Entity entity : world.getNearbyEntities(initiateLoc, 1, 6, 1)) {
             if (entity instanceof LivingEntity target && entity != player) {
 
-                ForceDamage forceDamage = new ForceDamage(target, damage, source);
+                ForceDamage forceDamage = new ForceDamage(target, damage, source, false);
                 forceDamage.applyEffect(player);
-                target.setVelocity(new Vector(0, 0, 0));
 
                 Stun stun = new Stun(target, config.r_Skill_stun);
                 stun.applyEffect(player);

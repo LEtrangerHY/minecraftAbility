@@ -79,8 +79,8 @@ public class bloodPetal implements Listener {
     public void Sweep(Player player, double healAmount) {
 
         long currentLeft = cool.getRemainCooldown(player, "Q");
-        long reducedTime = Math.max(0, currentLeft - 1000);
-        cool.updateCooldown(player, "Q", reducedTime);
+        long reducedTime = Math.max(0, currentLeft - 2000);
+        if (cool.isReloading(player, "Q")) cool.updateCooldown(player, "Q", reducedTime);
 
         if (healAmount > 0) {
             double maxHealth = Objects.requireNonNull(player.getAttribute(Attribute.MAX_HEALTH)).getValue();
@@ -205,10 +205,9 @@ public class bloodPetal implements Listener {
                         localDamagedSet.add(entity);
 
                         config.atk.put(player.getUniqueId(), "P");
-                        ForceDamage forceDamage = new ForceDamage(target, healAmount, source);
+                        ForceDamage forceDamage = new ForceDamage(target, healAmount, source, true);
                         forceDamage.applyEffect(player);
                         config.atk.remove(player.getUniqueId());
-                        target.setVelocity(new Vector(0,0,0));
 
                         player.getWorld().spawnParticle(Particle.BLOCK, target.getLocation().add(0, 1.4, 0), 7, 0.3, 0.3, 0.3, Bukkit.createBlockData(Material.REDSTONE_BLOCK));
                     }

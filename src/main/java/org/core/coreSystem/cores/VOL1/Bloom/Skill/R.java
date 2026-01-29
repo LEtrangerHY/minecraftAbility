@@ -109,7 +109,7 @@ public class R implements SkillBase {
                 for (Entity e : center.getWorld().getNearbyEntities(center, radius, maxHeight, radius)) {
                     if (e instanceof LivingEntity target && !target.equals(player)) {
 
-                        ForceDamage forceDamage = new ForceDamage(target, damage, source);
+                        ForceDamage forceDamage = new ForceDamage(target, damage, source, false);
                         forceDamage.applyEffect(player);
                         target.setVelocity(new Vector(0, 0.7, 0));
 

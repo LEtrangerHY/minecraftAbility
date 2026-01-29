@@ -105,9 +105,8 @@ public class R implements SkillBase {
                                 world.spawnParticle(Particle.ENCHANTED_HIT, tLoc.add(0, 1.2, 0), 33, 0.6, 0.6, 0.6, 1);
                             }
 
-                            ForceDamage forceDamage = new ForceDamage(target, finalDamage, source);
+                            ForceDamage forceDamage = new ForceDamage(target, finalDamage, source, true);
                             forceDamage.applyEffect(player);
-                            target.setVelocity(new Vector(0, 0, 0));
 
                             damagedSet.add(target);
                         }

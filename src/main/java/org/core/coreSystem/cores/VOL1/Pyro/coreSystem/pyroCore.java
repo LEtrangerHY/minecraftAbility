@@ -116,13 +116,13 @@ public class pyroCore extends absCore {
                             return;
                         }
 
-                        cool.setCooldown(player, 2000L, "flame");
+                        cool.setCooldown(player, 1400L, "flame");
 
                         World world = player.getWorld();
                         Location playerLocation = player.getLocation();
                         Vector direction = playerLocation.getDirection().normalize().multiply(1.3);
 
-                        player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(0.5);
+                        player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(1 / 1.4);
                         world.playSound(player.getLocation(), Sound.ITEM_FIRECHARGE_USE, 1, 1);
 
                         config.collision.put(player.getUniqueId(), false);
@@ -138,7 +138,7 @@ public class pyroCore extends absCore {
                             @Override
                             public void run() {
 
-                                if (ticks >= 25 || config.collision.getOrDefault(player.getUniqueId(), true)) {
+                                if (ticks >= 17 || config.collision.getOrDefault(player.getUniqueId(), true)) {
                                     config.collision.remove(player.getUniqueId());
                                     this.cancel();
                                     return;
@@ -148,8 +148,8 @@ public class pyroCore extends absCore {
                                         .add(direction.clone().multiply(ticks * 1.5))
                                         .add(0, 1.4, 0);
 
-                                world.spawnParticle(Particle.FLAME, particleLocation, 3, 0.1, 0.1, 0.1, 0);
-                                world.spawnParticle(Particle.SMOKE, particleLocation, 2, 0.1, 0.1, 0.1, 0);
+                                world.spawnParticle(Particle.FLAME, particleLocation, 7, 0.5, 0.5, 0.5, 0);
+                                world.spawnParticle(Particle.SMOKE, particleLocation, 3, 0.3, 0.3, 0.3, 0);
 
                                 Block block = particleLocation.getBlock();
 
@@ -172,10 +172,10 @@ public class pyroCore extends absCore {
                                     config.collision.put(player.getUniqueId(), true);
                                 }
 
-                                for (Entity entity : world.getNearbyEntities(particleLocation, 0.5, 0.5, 0.5)) {
+                                for (Entity entity : world.getNearbyEntities(particleLocation, 0.7, 0.7, 0.7)) {
                                     if (entity instanceof LivingEntity target && entity != player) {
 
-                                        ForceDamage forceDamage = new ForceDamage(target, 5.0, source);
+                                        ForceDamage forceDamage = new ForceDamage(target, 5.0, source, false);
                                         forceDamage.applyEffect(player);
                                         Burst(player, particleLocation);
                                         config.collision.put(player.getUniqueId(), true);
@@ -203,8 +203,8 @@ public class pyroCore extends absCore {
         World world = player.getWorld();
 
         world.playSound(player.getLocation(), Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1, 1);
-        world.spawnParticle(Particle.FLAME, burstLoction, 21, 0.1, 0.1, 0.1, 0.9);
-        world.spawnParticle(Particle.SOUL_FIRE_FLAME, burstLoction, 14, 0.1, 0.1, 0.1, 0.9);
+        world.spawnParticle(Particle.FLAME, burstLoction, 28, 0, 0, 0, 0.7);
+        world.spawnParticle(Particle.SOUL_FIRE_FLAME, burstLoction, 14, 0, 0, 0, 0.7);
 
         DamageSource source = DamageSource.builder(DamageType.MAGIC)
                 .withCausingEntity(player)
@@ -219,7 +219,7 @@ public class pyroCore extends absCore {
                     burn.applyEffect(player);
                 }
 
-                ForceDamage forceDamage = new ForceDamage(target, 2.0, source);
+                ForceDamage forceDamage = new ForceDamage(target, 2.0, source, false);
                 forceDamage.applyEffect(player);
 
                 Vector direction = entity.getLocation().toVector().subtract(burstLoction.toVector()).normalize().multiply(0.5);

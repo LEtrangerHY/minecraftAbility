@@ -2,6 +2,7 @@ package org.core.coreSystem.cores.VOL1.Dagger.Skill;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.title.Title;
 import org.bukkit.*;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
@@ -17,6 +18,7 @@ import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.cores.VOL1.Dagger.Passive.bloodStroke;
 import org.core.coreSystem.cores.VOL1.Dagger.coreSystem.Dagger;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -58,9 +60,8 @@ public class R implements SkillBase {
                     .withDirectEntity(player)
                     .build();
 
-            ForceDamage forceDamage = new ForceDamage(target, damage, source);
+            ForceDamage forceDamage = new ForceDamage(target, damage, source, true);
             forceDamage.applyEffect(player);
-            target.setVelocity(new Vector(0, 0, 0));
             config.r_damaged.remove(player.getUniqueId());
 
             world.playSound(player.getLocation(), Sound.ITEM_TRIDENT_THROW, 1, 1);
@@ -80,7 +81,12 @@ public class R implements SkillBase {
 
             world.spawnParticle(Particle.CRIT, particleLocation, 8, 0.08, 0.08, 0.08, 0);
 
-            player.sendActionBar(Component.text("not designated").color(NamedTextColor.DARK_RED));
+            Title title = Title.title(
+                    Component.empty(),
+                    Component.text("not designated").color(NamedTextColor.DARK_RED),
+                    Title.Times.times(Duration.ZERO, Duration.ofMillis(1000), Duration.ofMillis(500))
+            );
+            player.showTitle(title);
 
             long cools = 250L;
             cool.updateCooldown(player, "R", cools);

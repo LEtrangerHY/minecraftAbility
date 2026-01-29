@@ -69,7 +69,7 @@ public class R implements SkillBase {
 
                         world.spawnParticle(Particle.EXPLOSION, entity.getLocation().clone().add(0, 1, 0), 1, 0, 0, 0, 0);
 
-                        ForceDamage forceDamage = new ForceDamage((LivingEntity) entity, damage, source);
+                        ForceDamage forceDamage = new ForceDamage((LivingEntity) entity, damage, source, false);
                         forceDamage.applyEffect(player);
 
                         Vector direction = entity.getLocation().toVector().subtract(particleLoc.toVector()).normalize().multiply(1.4);

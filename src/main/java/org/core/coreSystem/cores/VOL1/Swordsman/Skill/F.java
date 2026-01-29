@@ -162,9 +162,8 @@ public class F implements SkillBase {
                                     Stun stun = new Stun(target, config.f_Skill_stun);
                                     stun.applyEffect(player);
 
-                                    ForceDamage forceDamage = new ForceDamage(target, damage, source);
+                                    ForceDamage forceDamage = new ForceDamage(target, damage, source, true);
                                     forceDamage.applyEffect(player);
-                                    target.setVelocity(new Vector(0, 0, 0));
 
                                     damagedSet.add(target);
                                 }
@@ -234,9 +233,8 @@ public class F implements SkillBase {
                         if (entity instanceof LivingEntity target && entity != player) {
                             world.spawnParticle(Particle.CRIT, target.getLocation().add(0, 1.0, 0), 20, 0.5, 0.5, 0.5, 1);
 
-                            ForceDamage forceDamage = new ForceDamage(target, damage, source);
+                            ForceDamage forceDamage = new ForceDamage(target, damage, source, true);
                             forceDamage.applyEffect(player);
-                            target.setVelocity(new Vector(0, 0, 0));
                         }
                     }
                     ticks++;

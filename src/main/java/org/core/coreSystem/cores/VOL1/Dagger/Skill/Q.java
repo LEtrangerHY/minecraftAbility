@@ -83,9 +83,8 @@ public class Q implements SkillBase {
                         config.f_damaging.put(player.getUniqueId(), true);
                         bloodStroker.damageStroke(player, target);
 
-                        ForceDamage forceDamage = new ForceDamage(target, damage, source);
+                        ForceDamage forceDamage = new ForceDamage(target, damage, source, true);
                         forceDamage.applyEffect(player);
-                        target.setVelocity(new Vector(0, 0, 0));
                         config.f_damaging.remove(player.getUniqueId());
 
                         player.setVelocity(new Vector(0, 0, 0));
@@ -162,9 +161,8 @@ public class Q implements SkillBase {
                         config.f_damaging.put(player.getUniqueId(), true);
                         bloodStroker.damageStroke(player, target);
 
-                        ForceDamage forceDamage = new ForceDamage(target, damage / 2, source);
+                        ForceDamage forceDamage = new ForceDamage(target, damage / 2, source, true);
                         forceDamage.applyEffect(player);
-                        target.setVelocity(new Vector(0, 0, 0));
                         config.f_damaging.remove(player.getUniqueId());
 
                         config.q_damaged.getOrDefault(player.getUniqueId(), new HashSet<>()).add(target);

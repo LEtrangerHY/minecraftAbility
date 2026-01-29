@@ -91,9 +91,8 @@ public class Q implements SkillBase {
                         if (!damagedSet.contains(target)) {
 
                             config.atk.put(player.getUniqueId(), "S");
-                            ForceDamage forceDamage = new ForceDamage(target, damage, source);
+                            ForceDamage forceDamage = new ForceDamage(target, damage, source, true);
                             forceDamage.applyEffect(player);
-                            target.setVelocity(new Vector(0, 0, 0));
                             config.atk.remove(player.getUniqueId());
                             world.spawnParticle(Particle.BLOCK, target.getLocation().add(0, 1.4, 0), 4, 0.3, 0.3, 0.3, Bukkit.createBlockData(Material.REDSTONE_BLOCK));
 

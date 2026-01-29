@@ -171,7 +171,7 @@ public class sabCore extends absCore {
 
                                 for (Entity nearby : item.getNearbyEntities(0.5, 0.5, 0.5)) {
                                     if (nearby instanceof LivingEntity target && nearby != player) {
-                                        new ForceDamage(target, 5.0, source).applyEffect(player);
+                                        new ForceDamage(target, 5.0, source, false).applyEffect(player);
                                         world.playSound(target.getLocation(), Sound.ITEM_TRIDENT_HIT, 1.0f, 1.0f);
                                         world.spawnParticle(Particle.BLOCK, target.getLocation().add(0, 1.2, 0), 14, 0.3, 0.3, 0.3, BLOOD_BLOCK);
 

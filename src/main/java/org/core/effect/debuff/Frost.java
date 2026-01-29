@@ -1,10 +1,11 @@
 package org.core.effect.debuff;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Particle;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -15,7 +16,10 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class Frost implements Debuffs {
+    // 쿨타임/지속시간 관리용
     private static final HashMap<UUID, Long> frostbiteEntities = new HashMap<>();
+    // 보스바 관리용 (플레이어 UUID -> BossBar)
+    private static final HashMap<UUID, BossBar> activeBars = new HashMap<>();
 
     private final Entity target;
     private final long duration;
@@ -44,6 +48,10 @@ public class Frost implements Debuffs {
         long endTime = currentTime + duration;
         frostbiteEntities.put(targetId, endTime);
 
+        if (target instanceof Player player) {
+            createOrUpdateBossBar(player);
+        }
+
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -54,16 +62,18 @@ public class Frost implements Debuffs {
                 }
 
                 long currentEndTime = frostbiteEntities.get(targetId);
-                if (System.currentTimeMillis() >= currentEndTime) {
+                long now = System.currentTimeMillis();
+
+                if (now >= currentEndTime) {
                     removeEffect(target);
                     cancel();
                     return;
                 }
 
-                target.getWorld().spawnParticle(Particle.SNOWFLAKE, target.getLocation().clone().add(0, 1.3, 0), 6, 0.5, 0.5, 0.5, 0);
+                target.getWorld().spawnParticle(Particle.SNOWFLAKE, target.getLocation().clone().add(0, 1.3, 0), 1, 0.2, 0.5, 0.2, 0);
 
                 Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(0, 255, 255), 0.6f);
-                target.getWorld().spawnParticle(Particle.DUST, target.getLocation().clone().add(0, 1.3, 0), 3, 0.4, 0.4, 0.4, 0, dustOptions);
+                target.getWorld().spawnParticle(Particle.DUST, target.getLocation().clone().add(0, 1.3, 0), 1, 0.3, 0.4, 0.3, 0, dustOptions);
 
                 target.setFreezeTicks(140);
 
@@ -73,23 +83,52 @@ public class Frost implements Debuffs {
                         cancel();
                         return;
                     }
-                    player.sendActionBar(Component.text("Frost").color(NamedTextColor.AQUA));
+
+                    updateBossBarProgress(player, now, currentEndTime);
                 }
             }
-        }.runTaskTimer(Objects.requireNonNull(Bukkit.getPluginManager().getPlugin("Core")), 0L, 20L);
+        }.runTaskTimer(Objects.requireNonNull(Bukkit.getPluginManager().getPlugin("Core")), 0L, 1L);
     }
 
     @Override
     public void removeEffect(Entity entity) {
         frostbiteEntities.remove(entity.getUniqueId());
         entity.setFreezeTicks(0);
+
         if (entity instanceof Player player) {
-            player.sendActionBar(Component.text(" "));
+            BossBar bar = activeBars.remove(player.getUniqueId());
+            if (bar != null) {
+                bar.removeAll();
+            }
         }
     }
 
     public static boolean isFrostbite(Entity entity) {
         Long endTime = frostbiteEntities.get(entity.getUniqueId());
         return endTime != null && System.currentTimeMillis() < endTime;
+    }
+
+    private void createOrUpdateBossBar(Player player) {
+        UUID uuid = player.getUniqueId();
+        BossBar bar = activeBars.get(uuid);
+
+        if (bar == null) {
+            bar = Bukkit.createBossBar("init", BarColor.BLUE, BarStyle.SOLID);
+            bar.setTitle("§b❄ Frost");
+            bar.addPlayer(player);
+            activeBars.put(uuid, bar);
+        }
+    }
+
+    private void updateBossBarProgress(Player player, long now, long endTime) {
+        BossBar bar = activeBars.get(player.getUniqueId());
+        if (bar == null) return;
+
+        long remaining = endTime - now;
+        double progress = (double) remaining / (double) duration;
+
+        progress = Math.max(0.0, Math.min(1.0, progress));
+
+        bar.setProgress(progress);
     }
 }

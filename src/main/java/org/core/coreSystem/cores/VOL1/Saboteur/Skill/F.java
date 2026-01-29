@@ -24,7 +24,7 @@ public class F implements SkillBase {
     public void Trigger(Player player){
         PotionEffect poison = new PotionEffect(PotionEffectType.POISON, 10, 5, false, true);
 
-        cool.setCooldown(player, 13000L, "Berserk");
+        cool.setCooldown(player, 13000L, "Berserk", "boss");
 
         new BukkitRunnable() {
             int tick = 0;
@@ -37,7 +37,7 @@ public class F implements SkillBase {
 
                 if (!player.isOnline() || player.isDead() || tick > 20 * 13 || !config.isHackAway.getOrDefault(player.getUniqueId(), false)) {
                     config.isHackAway.remove(player.getUniqueId());
-                    cool.updateCooldown(player , "Berserk", 0L);
+                    cool.updateCooldown(player , "Berserk", 0L, "boss");
 
                     cool.setCooldown(player, 4000L, "R");
                     cool.setCooldown(player, 4000L, "Q");

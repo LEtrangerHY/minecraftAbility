@@ -7,16 +7,19 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.util.Vector;
 
 public class ForceDamage implements Effects, Listener {
     private final LivingEntity target;
     private final double damage;
     private final DamageSource damageSource;
+    private final boolean isNonKnock;
 
-    public ForceDamage(LivingEntity target, double damage, DamageSource damageSource) {
+    public ForceDamage(LivingEntity target, double damage, DamageSource damageSource, boolean isNonKnock) {
         this.target = target;
         this.damage = damage;
         this.damageSource = damageSource;
+        this.isNonKnock = isNonKnock;
     }
 
     @Override
@@ -25,6 +28,7 @@ public class ForceDamage implements Effects, Listener {
 
         target.setNoDamageTicks(1);
         target.damage(damage, damageSource);
+        if(isNonKnock) target.setVelocity(new Vector(0, 0, 0));
         target.setNoDamageTicks(10);
     }
 

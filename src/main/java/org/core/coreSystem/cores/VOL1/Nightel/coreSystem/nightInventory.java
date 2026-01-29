@@ -46,8 +46,8 @@ public class nightInventory extends absInventory {
     protected Component getName(Player player, String skill) {
         return switch (skill) {
             case "R" -> Component.text("Dusk");
-            case "Q" -> Component.text("WhirlWind");
-            case "F" -> Component.text("CHAIN RESONANCE");
+            case "Q" -> Component.text("Illusion");
+            case "F" -> Component.text("NIGHTSHADE");
             default -> Component.text("???");
         };
     }

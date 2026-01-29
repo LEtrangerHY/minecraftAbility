@@ -2,6 +2,7 @@ package org.core.coreSystem.cores.VOL1.Commander.Skill;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.title.Title;
 import org.bukkit.*;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
@@ -20,6 +21,7 @@ import org.core.effect.crowdControl.ForceDamage;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.cores.VOL1.Commander.coreSystem.Commander;
 
+import java.time.Duration;
 import java.util.HashSet;
 
 public class Q implements SkillBase {
@@ -45,8 +47,15 @@ public class Q implements SkillBase {
             }
         }else{
             player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
-            player.sendActionBar(Component.text("com-block uninstalled").color(NamedTextColor.RED));
-            long cools = 100L;
+
+            Title title = Title.title(
+                    Component.empty(),
+                    Component.text("com-block uninstalled").color(NamedTextColor.RED),
+                    Title.Times.times(Duration.ZERO, Duration.ofMillis(300), Duration.ofMillis(200))
+            );
+            player.showTitle(title);
+
+            long cools = 500L;
             cool.updateCooldown(player, "Q", cools);
         }
     }
@@ -113,10 +122,9 @@ public class Q implements SkillBase {
 
             if(!entity.equals(player)) {
 
-                ForceDamage forceDamage = new ForceDamage((LivingEntity) entity, damage, source);
+                ForceDamage forceDamage = new ForceDamage((LivingEntity) entity, damage, source, false);
                 forceDamage.applyEffect(player);
                 forceDamage.applyEffect(player);
-                entity.setVelocity(new Vector(0, 0, 0));
 
                 PotionEffect slowness = new PotionEffect(PotionEffectType.SLOWNESS, 20 * 4, 1, false, false);
                 ((LivingEntity) entity).addPotionEffect(slowness);

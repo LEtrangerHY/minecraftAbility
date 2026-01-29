@@ -130,13 +130,12 @@ public class Q implements SkillBase {
 
                             if (toEntity.lengthSquared() <= (slashLength + 0.5) * (slashLength + 0.5)) {
 
-                                Vector toEntityDir = toEntity.clone().setY(0).normalize(); // 평면 각도 계산을 위해 Y=0
+                                Vector toEntityDir = toEntity.clone().setY(0).normalize();
                                 double dotProduct = rotatedDir.dot(toEntityDir);
 
                                 if (dotProduct >= hitThreshold) {
-                                    ForceDamage forceDamage = new ForceDamage(target, damage, source);
+                                    ForceDamage forceDamage = new ForceDamage(target, damage, source, true);
                                     forceDamage.applyEffect(player);
-                                    target.setVelocity(new Vector(0, 0, 0));
 
                                     int currentAbsorption = player.getAbsorptionAmount() > 0 ? (int) player.getAbsorptionAmount() : 0;
                                     int newAbsorption = Math.min(currentAbsorption + 1, 8);

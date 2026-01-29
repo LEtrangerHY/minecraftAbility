@@ -144,7 +144,7 @@ public class bloomCore extends absCore {
                                 for (Entity entity : world.getNearbyEntities(particleLocation, 1.7, 1.7, 1.7)) {
                                     if (entity instanceof LivingEntity target && entity != player) {
 
-                                        ForceDamage forceDamage = new ForceDamage(target, 1.7, source);
+                                        ForceDamage forceDamage = new ForceDamage(target, 1.7, source, false);
                                         forceDamage.applyEffect(player);
                                     }
                                 }

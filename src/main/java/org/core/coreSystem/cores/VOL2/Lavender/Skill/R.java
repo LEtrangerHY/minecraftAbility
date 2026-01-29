@@ -307,7 +307,7 @@ public class R implements SkillBase {
                     if (!hitSegments.contains(i)) {
                         world.spawnParticle(Particle.BLOCK, entity.getLocation().clone().add(0, 1.2, 0), 9, 0.6, 0.6, 0.6, ironDust);
 
-                        ForceDamage forceDamage = new ForceDamage(target, damage, source);
+                        ForceDamage forceDamage = new ForceDamage(target, damage, source, true);
                         forceDamage.applyEffect(player);
 
                         Stun stun = new Stun(target, 3000L);
@@ -356,7 +356,7 @@ public class R implements SkillBase {
                 world.spawnParticle(Particle.BLOCK, entity.getLocation().clone().add(0, 1.2, 0), 9, 0.6, 0.6, 0.6, blood);
                 world.spawnParticle(Particle.SWEEP_ATTACK, entity.getLocation().clone().add(0, 1.2, 0), 1, 0, 0, 0, 1);
 
-                ForceDamage forceDamage = new ForceDamage(target, damage * 3, source);
+                ForceDamage forceDamage = new ForceDamage(target, damage * 3, source, false);
                 forceDamage.applyEffect(player);
             }
         }

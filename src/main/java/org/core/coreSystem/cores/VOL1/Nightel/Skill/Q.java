@@ -45,43 +45,70 @@ public class Q implements SkillBase {
 
     private void performTeleport(Player player) {
         World world = player.getWorld();
-        Location start = player.getLocation();
-        Vector direction = start.getDirection().normalize();
+
+        Location eyeLoc = player.getEyeLocation();
+        Location feetLoc = player.getLocation();
+        Vector direction = eyeLoc.getDirection().normalize();
+
+        double eyeHeight = player.getEyeHeight();
 
         double safeDistance = -1;
 
         for (double d = 6.0; d >= 0; d -= 0.2) {
-            double x = start.getX() + direction.getX() * d;
-            double y = start.getY() + direction.getY() * d;
-            double z = start.getZ() + direction.getZ() * d;
 
-            Block feetBlock = new Location(world, x, y, z).getBlock();
-            Block headBlock = feetBlock.getRelative(0, 1, 0);
+            double x = eyeLoc.getX() + direction.getX() * d;
+            double y = eyeLoc.getY() + direction.getY() * d;
+            double z = eyeLoc.getZ() + direction.getZ() * d;
 
-            if (feetBlock.isPassable() && headBlock.isPassable()) {
+            Location checkHeadLoc = new Location(world, x, y, z);
+            Location checkFeetLoc = new Location(world, x, y - eyeHeight, z);
+
+            Block headBlock = checkHeadLoc.getBlock();
+            Block feetBlock = checkFeetLoc.getBlock();
+
+            if (headBlock.isPassable() && feetBlock.isPassable()) {
                 safeDistance = d;
                 break;
             }
         }
 
-        if (safeDistance >= 0) {
-            UUID uuid = player.getUniqueId();
-            String lastSkill = config.chainSkill.getOrDefault(uuid, "");
-            boolean same = config.chainSkill.containsKey(uuid) && lastSkill.equals("Q");
+        UUID uuid = player.getUniqueId();
+        String lastSkill = config.chainSkill.getOrDefault(uuid, "");
+        boolean same = config.chainSkill.containsKey(uuid) && lastSkill.equals("Q");
 
-            chain.chainCount(player, config.q_Skill_Cool, "Q");
+        chain.chainCount(player, config.q_Skill_Cool, "Q");
 
-            Location targetLocation = start.clone().add(direction.clone().multiply(safeDistance));
-            targetLocation.setDirection(start.toVector().subtract(targetLocation.toVector()));
+        double actualMoveDistance = (safeDistance == -1) ? 0 : safeDistance;
 
-            player.teleport(targetLocation);
+        if (actualMoveDistance > 0) {
+            Location targetHeadLoc = eyeLoc.clone().add(direction.clone().multiply(actualMoveDistance));
+            Location targetFeetLoc = targetHeadLoc.subtract(0, eyeHeight, 0);
+
+            Block feetBlock = targetFeetLoc.getBlock();
+            if (feetBlock.getType().isSolid()) {
+                BoundingBox bb = feetBlock.getBoundingBox();
+                if (targetFeetLoc.getY() < bb.getMaxY()) {
+                    targetFeetLoc.setY(bb.getMaxY());
+                }
+            } else {
+                Block belowBlock = targetFeetLoc.clone().subtract(0, 0.05, 0).getBlock();
+                if (belowBlock.getType().isSolid()) {
+                    BoundingBox bb = belowBlock.getBoundingBox();
+                    if (targetFeetLoc.getY() < bb.getMaxY()) {
+                        targetFeetLoc.setY(bb.getMaxY());
+                    }
+                }
+            }
+
+            targetFeetLoc.setDirection(feetLoc.toVector().subtract(targetFeetLoc.toVector()));
+
+            player.teleport(targetFeetLoc);
             world.spawnParticle(Particle.SPIT, player.getLocation(), 33, 0.2, 0.3, 0.2, 0.6);
-
-            performSlash(player, safeDistance, start, direction, same);
         } else {
-            world.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_LEATHER, 1f, 1f);
-            player.sendActionBar(Component.text("failed").color(NamedTextColor.RED));
+            world.playSound(player.getLocation(), Sound.BLOCK_FIRE_EXTINGUISH, 0.5f, 2.0f);
         }
+
+        performSlash(player, actualMoveDistance, feetLoc, direction, same);
     }
 
     private void performSlash(Player player, double maxDistance, Location start, Vector direction, boolean same) {
@@ -103,16 +130,23 @@ public class Q implements SkillBase {
         Location end = start.clone().add(direction.clone().multiply(maxDistance));
         BoundingBox box = BoundingBox.of(start, end).expand(1.8);
 
+        Vector attackerCenter = start.toVector().add(new Vector(0, player.getHeight() / 2.0, 0));
+
         List<LivingEntity> targets = new ArrayList<>();
 
         for (Entity entity : world.getNearbyEntities(box)) {
             if (entity instanceof LivingEntity target && entity != player) {
                 if (!damagedSet.contains(target)) {
-                    Vector toEntity = target.getLocation().toVector().subtract(start.toVector());
+
+                    Vector targetCenter = target.getBoundingBox().getCenter();
+
+                    Vector toEntity = targetCenter.subtract(attackerCenter);
+
                     double dot = toEntity.dot(direction);
 
                     if (dot >= -0.5 && dot <= maxDistance + 0.5) {
                         Vector projection = direction.clone().multiply(dot);
+
                         if (toEntity.subtract(projection).lengthSquared() <= 3.24) {
                             targets.add(target);
                             damagedSet.add(target);
@@ -139,9 +173,8 @@ public class Q implements SkillBase {
                             world.playSound(tLoc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f);
                             world.playSound(tLoc, Sound.ITEM_TRIDENT_HIT_GROUND, 1f, 1f);
 
-                            ForceDamage forceDamage = new ForceDamage(target, damage, source);
+                            ForceDamage forceDamage = new ForceDamage(target, damage, source, true);
                             forceDamage.applyEffect(player);
-                            target.setVelocity(new Vector(0, 0, 0));
 
                             Location effectLoc = tLoc.add(0, 1.2, 0);
                             world.spawnParticle(Particle.SWEEP_ATTACK, effectLoc, 3, 0.6, 0.6, 0.6, 1);

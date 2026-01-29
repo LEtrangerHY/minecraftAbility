@@ -42,9 +42,8 @@ public class bloodStroke {
                 .withDirectEntity(player)
                 .build();
 
-        ForceDamage forceDamage = new ForceDamage(entity, entity.getHealth() * 0.13, source);
+        ForceDamage forceDamage = new ForceDamage(entity, entity.getHealth() * 0.13, source, true);
         forceDamage.applyEffect(player);
-        entity.setVelocity(new Vector(0, 0, 0));
 
     }
 }

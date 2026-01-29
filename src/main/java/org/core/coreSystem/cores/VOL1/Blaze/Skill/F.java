@@ -2,6 +2,7 @@ package org.core.coreSystem.cores.VOL1.Blaze.Skill;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.title.Title;
 import org.bukkit.*;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
@@ -18,7 +19,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 import org.core.cool.Cool;
 import org.core.effect.debuff.Burn;
 import org.core.effect.crowdControl.ForceDamage;
@@ -27,9 +27,8 @@ import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.cores.VOL1.Blaze.Passive.BlueFlame;
 import org.core.coreSystem.cores.VOL1.Blaze.coreSystem.Blaze;
 
+import java.time.Duration;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -100,8 +99,15 @@ public class F implements SkillBase {
             }
         } else {
             player.playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 1, 1);
-            player.sendActionBar(Component.text("Soul needed").color(NamedTextColor.RED));
-            cool.updateCooldown(player, "F", 100L);
+
+            Title title = Title.title(
+                    Component.empty(),
+                    Component.text("Soul needed").color(NamedTextColor.RED),
+                    Title.Times.times(Duration.ZERO, Duration.ofMillis(300), Duration.ofMillis(200))
+            );
+            player.showTitle(title);
+
+            cool.updateCooldown(player, "F", 500L);
         }
     }
 
@@ -163,7 +169,6 @@ public class F implements SkillBase {
 
         new BukkitRunnable() {
             int tick = 0;
-            final Vector zeroVel = new Vector(0, 0, 0);
 
             @Override
             public void run() {
@@ -182,9 +187,8 @@ public class F implements SkillBase {
 
                 for (Entity entity : world.getNearbyEntities(pollLoc, 1.3, 13, 1.3)) {
                     if (entity instanceof LivingEntity target && entity != player) {
-                        ForceDamage forceDamage = new ForceDamage(target, damage, source);
+                        ForceDamage forceDamage = new ForceDamage(target, damage, source, false);
                         forceDamage.applyEffect(player);
-                        target.setVelocity(zeroVel);
                     }
                 }
 

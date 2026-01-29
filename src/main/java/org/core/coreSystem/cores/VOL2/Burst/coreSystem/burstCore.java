@@ -126,7 +126,7 @@ public class burstCore extends absCore {
                             if (entity.equals(player) || !(entity instanceof LivingEntity)) continue;
 
 
-                            ForceDamage forceDamage = new ForceDamage((LivingEntity) entity, 6.0, source);
+                            ForceDamage forceDamage = new ForceDamage((LivingEntity) entity, 6.0, source, false);
                             forceDamage.applyEffect(player);
 
                             Vector direction = entity.getLocation().toVector().subtract(center.toVector()).normalize().multiply(0.8);
@@ -140,7 +140,7 @@ public class burstCore extends absCore {
 
                             world.spawnParticle(Particle.EXPLOSION, entity.getLocation().clone().add(0, 1, 0), 1, 0, 0, 0, 0);
 
-                            ForceDamage forceDamage = new ForceDamage((LivingEntity) entity, 7.0, source);
+                            ForceDamage forceDamage = new ForceDamage((LivingEntity) entity, 7.0, source, false);
                             forceDamage.applyEffect(player);
 
                             Vector direction = entity.getLocation().toVector().subtract(center.toVector()).normalize().multiply(1.3);

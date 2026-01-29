@@ -49,7 +49,7 @@ public class Christmas {
         Location center = player.getLocation();
 
         for (Entity entity : world.getNearbyEntities(center, 5, 5, 5)) {
-            if (entity.equals(player) || !(entity instanceof LivingEntity)) continue;
+            if (entity.equals(player) || !(entity instanceof LivingEntity) || entity.isInvulnerable()) continue;
 
             Vector direction = entity.getLocation().toVector().subtract(center.toVector()).normalize().multiply(1.2);
             direction.setY(0.7);

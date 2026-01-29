@@ -2,6 +2,7 @@ package org.core.coreSystem.cores.VOL1.Dagger.Skill;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.title.Title;
 import org.bukkit.*;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
@@ -19,6 +20,7 @@ import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.cores.VOL1.Dagger.Passive.bloodStroke;
 import org.core.coreSystem.cores.VOL1.Dagger.coreSystem.Dagger;
 
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -39,13 +41,27 @@ public class F implements SkillBase {
     @Override
     public void Trigger(Player player) {
         if(!config.f_using.getOrDefault(player.getUniqueId(), false) && !config.f_dash.getOrDefault(player.getUniqueId(), false)){
-            player.sendActionBar(Component.text("left click to slash").color(NamedTextColor.DARK_RED));
+
+            Title title = Title.title(
+                    Component.empty(),
+                    Component.text("left click to slash").color(NamedTextColor.DARK_RED),
+                    Title.Times.times(Duration.ZERO, Duration.ofMillis(1000), Duration.ofMillis(400))
+            );
+            player.showTitle(title);
+
             cool.updateCooldown(player, "F", 0L);
             X_slash_on(player);
         }else if(!config.f_using.getOrDefault(player.getUniqueId(), false) && config.f_dash.getOrDefault(player.getUniqueId(), false)){
             X_finish(player);
         }else{
-            player.sendActionBar(Component.text("dash is not set").color(NamedTextColor.DARK_RED));
+
+            Title title = Title.title(
+                    Component.empty(),
+                    Component.text("dash is not set").color(NamedTextColor.DARK_RED),
+                    Title.Times.times(Duration.ZERO, Duration.ofMillis(1000), Duration.ofMillis(400))
+            );
+            player.showTitle(title);
+
             cool.updateCooldown(player, "F", 0L);
         }
     }
@@ -54,7 +70,7 @@ public class F implements SkillBase {
 
         player.getWorld().playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.0f, 1.0f);
 
-        cool.setCooldown(player, 10000L, "X");
+        cool.setCooldown(player, 10000L, "X-SLASH", "boss");
 
         new BukkitRunnable() {
             int ticks = 0;
@@ -68,7 +84,7 @@ public class F implements SkillBase {
 
                 if(ticks >= 200 || config.f_slash.getOrDefault(player.getUniqueId(), 0) >= 2){
                     long cools = 50L;
-                    cool.updateCooldown(player, "X", cools);
+                    cool.updateCooldown(player, "X-SLASH", cools, "boss");
                     config.f_using.remove(player.getUniqueId());
                     config.f_slash.remove(player.getUniqueId());
                     if(!config.dash_object.getOrDefault(player.getUniqueId(), new LinkedHashSet<>()).isEmpty()){
@@ -76,12 +92,26 @@ public class F implements SkillBase {
                         config.dash_num.put(player.getUniqueId(), config.dash_object.getOrDefault(player.getUniqueId(), new LinkedHashSet<>()).size());
                         config.f_dash.put(player.getUniqueId(), true);
 
-                        player.sendActionBar(Component.text(config.dash_object.getOrDefault(player.getUniqueId(), new LinkedHashSet<>()).size() + " set").color(NamedTextColor.DARK_RED));
+                        int count = config.dash_object.getOrDefault(player.getUniqueId(), new LinkedHashSet<>()).size();
+                        Title title = Title.title(
+                                Component.empty(),
+                                Component.text(count + " set").color(NamedTextColor.DARK_RED),
+                                Title.Times.times(Duration.ZERO, Duration.ofMillis(1000), Duration.ofMillis(400))
+                        );
+                        player.showTitle(title);
+
                     }else{
                         player.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_LEATHER, 1, 1);
                         config.f_dash.remove(player.getUniqueId());
                         config.dash_object.remove(player.getUniqueId());
-                        player.sendActionBar(Component.text("no slash").color(NamedTextColor.DARK_RED));
+
+                        Title title = Title.title(
+                                Component.empty(),
+                                Component.text("no slash").color(NamedTextColor.DARK_RED),
+                                Title.Times.times(Duration.ZERO, Duration.ofMillis(1000), Duration.ofMillis(400))
+                        );
+                        player.showTitle(title);
+
                         cool.setCooldown(player, 10000L, "F");
                     }
                     this.cancel();
@@ -114,12 +144,27 @@ public class F implements SkillBase {
         if(!config.dash_object.getOrDefault(player.getUniqueId(), new LinkedHashSet<>()).isEmpty()){
             detect(player);
             config.dash_object.getOrDefault(player.getUniqueId(), new LinkedHashSet<>()).removeFirst();
-            player.sendActionBar(Component.text(config.dash_object.getOrDefault(player.getUniqueId(), new LinkedHashSet<>()).size()).color(NamedTextColor.DARK_RED));
+
+            int count = config.dash_object.getOrDefault(player.getUniqueId(), new LinkedHashSet<>()).size();
+            Title title = Title.title(
+                    Component.empty(),
+                    Component.text(count).color(NamedTextColor.DARK_RED),
+                    Title.Times.times(Duration.ZERO, Duration.ofMillis(1000), Duration.ofMillis(400))
+            );
+            player.showTitle(title);
+
             cool.updateCooldown(player, "F", 50L);
             if(config.dash_object.getOrDefault(player.getUniqueId(), new LinkedHashSet<>()).isEmpty()){
                 config.dash_object.remove(player.getUniqueId());
                 config.f_dash.remove(player.getUniqueId());
-                player.sendActionBar(Component.text("over").color(NamedTextColor.DARK_RED));
+
+                Title overTitle = Title.title(
+                        Component.empty(),
+                        Component.text("over").color(NamedTextColor.DARK_RED),
+                        Title.Times.times(Duration.ZERO, Duration.ofMillis(1000), Duration.ofMillis(400))
+                );
+                player.showTitle(overTitle);
+
                 cool.updateCooldown(player, "F", 10000L);
             }
         }
@@ -151,7 +196,14 @@ public class F implements SkillBase {
                     if(config.f_damaged_2.getOrDefault(player.getUniqueId(), new HashSet<>()).isEmpty()) {
                         config.dash_object.remove(player.getUniqueId());
                         config.f_dash.remove(player.getUniqueId());
-                        player.sendActionBar(Component.text("over").color(NamedTextColor.DARK_RED));
+
+                        Title title = Title.title(
+                                Component.empty(),
+                                Component.text("over").color(NamedTextColor.DARK_RED),
+                                Title.Times.times(Duration.ZERO, Duration.ofMillis(1000), Duration.ofMillis(500))
+                        );
+                        player.showTitle(title);
+
                         cool.updateCooldown(player, "F", 10000L);
                     }
 
@@ -170,9 +222,8 @@ public class F implements SkillBase {
                         config.f_damaging.put(player.getUniqueId(), true);
                         bloodStroker.damageStroke(player, target);
 
-                        ForceDamage forceDamage = new ForceDamage(target, damage / config.dash_num.getOrDefault(player.getUniqueId(), 1), source);
+                        ForceDamage forceDamage = new ForceDamage(target, damage / config.dash_num.getOrDefault(player.getUniqueId(), 1), source, true);
                         forceDamage.applyEffect(player);
-                        target.setVelocity(new Vector(0, 0, 0));
                         config.f_damaging.remove(player.getUniqueId());
 
                         config.f_damaged_2.getOrDefault(player.getUniqueId(), new HashSet<>()).add(target);

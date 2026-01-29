@@ -102,9 +102,8 @@ public class R implements SkillBase {
 
                         config.r_damaging.put(player.getUniqueId(), true);
 
-                        ForceDamage forceDamage = new ForceDamage(target, damage, source);
+                        ForceDamage forceDamage = new ForceDamage(target, damage, source, true);
                         forceDamage.applyEffect(player);
-                        target.setVelocity(new Vector(0, 0, 0));
 
                         config.r_damaging.remove(player.getUniqueId());
 
@@ -114,12 +113,8 @@ public class R implements SkillBase {
                             player.getWorld().playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1);
                             Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(255, 255, 0), 1.0f);
                             player.getWorld().spawnParticle(Particle.DUST, player.getLocation().add(0, 1, 0), 25, 0.4, 0.3, 0.4, 0.08, dustOptions);
-                            String send = String.format("%.2f", damage * velocity);
-                            player.sendActionBar(Component.text(send).color(NamedTextColor.YELLOW));
                             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1.0f, 1.0f);
                         }else {
-                            String send = String.format("%.2f", damage * velocity);
-                            player.sendActionBar(Component.text(send).color(NamedTextColor.WHITE));
                             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_WEAK, 1.0f, 1.0f);
                         }
 

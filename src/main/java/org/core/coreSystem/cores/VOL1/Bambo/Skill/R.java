@@ -2,6 +2,7 @@ package org.core.coreSystem.cores.VOL1.Bambo.Skill;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.title.Title;
 import org.bukkit.*;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
@@ -18,6 +19,7 @@ import org.core.coreSystem.cores.VOL1.Bambo.coreSystem.Bambo;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.bukkit.util.Vector;
 
+import java.time.Duration;
 import java.util.*;
 
 public class R implements SkillBase {
@@ -47,13 +49,25 @@ public class R implements SkillBase {
 
                 cool.updateCooldown(player, "R", cools);
 
-                player.sendActionBar(Component.text("Loaded").color(NamedTextColor.GREEN));
+                Title title = Title.title(
+                        Component.empty(),
+                        Component.text("Loaded").color(NamedTextColor.GREEN),
+                        Title.Times.times(Duration.ZERO, Duration.ofMillis(1000), Duration.ofMillis(500))
+                );
+                player.showTitle(title);
 
                 offhandItem.setAmount(offhandItem.getAmount() - 1);
             }else{
                 player.getWorld().playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_LEATHER, 1, 1);
-                player.sendActionBar(Component.text("iron needed").color(NamedTextColor.RED));
-                long cools = 100L;
+
+                Title title = Title.title(
+                        Component.empty(),
+                        Component.text("iron needed").color(NamedTextColor.RED),
+                        Title.Times.times(Duration.ZERO, Duration.ofMillis(300), Duration.ofMillis(200))
+                );
+                player.showTitle(title);
+
+                long cools = 500L;
                 cool.updateCooldown(player, "R", cools);
             }
 
@@ -98,11 +112,10 @@ public class R implements SkillBase {
                         && entity != player
                         && !config.damaged.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(entity)) {
 
-                    ForceDamage forceDamage = new ForceDamage(target, damage, source);
+                    ForceDamage forceDamage = new ForceDamage(target, damage, source, true);
                     forceDamage.applyEffect(player);
 
                     config.damaged.computeIfAbsent(player.getUniqueId(), k -> new HashSet<>()).add(target);
-                    target.setVelocity(new Vector(0, 0, 0));
                 }
             }
         }
@@ -110,7 +123,12 @@ public class R implements SkillBase {
 
         config.damaged.remove(player.getUniqueId());
 
-        player.sendActionBar(Component.text("Fired!").color(NamedTextColor.DARK_GREEN));
+        Title title = Title.title(
+                Component.empty(),
+                Component.text("Fired!").color(NamedTextColor.DARK_GREEN),
+                Title.Times.times(Duration.ZERO, Duration.ofMillis(500), Duration.ofMillis(200))
+        );
+        player.showTitle(title);
 
     }
 }

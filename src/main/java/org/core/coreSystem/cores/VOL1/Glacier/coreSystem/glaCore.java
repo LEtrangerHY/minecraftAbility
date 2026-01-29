@@ -144,15 +144,15 @@ public class glaCore extends absCore {
                                         .add(0, 1.4, 0);
 
                                 Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(0, 255, 255), 0.6f);
-                                world.spawnParticle(Particle.SNOWFLAKE, particleLocation, 3, 0.1, 0.1, 0.1, 0);
-                                world.spawnParticle(Particle.DUST, particleLocation, 2, 0.1, 0.1, 0.1, 0, dustOptions);
+                                world.spawnParticle(Particle.SNOWFLAKE, particleLocation, 6, 0.5, 0.5, 0.5, 0);
+                                world.spawnParticle(Particle.DUST, particleLocation, 3, 0.3, 0.3, 0.3, 0, dustOptions);
 
-                                for (Entity entity : world.getNearbyEntities(particleLocation, 0.5, 0.5, 0.5)) {
+                                for (Entity entity : world.getNearbyEntities(particleLocation, 0.6, 0.6, 0.6)) {
                                     if (entity instanceof LivingEntity target && entity != player) {
 
                                         world.playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 1);
 
-                                        ForceDamage forceDamage = new ForceDamage(target, 4.0, source);
+                                        ForceDamage forceDamage = new ForceDamage(target, 4.0, source, false);
                                         forceDamage.applyEffect(player);
 
                                         if (Math.random() < 0.6) {

@@ -146,11 +146,11 @@ public class blazeCore extends absCore {
                         if(config.BurstBlaze.getOrDefault(player.getUniqueId(), false)){
                             double amp = config.q_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L);
                             damage = 0.4 * (1 + amp);
-                            player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(0.5);
-                            cool.setCooldown(player, 2000L, "blaze");
+                            player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(1 / 1.3);
+                            cool.setCooldown(player, 1300L, "blaze");
                         }else {
-                            player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(0.25);
-                            cool.setCooldown(player, 4000L, "blaze");
+                            player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(1 / 2.6);
+                            cool.setCooldown(player, 2600L, "blaze");
                         }
 
                         DamageSource source = DamageSource.builder(DamageType.MAGIC)
@@ -171,7 +171,7 @@ public class blazeCore extends absCore {
                         double coneAngle = (config.BurstBlaze.getOrDefault(player.getUniqueId(), false)) ? 360.0 : 60.0;
 
                         if(config.BurstBlaze.getOrDefault(player.getUniqueId(), false)){
-                            player.spawnParticle(Particle.SOUL_FIRE_FLAME, player.getLocation().clone().add(0, 0.6, 0), 108, 0.1, 0.1, 0.1, 0.8);
+                            player.spawnParticle(Particle.SOUL_FIRE_FLAME, player.getLocation().clone().add(0, 0.6, 0), 44, 0.1, 0.1, 0.1, 0.8);
                             for (Entity entity : world.getNearbyEntities(player.getLocation(), 13, 13, 13)) {
                                 if (entity instanceof LivingEntity target && entity != player) {
 
@@ -213,7 +213,7 @@ public class blazeCore extends absCore {
 
                                             config.damaged.get(player.getUniqueId()).add(entity);
 
-                                            ForceDamage forceDamage = new ForceDamage(target, finalDamage, source);
+                                            ForceDamage forceDamage = new ForceDamage(target, finalDamage, source, false);
                                             forceDamage.applyEffect(player);
 
                                             double per = (config.BurstBlaze.getOrDefault(player.getUniqueId(), false)) ? 1.0 : 0.4;

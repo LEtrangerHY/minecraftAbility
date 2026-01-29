@@ -2,6 +2,7 @@ package org.core.coreSystem.cores.VOL1.Saboteur.Skill;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.title.Title;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -26,6 +27,7 @@ import org.core.effect.crowdControl.Stun;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.cores.VOL1.Saboteur.coreSystem.Saboteur;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -114,9 +116,8 @@ public class R implements SkillBase {
                         Stun stun = new Stun(hit, 2000);
                         stun.applyEffect(player);
 
-                        ForceDamage forceDamage = new ForceDamage(hit, damage, source);
+                        ForceDamage forceDamage = new ForceDamage(hit, damage, source, true);
                         forceDamage.applyEffect(player);
-                        hit.setVelocity(new Vector(0, 0, 0));
 
                         shard.remove();
                         cancel();
@@ -158,13 +159,25 @@ public class R implements SkillBase {
         List<Location> list = config.trapThrowPos.get(player.getUniqueId());
         if (list.contains(particleLoc)) {
             list.remove(particleLoc);
-            player.sendActionBar(Component.text("Trap removed : throw").color(NamedTextColor.YELLOW));
+
+            Title title = Title.title(
+                    Component.empty(),
+                    Component.text("Trap removed : Throw").color(NamedTextColor.YELLOW),
+                    Title.Times.times(Duration.ZERO, Duration.ofMillis(1000), Duration.ofMillis(200))
+            );
+            player.showTitle(title);
+
             world.playSound(player.getLocation().clone(), Sound.ITEM_ARMOR_EQUIP_LEATHER, 1f, 1f);
             cool.updateCooldown(player, "R", 500L);
             return;
         }
 
-        player.sendActionBar(Component.text("Trap set! : throw").color(NamedTextColor.GREEN));
+        Title title = Title.title(
+                Component.empty(),
+                Component.text("Trap set! : Throw").color(NamedTextColor.GREEN),
+                Title.Times.times(Duration.ZERO, Duration.ofMillis(1000), Duration.ofMillis(200))
+        );
+        player.showTitle(title);
 
         player.playSound(targetBlock.getLocation().clone(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
         if(list.size() < 4) {
@@ -224,13 +237,25 @@ public class R implements SkillBase {
         List<Location> list = config.trapSpikePos.get(player.getUniqueId());
         if (list.contains(particleLoc)) {
             list.remove(particleLoc);
-            player.sendActionBar(Component.text("Trap removed : spike").color(NamedTextColor.YELLOW));
+
+            Title title = Title.title(
+                    Component.empty(),
+                    Component.text("Trap removed : Spike").color(NamedTextColor.YELLOW),
+                    Title.Times.times(Duration.ZERO, Duration.ofMillis(1000), Duration.ofMillis(500))
+            );
+            player.showTitle(title);
+
             world.playSound(player.getLocation().clone(), Sound.ITEM_ARMOR_EQUIP_LEATHER, 1f, 1f);
             cool.updateCooldown(player, "R", 500L);
             return;
         }
 
-        player.sendActionBar(Component.text("Trap set! : spike").color(NamedTextColor.GREEN));
+        Title title = Title.title(
+                Component.empty(),
+                Component.text("Trap set! : Spike").color(NamedTextColor.GREEN),
+                Title.Times.times(Duration.ZERO, Duration.ofMillis(1000), Duration.ofMillis(500))
+        );
+        player.showTitle(title);
 
         player.playSound(targetBlock.getLocation().clone(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
         if(list.size() < 3) {
@@ -300,9 +325,8 @@ public class R implements SkillBase {
                                     target.addPotionEffect(poison);
                                 }
 
-                                ForceDamage forceDamage = new ForceDamage(target, damage, source);
+                                ForceDamage forceDamage = new ForceDamage(target, damage, source, true);
                                 forceDamage.applyEffect(player);
-                                target.setVelocity(new Vector(0, 0, 0));
                             }
                         }
                     }
@@ -367,7 +391,7 @@ public class R implements SkillBase {
                 for (Entity nearby : item.getNearbyEntities(0.5, 0.5, 0.5)) {
                     if (nearby instanceof LivingEntity target && nearby != player) {
 
-                        ForceDamage forceDamage = new ForceDamage(target, damage, source);
+                        ForceDamage forceDamage = new ForceDamage(target, damage, source, false);
                         forceDamage.applyEffect(player);
                         world.playSound(target.getLocation().clone(), Sound.ITEM_TRIDENT_HIT, 1.0f, 1.0f);
                         world.spawnParticle(Particle.BLOCK, target.getLocation().clone().add(0, 1.2, 0), 14, 0.3, 0.3, 0.3,
@@ -503,9 +527,8 @@ public class R implements SkillBase {
                                 PotionEffect poison = new PotionEffect(PotionEffectType.POISON, 20 * 4, 5, false, true);
                                 target.addPotionEffect(poison);
 
-                                ForceDamage forceDamage = new ForceDamage(target, damage, source);
+                                ForceDamage forceDamage = new ForceDamage(target, damage, source, true);
                                 forceDamage.applyEffect(player);
-                                target.setVelocity(new Vector(0, 0, 0));
 
                                 config.r_damaged_Sweep_Hack.getOrDefault(player.getUniqueId(), new HashSet<>()).add(entity);
                             }
@@ -536,5 +559,4 @@ public class R implements SkillBase {
 
         return null;
     }
-
 }

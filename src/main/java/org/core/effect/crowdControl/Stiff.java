@@ -3,6 +3,9 @@ package org.core.effect.crowdControl;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -16,6 +19,7 @@ import java.util.UUID;
 
 public class Stiff implements Effects, Listener {
     public static Map<UUID, Long> stiffEntities = new HashMap<>();
+    private static final Map<UUID, BossBar> activeBars = new HashMap<>();
 
     private final Entity target;
     private final long duration;
@@ -46,6 +50,10 @@ public class Stiff implements Effects, Listener {
 
         stiffEntities.put(targetId, newEndTime);
 
+        if (target instanceof Player player) {
+            createOrUpdateBossBar(player);
+        }
+
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -56,8 +64,9 @@ public class Stiff implements Effects, Listener {
                 }
 
                 long endTime = stiffEntities.get(targetId);
+                long now = System.currentTimeMillis();
 
-                if (System.currentTimeMillis() >= endTime || target.isDead()) {
+                if (now >= endTime || target.isDead()) {
                     removeEffect(target);
                     cancel();
                     return;
@@ -69,7 +78,7 @@ public class Stiff implements Effects, Listener {
                         cancel();
                         return;
                     }
-                    player.sendActionBar(Component.text("Stiff").color(NamedTextColor.YELLOW));
+                    updateBossBarProgress(player, now, endTime);
                 }
             }
         }.runTaskTimer(Objects.requireNonNull(Bukkit.getPluginManager().getPlugin("Core")), 0L, 1L);
@@ -78,17 +87,50 @@ public class Stiff implements Effects, Listener {
     @Override
     public void removeEffect(Entity entity) {
         stiffEntities.remove(entity.getUniqueId());
-        if (entity instanceof Player player && player.isOnline()) {
-            player.sendActionBar(Component.text(" "));
+        if (entity instanceof Player player) {
+            BossBar bar = activeBars.remove(player.getUniqueId());
+            if (bar != null) {
+                bar.removeAll();
+            }
         }
     }
 
     public static void breakStiff(Entity entity) {
         stiffEntities.remove(entity.getUniqueId());
+        if (entity instanceof Player player) {
+            BossBar bar = activeBars.remove(player.getUniqueId());
+            if (bar != null) {
+                bar.removeAll();
+            }
+        }
     }
 
     public static boolean isStiff(Entity entity) {
         Long endTime = stiffEntities.get(entity.getUniqueId());
         return endTime != null && System.currentTimeMillis() < endTime;
+    }
+
+    // --- BossBar Helpers ---
+
+    private void createOrUpdateBossBar(Player player) {
+        UUID uuid = player.getUniqueId();
+        BossBar bar = activeBars.get(uuid);
+
+        if (bar == null) {
+            bar = Bukkit.createBossBar("init", BarColor.YELLOW, BarStyle.SOLID);
+            bar.setTitle(Component.text("Stiff").color(NamedTextColor.WHITE).content());
+            bar.addPlayer(player);
+            activeBars.put(uuid, bar);
+        }
+    }
+
+    private void updateBossBarProgress(Player player, long now, long endTime) {
+        BossBar bar = activeBars.get(player.getUniqueId());
+        if (bar == null) return;
+
+        long remaining = endTime - now;
+        double progress = (double) remaining / (double) duration;
+        progress = Math.max(0.0, Math.min(1.0, progress));
+        bar.setProgress(progress);
     }
 }

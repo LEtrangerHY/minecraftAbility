@@ -2,6 +2,7 @@ package org.core.coreSystem.cores.VOL1.Nightel.Passive;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.title.Title;
 import org.bukkit.*;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
@@ -13,6 +14,7 @@ import org.core.cool.Cool;
 import org.core.main.coreConfig;
 import org.core.coreSystem.cores.VOL1.Nightel.coreSystem.Nightel;
 
+import java.time.Duration;
 import java.util.*;
 
 public class Chain implements Listener {
@@ -23,8 +25,7 @@ public class Chain implements Listener {
     private final coreConfig tag;
 
     private static final BlockData CHAIN_DATA = Material.IRON_CHAIN.createBlockData();
-    private static final Component ICON_FULL = Component.text("⌬").color(NamedTextColor.GRAY);
-    private static final Component ICON_FULL_BAR = Component.text("⌬ ⌬ ⌬ ⌬ ⌬ ⌬").color(NamedTextColor.WHITE);
+    private static final Component ICON_FULL = Component.text("⬡").color(NamedTextColor.GRAY);
 
     private static final String[] HEX_ICONS = new String[7];
     private static final String[] BENZENE_ICONS = new String[7];
@@ -32,7 +33,7 @@ public class Chain implements Listener {
     static {
         for (int i = 0; i <= 6; i++) {
             HEX_ICONS[i] = "⬡ ".repeat(i).trim();
-            BENZENE_ICONS[i] = "⌬ ".repeat(Math.max(0, 6 - i)).trim();
+            BENZENE_ICONS[i] = "⬡ ".repeat(Math.max(0, 6 - i)).trim();
         }
     }
 
@@ -81,7 +82,13 @@ public class Chain implements Listener {
             int finalPoint = config.chainCount.getOrDefault(uuid, 0);
 
             if (finalPoint < 6) {
-                player.sendActionBar(Component.text(HEX_ICONS[finalPoint]).color(NamedTextColor.GRAY));
+                Title title = Title.title(
+                        Component.empty(),
+                        Component.text(HEX_ICONS[finalPoint]).color(NamedTextColor.GRAY),
+                        Title.Times.times(Duration.ZERO, Duration.ofMillis(1200), Duration.ofMillis(200))
+                );
+                player.showTitle(title);
+
                 chainDecrease(player);
             } else {
                 hexaChainLoad(player);
@@ -111,7 +118,13 @@ public class Chain implements Listener {
                 if (currentCount == 0 || currentCount == 6 || player.isDead() || isUsingF) {
                     if (currentCount == 0) {
                         config.chainCount.remove(playerUUID);
-                        player.sendActionBar(ICON_FULL);
+
+                        Title title = Title.title(
+                                Component.empty(),
+                                ICON_FULL,
+                                Title.Times.times(Duration.ZERO, Duration.ofMillis(600), Duration.ofMillis(200))
+                        );
+                        player.showTitle(title);
                     }
                     config.chainSkill.remove(playerUUID);
                     activeChainTasks.remove(playerUUID);
@@ -125,7 +138,13 @@ public class Chain implements Listener {
                     if (currentCount > 0 && currentCount < 6) {
                         int nextCount = currentCount - 1;
 
-                        player.sendActionBar(Component.text(HEX_ICONS[nextCount]).color(NamedTextColor.GRAY));
+                        Title title = Title.title(
+                                Component.empty(),
+                                Component.text(HEX_ICONS[nextCount]).color(NamedTextColor.GRAY),
+                                Title.Times.times(Duration.ZERO, Duration.ofMillis(600), Duration.ofMillis(200))
+                        );
+                        player.showTitle(title);
+
                         config.chainCount.put(playerUUID, nextCount);
 
                         Location particleLoc = player.getLocation().add(0, 1.2, 0);
@@ -160,7 +179,12 @@ public class Chain implements Listener {
 
                 int index = tick / 10;
                 if (index < BENZENE_ICONS.length) {
-                    player.sendActionBar(Component.text(BENZENE_ICONS[index]).color(NamedTextColor.DARK_GRAY));
+                    Title title = Title.title(
+                            Component.empty(),
+                            Component.text(BENZENE_ICONS[index]).color(NamedTextColor.DARK_GRAY),
+                            Title.Times.times(Duration.ZERO, Duration.ofMillis(500), Duration.ZERO)
+                    );
+                    player.showTitle(title);
                 }
 
                 tick++;
@@ -185,7 +209,12 @@ public class Chain implements Listener {
         config.chainCount.remove(uuid);
         config.chainSkill.remove(uuid);
 
-        player.sendActionBar(ICON_FULL);
+        Title title = Title.title(
+                Component.empty(),
+                ICON_FULL,
+                Title.Times.times(Duration.ZERO, Duration.ofMillis(1200), Duration.ofMillis(200))
+        );
+        player.showTitle(title);
     }
 
     private final Map<UUID, BukkitRunnable> activeTasks = new HashMap<>();
@@ -227,11 +256,7 @@ public class Chain implements Listener {
                 int chainCount = config.chainCount.getOrDefault(playerUUID, 0);
 
                 String benzene;
-                if (chainCount < 6) {
-                    benzene = HEX_ICONS[chainCount];
-                } else {
-                    benzene = "⌬ ⌬ ⌬ ⌬ ⌬ ⌬";
-                }
+                benzene = HEX_ICONS[chainCount];
 
                 Score score1 = objective.getScore(benzene);
                 score1.setScore(7);

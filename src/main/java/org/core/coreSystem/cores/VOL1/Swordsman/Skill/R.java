@@ -116,9 +116,8 @@ public class R implements SkillBase {
                 for (Entity entity : player.getNearbyEntities(0.5, 0.5, 0.5)) {
                     if (entity instanceof LivingEntity target && entity != player) {
                         if (!damagedSet.contains(target)) {
-                            ForceDamage forceDamage = new ForceDamage(target, damage, source);
+                            ForceDamage forceDamage = new ForceDamage(target, damage, source, true);
                             forceDamage.applyEffect(player);
-                            target.setVelocity(new Vector(0, 0, 0));
 
                             damagedSet.add(target);
                         }
@@ -171,9 +170,8 @@ public class R implements SkillBase {
                             Stun stun = new Stun(target, config.r_Skill_stun);
                             stun.applyEffect(player);
 
-                            ForceDamage forceDamage = new ForceDamage(target, damage, source);
+                            ForceDamage forceDamage = new ForceDamage(target, damage, source, true);
                             forceDamage.applyEffect(player);
-                            target.setVelocity(new Vector(0, 0, 0));
 
                             damagedSet.add(target);
                         }
@@ -238,9 +236,8 @@ public class R implements SkillBase {
                         world.spawnParticle(Particle.CRIT, target.getLocation().add(0, 1.0, 0), 20, 0.4, 0.4, 0.4, 1);
                         if (isFirst) world.spawnParticle(Particle.SPIT, target.getLocation().add(0, 1.0, 0), 20, 0.2, 0.3, 0.2, 0.5);
 
-                        ForceDamage forceDamage = new ForceDamage(target, finalDamage, source);
+                        ForceDamage forceDamage = new ForceDamage(target, finalDamage, source, true);
                         forceDamage.applyEffect(player);
-                        target.setVelocity(new Vector(0, 0, 0));
 
                         damagedSet.add(target);
                     }

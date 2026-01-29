@@ -2,6 +2,7 @@ package org.core.coreSystem.cores.VOL1.Carpenter.Skill;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.title.Title;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -13,6 +14,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.core.cool.Cool;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.cores.VOL1.Carpenter.coreSystem.Carpenter;
+
+import java.time.Duration;
 
 public class F implements SkillBase {
 
@@ -28,18 +31,33 @@ public class F implements SkillBase {
 
     @Override
     public void Trigger(Player player) {
-        if(config.f_count.getOrDefault(player.getUniqueId(), 0) < 3){
-            config.f_count.put(player.getUniqueId(), config.f_count.getOrDefault(player.getUniqueId(), 0) + 1);
-            if(config.f_count.getOrDefault(player.getUniqueId(), 3) != 0){
-                player.sendActionBar(Component.text(3 - config.f_count.getOrDefault(player.getUniqueId(), 0)).color(NamedTextColor.YELLOW));
-            }else if(config.f_count.getOrDefault(player.getUniqueId(), 3) == 0){
-                player.sendActionBar(Component.text("totem set").color(NamedTextColor.YELLOW));
-            }
+        int currentCount = config.f_count.getOrDefault(player.getUniqueId(), 0);
+
+        if(currentCount < 3){
+            config.f_count.put(player.getUniqueId(), currentCount + 1);
+
+            int remaining = 3 - (currentCount + 1);
+            String msg = (remaining == 0) ? "Ready" : remaining + " left";
+
+            Title title = Title.title(
+                    Component.empty(),
+                    Component.text(msg).color(NamedTextColor.YELLOW),
+                    Title.Times.times(Duration.ZERO, Duration.ofMillis(230), Duration.ofMillis(200))
+            );
+            player.showTitle(title);
+
             heal(player);
             cool.updateCooldown(player, "F", 430L);
         }else{
             config.f_count.remove(player.getUniqueId());
-            player.sendActionBar(Component.text("gained").color(NamedTextColor.YELLOW));
+
+            Title title = Title.title(
+                    Component.empty(),
+                    Component.text("Totem Gained!").color(NamedTextColor.GOLD),
+                    Title.Times.times(Duration.ZERO, Duration.ofMillis(400), Duration.ofMillis(300))
+            );
+            player.showTitle(title);
+
             totem(player);
             cool.updateCooldown(player, "F", 120000L);
         }

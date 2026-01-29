@@ -46,7 +46,7 @@ public class F implements SkillBase {
 
             world.spawnParticle(Particle.EXPLOSION, entity.getLocation().clone().add(0, 1, 0), 1, 0, 0, 0, 0);
 
-            ForceDamage forceDamage = new ForceDamage((LivingEntity) entity, damage / 2, source);
+            ForceDamage forceDamage = new ForceDamage((LivingEntity) entity, damage / 2, source, false);
             forceDamage.applyEffect(player);
 
             Vector direction = entity.getLocation().toVector().subtract(playerLoc.toVector()).normalize().multiply(1.0);

@@ -202,9 +202,8 @@ public class F implements SkillBase {
                             if (angle < maxAngle + 0.3) {
                                 if (damagedEntities != null) damagedEntities.add(target);
 
-                                ForceDamage forceDamage = new ForceDamage(target, damage, source);
+                                ForceDamage forceDamage = new ForceDamage(target, damage, source, true);
                                 forceDamage.applyEffect(player);
-                                target.setVelocity(new Vector(0, 0, 0));
                                 iterator.remove();
                             }
                         }

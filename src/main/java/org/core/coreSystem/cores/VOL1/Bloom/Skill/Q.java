@@ -116,7 +116,7 @@ public class Q implements SkillBase {
                                 world.spawnParticle(Particle.EXPLOSION, target.getLocation().add(0, 1.4, 0), 1, 0, 0, 0, 1);
                                 world.spawnParticle(Particle.FALLING_DUST, target.getLocation().add(0, 1.4, 0), 10, 0.5, 0.5, 0.5, Material.PINK_CONCRETE.createBlockData());
 
-                                ForceDamage forceDamage = new ForceDamage(target, damage, source);
+                                ForceDamage forceDamage = new ForceDamage(target, damage, source, false);
                                 forceDamage.applyEffect(player);
 
                                 Vector direction = target.getLocation().toVector().subtract(player.getLocation().toVector()).normalize().multiply(1.7);

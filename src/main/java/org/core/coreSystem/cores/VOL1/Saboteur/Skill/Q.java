@@ -202,9 +202,8 @@ public class Q implements SkillBase {
                 for (Entity entity : nearbyEntities) {
                     if (entity instanceof LivingEntity target && entity != player && !config.q_damaged_Hack.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(entity)) {
 
-                        ForceDamage forceDamage = new ForceDamage(target, finalDamage, source);
+                        ForceDamage forceDamage = new ForceDamage(target, finalDamage, source, true);
                         forceDamage.applyEffect(player);
-                        target.setVelocity(new Vector(0, 0, 0));
 
                         config.q_damaged_Hack.getOrDefault(player.getUniqueId(), new HashSet<>()).add(target);
                     }
@@ -274,7 +273,7 @@ public class Q implements SkillBase {
                     for (Entity nearby : item.getNearbyEntities(0.5, 0.5, 0.5)) {
                         if (nearby instanceof LivingEntity target && nearby != player) {
 
-                            ForceDamage forceDamage = new ForceDamage(target, damage, source);
+                            ForceDamage forceDamage = new ForceDamage(target, damage, source, false);
                             forceDamage.applyEffect(player);
 
                             PotionEffect poison = new PotionEffect(PotionEffectType.POISON, 20 * 4, 5, false, true);
@@ -420,9 +419,8 @@ public class Q implements SkillBase {
                                 PotionEffect poison = new PotionEffect(PotionEffectType.POISON, 20 * 4, 5, false, true);
                                 target.addPotionEffect(poison);
 
-                                ForceDamage forceDamage = new ForceDamage(target, damage / 2, source);
+                                ForceDamage forceDamage = new ForceDamage(target, damage / 2, source, true);
                                 forceDamage.applyEffect(player);
-                                target.setVelocity(new Vector(0, 0, 0));
 
                                 config.q_damaged_Sweep_Hack.getOrDefault(player.getUniqueId(), new HashSet<>()).add(entity);
                             }

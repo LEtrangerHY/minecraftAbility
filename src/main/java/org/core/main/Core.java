@@ -24,18 +24,18 @@ import org.core.coreEntity.absEntityLeveling.EntityLevelingManager;
 import org.core.coreSystem.cores.VOL1.Bambo.coreSystem.Bambo;
 import org.core.coreSystem.cores.VOL1.Bambo.coreSystem.bambCore;
 import org.core.coreSystem.cores.VOL1.Bambo.coreSystem.bambInventory;
-import org.core.coreSystem.cores.VOL1.Benzene.coreSystem.Benzene;
-import org.core.coreSystem.cores.VOL1.Benzene.coreSystem.benzCore;
-import org.core.coreSystem.cores.VOL1.Benzene.coreSystem.benzInventory;
+import org.core.coreSystem.cores.KEY.Benzene.coreSystem.Benzene;
+import org.core.coreSystem.cores.KEY.Benzene.coreSystem.benzCore;
+import org.core.coreSystem.cores.KEY.Benzene.coreSystem.benzInventory;
 import org.core.coreSystem.cores.VOL1.Blaze.coreSystem.Blaze;
 import org.core.coreSystem.cores.VOL1.Blaze.coreSystem.blazeCore;
 import org.core.coreSystem.cores.VOL1.Blaze.coreSystem.blazeInventory;
 import org.core.coreSystem.cores.VOL1.Bloom.coreSystem.Bloom;
 import org.core.coreSystem.cores.VOL1.Bloom.coreSystem.bloomCore;
 import org.core.coreSystem.cores.VOL1.Bloom.coreSystem.bloomInventory;
-import org.core.coreSystem.cores.VOL1.Blue.coreSystem.Blue;
-import org.core.coreSystem.cores.VOL1.Blue.coreSystem.blueCore;
-import org.core.coreSystem.cores.VOL1.Blue.coreSystem.blueInventory;
+import org.core.coreSystem.cores.VOL2.Blue.coreSystem.Blue;
+import org.core.coreSystem.cores.VOL2.Blue.coreSystem.blueCore;
+import org.core.coreSystem.cores.VOL2.Blue.coreSystem.blueInventory;
 import org.core.coreSystem.cores.VOL1.Carpenter.coreSystem.Carpenter;
 import org.core.coreSystem.cores.VOL1.Carpenter.coreSystem.carpCore;
 import org.core.coreSystem.cores.VOL1.Carpenter.coreSystem.carpInventory;
@@ -51,12 +51,12 @@ import org.core.coreSystem.cores.VOL1.Glacier.coreSystem.glaInventory;
 import org.core.coreSystem.cores.VOL1.Harvester.coreSystem.Harvester;
 import org.core.coreSystem.cores.VOL1.Harvester.coreSystem.harvCore;
 import org.core.coreSystem.cores.VOL1.Harvester.coreSystem.harvInventory;
-import org.core.coreSystem.cores.VOL1.Knight.coreSystem.Knight;
-import org.core.coreSystem.cores.VOL1.Knight.coreSystem.knightCore;
-import org.core.coreSystem.cores.VOL1.Knight.coreSystem.knightInventory;
-import org.core.coreSystem.cores.VOL1.Luster.coreSystem.Luster;
-import org.core.coreSystem.cores.VOL1.Luster.coreSystem.lustCore;
-import org.core.coreSystem.cores.VOL1.Luster.coreSystem.lustInventory;
+import org.core.coreSystem.cores.VOL2.Knight.coreSystem.Knight;
+import org.core.coreSystem.cores.VOL2.Knight.coreSystem.knightCore;
+import org.core.coreSystem.cores.VOL2.Knight.coreSystem.knightInventory;
+import org.core.coreSystem.cores.VOL2.Luster.coreSystem.Luster;
+import org.core.coreSystem.cores.VOL2.Luster.coreSystem.lustCore;
+import org.core.coreSystem.cores.VOL2.Luster.coreSystem.lustInventory;
 import org.core.coreSystem.cores.VOL1.Nightel.coreSystem.Nightel;
 import org.core.coreSystem.cores.VOL1.Nightel.coreSystem.nightCore;
 import org.core.coreSystem.cores.VOL1.Nightel.coreSystem.nightInventory;
@@ -87,6 +87,8 @@ public final class Core extends JavaPlugin implements Listener {
     private coreConfig config;
 
     private LevelingManager level;
+
+    private Cool cool;
 
     private nightCore nightel;
     private benzCore benz;
@@ -163,7 +165,7 @@ public final class Core extends JavaPlugin implements Listener {
         Lavender lavConfig = new Lavender();
         Rose roseConfig = new Rose();
 
-        Cool cool = new Cool(this);
+        this.cool = new Cool(this);
 
         this.config = new coreConfig(this, cool);
 

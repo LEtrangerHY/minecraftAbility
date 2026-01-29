@@ -2,6 +2,7 @@ package org.core.coreSystem.cores.VOL1.Commander.Skill;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.title.Title;
 import org.bukkit.*;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
@@ -18,6 +19,7 @@ import org.core.effect.crowdControl.ForceDamage;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.cores.VOL1.Commander.coreSystem.Commander;
 
+import java.time.Duration;
 import java.util.HashSet;
 
 public class F implements SkillBase {
@@ -42,8 +44,15 @@ public class F implements SkillBase {
             }
         }else{
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
-            player.sendActionBar(Component.text("com-block uninstalled").color(NamedTextColor.RED));
-            long cools = 100L;
+
+            Title title = Title.title(
+                    Component.empty(),
+                    Component.text("com-block uninstalled").color(NamedTextColor.RED),
+                    Title.Times.times(Duration.ZERO, Duration.ofMillis(300), Duration.ofMillis(200))
+            );
+            player.showTitle(title);
+
+            long cools = 500L;
             cool.updateCooldown(player, "F", cools);
         }
     }
@@ -141,9 +150,8 @@ public class F implements SkillBase {
                 .withDirectEntity(player)
                 .build();
 
-        ForceDamage forceDamage = new ForceDamage((LivingEntity) entity, damage, source);
+        ForceDamage forceDamage = new ForceDamage((LivingEntity) entity, damage, source, false);
         forceDamage.applyEffect(player);
-        entity.setVelocity(new Vector(0, 0, 0));
     }
 
     public void attackLine(Player player, double maxDistance, Location start, Vector direction){

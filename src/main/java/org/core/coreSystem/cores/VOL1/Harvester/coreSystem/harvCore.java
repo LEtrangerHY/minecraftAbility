@@ -2,6 +2,7 @@ package org.core.coreSystem.cores.VOL1.Harvester.coreSystem;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.title.Title;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -27,6 +28,8 @@ import org.core.coreSystem.cores.VOL1.Harvester.Passive.Bountiful;
 import org.core.coreSystem.cores.VOL1.Harvester.Skill.F;
 import org.core.coreSystem.cores.VOL1.Harvester.Skill.Q;
 import org.core.coreSystem.cores.VOL1.Harvester.Skill.R;
+
+import java.time.Duration;
 
 public class harvCore extends absCore {
 
@@ -127,7 +130,14 @@ public class harvCore extends absCore {
         Player player = event.getPlayer();
 
         if(contains(player)) {
-            if(player.isInvisible()) player.sendActionBar(Component.text("Invisible").color(NamedTextColor.DARK_GREEN));
+            if(player.isInvisible()) {
+                Title title = Title.title(
+                        Component.empty(),
+                        Component.text("Invisible").color(NamedTextColor.DARK_GREEN),
+                        Title.Times.times(Duration.ZERO, Duration.ofMillis(800), Duration.ofMillis(200))
+                );
+                player.showTitle(title);
+            }
             player.setInvisible(bountiful.bushCheck(player));
         }
 

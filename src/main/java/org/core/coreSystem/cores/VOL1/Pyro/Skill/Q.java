@@ -2,6 +2,7 @@ package org.core.coreSystem.cores.VOL1.Pyro.Skill;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.title.Title;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -14,6 +15,8 @@ import org.core.cool.Cool;
 import org.core.effect.debuff.Burn;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.cores.VOL1.Pyro.coreSystem.Pyro;
+
+import java.time.Duration;
 import java.util.Random;
 
 public class Q implements SkillBase {
@@ -78,8 +81,13 @@ public class Q implements SkillBase {
             offhandItem.setAmount(offhandItem.getAmount() - 7);
         }else{
             player.getWorld().playSound(player.getLocation(), Sound.ITEM_FLINTANDSTEEL_USE, 1, 1);
-            player.sendActionBar(Component.text("powder needed").color(NamedTextColor.RED));
-            long cools = 100L;
+            Title title = Title.title(
+                    Component.empty(),
+                    Component.text("powder needed").color(NamedTextColor.RED),
+                    Title.Times.times(Duration.ZERO, Duration.ofMillis(300), Duration.ofMillis(200))
+            );
+            player.showTitle(title);
+            long cools = 500L;
             cool.updateCooldown(player, "Q", cools);
         }
     }

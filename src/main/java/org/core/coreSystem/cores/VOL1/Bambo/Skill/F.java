@@ -2,6 +2,7 @@ package org.core.coreSystem.cores.VOL1.Bambo.Skill;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.title.Title;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -14,6 +15,7 @@ import org.core.cool.Cool;
 import org.core.coreSystem.cores.VOL1.Bambo.coreSystem.Bambo;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 
+import java.time.Duration;
 import java.util.*;
 
 public class F implements SkillBase {
@@ -74,9 +76,14 @@ public class F implements SkillBase {
                 }
             }
         }else {
-            player.sendActionBar(Component.text("iron needed").color(NamedTextColor.RED));
+            Title title = Title.title(
+                    Component.empty(),
+                    Component.text("iron nugget needed").color(NamedTextColor.RED),
+                    Title.Times.times(Duration.ZERO, Duration.ofMillis(300), Duration.ofMillis(200))
+            );
+            player.showTitle(title);
             player.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_LEATHER, 1, 1);
-            long cools = 100L;
+            long cools = 500L;
             cool.updateCooldown(player, "F", cools);
         }
 

@@ -82,9 +82,8 @@ public class F implements SkillBase {
                         world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.0f, 1.0f);
 
                         config.atk.put(player.getUniqueId(), "S");
-                        ForceDamage forceDamage = new ForceDamage(target, damage, source);
+                        ForceDamage forceDamage = new ForceDamage(target, damage, source, true);
                         forceDamage.applyEffect(player);
-                        target.setVelocity(new Vector(0, 0, 0));
                         config.atk.remove(player.getUniqueId());
 
                     }

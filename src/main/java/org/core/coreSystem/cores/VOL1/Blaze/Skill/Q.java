@@ -2,8 +2,9 @@ package org.core.coreSystem.cores.VOL1.Blaze.Skill;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.title.Title;
 import org.bukkit.*;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -14,6 +15,8 @@ import org.core.cool.Cool;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.cores.VOL1.Blaze.Passive.BlueFlame;
 import org.core.coreSystem.cores.VOL1.Blaze.coreSystem.Blaze;
+
+import java.time.Duration;
 
 public class Q implements SkillBase {
     private final Blaze config;
@@ -45,7 +48,7 @@ public class Q implements SkillBase {
 
             config.BurstBlaze.put(player.getUniqueId(), true);
 
-            cool.setCooldown(player, 13000L, "BurstBlaze");
+            cool.setCooldown(player, 13000L, "BurstBlaze", "boss");
 
             PotionEffect wither = new PotionEffect(PotionEffectType.WITHER, 120, 1, false, false);
             player.addPotionEffect(wither);
@@ -60,7 +63,7 @@ public class Q implements SkillBase {
                 public void run(){
 
                     if(tick > 65 || player.isDead()){
-                        cool.updateCooldown(player, "BurstBlaze", 0L);
+                        cool.updateCooldown(player, "BurstBlaze", 0L, "boss");
                         config.BurstBlaze.remove(player.getUniqueId());
                         cancel();
                         return;
@@ -80,8 +83,15 @@ public class Q implements SkillBase {
             }
         } else {
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 1f, 1f);
-            player.sendActionBar(Component.text("Soul needed").color(NamedTextColor.RED));
-            cool.updateCooldown(player, "Q", 100L);
+
+            Title title = Title.title(
+                    Component.empty(),
+                    Component.text("Soul needed").color(NamedTextColor.RED),
+                    Title.Times.times(Duration.ZERO, Duration.ofMillis(300), Duration.ofMillis(200))
+            );
+            player.showTitle(title);
+
+            cool.updateCooldown(player, "Q", 500L);
         }
     }
 

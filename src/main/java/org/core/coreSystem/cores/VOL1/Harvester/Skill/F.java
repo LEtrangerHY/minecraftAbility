@@ -165,9 +165,8 @@ public class F implements SkillBase {
 
                         player.heal(finalDamage / 2);
 
-                        ForceDamage forceDamage = new ForceDamage(target, damage, source);
+                        ForceDamage forceDamage = new ForceDamage(target, damage, source, true);
                         forceDamage.applyEffect(player);
-                        target.setVelocity(new Vector(0, 0, 0));
 
                         config.f_damaged.get(player.getUniqueId()).add(entity);
                     }

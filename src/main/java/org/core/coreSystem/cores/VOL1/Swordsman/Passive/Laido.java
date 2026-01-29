@@ -2,6 +2,7 @@ package org.core.coreSystem.cores.VOL1.Swordsman.Passive;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.title.Title;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -18,6 +19,7 @@ import org.core.effect.crowdControl.Stun;
 import org.core.main.coreConfig;
 import org.core.coreSystem.cores.VOL1.Swordsman.coreSystem.Swordsman;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,11 +66,18 @@ public class Laido {
                         && !Frost.isFrostbite(player)
                         && config.laidoSlash.getOrDefault(player.getUniqueId(), false)
                         && tag.Swordsman.contains(player)) {
-                    player.sendActionBar(Component.text("Sheath").color(NamedTextColor.YELLOW));
+
+                    Title title = Title.title(
+                            Component.empty(),
+                            Component.text("Sheath").color(NamedTextColor.YELLOW),
+                            Title.Times.times(Duration.ZERO, Duration.ofMillis(1000), Duration.ofMillis(200))
+                    );
+                    player.showTitle(title);
                 }
 
                 if (!config.laidoSlash.containsKey(player.getUniqueId()) || !tag.Swordsman.contains(player)) {
                     config.laidoSlash.remove(player.getUniqueId());
+
                     cancel();
                 }
             }
@@ -104,7 +113,12 @@ public class Laido {
         config.laidoSlash.remove(player.getUniqueId());
         world.spawnParticle(Particle.SPIT, player.getLocation().clone().add(0, 1.0, 0), 20, 0.2, 0.3, 0.2, 0.5);
         world.playSound(player.getLocation(), Sound.ITEM_TRIDENT_THROW, 1.0f, 1.0f);
-        player.sendActionBar(Component.text("Draw").color(NamedTextColor.GREEN));
-    }
 
+        Title title = Title.title(
+                Component.empty(),
+                Component.text("Draw").color(NamedTextColor.GREEN),
+                Title.Times.times(Duration.ZERO, Duration.ofMillis(1000), Duration.ofMillis(200))
+        );
+        player.showTitle(title);
+    }
 }

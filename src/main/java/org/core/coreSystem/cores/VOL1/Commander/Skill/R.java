@@ -113,10 +113,8 @@ public class R implements SkillBase, Listener{
 
                             world.playSound(fb.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
 
-                            ForceDamage forceDamage = new ForceDamage(le, damage, source);
+                            ForceDamage forceDamage = new ForceDamage(le, damage, source, false);
                             forceDamage.applyEffect(player);
-
-                            le.setVelocity(new Vector(0, 0, 0));
 
                             world.spawnParticle(Particle.BLOCK, fb.getLocation(), 44, 0.3, 0.3, 0.3,
                                     command);

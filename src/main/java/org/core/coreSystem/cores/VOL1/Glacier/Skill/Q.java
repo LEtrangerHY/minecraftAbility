@@ -2,6 +2,7 @@ package org.core.coreSystem.cores.VOL1.Glacier.Skill;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.title.Title;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -12,6 +13,8 @@ import org.bukkit.util.Vector;
 import org.core.cool.Cool;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.cores.VOL1.Glacier.coreSystem.Glacier;
+
+import java.time.Duration;
 
 public class Q implements SkillBase {
     private final Glacier config;
@@ -40,8 +43,15 @@ public class Q implements SkillBase {
             offhandItem.setAmount(offhandItem.getAmount() - 6);
         }else{
             world.playSound(player.getLocation(), Sound.BLOCK_GLASS_PLACE, 1, 1);
-            player.sendActionBar(Component.text("Blue Ice needed").color(NamedTextColor.RED));
-            long cools = 100L;
+
+            Title title = Title.title(
+                    Component.empty(),
+                    Component.text("Blue Ice needed").color(NamedTextColor.RED),
+                    Title.Times.times(Duration.ZERO, Duration.ofMillis(300), Duration.ofMillis(200))
+            );
+            player.showTitle(title);
+
+            long cools = 500L;
             cool.updateCooldown(player, "Q", cools);
         }
     }
