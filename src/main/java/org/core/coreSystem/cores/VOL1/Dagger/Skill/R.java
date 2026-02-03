@@ -84,11 +84,11 @@ public class R implements SkillBase {
             Title title = Title.title(
                     Component.empty(),
                     Component.text("not designated").color(NamedTextColor.DARK_RED),
-                    Title.Times.times(Duration.ZERO, Duration.ofMillis(1000), Duration.ofMillis(500))
+                    Title.Times.times(Duration.ZERO, Duration.ofMillis(300), Duration.ofMillis(200))
             );
             player.showTitle(title);
 
-            long cools = 250L;
+            long cools = 500L;
             cool.updateCooldown(player, "R", cools);
 
         }

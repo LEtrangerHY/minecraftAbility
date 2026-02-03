@@ -22,7 +22,6 @@ public class Knight {
     //R
     public HashMap<UUID, Integer> swordCount = new HashMap<>();
     public double r_Skill_amplify = 0.2;
-    public double R_Skill_Damage = (double) 7 /3;
     public long r_Skill_Cool = 300;
 
     //Q

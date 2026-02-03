@@ -16,6 +16,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.*;
+import org.core.coreSystem.cores.KEY.PLAYER.coreSystem.playerLeveling;
 import org.core.coreSystem.cores.VOL2.Lavender.coreSystem.lavLeveling;
 import org.core.coreSystem.cores.VOL2.Rose.coreSystem.roseLeveling;
 import org.core.main.coreConfig;
@@ -100,13 +101,17 @@ public class LevelingManager implements Listener {
             long exp = event.getAmount();
 
             switch (config.getPlayerCore(player)) {
-                case "BENZENE" :
-                    benzLeveling benzene = new benzLeveling(plugin, player, exp);
-                    benzene.addExp(player);
+                case "PLAYER" :
+                    playerLeveling PLAYER = new playerLeveling(plugin, player, exp);
+                    PLAYER.addExp(player);
                     break;
                 case "NIGHTEL" :
                     nightLeveling nox = new nightLeveling(plugin, player, exp);
                     nox.addExp(player);
+                    break;
+                case "BENZENE" :
+                    benzLeveling benzene = new benzLeveling(plugin, player, exp);
+                    benzene.addExp(player);
                     break;
                 case "BAMBO" :
                     bambLeveling bambo = new bambLeveling(plugin, player, exp);

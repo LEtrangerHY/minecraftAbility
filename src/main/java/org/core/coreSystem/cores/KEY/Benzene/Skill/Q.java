@@ -22,8 +22,7 @@ public class Q implements SkillBase {
     private final JavaPlugin plugin;
     private final Cool cool;
 
-    private static final Particle.DustOptions DUST_TARGET = new Particle.DustOptions(Color.fromRGB(30, 30, 30), 0.5f);
-    private static final Particle.DustOptions DUST_CHAIN = new Particle.DustOptions(Color.fromRGB(66, 66, 66), 0.5f);
+    private static final Particle.DustOptions DUST_CHAIN = new Particle.DustOptions(Color.fromRGB(66, 66, 66), 1.0f);
     private static final BlockData CHAIN_BLOCK_DATA = Material.IRON_CHAIN.createBlockData();
     private static final PotionEffect GLOW_EFFECT = new PotionEffect(PotionEffectType.GLOWING, 40, 2, false, false);
 
@@ -38,7 +37,7 @@ public class Q implements SkillBase {
         player.swingOffHand();
         World world = player.getWorld();
 
-        LivingEntity entity = getTargetedEntity(player, 12, 0.6); // RaySize 약간 증가 (편의성)
+        LivingEntity entity = getTargetedEntity(player, 12, 0.6);
 
         world.playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.6f, 1.0f);
 
@@ -84,7 +83,6 @@ public class Q implements SkillBase {
 
     private void handleAreaTarget(Player player, World world) {
         Location pLoc = player.getLocation();
-        world.spawnParticle(Particle.DUST, pLoc.add(0, 0.6, 0), 222, 3, 0, 3, 0, DUST_TARGET);
         world.playSound(pLoc, Sound.ITEM_TRIDENT_HIT_GROUND, 1.0f, 1.0f);
 
         int hitCount = 0;

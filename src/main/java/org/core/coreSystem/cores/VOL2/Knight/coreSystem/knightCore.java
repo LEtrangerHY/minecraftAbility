@@ -267,10 +267,16 @@ public class knightCore extends absCore {
         return Fskill;
     }
 
+    private boolean isSword(ItemStack item) {
+        if (item == null) return false;
+        return item.getType().name().endsWith("_SWORD");
+    }
+
     private boolean hasProperItems(Player player) {
         ItemStack main = player.getInventory().getItemInMainHand();
         ItemStack off = player.getInventory().getItemInOffHand();
-        return main.getType() == Material.NETHERITE_SWORD && off.getType() == Material.DIAMOND_SWORD;
+
+        return isSword(main) && isSword(off);
     }
 
     private boolean canUseRSkill(Player player) { return true; }
@@ -287,8 +293,7 @@ public class knightCore extends absCore {
     @Override
     protected boolean isDropRequired(Player player, ItemStack droppedItem){
         ItemStack off = player.getInventory().getItemInOffHand();
-        return droppedItem.getType() == Material.NETHERITE_SWORD &&
-                off.getType() == Material.DIAMOND_SWORD;
+        return isSword(droppedItem) && isSword(off);
     }
 
     @Override

@@ -63,6 +63,7 @@ public class cmdCore implements CommandExecutor, TabCompleter {
                 suggestions.add(p.getName());
             }
         } else if (args.length == 2) {
+            suggestions.add("player");
             suggestions.add("nightel");
             suggestions.add("knight");
             suggestions.add("pyro");

@@ -110,8 +110,6 @@ public class Stiff implements Effects, Listener {
         return endTime != null && System.currentTimeMillis() < endTime;
     }
 
-    // --- BossBar Helpers ---
-
     private void createOrUpdateBossBar(Player player) {
         UUID uuid = player.getUniqueId();
         BossBar bar = activeBars.get(uuid);

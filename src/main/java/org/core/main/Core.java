@@ -10,6 +10,9 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.core.command.*;
 import org.core.cool.Cool;
+import org.core.coreSystem.cores.KEY.PLAYER.coreSystem.PLAYER;
+import org.core.coreSystem.cores.KEY.PLAYER.coreSystem.playerCore;
+import org.core.coreSystem.cores.KEY.PLAYER.coreSystem.playerInventory;
 import org.core.coreSystem.cores.VOL2.Lavender.coreSystem.Lavender;
 import org.core.coreSystem.cores.VOL2.Lavender.coreSystem.lavCore;
 import org.core.coreSystem.cores.VOL2.Lavender.coreSystem.lavInventory;
@@ -90,6 +93,7 @@ public final class Core extends JavaPlugin implements Listener {
 
     private Cool cool;
 
+    private playerCore player;
     private nightCore nightel;
     private benzCore benz;
     private bambCore bamb;
@@ -110,6 +114,7 @@ public final class Core extends JavaPlugin implements Listener {
     private lavCore lavender;
     private roseCore rose;
 
+    private playerInventory playerInv;
     private nightInventory nightInv;
     private benzInventory benzInv;
     private bambInventory bambInv;
@@ -145,6 +150,7 @@ public final class Core extends JavaPlugin implements Listener {
 
         saveDefaultConfig();
 
+        PLAYER playerConfig = new PLAYER();
         Nightel nightConfig = new Nightel();
         Benzene benzConfig = new Benzene();
         Bambo bambConfig = new Bambo();
@@ -173,6 +179,11 @@ public final class Core extends JavaPlugin implements Listener {
 
         this.level = new LevelingManager(this, this.config);
         Bukkit.getPluginManager().registerEvents(this.level, this);
+
+        this.player = new playerCore(this, this.config, playerConfig, cool);
+        Bukkit.getPluginManager().registerEvents(this.player, this);
+        this.playerInv = new playerInventory(this, this.config);
+        Bukkit.getPluginManager().registerEvents(this.playerInv, this);
 
         this.nightel = new nightCore(this, this.config, nightConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.nightel, this);

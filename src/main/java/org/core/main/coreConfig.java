@@ -9,6 +9,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.core.cool.Cool;
 import org.core.playerSettings.persistentPlayerSet;
 
+import javax.naming.Name;
 import java.util.Set;
 
 public class coreConfig {
@@ -16,6 +17,7 @@ public class coreConfig {
     private final JavaPlugin plugin;
     private final Cool cool;
 
+    public Set<Player> PLAYER;
     public Set<Player> Nightel;
     public Set<Player> Benzene;
     public Set<Player> Bambo;
@@ -40,6 +42,7 @@ public class coreConfig {
         this.plugin = plugin;
         this.cool = cool;
 
+        this.PLAYER = new persistentPlayerSet(plugin, "setting_player");
         this.Nightel = new persistentPlayerSet(plugin, "setting_nightel");
         this.Benzene = new persistentPlayerSet(plugin, "setting_benzene");
         this.Bambo = new persistentPlayerSet(plugin, "setting_bambo");
@@ -62,6 +65,7 @@ public class coreConfig {
     }
 
     public String getPlayerCore(Player player) {
+        if (PLAYER.contains(player)) return "PLAYER";
         if (Nightel.contains(player)) return "NIGHTEL";
         if (Benzene.contains(player)) return "BENZENE";
         if (Bambo.contains(player)) return "BAMBO";
@@ -100,6 +104,7 @@ public class coreConfig {
         cool.updateCooldown(player, "Q", 10000L);
         cool.resumeCooldown(player, "F");
         cool.updateCooldown(player, "F", 10000L);
+        player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_player"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_nightel"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_benzene"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_bambo"), PersistentDataType.BYTE, (byte) 0);
@@ -131,6 +136,7 @@ public class coreConfig {
 
     private NamespacedKey getSettingKey(String setting) {
         return switch (setting.toLowerCase()) {
+            case "player" -> new NamespacedKey(plugin, "setting_player");
             case "nightel" -> new NamespacedKey(plugin, "setting_nightel");
             case "benzene" -> new NamespacedKey(plugin, "setting_benzene");
             case "bambo" -> new NamespacedKey(plugin, "setting_bambo");

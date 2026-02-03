@@ -64,12 +64,12 @@ public class Q implements SkillBase {
                 Title title = Title.title(
                         Component.empty(),
                         Component.text("not designated").color(NamedTextColor.BLACK),
-                        Title.Times.times(Duration.ZERO, Duration.ofMillis(1000), Duration.ofMillis(500))
+                        Title.Times.times(Duration.ZERO, Duration.ofMillis(300), Duration.ofMillis(200))
                 );
                 player.showTitle(title);
 
                 player.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_LEATHER, 1, 1);
-                long cools = 100L;
+                long cools = 500L;
                 cool.updateCooldown(player, "Q", cools);
             }
 
@@ -103,11 +103,10 @@ public class Q implements SkillBase {
                         world.playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_REPAIR, 1, 1);
                         world.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_LEATHER, 1, 1);
 
-                        // [수정] 액션바 -> 서브타이틀
                         Title title = Title.title(
                                 Component.empty(),
                                 Component.text("Focus Cancelled").color(NamedTextColor.BLACK),
-                                Title.Times.times(Duration.ZERO, Duration.ofMillis(1000), Duration.ofMillis(500))
+                                Title.Times.times(Duration.ZERO, Duration.ofMillis(300), Duration.ofMillis(200))
                         );
                         player.showTitle(title);
 

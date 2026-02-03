@@ -1,12 +1,16 @@
 package org.core.coreSystem.cores.VOL2.Knight.Skill;
 
+import com.google.common.collect.Multimap;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
 import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
 import org.bukkit.entity.*;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
@@ -18,12 +22,13 @@ import org.bukkit.util.EulerAngle;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.core.cool.Cool;
-import org.core.effect.crowdControl.ForceDamage;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.cores.VOL2.Knight.coreSystem.Knight;
+import org.core.effect.crowdControl.ForceDamage;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
@@ -42,22 +47,25 @@ public class R implements SkillBase {
     public void Trigger(Player player) {
         World world = player.getWorld();
 
-        if(config.swordCount.getOrDefault(player.getUniqueId(), 0) < 3) {
-            player.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_LEATHER, 1, 1);
+        if (config.swordCount.getOrDefault(player.getUniqueId(), 0) < 3) {
 
             Entity target = getTargetedEntity(player, 17, 0.3);
-            if (target == null) return;
+
+            if (target == null || target.isDead() || (target instanceof LivingEntity && ((LivingEntity) target).getHealth() <= 0)) {
+                return;
+            }
+
+            player.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_LEATHER, 1, 1);
 
             int currentCount = config.swordCount.getOrDefault(player.getUniqueId(), 0) + 1;
             config.swordCount.put(player.getUniqueId(), currentCount);
 
             world.spawnParticle(Particle.ENCHANTED_HIT, target.getLocation().clone().add(0, 1, 0), 49, 0.4, 0.4, 0.4, 1);
 
-            // [수정] 액션바 -> 서브타이틀 (현재 스택 표시)
             Title title = Title.title(
                     Component.empty(),
                     Component.text(currentCount).color(NamedTextColor.BLACK),
-                    Title.Times.times(Duration.ZERO, Duration.ofMillis(1000), Duration.ofMillis(500))
+                    Title.Times.times(Duration.ZERO, Duration.ofMillis(100), Duration.ofMillis(200))
             );
             player.showTitle(title);
 
@@ -77,17 +85,16 @@ public class R implements SkillBase {
                 }
             }
 
-        }else{
-            // [수정] 액션바 -> 서브타이틀 (경고)
+        } else {
             Title title = Title.title(
                     Component.empty(),
                     Component.text("Can use 3 times").color(NamedTextColor.RED),
-                    Title.Times.times(Duration.ZERO, Duration.ofMillis(1000), Duration.ofMillis(500))
+                    Title.Times.times(Duration.ZERO, Duration.ofMillis(100), Duration.ofMillis(200))
             );
             player.showTitle(title);
 
             world.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_LEATHER, 1, 1);
-            long cools = 100L;
+            long cools = 300L;
             cool.updateCooldown(player, "R", cools);
         }
     }
@@ -100,7 +107,38 @@ public class R implements SkillBase {
         final double radius = 7;
         final double yOffset = 0.3;
         final double projectileSpeed = 1.0;
-        final double damage = config.R_Skill_Damage;
+
+        double baseDamage = 1.0;
+
+        ItemStack offHandItem = player.getInventory().getItemInOffHand();
+
+        if (offHandItem != null && offHandItem.getType() != Material.AIR) {
+            boolean foundCustom = false;
+            ItemMeta meta = offHandItem.getItemMeta();
+
+            if (meta != null && meta.hasAttributeModifiers()) {
+                Collection<AttributeModifier> modifiers = meta.getAttributeModifiers(Attribute.ATTACK_DAMAGE);
+
+                if (modifiers != null) {
+                    for (AttributeModifier modifier : modifiers) {
+                        baseDamage += modifier.getAmount();
+                    }
+                    foundCustom = true;
+                }
+            }
+
+            if (!foundCustom) {
+                Multimap<Attribute, AttributeModifier> defaults = offHandItem.getType().getDefaultAttributeModifiers(EquipmentSlot.HAND);
+
+                if (defaults.containsKey(Attribute.ATTACK_DAMAGE)) {
+                    for (AttributeModifier modifier : defaults.get(Attribute.ATTACK_DAMAGE)) {
+                        baseDamage += modifier.getAmount();
+                    }
+                }
+            }
+        }
+
+        final double damage = baseDamage / 3.0;
 
         final List<ArmorStand> swords = new ArrayList<>();
         final List<Double> baseAngles = new ArrayList<>();
@@ -131,7 +169,9 @@ public class R implements SkillBase {
             stand.setArms(false);
             stand.setBasePlate(false);
 
-            ItemStack swordItem = new ItemStack(Material.DIAMOND_SWORD);
+            ItemStack off = player.getInventory().getItemInOffHand();
+
+            ItemStack swordItem = new ItemStack(off);
             stand.getEquipment().setItemInMainHand(swordItem);
 
             stand.setLeftArmPose(new EulerAngle(0, 0, Math.toRadians(90)));
@@ -146,18 +186,17 @@ public class R implements SkillBase {
 
             @Override
             public void run() {
-                if (target.isDead()) {
+                if (target.isDead() || (target instanceof LivingEntity && ((LivingEntity) target).getHealth() <= 0)) {
                     swords.forEach(ArmorStand::remove);
-                    if(config.swordCount.getOrDefault(player.getUniqueId(), 0) > 0) {
+                    if (config.swordCount.getOrDefault(player.getUniqueId(), 0) > 0) {
                         player.heal(damage * 3);
                         int newCount = config.swordCount.getOrDefault(player.getUniqueId(), 0) - 1;
                         config.swordCount.put(player.getUniqueId(), newCount);
 
-                        // [수정] 액션바 -> 서브타이틀 (남은 횟수 표시)
                         Title title = Title.title(
                                 Component.empty(),
                                 Component.text((3 - newCount) + " set").color(NamedTextColor.GRAY),
-                                Title.Times.times(Duration.ZERO, Duration.ofMillis(1000), Duration.ofMillis(500))
+                                Title.Times.times(Duration.ZERO, Duration.ofMillis(100), Duration.ofMillis(200))
                         );
                         player.showTitle(title);
 
@@ -191,9 +230,9 @@ public class R implements SkillBase {
                     newLoc.setPitch(pitch);
 
                     Location prevHilt = prevHiltLocations.get(i);
-                    if(Math.random() < 0.17) {
+                    if (Math.random() < 0.17) {
                         spawnParticleTrail(world, prevHilt, newLoc, Particle.DUST, dustOption_gra);
-                    }else{
+                    } else {
                         spawnParticleTrail(world, prevHilt, newLoc, Particle.DUST, dustOption);
                     }
 
@@ -204,16 +243,37 @@ public class R implements SkillBase {
                 ticks++;
 
                 if (ticks >= 20 * 7) {
-                    if(config.swordCount.getOrDefault(player.getUniqueId(), 0) > 0) {
+                    if (target.isDead() || (target instanceof LivingEntity && ((LivingEntity) target).getHealth() <= 0)) {
+                        swords.forEach(ArmorStand::remove);
+                        if (config.swordCount.getOrDefault(player.getUniqueId(), 0) > 0) {
+                            player.heal(damage);
+                            int newCount = config.swordCount.getOrDefault(player.getUniqueId(), 0) - 1;
+                            config.swordCount.put(player.getUniqueId(), newCount);
+
+                            Title title = Title.title(
+                                    Component.empty(),
+                                    Component.text((3 - newCount) + " set").color(NamedTextColor.GRAY),
+                                    Title.Times.times(Duration.ZERO, Duration.ofMillis(100), Duration.ofMillis(200))
+                            );
+                            player.showTitle(title);
+
+                            if (newCount == 0) {
+                                config.swordCount.remove(player.getUniqueId());
+                            }
+                        }
+                        this.cancel();
+                        return;
+                    }
+
+                    if (config.swordCount.getOrDefault(player.getUniqueId(), 0) > 0) {
                         player.heal(damage);
                         int newCount = config.swordCount.getOrDefault(player.getUniqueId(), 0) - 1;
                         config.swordCount.put(player.getUniqueId(), newCount);
 
-                        // [수정] 액션바 -> 서브타이틀 (남은 횟수 표시)
                         Title title = Title.title(
                                 Component.empty(),
                                 Component.text((3 - newCount) + " set").color(NamedTextColor.GRAY),
-                                Title.Times.times(Duration.ZERO, Duration.ofMillis(1000), Duration.ofMillis(500))
+                                Title.Times.times(Duration.ZERO, Duration.ofMillis(100), Duration.ofMillis(200))
                         );
                         player.showTitle(title);
 
@@ -284,14 +344,16 @@ public class R implements SkillBase {
 
                 Location swordLoc = sword.getLocation().clone();
                 Location hiltLoc = swordLoc.clone().add(0, 0.7, 0);
-                if(Math.random() < 0.17) {
+                if (Math.random() < 0.17) {
                     sword.getWorld().spawnParticle(Particle.DUST, hiltLoc, 1, 0, 0, 0, 0, dustOption_gra);
-                }else{
+                } else {
                     sword.getWorld().spawnParticle(Particle.DUST, hiltLoc, 1, 0, 0, 0, 0, dustOption);
                 }
 
                 for (Entity e : sword.getNearbyEntities(0.7, 0.7, 0.7)) {
                     if (e != player && e instanceof LivingEntity le) {
+                        if (le.isDead() || le.getHealth() <= 0) continue;
+
                         player.getWorld().spawnParticle(Particle.ENCHANTED_HIT, e.getLocation().clone().add(0, 1, 0), 21, 0.4, 0.4, 0.4, 1);
                         player.playSound(e.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1);
 
@@ -321,14 +383,20 @@ public class R implements SkillBase {
         List<LivingEntity> candidates = new ArrayList<>();
 
         for (Entity entity : world.getNearbyEntities(eyeLocation, range, range, range)) {
+            if (entity instanceof ArmorStand) continue;
+
             if (!(entity instanceof LivingEntity) || entity.equals(player) || entity.isInvulnerable()) continue;
+
+            LivingEntity livingEntity = (LivingEntity) entity;
+
+            if (livingEntity.isDead() || livingEntity.getHealth() <= 0) continue;
 
             RayTraceResult result = world.rayTraceEntities(
                     eyeLocation, direction, range, raySize, e -> e.equals(entity)
             );
 
             if (result != null) {
-                candidates.add((LivingEntity) entity);
+                candidates.add(livingEntity);
             }
         }
 
