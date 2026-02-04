@@ -1,4 +1,4 @@
-package org.core.coreSystem.cores.VOL1.Bambo.coreSystem;
+package org.core.coreSystem.cores.VOL1.Bamboo.coreSystem;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.UUID;
 
-public class Bambo {
+public class Bamboo {
 
     //CoolHashmap
     public HashMap<UUID, Long> R_COOLDOWN = new HashMap<>();

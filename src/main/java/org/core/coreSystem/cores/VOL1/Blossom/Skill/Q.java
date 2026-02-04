@@ -1,4 +1,4 @@
-package org.core.coreSystem.cores.VOL1.Bloom.Skill;
+package org.core.coreSystem.cores.VOL1.Blossom.Skill;
 
 import org.bukkit.*;
 import org.bukkit.damage.DamageSource;
@@ -13,16 +13,16 @@ import org.bukkit.util.Vector;
 import org.core.cool.Cool;
 import org.core.effect.crowdControl.ForceDamage;
 import org.core.coreSystem.absCoreSystem.SkillBase;
-import org.core.coreSystem.cores.VOL1.Bloom.coreSystem.Bloom;
+import org.core.coreSystem.cores.VOL1.Blossom.coreSystem.Blossom;
 
 import java.util.HashSet;
 
 public class Q implements SkillBase {
-    private final Bloom config;
+    private final Blossom config;
     private final JavaPlugin plugin;
     private final Cool cool;
 
-    public Q(Bloom config, JavaPlugin plugin, Cool cool) {
+    public Q(Blossom config, JavaPlugin plugin, Cool cool) {
         this.config = config;
         this.plugin = plugin;
         this.cool = cool;

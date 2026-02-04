@@ -1,4 +1,4 @@
-package org.core.coreSystem.cores.VOL1.Bambo.Skill;
+package org.core.coreSystem.cores.VOL1.Bamboo.Skill;
 
 import org.bukkit.*;
 import org.bukkit.Particle;
@@ -10,16 +10,16 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 import org.core.cool.Cool;
-import org.core.coreSystem.cores.VOL1.Bambo.coreSystem.Bambo;
+import org.core.coreSystem.cores.VOL1.Bamboo.coreSystem.Bamboo;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 
 public class Q implements SkillBase {
 
-    private final Bambo config;
+    private final Bamboo config;
     private final JavaPlugin plugin;
     private final Cool cool;
 
-    public Q(Bambo config, JavaPlugin plugin, Cool cool) {
+    public Q(Bamboo config, JavaPlugin plugin, Cool cool) {
         this.config = config;
         this.plugin = plugin;
         this.cool = cool;

@@ -24,18 +24,18 @@ import org.core.effect.crowdControl.Stiff;
 import org.core.effect.effectPlugin.moveCancelManager;
 import org.core.level.LevelingManager;
 import org.core.coreEntity.absEntityLeveling.EntityLevelingManager;
-import org.core.coreSystem.cores.VOL1.Bambo.coreSystem.Bambo;
-import org.core.coreSystem.cores.VOL1.Bambo.coreSystem.bambCore;
-import org.core.coreSystem.cores.VOL1.Bambo.coreSystem.bambInventory;
+import org.core.coreSystem.cores.VOL1.Bamboo.coreSystem.Bamboo;
+import org.core.coreSystem.cores.VOL1.Bamboo.coreSystem.bambCore;
+import org.core.coreSystem.cores.VOL1.Bamboo.coreSystem.bambInventory;
 import org.core.coreSystem.cores.KEY.Benzene.coreSystem.Benzene;
 import org.core.coreSystem.cores.KEY.Benzene.coreSystem.benzCore;
 import org.core.coreSystem.cores.KEY.Benzene.coreSystem.benzInventory;
 import org.core.coreSystem.cores.VOL1.Blaze.coreSystem.Blaze;
 import org.core.coreSystem.cores.VOL1.Blaze.coreSystem.blazeCore;
 import org.core.coreSystem.cores.VOL1.Blaze.coreSystem.blazeInventory;
-import org.core.coreSystem.cores.VOL1.Bloom.coreSystem.Bloom;
-import org.core.coreSystem.cores.VOL1.Bloom.coreSystem.bloomCore;
-import org.core.coreSystem.cores.VOL1.Bloom.coreSystem.bloomInventory;
+import org.core.coreSystem.cores.VOL1.Blossom.coreSystem.Blossom;
+import org.core.coreSystem.cores.VOL1.Blossom.coreSystem.blossCore;
+import org.core.coreSystem.cores.VOL1.Blossom.coreSystem.blossInventory;
 import org.core.coreSystem.cores.VOL2.Blue.coreSystem.Blue;
 import org.core.coreSystem.cores.VOL2.Blue.coreSystem.blueCore;
 import org.core.coreSystem.cores.VOL2.Blue.coreSystem.blueInventory;
@@ -106,7 +106,7 @@ public final class Core extends JavaPlugin implements Listener {
     private blazeCore blaze;
     private comCore commander;
     private harvCore harvester;
-    private bloomCore bloom;
+    private blossCore bloom;
     private blueCore blue;
     private swordCore swordsman;
     private sabCore saboteur;
@@ -127,7 +127,7 @@ public final class Core extends JavaPlugin implements Listener {
     private blazeInventory blazeInv;
     private comInventory comInv;
     private harvInventory harvInv;
-    private bloomInventory bloomInv;
+    private blossInventory bloomInv;
     private blueInventory blueInv;
     private swordInventory swordInv;
     private sabInventory sabInv;
@@ -153,7 +153,7 @@ public final class Core extends JavaPlugin implements Listener {
         PLAYER playerConfig = new PLAYER();
         Nightel nightConfig = new Nightel();
         Benzene benzConfig = new Benzene();
-        Bambo bambConfig = new Bambo();
+        Bamboo bambConfig = new Bamboo();
         Carpenter carpConfig = new Carpenter();
         Dagger dagConfig = new Dagger();
         Pyro pyroConfig = new Pyro();
@@ -163,7 +163,7 @@ public final class Core extends JavaPlugin implements Listener {
         Blaze blazeConfig = new Blaze();
         Commander comConfig = new Commander();
         Harvester harvConfig = new Harvester();
-        Bloom bloomConfig = new Bloom();
+        Blossom blossomConfig = new Blossom();
         Blue blueConfig = new Blue();
         Swordsman swordConfig = new Swordsman();
         Saboteur sabConfig = new Saboteur();
@@ -240,9 +240,9 @@ public final class Core extends JavaPlugin implements Listener {
         this.harvInv = new harvInventory(this, this.config);
         Bukkit.getPluginManager().registerEvents(this.harvInv, this);
 
-        this.bloom = new bloomCore(this, config, bloomConfig, cool);
+        this.bloom = new blossCore(this, config, blossomConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.bloom, this);
-        this.bloomInv = new bloomInventory(this, this.config);
+        this.bloomInv = new blossInventory(this, this.config);
         Bukkit.getPluginManager().registerEvents(this.bloomInv, this);
 
         this.blue = new blueCore(this, config, blueConfig, cool);

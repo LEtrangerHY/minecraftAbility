@@ -9,7 +9,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.core.cool.Cool;
 import org.core.playerSettings.persistentPlayerSet;
 
-import javax.naming.Name;
 import java.util.Set;
 
 public class coreConfig {
@@ -20,7 +19,7 @@ public class coreConfig {
     public Set<Player> PLAYER;
     public Set<Player> Nightel;
     public Set<Player> Benzene;
-    public Set<Player> Bambo;
+    public Set<Player> Bamboo;
     public Set<Player> Carpenter;
     public Set<Player> Dagger;
     public Set<Player> Pyro;
@@ -30,7 +29,7 @@ public class coreConfig {
     public Set<Player> Blaze;
     public Set<Player> Commander;
     public Set<Player> Harvester;
-    public Set<Player> Bloom;
+    public Set<Player> Blossom;
     public Set<Player> Blue;
     public Set<Player> Swordsman;
     public Set<Player> Saboteur;
@@ -45,7 +44,7 @@ public class coreConfig {
         this.PLAYER = new persistentPlayerSet(plugin, "setting_player");
         this.Nightel = new persistentPlayerSet(plugin, "setting_nightel");
         this.Benzene = new persistentPlayerSet(plugin, "setting_benzene");
-        this.Bambo = new persistentPlayerSet(plugin, "setting_bambo");
+        this.Bamboo = new persistentPlayerSet(plugin, "setting_bamboo");
         this.Carpenter = new persistentPlayerSet(plugin, "setting_carpenter");
         this.Dagger = new persistentPlayerSet(plugin, "setting_dagger");
         this.Pyro = new persistentPlayerSet(plugin, "setting_pyro");
@@ -55,7 +54,7 @@ public class coreConfig {
         this.Blaze = new persistentPlayerSet(plugin, "setting_blaze");
         this.Commander = new persistentPlayerSet(plugin, "setting_commander");
         this.Harvester = new persistentPlayerSet(plugin, "setting_harvester");
-        this.Bloom = new persistentPlayerSet(plugin, "setting_bloom");
+        this.Blossom = new persistentPlayerSet(plugin, "setting_blossom");
         this.Blue = new persistentPlayerSet(plugin, "setting_blue");
         this.Swordsman = new persistentPlayerSet(plugin, "setting_swordsman");
         this.Saboteur = new persistentPlayerSet(plugin, "setting_saboteur");
@@ -68,7 +67,7 @@ public class coreConfig {
         if (PLAYER.contains(player)) return "PLAYER";
         if (Nightel.contains(player)) return "NIGHTEL";
         if (Benzene.contains(player)) return "BENZENE";
-        if (Bambo.contains(player)) return "BAMBO";
+        if (Bamboo.contains(player)) return "BAMBOO";
         if (Carpenter.contains(player)) return "CARPENTER";
         if (Dagger.contains(player)) return "DAGGER";
         if (Pyro.contains(player)) return "PYRO";
@@ -78,7 +77,7 @@ public class coreConfig {
         if (Blaze.contains(player)) return "BLAZE";
         if (Commander.contains(player)) return "COMMANDER";
         if (Harvester.contains(player)) return "HARVESTER";
-        if (Bloom.contains(player)) return "BLOOM";
+        if (Blossom.contains(player)) return "BLOSSOM";
         if (Blue.contains(player)) return "BLUE";
         if (Swordsman.contains(player)) return "SWORDSMAN";
         if (Saboteur.contains(player)) return "SABOTEUR";
@@ -107,7 +106,7 @@ public class coreConfig {
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_player"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_nightel"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_benzene"), PersistentDataType.BYTE, (byte) 0);
-        player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_bambo"), PersistentDataType.BYTE, (byte) 0);
+        player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_bamboo"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_carpenter"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_dagger"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_pyro"), PersistentDataType.BYTE, (byte) 0);
@@ -117,7 +116,7 @@ public class coreConfig {
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_blaze"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_commander"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_harvester"), PersistentDataType.BYTE, (byte) 0);
-        player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_bloom"), PersistentDataType.BYTE, (byte) 0);
+        player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_blossom"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_blue"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_swordsman"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_saboteur"), PersistentDataType.BYTE, (byte) 0);
@@ -139,7 +138,7 @@ public class coreConfig {
             case "player" -> new NamespacedKey(plugin, "setting_player");
             case "nightel" -> new NamespacedKey(plugin, "setting_nightel");
             case "benzene" -> new NamespacedKey(plugin, "setting_benzene");
-            case "bambo" -> new NamespacedKey(plugin, "setting_bambo");
+            case "bambo" -> new NamespacedKey(plugin, "setting_bamboo");
             case "carpenter" -> new NamespacedKey(plugin, "setting_carpenter");
             case "dagger" -> new NamespacedKey(plugin, "setting_dagger");
             case "pyro" -> new NamespacedKey(plugin, "setting_pyro");
@@ -149,7 +148,7 @@ public class coreConfig {
             case "blaze" -> new NamespacedKey(plugin, "setting_blaze");
             case "commander" -> new NamespacedKey(plugin, "setting_commander");
             case "harvester" -> new NamespacedKey(plugin, "setting_harvester");
-            case "bloom" -> new NamespacedKey(plugin, "setting_bloom");
+            case "bloom" -> new NamespacedKey(plugin, "setting_blossom");
             case "blue" -> new NamespacedKey(plugin, "setting_blue");
             case "swordsman" -> new NamespacedKey(plugin, "setting_swordsman");
             case "saboteur" -> new NamespacedKey(plugin, "setting_saboteur");

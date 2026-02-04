@@ -100,7 +100,7 @@ public class Q implements SkillBase {
                 }
 
                 Location baseLoc = entity.getLocation();
-                world.spawnParticle(Particle.DUST, baseLoc.clone().add(0, 3.3, 0), 1, 0.1, 0.1, 0.1, 0.06, DUST_TARGET);
+                world.spawnParticle(Particle.DUST, baseLoc.clone().add(0, 3.3, 0), 3, 0.1, 0.1, 0.1, 0.06, DUST_TARGET);
 
                 tick++;
             }

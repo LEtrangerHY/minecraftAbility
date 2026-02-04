@@ -20,10 +20,10 @@ import org.core.coreSystem.cores.KEY.PLAYER.coreSystem.playerLeveling;
 import org.core.coreSystem.cores.VOL2.Lavender.coreSystem.lavLeveling;
 import org.core.coreSystem.cores.VOL2.Rose.coreSystem.roseLeveling;
 import org.core.main.coreConfig;
-import org.core.coreSystem.cores.VOL1.Bambo.coreSystem.bambLeveling;
+import org.core.coreSystem.cores.VOL1.Bamboo.coreSystem.bambLeveling;
 import org.core.coreSystem.cores.KEY.Benzene.coreSystem.benzLeveling;
 import org.core.coreSystem.cores.VOL1.Blaze.coreSystem.blazeLeveling;
-import org.core.coreSystem.cores.VOL1.Bloom.coreSystem.bloomLeveling;
+import org.core.coreSystem.cores.VOL1.Blossom.coreSystem.blossLeveling;
 import org.core.coreSystem.cores.VOL2.Blue.coreSystem.blueLeveling;
 import org.core.coreSystem.cores.VOL1.Carpenter.coreSystem.carpLeveling;
 import org.core.coreSystem.cores.VOL1.Commander.coreSystem.comLeveling;
@@ -154,7 +154,7 @@ public class LevelingManager implements Listener {
                     harvester.addExp(player);
                     break;
                 case "BLOOM" :
-                    bloomLeveling bloom = new bloomLeveling(plugin, player, exp);
+                    blossLeveling bloom = new blossLeveling(plugin, player, exp);
                     bloom.addExp(player);
                     break;
                 case "BLUE" :

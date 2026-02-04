@@ -1,4 +1,4 @@
-package org.core.coreSystem.cores.VOL1.Bambo.coreSystem;
+package org.core.coreSystem.cores.VOL1.Bamboo.coreSystem;
 
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;

@@ -1,4 +1,4 @@
-package org.core.coreSystem.cores.VOL1.Bambo.Skill;
+package org.core.coreSystem.cores.VOL1.Bamboo.Skill;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -12,7 +12,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.core.cool.Cool;
-import org.core.coreSystem.cores.VOL1.Bambo.coreSystem.Bambo;
+import org.core.coreSystem.cores.VOL1.Bamboo.coreSystem.Bamboo;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 
 import java.time.Duration;
@@ -20,11 +20,11 @@ import java.util.*;
 
 public class F implements SkillBase {
 
-    private final Bambo config;
+    private final Bamboo config;
     private final JavaPlugin plugin;
     private final Cool cool;
 
-    public F(Bambo config, JavaPlugin plugin, Cool cool) {
+    public F(Bamboo config, JavaPlugin plugin, Cool cool) {
         this.config = config;
         this.plugin = plugin;
         this.cool = cool;

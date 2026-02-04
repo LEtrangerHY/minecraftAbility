@@ -1,4 +1,4 @@
-package org.core.coreSystem.cores.VOL1.Bambo.coreSystem;
+package org.core.coreSystem.cores.VOL1.Bamboo.coreSystem;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -37,7 +37,7 @@ public class bambInventory extends absInventory {
 
     @Override
     protected boolean contains(Player player) {
-        return tag.Bambo.contains(player);
+        return tag.Bamboo.contains(player);
     }
 
     @Override

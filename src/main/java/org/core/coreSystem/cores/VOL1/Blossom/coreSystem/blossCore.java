@@ -1,4 +1,4 @@
-package org.core.coreSystem.cores.VOL1.Bloom.coreSystem;
+package org.core.coreSystem.cores.VOL1.Blossom.coreSystem;
 
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
@@ -24,20 +24,20 @@ import org.core.main.coreConfig;
 import org.core.coreSystem.absCoreSystem.ConfigWrapper;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.absCoreSystem.absCore;
-import org.core.coreSystem.cores.VOL1.Bloom.Skill.F;
-import org.core.coreSystem.cores.VOL1.Bloom.Skill.Q;
-import org.core.coreSystem.cores.VOL1.Bloom.Skill.R;
+import org.core.coreSystem.cores.VOL1.Blossom.Skill.F;
+import org.core.coreSystem.cores.VOL1.Blossom.Skill.Q;
+import org.core.coreSystem.cores.VOL1.Blossom.Skill.R;
 
-public class bloomCore extends absCore {
+public class blossCore extends absCore {
 
     private final Core plugin;
-    private final Bloom config;
+    private final Blossom config;
 
     private final R Rskill;
     private final Q Qskill;
     private final F Fskill;
 
-    public bloomCore(Core plugin, coreConfig tag, Bloom config, Cool cool) {
+    public blossCore(Core plugin, coreConfig tag, Blossom config, Cool cool) {
         super(tag, cool);
 
         this.plugin = plugin;
@@ -47,7 +47,7 @@ public class bloomCore extends absCore {
         this.Qskill = new Q(config, plugin, cool);
         this.Fskill = new F(config, plugin, cool);
 
-        plugin.getLogger().info("Bloom downloaded...");
+        plugin.getLogger().info("Blossom downloaded...");
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
@@ -89,7 +89,7 @@ public class bloomCore extends absCore {
     @EventHandler(priority = EventPriority.NORMAL)
     public void passiveAttackEffect(PlayerInteractEvent event) {
 
-        if(tag.Bloom.contains(event.getPlayer()) && hasProperItems(event.getPlayer())) {
+        if(tag.Blossom.contains(event.getPlayer()) && hasProperItems(event.getPlayer())) {
             if (!pAttackUsing.contains(event.getPlayer().getUniqueId())) {
 
                 Player player = event.getPlayer();
@@ -166,7 +166,7 @@ public class bloomCore extends absCore {
 
     @Override
     protected boolean contains(Player player) {
-        return tag.Bloom.contains(player);
+        return tag.Blossom.contains(player);
     }
 
     @Override

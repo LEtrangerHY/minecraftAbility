@@ -1,4 +1,4 @@
-package org.core.coreSystem.cores.VOL1.Bloom.Skill;
+package org.core.coreSystem.cores.VOL1.Blossom.Skill;
 
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -13,20 +13,19 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.RayTraceResult;
-import org.bukkit.util.Vector;
 import org.core.cool.Cool;
 import org.core.effect.crowdControl.ForceDamage;
 import org.core.coreSystem.absCoreSystem.SkillBase;
-import org.core.coreSystem.cores.VOL1.Bloom.coreSystem.Bloom;
+import org.core.coreSystem.cores.VOL1.Blossom.coreSystem.Blossom;
 
 import java.util.*;
 
 public class F implements SkillBase {
-    private final Bloom config;
+    private final Blossom config;
     private final JavaPlugin plugin;
     private final Cool cool;
 
-    public F(Bloom config, JavaPlugin plugin, Cool cool) {
+    public F(Blossom config, JavaPlugin plugin, Cool cool) {
         this.config = config;
         this.plugin = plugin;
         this.cool = cool;

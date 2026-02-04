@@ -70,7 +70,7 @@ public class cmdCore implements CommandExecutor, TabCompleter {
             suggestions.add("glacier");
             suggestions.add("dagger");
             suggestions.add("carpenter");
-            suggestions.add("bambo");
+            suggestions.add("bamboo");
             suggestions.add("luster");
             suggestions.add("blaze");
             suggestions.add("commander");

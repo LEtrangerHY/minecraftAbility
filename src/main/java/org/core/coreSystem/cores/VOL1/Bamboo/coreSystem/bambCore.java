@@ -1,4 +1,4 @@
-package org.core.coreSystem.cores.VOL1.Bambo.coreSystem;
+package org.core.coreSystem.cores.VOL1.Bamboo.coreSystem;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -21,15 +21,15 @@ import org.core.main.coreConfig;
 import org.core.coreSystem.absCoreSystem.ConfigWrapper;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.absCoreSystem.absCore;
-import org.core.coreSystem.cores.VOL1.Bambo.Passive.IngReload;
-import org.core.coreSystem.cores.VOL1.Bambo.Skill.F;
-import org.core.coreSystem.cores.VOL1.Bambo.Skill.Q;
-import org.core.coreSystem.cores.VOL1.Bambo.Skill.R;
+import org.core.coreSystem.cores.VOL1.Bamboo.Passive.IngReload;
+import org.core.coreSystem.cores.VOL1.Bamboo.Skill.F;
+import org.core.coreSystem.cores.VOL1.Bamboo.Skill.Q;
+import org.core.coreSystem.cores.VOL1.Bamboo.Skill.R;
 
 public class bambCore extends absCore {
 
     private final Core plugin;
-    private final Bambo config;
+    private final Bamboo config;
 
     private final IngReload ingreload;
 
@@ -37,7 +37,7 @@ public class bambCore extends absCore {
     private final Q Qskill;
     private final F Fskill;
 
-    public bambCore(Core plugin, coreConfig tag, Bambo config, Cool cool) {
+    public bambCore(Core plugin, coreConfig tag, Bamboo config, Cool cool) {
         super(tag, cool);
 
         this.plugin = plugin;
@@ -49,7 +49,7 @@ public class bambCore extends absCore {
         this.Qskill = new Q(config, plugin, cool);
         this.Fskill = new F(config, plugin, cool);
 
-        plugin.getLogger().info("Bambo downloaded...");
+        plugin.getLogger().info("Bamboo downloaded...");
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
@@ -95,7 +95,7 @@ public class bambCore extends absCore {
 
     @EventHandler(priority = EventPriority.NORMAL)
     public void passiveAttackEffect(PlayerInteractEvent event) {
-        if(tag.Bambo.contains(event.getPlayer())){
+        if(tag.Bamboo.contains(event.getPlayer())){
             if (pAttackUsing.contains(event.getPlayer().getUniqueId())) {
                 pAttackUsing.remove(event.getPlayer().getUniqueId());
             }
@@ -108,7 +108,7 @@ public class bambCore extends absCore {
         if (!(event.getDamager() instanceof Player player)) return;
         if (!(event.getEntity() instanceof LivingEntity target)) return;
 
-        if(tag.Bambo.contains(player)) {
+        if(tag.Bamboo.contains(player)) {
             if (hasProperItems(player)) {
                 if (!config.r_damaged.getOrDefault(player.getUniqueId(), false)) {
                     if (!config.reloaded.getOrDefault(player.getUniqueId(), false)) {
@@ -127,7 +127,7 @@ public class bambCore extends absCore {
     public void onFallDamage(EntityDamageEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
 
-        if(tag.Bambo.contains(player)) {
+        if(tag.Bamboo.contains(player)) {
             if (event.getCause() == EntityDamageEvent.DamageCause.FALL &&
                     player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "noFallDamage"), PersistentDataType.BOOLEAN, false)) {
                 event.setCancelled(true);
@@ -140,7 +140,7 @@ public class bambCore extends absCore {
     public void onGameModeChange(PlayerGameModeChangeEvent event) {
         Player player = event.getPlayer();
 
-        if(tag.Bambo.contains(player)) {
+        if(tag.Bamboo.contains(player)) {
             if (player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "noFallDamage"), PersistentDataType.BOOLEAN, false)) {
                 player.getPersistentDataContainer().remove(new NamespacedKey(plugin, "noFallDamage"));
             }
@@ -149,7 +149,7 @@ public class bambCore extends absCore {
 
     @Override
     protected boolean contains(Player player) {
-        return tag.Bambo.contains(player);
+        return tag.Bamboo.contains(player);
     }
 
     @Override

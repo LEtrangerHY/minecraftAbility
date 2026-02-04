@@ -1,4 +1,4 @@
-package org.core.coreSystem.cores.VOL1.Bloom.coreSystem;
+package org.core.coreSystem.cores.VOL1.Blossom.coreSystem;
 
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
@@ -13,13 +13,13 @@ import org.core.level.Levels;
 import java.util.Collections;
 import java.util.Set;
 
-public class bloomLeveling implements Levels {
+public class blossLeveling implements Levels {
 
     private final JavaPlugin plugin;
     private final Player player;
     private final long exp;
 
-    public bloomLeveling(JavaPlugin plugin, Player player, long exp) {
+    public blossLeveling(JavaPlugin plugin, Player player, long exp) {
         this.plugin = plugin;
         this.player = player;
         this.exp = exp;

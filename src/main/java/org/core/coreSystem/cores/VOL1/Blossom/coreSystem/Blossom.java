@@ -1,4 +1,4 @@
-package org.core.coreSystem.cores.VOL1.Bloom.coreSystem;
+package org.core.coreSystem.cores.VOL1.Blossom.coreSystem;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.UUID;
 
-public class Bloom {
+public class Blossom {
     //CoolHashmap
     public HashMap<UUID, Long> R_COOLDOWN = new HashMap<>();
     public HashMap<UUID, Long> Q_COOLDOWN = new HashMap<>();

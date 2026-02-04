@@ -1,4 +1,4 @@
-package org.core.coreSystem.cores.VOL1.Bloom.coreSystem;
+package org.core.coreSystem.cores.VOL1.Blossom.coreSystem;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -20,11 +20,11 @@ import org.core.coreSystem.absInventorySystem.absInventory;
 import java.util.ArrayList;
 import java.util.List;
 
-public class bloomInventory extends absInventory {
+public class blossInventory extends absInventory {
 
     private final Core plugin;
 
-    public bloomInventory(Core plugin, coreConfig config) {
+    public blossInventory(Core plugin, coreConfig config) {
         super(config);
 
         this.plugin = plugin;
@@ -37,7 +37,7 @@ public class bloomInventory extends absInventory {
 
     @Override
     protected boolean contains(Player player) {
-        return tag.Bloom.contains(player);
+        return tag.Blossom.contains(player);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class bloomInventory extends absInventory {
     protected Component getName(Player player, String skill) {
 
         return switch (skill) {
-            case "R" -> Component.text("BlossomRise");
+            case "R" -> Component.text("BloomRise");
             case "Q" -> Component.text("PetalBlizzard");
             case "F" -> Component.text("WONDERLAND");
             default -> Component.text("???");
