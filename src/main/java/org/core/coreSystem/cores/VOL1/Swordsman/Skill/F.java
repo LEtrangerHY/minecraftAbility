@@ -11,30 +11,28 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.core.cool.Cool;
+import org.core.coreSystem.cores.VOL1.Swordsman.Passive.Iaido;
 import org.core.effect.crowdControl.ForceDamage;
 import org.core.effect.crowdControl.Invulnerable;
 import org.core.effect.crowdControl.Stiff;
 import org.core.effect.crowdControl.Stun;
 import org.core.coreSystem.absCoreSystem.SkillBase;
-import org.core.coreSystem.cores.VOL1.Swordsman.Passive.Laido;
 import org.core.coreSystem.cores.VOL1.Swordsman.coreSystem.Swordsman;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.UUID;
 
 public class F implements SkillBase {
     private final Swordsman config;
     private final JavaPlugin plugin;
     private final Cool cool;
-    private final Laido laido;
+    private final Iaido laido;
     private final NamespacedKey keyF;
 
     private static final Particle.DustOptions DUST_DASH = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 0.6f);
     private static final Particle.DustOptions DUST_SLASH = new Particle.DustOptions(Color.fromRGB(0, 0, 0), 0.6f);
 
-    public F(Swordsman config, JavaPlugin plugin, Cool cool, Laido laido) {
+    public F(Swordsman config, JavaPlugin plugin, Cool cool, Iaido laido) {
         this.config = config;
         this.plugin = plugin;
         this.cool = cool;

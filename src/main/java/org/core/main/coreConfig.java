@@ -36,6 +36,7 @@ public class coreConfig {
     public Set<Player> Burst;
     public Set<Player> Lavender;
     public Set<Player> Rose;
+    public Set<Player> Claud;
 
     public coreConfig(JavaPlugin plugin, Cool cool) {
         this.plugin = plugin;
@@ -61,6 +62,7 @@ public class coreConfig {
         this.Burst = new persistentPlayerSet(plugin, "setting_burst");
         this.Lavender = new persistentPlayerSet(plugin, "setting_lavender");
         this.Rose = new persistentPlayerSet(plugin, "setting_rose");
+        this.Claud = new persistentPlayerSet(plugin, "setting_claud");
     }
 
     public String getPlayerCore(Player player) {
@@ -84,6 +86,7 @@ public class coreConfig {
         if (Burst.contains(player)) return "BURST";
         if (Lavender.contains(player)) return "LAVENDER";
         if (Rose.contains(player)) return "ROSE";
+        if (Claud.contains(player)) return "CLAUD";
         return "NONE";
     }
 
@@ -123,6 +126,7 @@ public class coreConfig {
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_burst"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_lavender"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_rose"), PersistentDataType.BYTE, (byte) 0);
+        player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_claud"), PersistentDataType.BYTE, (byte) 0);
     }
 
     public void setSetting(Player player, String setting, boolean value) {
@@ -138,7 +142,7 @@ public class coreConfig {
             case "player" -> new NamespacedKey(plugin, "setting_player");
             case "nightel" -> new NamespacedKey(plugin, "setting_nightel");
             case "benzene" -> new NamespacedKey(plugin, "setting_benzene");
-            case "bambo" -> new NamespacedKey(plugin, "setting_bamboo");
+            case "bamboo" -> new NamespacedKey(plugin, "setting_bamboo");
             case "carpenter" -> new NamespacedKey(plugin, "setting_carpenter");
             case "dagger" -> new NamespacedKey(plugin, "setting_dagger");
             case "pyro" -> new NamespacedKey(plugin, "setting_pyro");
@@ -148,13 +152,14 @@ public class coreConfig {
             case "blaze" -> new NamespacedKey(plugin, "setting_blaze");
             case "commander" -> new NamespacedKey(plugin, "setting_commander");
             case "harvester" -> new NamespacedKey(plugin, "setting_harvester");
-            case "bloom" -> new NamespacedKey(plugin, "setting_blossom");
+            case "blossom" -> new NamespacedKey(plugin, "setting_blossom");
             case "blue" -> new NamespacedKey(plugin, "setting_blue");
             case "swordsman" -> new NamespacedKey(plugin, "setting_swordsman");
             case "saboteur" -> new NamespacedKey(plugin, "setting_saboteur");
             case "burst" -> new NamespacedKey(plugin, "setting_burst");
             case "lavender" -> new NamespacedKey(plugin, "setting_lavender");
             case "rose" -> new NamespacedKey(plugin, "setting_rose");
+            case "claud" -> new NamespacedKey(plugin, "setting_claud");
             default -> null;
         };
     }

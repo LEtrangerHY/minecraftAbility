@@ -12,11 +12,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.core.cool.Cool;
+import org.core.coreSystem.cores.VOL1.Swordsman.Passive.Iaido;
 import org.core.effect.crowdControl.ForceDamage;
 import org.core.effect.crowdControl.Invulnerable;
 import org.core.effect.crowdControl.Stun;
 import org.core.coreSystem.absCoreSystem.SkillBase;
-import org.core.coreSystem.cores.VOL1.Swordsman.Passive.Laido;
 import org.core.coreSystem.cores.VOL1.Swordsman.coreSystem.Swordsman;
 
 import java.util.ArrayList;
@@ -28,12 +28,12 @@ public class R implements SkillBase {
     private final Swordsman config;
     private final JavaPlugin plugin;
     private final Cool cool;
-    private final Laido laido;
+    private final Iaido laido;
     private final NamespacedKey keyR;
 
     private static final Particle.DustOptions DUST_RAPID = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 0.5f);
 
-    public R(Swordsman config, JavaPlugin plugin, Cool cool, Laido laido) {
+    public R(Swordsman config, JavaPlugin plugin, Cool cool, Iaido laido) {
         this.config = config;
         this.plugin = plugin;
         this.cool = cool;

@@ -13,6 +13,9 @@ import org.core.cool.Cool;
 import org.core.coreSystem.cores.KEY.PLAYER.coreSystem.PLAYER;
 import org.core.coreSystem.cores.KEY.PLAYER.coreSystem.playerCore;
 import org.core.coreSystem.cores.KEY.PLAYER.coreSystem.playerInventory;
+import org.core.coreSystem.cores.VOL3.Claud.coreSystem.Claud;
+import org.core.coreSystem.cores.VOL3.Claud.coreSystem.claudCore;
+import org.core.coreSystem.cores.VOL3.Claud.coreSystem.claudInventory;
 import org.core.coreSystem.cores.VOL2.Lavender.coreSystem.Lavender;
 import org.core.coreSystem.cores.VOL2.Lavender.coreSystem.lavCore;
 import org.core.coreSystem.cores.VOL2.Lavender.coreSystem.lavInventory;
@@ -113,6 +116,7 @@ public final class Core extends JavaPlugin implements Listener {
     private burstCore burst;
     private lavCore lavender;
     private roseCore rose;
+    private claudCore claud;
 
     private playerInventory playerInv;
     private nightInventory nightInv;
@@ -134,6 +138,7 @@ public final class Core extends JavaPlugin implements Listener {
     private burstInventory burstInv;
     private lavInventory lavInv;
     private roseInventory roseInv;
+    private claudInventory claudInv;
 
     private EntityLevelingManager Elevel;
 
@@ -170,6 +175,7 @@ public final class Core extends JavaPlugin implements Listener {
         Burst burstConfig = new Burst();
         Lavender lavConfig = new Lavender();
         Rose roseConfig = new Rose();
+        Claud claudConfig = new Claud();
 
         this.cool = new Cool(this);
 
@@ -274,6 +280,11 @@ public final class Core extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(this.rose, this);
         this.roseInv = new roseInventory(this, this.config);
         Bukkit.getPluginManager().registerEvents(this.roseInv, this);
+
+        this.claud = new claudCore(this, this.config, claudConfig, cool);
+        Bukkit.getPluginManager().registerEvents(this.claud, this);
+        this.claudInv = new claudInventory(this, this.config);
+        Bukkit.getPluginManager().registerEvents(this.claudInv, this);
 
         this.benz = new benzCore(this, this.config, benzConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.benz, this);

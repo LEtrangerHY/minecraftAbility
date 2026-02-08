@@ -21,6 +21,7 @@ import org.bukkit.inventory.meta.BundleMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.core.cool.Cool;
+import org.core.coreSystem.cores.VOL1.Swordsman.Passive.Iaido;
 import org.core.main.Core;
 import org.core.main.coreConfig;
 import org.core.coreSystem.absCoreSystem.ConfigWrapper;
@@ -29,7 +30,6 @@ import org.core.coreSystem.absCoreSystem.absCore;
 import org.core.coreSystem.cores.VOL1.Swordsman.Skill.F;
 import org.core.coreSystem.cores.VOL1.Swordsman.Skill.Q;
 import org.core.coreSystem.cores.VOL1.Swordsman.Skill.R;
-import org.core.coreSystem.cores.VOL1.Swordsman.Passive.Laido;
 
 import java.util.*;
 
@@ -37,7 +37,7 @@ public class swordCore extends absCore {
     private final Core plugin;
     private final Swordsman config;
 
-    private final Laido laido;
+    private final Iaido iaido;
 
     private final R Rskill;
     private final Q Qskill;
@@ -49,11 +49,11 @@ public class swordCore extends absCore {
         this.plugin = plugin;
         this.config = config;
 
-        this.laido = new Laido(config, tag, plugin, cool);
+        this.iaido = new Iaido(config, tag, plugin, cool);
 
-        this.Rskill = new R(config, plugin, cool, laido);
-        this.Qskill = new Q(config, plugin, cool, laido);
-        this.Fskill = new F(config, plugin, cool, laido);
+        this.Rskill = new R(config, plugin, cool, iaido);
+        this.Qskill = new Q(config, plugin, cool, iaido);
+        this.Fskill = new F(config, plugin, cool, iaido);
 
         plugin.getLogger().info("Swordsman downloaded...");
     }
@@ -124,7 +124,7 @@ public class swordCore extends absCore {
             activeChargeBars.remove(player.getUniqueId());
         }
 
-        BossBar bossBar = Bukkit.createBossBar("laido", BarColor.PURPLE, BarStyle.SOLID);
+        BossBar bossBar = Bukkit.createBossBar("Iaido", BarColor.PURPLE, BarStyle.SOLID);
         bossBar.setProgress(0.0);
         bossBar.addPlayer(player);
         activeChargeBars.put(player.getUniqueId(), bossBar);
@@ -146,7 +146,7 @@ public class swordCore extends absCore {
                     bossBar.setProgress(progress);
                 } else {
                     bossBar.setProgress(1.0);
-                    laido.Sheath(player);
+                    iaido.Sheath(player);
                 }
             }
 
@@ -181,7 +181,7 @@ public class swordCore extends absCore {
             world.spawnParticle(Particle.BLOCK, target.getLocation().clone().add(0, 1.2, 0), 10, 0.3, 0.3, 0.3,
                     blood);
 
-            laido.Draw(player);
+            iaido.Draw(player);
         }
     }
 

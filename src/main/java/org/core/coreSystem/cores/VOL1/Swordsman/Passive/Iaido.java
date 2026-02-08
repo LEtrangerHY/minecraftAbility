@@ -23,14 +23,14 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Laido {
+public class Iaido {
 
     private final Swordsman config;
     private final JavaPlugin plugin;
     private final Cool cool;
     private final coreConfig tag;
 
-    public Laido(Swordsman config, coreConfig tag, JavaPlugin plugin, Cool cool) {
+    public Iaido(Swordsman config, coreConfig tag, JavaPlugin plugin, Cool cool) {
         this.config = config;
         this.plugin = plugin;
         this.cool = cool;

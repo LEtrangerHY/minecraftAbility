@@ -1,5 +1,6 @@
 package org.core.coreSystem.absCoreSystem;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -70,24 +71,25 @@ public abstract class absCore implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void rSkillTrigger(PlayerInteractEvent event) {
         Player player = event.getPlayer();
+        ItemStack main = player.getInventory().getItemInMainHand();
 
         if (!contains(player) || !isItemRequired(player) || Stun.isStunned(player)) return;
 
         if (event.getAction() != Action.LEFT_CLICK_AIR && event.getAction() != Action.LEFT_CLICK_BLOCK) {
             if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 
-                event.setCancelled(true);
+                if (main.getType() != Material.IRON_SPEAR) event.setCancelled(true);
 
                 if(!pAttackUsing.contains(player.getUniqueId())) {
                     pAttackUsing.add(player.getUniqueId());
                 }
 
-                if (this.cool.isReloading(player, "R") || !isRCondition(player)) {
+                if (cool.isReloading(player, "R") || !isRCondition(player)) {
                     return;
                 }
 
-                this.cool.setCooldown(player, this.getConfigWrapper().getRcooldown(player), "R");
-                this.getRSkill().Trigger(player);
+                cool.setCooldown(player, this.getConfigWrapper().getRcooldown(player), "R");
+                getRSkill().Trigger(player);
             }
         }
     }
@@ -113,7 +115,6 @@ public abstract class absCore implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void fSkillTrigger(PlayerSwapHandItemsEvent event) {
-
         Player player = event.getPlayer();
 
         if (!contains(player) || !isItemRequired(player) || Stun.isStunned(player)) return;

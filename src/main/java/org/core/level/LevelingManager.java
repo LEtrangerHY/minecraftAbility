@@ -19,6 +19,7 @@ import org.bukkit.scoreboard.*;
 import org.core.coreSystem.cores.KEY.PLAYER.coreSystem.playerLeveling;
 import org.core.coreSystem.cores.VOL2.Lavender.coreSystem.lavLeveling;
 import org.core.coreSystem.cores.VOL2.Rose.coreSystem.roseLeveling;
+import org.core.coreSystem.cores.VOL3.Claud.coreSystem.claudLeveling;
 import org.core.main.coreConfig;
 import org.core.coreSystem.cores.VOL1.Bamboo.coreSystem.bambLeveling;
 import org.core.coreSystem.cores.KEY.Benzene.coreSystem.benzLeveling;
@@ -113,9 +114,9 @@ public class LevelingManager implements Listener {
                     benzLeveling benzene = new benzLeveling(plugin, player, exp);
                     benzene.addExp(player);
                     break;
-                case "BAMBO" :
-                    bambLeveling bambo = new bambLeveling(plugin, player, exp);
-                    bambo.addExp(player);
+                case "BAMBOO" :
+                    bambLeveling bamboo = new bambLeveling(plugin, player, exp);
+                    bamboo.addExp(player);
                     break;
                 case "CARPENTER" :
                     carpLeveling carpenter = new carpLeveling(plugin, player, exp);
@@ -153,9 +154,9 @@ public class LevelingManager implements Listener {
                     harvLeveling harvester = new harvLeveling(plugin, player, exp);
                     harvester.addExp(player);
                     break;
-                case "BLOOM" :
-                    blossLeveling bloom = new blossLeveling(plugin, player, exp);
-                    bloom.addExp(player);
+                case "BLOSSOM" :
+                    blossLeveling blossom = new blossLeveling(plugin, player, exp);
+                    blossom.addExp(player);
                     break;
                 case "BLUE" :
                     blueLeveling blue = new blueLeveling(plugin, player, exp);
@@ -180,6 +181,10 @@ public class LevelingManager implements Listener {
                 case "ROSE" :
                     roseLeveling rose = new roseLeveling(plugin, player, exp);
                     rose.addExp(player);
+                    break;
+                case "CLAUD" :
+                    claudLeveling claud = new claudLeveling(plugin, player, exp);
+                    claud.addExp(player);
                     break;
                 default :
                     break;

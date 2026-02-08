@@ -40,9 +40,14 @@ public class knightInventory extends absInventory {
         return tag.Knight.contains(player);
     }
 
+    private boolean isSword(ItemStack item) {
+        if (item == null) return false;
+        return item.getType().name().endsWith("_SWORD");
+    }
+
     @Override
     protected boolean isCoreItemClicked(Player player, ItemStack clicked){
-        return clicked.getType() == Material.NETHERITE_SWORD;
+        return isSword(clicked);
     }
 
     @Override

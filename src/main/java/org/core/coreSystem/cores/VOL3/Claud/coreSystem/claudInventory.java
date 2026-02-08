@@ -1,4 +1,4 @@
-package org.core.coreSystem.cores.KEY.Benzene.coreSystem;
+package org.core.coreSystem.cores.VOL3.Claud.coreSystem;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -12,19 +12,19 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
-import org.core.main.Core;
-import org.core.main.coreConfig;
 import org.core.coreSystem.absInventorySystem.InventoryWrapper;
 import org.core.coreSystem.absInventorySystem.absInventory;
+import org.core.main.Core;
+import org.core.main.coreConfig;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class benzInventory extends absInventory {
+public class claudInventory extends absInventory {
 
     private final Core plugin;
 
-    public benzInventory(Core plugin, coreConfig config) {
+    public claudInventory(Core plugin, coreConfig config) {
         super(config);
 
         this.plugin = plugin;
@@ -37,7 +37,7 @@ public class benzInventory extends absInventory {
 
     @Override
     protected boolean contains(Player player) {
-        return tag.Benzene.contains(player);
+        return tag.Claud.contains(player);
     }
 
     @Override
@@ -47,11 +47,10 @@ public class benzInventory extends absInventory {
 
     @Override
     protected Component getName(Player player, String skill) {
-
         return switch (skill) {
-            case "R" -> Component.text("Dusk");
-            case "Q" -> Component.text("Resonance");
-            case "F" -> Component.text("⏣");
+            case "R" -> Component.text("-");
+            case "Q" -> Component.text("Strain");
+            case "F" -> Component.text("CLAUS");
             default -> Component.text("???");
         };
     }
@@ -59,9 +58,9 @@ public class benzInventory extends absInventory {
     @Override
     protected Material getTotem(Player player, String skill) {
         return switch (skill) {
-            case "R" -> Material.OXIDIZED_COPPER_CHAIN;
+            case "R" -> Material.IRON_SPEAR;
             case "Q" -> Material.IRON_CHAIN;
-            case "F" -> Material.ENDER_EYE;
+            case "F" -> Material.IRON_BARS;
             default -> Material.BARRIER;
         };
     }
@@ -90,14 +89,10 @@ public class benzInventory extends absInventory {
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
                 lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("시스템 : 활성화").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("패시브 : 비활성화 시 이동속도가 33% 증가한다").color(NamedTextColor.GREEN));
-                lore.add(Component.text("활성화 : 3회 이상 피해 가하기").color(NamedTextColor.GREEN));
-                lore.add(Component.text("전방으로 돌진하며 경로 내 대상들을 베어낸다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("피격-돌진 : ⏣을 1개 소모해 대상들에게 연쇄방향을 1회 중첩한다.").color(NamedTextColor.GREEN));
-
+                lore.add(Component.text("-").color(NamedTextColor.GREEN));
                 break;
             case "Q":
                 requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfQ.get((int) level)) : Component.text("Require EXP : MAX");
@@ -105,12 +100,10 @@ public class benzInventory extends absInventory {
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
                 lore.add(Component.text("타입 : 효과").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("시스템 : 지정형").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("2초간 대상을 고정시킨다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("지정 : 2초간 지정한 대상에게 중첩된 연쇄반향의 피해증폭율을 66% 상승시킨다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("비지정 : 2초간 범위 내 대상들에게 중첩된 연쇄반향의 피해전파율을 66% 상승시킨다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("회전베기를 시전하며 후방으로 잠시 돌진 후 전방으로 돌진한다.").color(NamedTextColor.GREEN));
                 break;
             case "F":
                 requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfF.get((int) level)) : Component.text("Require EXP : MAX");
@@ -118,12 +111,10 @@ public class benzInventory extends absInventory {
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
                 lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("시스템 : 지정형").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("공통 : 전방으로 강한 참격을 가한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("지정 : ⏣을 1개 소모해 대상에게 연쇄방향을 1회 중첩한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("지정 : 대상을 중심으로 소모한 ⏣의 수만큼 연쇄 참격을 시전한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("돌진하며 지나간 거리에 차지된 TNT를 떨어트린다.").color(NamedTextColor.GREEN));
                 break;
             default:
                 break;
@@ -141,9 +132,9 @@ public class benzInventory extends absInventory {
         return player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, skill), PersistentDataType.LONG, 0L);
     }
 
-    public List<Long> requireExpOfR = List.of(33L, 66L, 111L, 222L, 333L, 666L);
-    public List<Long> requireExpOfQ = List.of(33L, 66L, 111L, 222L, 333L, 666L);
-    public List<Long> requireExpOfF = List.of(33L, 66L, 111L, 222L, 333L, 666L);
+    public List<Long> requireExpOfR = List.of(22L, 77L, 170L, 257L, 307L, 617L);
+    public List<Long> requireExpOfQ = List.of(22L, 77L, 170L, 257L, 307L, 617L);
+    public List<Long> requireExpOfF = List.of(22L, 77L, 170L, 257L, 307L, 617L);
 
     @Override
     protected void reinforceSkill(Player player, String skill, Long skillLevel, Inventory customInv) {
@@ -175,8 +166,8 @@ public class benzInventory extends absInventory {
         List<Long> requireExpList;
         switch (skill) {
             case "R": requireExpList = requireExpOfR; break;
-            case "Q": requireExpList = requireExpOfQ; applyAdditionalHealth(player, 1); break;
-            case "F": requireExpList = requireExpOfF; break;
+            case "Q": requireExpList = requireExpOfQ; break;
+            case "F": requireExpList = requireExpOfF; applyAdditionalHealth(player, 2); break;
             default: return;
         }
 
@@ -245,7 +236,6 @@ public class benzInventory extends absInventory {
         else if (level >= 16 && level <= 30) return 5 * level - 38;
         else return 9 * level - 158;
     }
-
 
     @Override
     protected InventoryWrapper getInventoryWrapper() {
