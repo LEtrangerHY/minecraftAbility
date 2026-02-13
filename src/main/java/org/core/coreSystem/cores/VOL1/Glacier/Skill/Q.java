@@ -5,10 +5,12 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.core.cool.Cool;
 import org.core.coreSystem.absCoreSystem.SkillBase;
@@ -35,13 +37,15 @@ public class Q implements SkillBase {
 
         if (offhandItem.getType() == Material.BLUE_ICE && offhandItem.getAmount() >= 7) {
 
-            world.spawnParticle(Particle.SNOWFLAKE, player.getLocation().clone().add(0, 1, 0), 80, 1.5, 1.5, 1.5, 0.1);
             world.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_BREAK, 1, 1);
             world.playSound(player.getLocation(), Sound.BLOCK_SNOW_BREAK, 1, 1);
+
+            spawnIceBreath(player);
+
             placePowderSnowCone(player, 8.0, 60.0);
 
             offhandItem.setAmount(offhandItem.getAmount() - 6);
-        }else{
+        } else {
             world.playSound(player.getLocation(), Sound.BLOCK_GLASS_PLACE, 1, 1);
 
             Title title = Title.title(
@@ -54,6 +58,74 @@ public class Q implements SkillBase {
             long cools = 500L;
             cool.updateCooldown(player, "Q", cools);
         }
+    }
+
+    private void spawnIceBreath(Player player) {
+        final Location startLoc = player.getEyeLocation().subtract(0, 0.3, 0);
+        final Vector direction = startLoc.getDirection();
+
+        Vector upAxis = new Vector(0, 1, 0);
+        if (Math.abs(direction.getY()) > 0.95) upAxis = new Vector(1, 0, 0);
+
+        final Vector rightVector = direction.getCrossProduct(upAxis).normalize();
+        final Vector upVector = rightVector.getCrossProduct(direction).normalize();
+
+        final Particle.DustOptions skyDust = new Particle.DustOptions(Color.fromRGB(0, 255, 255), 0.6f);
+        final BlockData blueIceData = Material.BLUE_ICE.createBlockData();
+
+        new BukkitRunnable() {
+            double currentDistance = 0;
+            final double maxDist = 8.0;
+            final double speed = 0.6;
+
+            @Override
+            public void run() {
+                if (!player.isOnline()) {
+                    cancel();
+                    return;
+                }
+
+                int density = 1;
+                double stepSize = speed / density;
+
+                for (int d = 0; d < density; d++) {
+                    currentDistance += stepSize;
+
+                    if (currentDistance > maxDist) {
+                        cancel();
+                        return;
+                    }
+
+                    double radius = currentDistance * 0.55;
+
+                    int arms = 5;
+                    for (int i = 0; i < arms; i++) {
+                        double angle = (i * (2 * Math.PI / arms)) + (currentDistance * 0.8);
+
+                        double x = Math.cos(angle) * radius;
+                        double y = Math.sin(angle) * radius;
+
+                        Vector offset = rightVector.clone().multiply(x).add(upVector.clone().multiply(y));
+                        Location particleLoc = startLoc.clone().add(direction.clone().multiply(currentDistance)).add(offset);
+
+                        player.getWorld().spawnParticle(Particle.SNOWFLAKE, particleLoc, 1, 0, 0, 0, 0);
+
+                        player.getWorld().spawnParticle(Particle.DUST, particleLoc, 1, 0, 0, 0, 0, skyDust);
+
+                        if (d == 0 && i % 3 == 0) {
+                            player.getWorld().spawnParticle(Particle.BLOCK, particleLoc, 1, 0, 0, 0, 0, blueIceData);
+                        }
+                    }
+
+                    if (currentDistance > 1.0) {
+                        Location centerLoc = startLoc.clone().add(direction.clone().multiply(currentDistance));
+                        player.getWorld().spawnParticle(Particle.CLOUD, centerLoc, 1, radius * 0.2, radius * 0.2, radius * 0.2, 0.02);
+
+                        player.getWorld().spawnParticle(Particle.DUST, centerLoc, 1, radius * 0.3, radius * 0.3, radius * 0.3, 0, skyDust);
+                    }
+                }
+            }
+        }.runTaskTimer(plugin, 0L, 1L);
     }
 
     public void placePowderSnowCone(Player player, double radius, double angleDegrees) {

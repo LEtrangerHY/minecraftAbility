@@ -171,7 +171,7 @@ public class roseInventory extends absInventory {
         switch (skill) {
             case "R": requireExpList = requireExpOfR; break;
             case "Q": requireExpList = requireExpOfQ; break;
-            case "F": requireExpList = requireExpOfF; applyAdditionalHealth(player, 2); break;
+            case "F": requireExpList = requireExpOfF; break;
             default: return;
         }
 

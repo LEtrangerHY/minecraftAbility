@@ -10,6 +10,7 @@ import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
@@ -17,9 +18,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class Burn implements Debuffs {
-    // 쿨타임/지속시간 관리용
     private static final HashMap<UUID, Long> burnedEntities = new HashMap<>();
-    // 보스바 관리용 (플레이어 UUID -> BossBar)
     private static final HashMap<UUID, BossBar> activeBars = new HashMap<>();
 
     private final Entity target;
@@ -41,7 +40,8 @@ public class Burn implements Debuffs {
         if (burnedEntities.containsKey(targetId)) {
             long currentEndTime = burnedEntities.get(targetId);
             if (currentEndTime > currentTime) {
-                burnedEntities.put(targetId, currentEndTime + duration);
+                long newEndTime = currentTime + duration;
+                burnedEntities.put(targetId, Math.max(currentEndTime, newEndTime));
                 return;
             }
         }
@@ -53,6 +53,9 @@ public class Burn implements Debuffs {
             createOrUpdateBossBar(player);
         }
 
+        Plugin plugin = Bukkit.getPluginManager().getPlugin("Core");
+        if (plugin == null) return;
+
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -62,17 +65,20 @@ public class Burn implements Debuffs {
                     return;
                 }
 
-                long currentEndTime = burnedEntities.get(targetId);
+                long updatedEndTime = burnedEntities.get(targetId);
                 long now = System.currentTimeMillis();
 
-                if (now >= currentEndTime) {
+                if (now >= updatedEndTime) {
                     removeEffect(target);
                     cancel();
                     return;
                 }
 
                 target.getWorld().spawnParticle(Particle.SOUL_FIRE_FLAME, target.getLocation().clone().add(0, 1.3, 0), 1, 0.2, 0.5, 0.2, 0);
-                target.setFireTicks(25);
+
+                if (target.getFireTicks() < 10) {
+                    target.setFireTicks(40);
+                }
 
                 if (target instanceof Player player) {
                     if (!player.isOnline()) {
@@ -80,11 +86,10 @@ public class Burn implements Debuffs {
                         cancel();
                         return;
                     }
-
-                    updateBossBarProgress(player, now, currentEndTime);
+                    updateBossBarProgress(player, now, updatedEndTime);
                 }
             }
-        }.runTaskTimer(Objects.requireNonNull(Bukkit.getPluginManager().getPlugin("Core")), 0L, 1L);
+        }.runTaskTimer(plugin, 0L, 1L);
     }
 
     @Override

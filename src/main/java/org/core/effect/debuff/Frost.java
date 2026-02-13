@@ -1,5 +1,7 @@
 package org.core.effect.debuff;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Particle;
@@ -9,16 +11,14 @@ import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
-import java.util.Objects;
 import java.util.UUID;
 
 public class Frost implements Debuffs {
-    // 쿨타임/지속시간 관리용
     private static final HashMap<UUID, Long> frostbiteEntities = new HashMap<>();
-    // 보스바 관리용 (플레이어 UUID -> BossBar)
     private static final HashMap<UUID, BossBar> activeBars = new HashMap<>();
 
     private final Entity target;
@@ -40,7 +40,8 @@ public class Frost implements Debuffs {
         if (frostbiteEntities.containsKey(targetId)) {
             long currentEndTime = frostbiteEntities.get(targetId);
             if (currentEndTime > currentTime) {
-                frostbiteEntities.put(targetId, currentEndTime + duration);
+                long newEndTime = currentTime + duration;
+                frostbiteEntities.put(targetId, Math.max(currentEndTime, newEndTime));
                 return;
             }
         }
@@ -52,6 +53,9 @@ public class Frost implements Debuffs {
             createOrUpdateBossBar(player);
         }
 
+        Plugin plugin = Bukkit.getPluginManager().getPlugin("Core");
+        if (plugin == null) return;
+
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -61,10 +65,10 @@ public class Frost implements Debuffs {
                     return;
                 }
 
-                long currentEndTime = frostbiteEntities.get(targetId);
+                long updatedEndTime = frostbiteEntities.get(targetId);
                 long now = System.currentTimeMillis();
 
-                if (now >= currentEndTime) {
+                if (now >= updatedEndTime) {
                     removeEffect(target);
                     cancel();
                     return;
@@ -75,7 +79,12 @@ public class Frost implements Debuffs {
                 Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(0, 255, 255), 0.6f);
                 target.getWorld().spawnParticle(Particle.DUST, target.getLocation().clone().add(0, 1.3, 0), 1, 0.3, 0.4, 0.3, 0, dustOptions);
 
-                target.setFreezeTicks(140);
+                int currentTicks = target.getFreezeTicks();
+                int maxTicks = target.getMaxFreezeTicks();
+
+                if (currentTicks < maxTicks) {
+                    target.setFreezeTicks(maxTicks + 60);
+                }
 
                 if (target instanceof Player player) {
                     if (!player.isOnline()) {
@@ -83,16 +92,16 @@ public class Frost implements Debuffs {
                         cancel();
                         return;
                     }
-
-                    updateBossBarProgress(player, now, currentEndTime);
+                    updateBossBarProgress(player, now, updatedEndTime);
                 }
             }
-        }.runTaskTimer(Objects.requireNonNull(Bukkit.getPluginManager().getPlugin("Core")), 0L, 1L);
+        }.runTaskTimer(plugin, 0L, 1L);
     }
 
     @Override
     public void removeEffect(Entity entity) {
         frostbiteEntities.remove(entity.getUniqueId());
+
         entity.setFreezeTicks(0);
 
         if (entity instanceof Player player) {
@@ -114,7 +123,7 @@ public class Frost implements Debuffs {
 
         if (bar == null) {
             bar = Bukkit.createBossBar("init", BarColor.BLUE, BarStyle.SOLID);
-            bar.setTitle("§b❄ Frost");
+            bar.setTitle(Component.text("Frost").color(NamedTextColor.AQUA).content());
             bar.addPlayer(player);
             activeBars.put(uuid, bar);
         }

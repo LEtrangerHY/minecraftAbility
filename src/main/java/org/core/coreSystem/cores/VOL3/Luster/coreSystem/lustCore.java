@@ -1,19 +1,18 @@
-package org.core.coreSystem.cores.VOL1.Pyro.coreSystem;
+package org.core.coreSystem.cores.VOL3.Luster.coreSystem;
 
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
-import org.bukkit.block.Block;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.player.PlayerGameModeChangeEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -23,44 +22,38 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.core.cool.Cool;
 import org.core.main.Core;
-import org.core.effect.debuff.Burn;
 import org.core.effect.crowdControl.ForceDamage;
 import org.core.main.coreConfig;
 import org.core.coreSystem.absCoreSystem.ConfigWrapper;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.absCoreSystem.absCore;
-import org.core.coreSystem.cores.VOL1.Pyro.Passive.Causalgia;
-import org.core.coreSystem.cores.VOL1.Pyro.Skill.F;
-import org.core.coreSystem.cores.VOL1.Pyro.Skill.Q;
-import org.core.coreSystem.cores.VOL1.Pyro.Skill.R;
+import org.core.coreSystem.cores.VOL3.Luster.Skill.F;
+import org.core.coreSystem.cores.VOL3.Luster.Skill.Q;
+import org.core.coreSystem.cores.VOL3.Luster.Skill.R;
 
-import static org.bukkit.Bukkit.getPlayer;
+import java.util.Map;
+import java.util.Set;
 
-
-public class pyroCore extends absCore {
+public class lustCore extends absCore {
     private final Core plugin;
-    private final Pyro config;
-
-    public final Causalgia causalgia;
+    private final Luster config;
 
     private final R Rskill;
     private final Q Qskill;
     private final F Fskill;
 
 
-    public pyroCore(Core plugin, coreConfig tag, Pyro config, Cool cool) {
+    public lustCore(Core plugin, coreConfig tag, Luster config, Cool cool) {
         super(tag, cool);
 
         this.plugin = plugin;
         this.config = config;
 
-        this.causalgia = new Causalgia(tag, config, plugin, cool);
-
         this.Rskill = new R(config, plugin, cool);
         this.Qskill = new Q(config, plugin, cool);
         this.Fskill = new F(config, plugin, cool);
 
-        plugin.getLogger().info("Pyro downloaded...");
+        plugin.getLogger().info("Luster downloaded...");
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
@@ -82,10 +75,9 @@ public class pyroCore extends absCore {
     }
 
     private void applyAdditionalHealth(Player player, boolean healFull) {
-        long addHP = player.getPersistentDataContainer().getOrDefault(
-                new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L)
-                + player.getPersistentDataContainer().getOrDefault(
-                new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L);
+        long addHP =
+                player.getPersistentDataContainer().getOrDefault(
+                        new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L) * 2;
 
         AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
         if (maxHealth != null) {
@@ -102,10 +94,30 @@ public class pyroCore extends absCore {
         }
     }
 
+    @EventHandler
+    public void onGolemDeath(EntityDeathEvent event) {
+        if (event.getEntity() instanceof IronGolem golem) {
+            Player owner = null;
+
+            for (Map.Entry<Player, Set<IronGolem>> entry : config.golems.entrySet()) {
+                if (entry.getValue().remove(golem)) {
+                    owner = entry.getKey();
+                    break;
+                }
+            }
+
+            if (owner != null && config.golems.get(owner).isEmpty() && tag.Luster.contains(owner)) {
+                long cools = 60000L;
+                cool.updateCooldown(owner, "F", cools);
+                config.golems.remove(owner);
+            }
+        }
+    }
+
     @EventHandler(priority = EventPriority.NORMAL)
     public void passiveAttackEffect(PlayerInteractEvent event) {
 
-        if(tag.Pyro.contains(event.getPlayer())) {
+        if(tag.Luster.contains(event.getPlayer())) {
             if (!pAttackUsing.contains(event.getPlayer().getUniqueId())) {
 
                 Player player = event.getPlayer();
@@ -113,21 +125,24 @@ public class pyroCore extends absCore {
                 if (hasProperItems(player)) {
                     if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
 
-                        if (cool.isReloading(player, "flame")) {
-                            player.getWorld().playSound(player.getLocation(), Sound.ITEM_FLINTANDSTEEL_USE, 1, 1);
+                        if (cool.isReloading(player, "iron")) {
+                            player.playSound(player.getLocation(), Sound.BLOCK_IRON_PLACE, 1, 1);
                             return;
                         }
 
-                        cool.setCooldown(player, 1400L, "flame");
+                        cool.setCooldown(player, 1300L, "iron");
 
                         World world = player.getWorld();
                         Location playerLocation = player.getLocation();
-                        Vector direction = playerLocation.getDirection().normalize().multiply(1.3);
+                        Vector direction = playerLocation.getDirection().normalize().multiply(1.4);
 
-                        player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(1 / 1.4);
-                        world.playSound(player.getLocation(), Sound.ITEM_FIRECHARGE_USE, 1, 1);
+                        player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue((double) 1 / 1.3);
+                        world.playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_REPAIR, 1, 1);
 
                         config.collision.put(player.getUniqueId(), false);
+
+                        Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(200, 200, 200), 1.7f);
+                        Particle.DustOptions dustOptions_gra = new Particle.DustOptions(Color.fromRGB(244, 244, 244), 1.4f);
 
                         DamageSource source = DamageSource.builder(DamageType.MAGIC)
                                 .withCausingEntity(player)
@@ -139,8 +154,7 @@ public class pyroCore extends absCore {
 
                             @Override
                             public void run() {
-
-                                if (ticks >= 17 || config.collision.getOrDefault(player.getUniqueId(), true)) {
+                                if (ticks >= 13 || config.collision.getOrDefault(player.getUniqueId(), true)) {
                                     config.collision.remove(player.getUniqueId());
                                     this.cancel();
                                     return;
@@ -150,36 +164,24 @@ public class pyroCore extends absCore {
                                         .add(direction.clone().multiply(ticks * 1.5))
                                         .add(0, 1.4, 0);
 
-                                world.spawnParticle(Particle.FLAME, particleLocation, 7, 0.5, 0.5, 0.5, 0);
-                                world.spawnParticle(Particle.SMOKE, particleLocation, 3, 0.3, 0.3, 0.3, 0);
+                                world.spawnParticle(Particle.DUST, particleLocation, 4, 0.5, 0.5, 0.5, 0, dustOptions);
+                                world.spawnParticle(Particle.DUST, particleLocation, 2, 0.2, 0.2, 0.2, 0, dustOptions_gra);
 
-                                Block block = particleLocation.getBlock();
-
-                                if (block.isBurnable() || block.getType() == Material.ICE || block.getType() == Material.SNOW || block.getType() == Material.BLUE_ICE || block.getType() == Material.FROSTED_ICE || block.getType() == Material.PACKED_ICE || block.getType() == Material.POWDER_SNOW || block.getType() == Material.SNOW_BLOCK) {
-                                    if(block.getType() == Material.BLUE_ICE) {
-                                        if(Math.random() < 0.06) {
-                                            block.setType(Material.FIRE);
-                                        }
-                                    }else{
-                                        block.setType(Material.FIRE);
-                                    }
-                                    if(Math.random() < 0.2) {
-                                        block.getWorld().playSound(block.getLocation(), Sound.ENTITY_GENERIC_BURN, 1, 1);
-                                    }
-                                }
-
-
-                                if(!block.isPassable()){
-                                    Burst(player, particleLocation);
-                                    config.collision.put(player.getUniqueId(), true);
-                                }
-
-                                for (Entity entity : world.getNearbyEntities(particleLocation, 0.7, 0.7, 0.7)) {
+                                for (Entity entity : world.getNearbyEntities(particleLocation, 0.4, 0.4, 0.4)) {
                                     if (entity instanceof LivingEntity target && entity != player) {
 
-                                        ForceDamage forceDamage = new ForceDamage(target, 5.0, source, false);
+                                        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1, 1);
+
+                                        ForceDamage forceDamage = new ForceDamage(target, 6.0, source, false);
                                         forceDamage.applyEffect(player);
-                                        Burst(player, particleLocation);
+
+                                        if (Math.random() < 0.26) {
+                                            player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1);
+
+                                            ForceDamage addForceDamage = new ForceDamage(target, 6.0, source, false);
+                                            addForceDamage.applyEffect(player);
+                                        }
+
                                         config.collision.put(player.getUniqueId(), true);
                                         break;
                                     }
@@ -200,64 +202,9 @@ public class pyroCore extends absCore {
         }
     }
 
-    public void Burst(Player player, Location burstLoction){
-
-        World world = player.getWorld();
-
-        world.playSound(player.getLocation(), Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1, 1);
-        world.spawnParticle(Particle.FLAME, burstLoction, 28, 0, 0, 0, 0.7);
-        world.spawnParticle(Particle.SOUL_FIRE_FLAME, burstLoction, 14, 0, 0, 0, 0.7);
-
-        DamageSource source = DamageSource.builder(DamageType.MAGIC)
-                .withCausingEntity(player)
-                .withDirectEntity(player)
-                .build();
-
-        for (Entity entity : world.getNearbyEntities(burstLoction, 3, 3, 3)) {
-            if (entity instanceof LivingEntity target && entity != player) {
-
-                if (Math.random() < 0.3) {
-                    Burn burn = new Burn(target, 7000L);
-                    burn.applyEffect(player);
-                }
-
-                ForceDamage forceDamage = new ForceDamage(target, 2.0, source, false);
-                forceDamage.applyEffect(player);
-
-                Vector direction = entity.getLocation().toVector().subtract(burstLoction.toVector()).normalize().multiply(0.5);
-                direction.setY(0.5);
-
-            }
-        }
-    }
-
-    @EventHandler
-    public void onFallDamage(EntityDamageEvent event) {
-        if (!(event.getEntity() instanceof Player player)) return;
-
-        if(tag.Pyro.contains(player)) {
-            if (event.getCause() == EntityDamageEvent.DamageCause.FALL &&
-                    player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "noFallDamage"), PersistentDataType.BOOLEAN, false)) {
-                event.setCancelled(true);
-                player.getPersistentDataContainer().remove(new NamespacedKey(plugin, "noFallDamage"));
-            }
-        }
-    }
-
-    @EventHandler
-    public void onGameModeChange(PlayerGameModeChangeEvent event) {
-        Player player = event.getPlayer();
-
-        if(tag.Pyro.contains(player)) {
-            if (player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "noFallDamage"), PersistentDataType.BOOLEAN, false)) {
-                player.getPersistentDataContainer().remove(new NamespacedKey(plugin, "noFallDamage"));
-            }
-        }
-    }
-
     @Override
     protected boolean contains(Player player) {
-        return tag.Pyro.contains(player);
+        return tag.Luster.contains(player);
     }
 
     @Override
@@ -278,7 +225,7 @@ public class pyroCore extends absCore {
     private boolean hasProperItems(Player player) {
         ItemStack main = player.getInventory().getItemInMainHand();
         ItemStack off = player.getInventory().getItemInOffHand();
-        return main.getType() == Material.BLAZE_ROD && off.getType() == Material.BLAZE_POWDER;
+        return main.getType() == Material.HEAVY_CORE && (off.getType() == Material.LODESTONE || off.getType() == Material.IRON_INGOT);
     }
 
     private boolean canUseRSkill(Player player) { return true; }
@@ -295,8 +242,7 @@ public class pyroCore extends absCore {
     @Override
     protected boolean isDropRequired(Player player, ItemStack droppedItem){
         ItemStack off = player.getInventory().getItemInOffHand();
-        return droppedItem.getType() == Material.BLAZE_ROD &&
-                off.getType() == Material.BLAZE_POWDER;
+        return droppedItem.getType() == Material.HEAVY_CORE && (off.getType() == Material.LODESTONE || off.getType() == Material.IRON_INGOT);
     }
 
     @Override

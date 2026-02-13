@@ -22,7 +22,7 @@ public class Q implements SkillBase {
     private final JavaPlugin plugin;
     private final Cool cool;
 
-    private static final Particle.DustOptions DUST_CHAIN = new Particle.DustOptions(Color.fromRGB(66, 66, 66), 1.0f);
+    private static final Particle.DustOptions DUST_CHAIN = new Particle.DustOptions(Color.fromRGB(66, 66, 66), 0.6f);
     private static final BlockData CHAIN_BLOCK_DATA = Material.IRON_CHAIN.createBlockData();
     private static final PotionEffect GLOW_EFFECT = new PotionEffect(PotionEffectType.GLOWING, 40, 2, false, false);
 

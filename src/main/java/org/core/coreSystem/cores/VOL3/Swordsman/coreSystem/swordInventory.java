@@ -1,4 +1,4 @@
-package org.core.coreSystem.cores.VOL3.Claud.coreSystem;
+package org.core.coreSystem.cores.VOL3.Swordsman.coreSystem;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -12,19 +12,19 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
-import org.core.coreSystem.absInventorySystem.InventoryWrapper;
-import org.core.coreSystem.absInventorySystem.absInventory;
 import org.core.main.Core;
 import org.core.main.coreConfig;
+import org.core.coreSystem.absInventorySystem.InventoryWrapper;
+import org.core.coreSystem.absInventorySystem.absInventory;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class claudInventory extends absInventory {
+public class swordInventory extends absInventory {
 
     private final Core plugin;
 
-    public claudInventory(Core plugin, coreConfig config) {
+    public swordInventory(Core plugin, coreConfig config) {
         super(config);
 
         this.plugin = plugin;
@@ -37,20 +37,21 @@ public class claudInventory extends absInventory {
 
     @Override
     protected boolean contains(Player player) {
-        return tag.Claud.contains(player);
+        return tag.Swordsman.contains(player);
     }
 
     @Override
     protected boolean isCoreItemClicked(Player player, ItemStack clicked){
-        return clicked.getType() == Material.IRON_CHAIN;
+        return clicked.getType() == Material.IRON_SWORD;
     }
 
     @Override
     protected Component getName(Player player, String skill) {
+
         return switch (skill) {
-            case "R" -> Component.text("-");
-            case "Q" -> Component.text("Strain");
-            case "F" -> Component.text("CLAUS");
+            case "R" -> Component.text("RapidSlash/QuickDraw");
+            case "Q" -> Component.text("SwallowSweep/SwallowCounter");
+            case "F" -> Component.text("CONVERGENCE");
             default -> Component.text("???");
         };
     }
@@ -58,9 +59,9 @@ public class claudInventory extends absInventory {
     @Override
     protected Material getTotem(Player player, String skill) {
         return switch (skill) {
-            case "R" -> Material.IRON_SPEAR;
-            case "Q" -> Material.IRON_CHAIN;
-            case "F" -> Material.IRON_BARS;
+            case "R" -> Material.STRING;
+            case "Q" -> Material.FEATHER;
+            case "F" -> Material.WIND_CHARGE;
             default -> Material.BARRIER;
         };
     }
@@ -92,31 +93,35 @@ public class claudInventory extends absInventory {
                 lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("-").color(NamedTextColor.GREEN));
+                lore.add(Component.text("2회 까지 돌진하며 경로 내 대상들을 베어낸다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("발도 - 일섬 : 돌진하며 경로 내 대상들을 베어내고, 경직시킨다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("발도 : 발도 - 일섬 이후 딜레이 뒤에 돌진 경로 내 적에게 한번 더 피해를 가한다.").color(NamedTextColor.GREEN));
                 break;
             case "Q":
                 requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfQ.get((int) level)) : Component.text("Require EXP : MAX");
                 lore.add(requireXp.color(NamedTextColor.AQUA));
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("타입 : 효과").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("시스템 : 재시전").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("전방으로 창을 던지며, 창에 피격된 적을 2초간 고정시킨다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("지시전 : 창이 꽂힌 뒤 6초 내 재시전 시, 창이 꽂힌 위치로 순간이동 한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("자신을 중심으로 회전베기를 시전한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("발도 : 전방으로 2번의 참격을 가한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("피해를 준 대상 수만큼 추가 체력을 획득한다.").color(NamedTextColor.GREEN));
                 break;
             case "F":
                 requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfF.get((int) level)) : Component.text("Require EXP : MAX");
                 lore.add(requireXp.color(NamedTextColor.AQUA));
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("시스템 : 피격형").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("타입 : 효과/공격").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("회전베기를 시전하며 후방으로 돌진한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("회전베기 피격 : 피격된 적의 숫자 * 3 만큼 배고픔을 회복하고 이에 비례한 속도만큼 전방으로 돌진한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("검을 납도하고, 해당 스킬을 제외한 모든 스킬의 쿨타임을 초기화시킨다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("발도 - 참격 : 전방으로 참격을 가하고, 피격된 적들을 기절시킨다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("발도 : 발도 - 참격 이후, 전방으로 돌진 후 범위 내의 대상에게 7번의 피해를 가한뒤 검을 납도한다.").color(NamedTextColor.GREEN));
                 break;
             default:
                 break;
@@ -134,9 +139,9 @@ public class claudInventory extends absInventory {
         return player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, skill), PersistentDataType.LONG, 0L);
     }
 
-    public List<Long> requireExpOfR = List.of(22L, 77L, 170L, 257L, 307L, 617L);
-    public List<Long> requireExpOfQ = List.of(22L, 77L, 170L, 257L, 307L, 617L);
-    public List<Long> requireExpOfF = List.of(22L, 77L, 170L, 257L, 307L, 617L);
+    public List<Long> requireExpOfR = List.of(55L, 82L, 136L, 244L, 334L, 622L);
+    public List<Long> requireExpOfQ = List.of(55L, 82L, 136L, 244L, 334L, 622L);
+    public List<Long> requireExpOfF = List.of(55L, 82L, 136L, 244L, 334L, 622L);
 
     @Override
     protected void reinforceSkill(Player player, String skill, Long skillLevel, Inventory customInv) {
@@ -167,7 +172,7 @@ public class claudInventory extends absInventory {
 
         List<Long> requireExpList;
         switch (skill) {
-            case "R": requireExpList = requireExpOfR; applyAdditionalHealth(player, 3); break;
+            case "R": requireExpList = requireExpOfR; break;
             case "Q": requireExpList = requireExpOfQ; break;
             case "F": requireExpList = requireExpOfF; break;
             default: return;
@@ -238,6 +243,7 @@ public class claudInventory extends absInventory {
         else if (level >= 16 && level <= 30) return 5 * level - 38;
         else return 9 * level - 158;
     }
+
 
     @Override
     protected InventoryWrapper getInventoryWrapper() {

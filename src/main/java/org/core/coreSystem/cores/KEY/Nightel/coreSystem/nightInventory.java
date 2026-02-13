@@ -1,32 +1,29 @@
-package org.core.coreSystem.cores.VOL3.Claud.coreSystem;
+package org.core.coreSystem.cores.KEY.Nightel.coreSystem;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.plugin.Plugin;
-import org.core.coreSystem.absInventorySystem.InventoryWrapper;
-import org.core.coreSystem.absInventorySystem.absInventory;
+import org.bukkit.plugin.Plugin; // Import 추가
 import org.core.main.Core;
 import org.core.main.coreConfig;
+import org.core.coreSystem.absInventorySystem.InventoryWrapper;
+import org.core.coreSystem.absInventorySystem.absInventory;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class claudInventory extends absInventory {
+public class nightInventory extends absInventory {
 
     private final Core plugin;
 
-    public claudInventory(Core plugin, coreConfig config) {
+    public nightInventory(Core plugin, coreConfig config) {
         super(config);
-
         this.plugin = plugin;
     }
 
@@ -37,20 +34,20 @@ public class claudInventory extends absInventory {
 
     @Override
     protected boolean contains(Player player) {
-        return tag.Claud.contains(player);
+        return tag.Nightel.contains(player);
     }
 
     @Override
     protected boolean isCoreItemClicked(Player player, ItemStack clicked){
-        return clicked.getType() == Material.IRON_CHAIN;
+        return clicked.getType() == Material.IRON_SWORD;
     }
 
     @Override
     protected Component getName(Player player, String skill) {
         return switch (skill) {
-            case "R" -> Component.text("-");
-            case "Q" -> Component.text("Strain");
-            case "F" -> Component.text("CLAUS");
+            case "R" -> Component.text("Dusk");
+            case "Q" -> Component.text("Illusion");
+            case "F" -> Component.text("NIGHTSHADE");
             default -> Component.text("???");
         };
     }
@@ -58,16 +55,15 @@ public class claudInventory extends absInventory {
     @Override
     protected Material getTotem(Player player, String skill) {
         return switch (skill) {
-            case "R" -> Material.IRON_SPEAR;
-            case "Q" -> Material.IRON_CHAIN;
-            case "F" -> Material.IRON_BARS;
+            case "R" -> Material.COPPER_CHAIN;
+            case "Q" -> Material.WIND_CHARGE;
+            case "F" -> Material.ENDER_PEARL;
             default -> Material.BARRIER;
         };
     }
 
     @Override
     protected List<Component> getTotemLore(Player player, String skill) {
-
         List<Component> lore = new ArrayList<>();
         long level = getSkillLevel(player, skill);
         long playerLevel = player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "level"), PersistentDataType.LONG, 0L);
@@ -86,37 +82,33 @@ public class claudInventory extends absInventory {
             case "R":
                 requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfR.get((int) level)) : Component.text("Require EXP : MAX");
                 lore.add(requireXp.color(NamedTextColor.AQUA));
-
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
                 lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("-").color(NamedTextColor.GREEN));
+                lore.add(Component.text("전방으로 돌진하며 경로 내 대상들을 베어낸다.").color(NamedTextColor.GREEN));
                 break;
             case "Q":
                 requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfQ.get((int) level)) : Component.text("Require EXP : MAX");
                 lore.add(requireXp.color(NamedTextColor.AQUA));
-
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("타입 : 효과").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("시스템 : 재시전").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("전방으로 창을 던지며, 창에 피격된 적을 2초간 고정시킨다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("지시전 : 창이 꽂힌 뒤 6초 내 재시전 시, 창이 꽂힌 위치로 순간이동 한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("전방으로 순간이동하고 궤적 내에 존재하는 대상들에게 속참을 가한다.").color(NamedTextColor.GREEN));
                 break;
             case "F":
                 requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfF.get((int) level)) : Component.text("Require EXP : MAX");
                 lore.add(requireXp.color(NamedTextColor.AQUA));
-
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
                 lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("시스템 : 피격형").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : 지정형").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("회전베기를 시전하며 후방으로 돌진한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("회전베기 피격 : 피격된 적의 숫자 * 3 만큼 배고픔을 회복하고 이에 비례한 속도만큼 전방으로 돌진한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("지정 : 대상을 중심으로 계몽 수만큼 연쇄 참격을 시전한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("시전 후 계몽과 해당 스킬을 제외한 모든 스킬의 쿨타임을 초기화한다.").color(NamedTextColor.GREEN));
                 break;
             default:
                 break;
@@ -134,9 +126,9 @@ public class claudInventory extends absInventory {
         return player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, skill), PersistentDataType.LONG, 0L);
     }
 
-    public List<Long> requireExpOfR = List.of(22L, 77L, 170L, 257L, 307L, 617L);
-    public List<Long> requireExpOfQ = List.of(22L, 77L, 170L, 257L, 307L, 617L);
-    public List<Long> requireExpOfF = List.of(22L, 77L, 170L, 257L, 307L, 617L);
+    public List<Long> requireExpOfR = List.of(33L, 66L, 111L, 222L, 333L, 666L);
+    public List<Long> requireExpOfQ = List.of(33L, 66L, 111L, 222L, 333L, 666L);
+    public List<Long> requireExpOfF = List.of(33L, 66L, 111L, 222L, 333L, 666L);
 
     @Override
     protected void reinforceSkill(Player player, String skill, Long skillLevel, Inventory customInv) {
@@ -144,30 +136,23 @@ public class claudInventory extends absInventory {
 
         long level = player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "level"), PersistentDataType.LONG, 0L);
 
+        // 레벨 제한 체크
         if (skillLevel == 3 && level < 6L){
             player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.5f, 1);
-            player.sendMessage(
-                    Component.text("승급 필요 : CORE LEVEL -> 6")
-                            .color(NamedTextColor.RED)
-            );
+            player.sendMessage(Component.text("승급 필요 : CORE LEVEL -> 6").color(NamedTextColor.RED));
             return;
         }
-
         if (skillLevel == 5 && level < 10L){
             player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.5f, 1);
-            player.sendMessage(
-                    Component.text("승급 필요 : CORE LEVEL -> 10")
-                            .color(NamedTextColor.RED)
-            );
+            player.sendMessage(Component.text("승급 필요 : CORE LEVEL -> 10").color(NamedTextColor.RED));
             return;
         }
 
-        long current = player.getPersistentDataContainer()
-                .getOrDefault(new NamespacedKey(plugin, skill), PersistentDataType.LONG, 0L);
+        long current = player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, skill), PersistentDataType.LONG, 0L);
 
         List<Long> requireExpList;
         switch (skill) {
-            case "R": requireExpList = requireExpOfR; applyAdditionalHealth(player, 3); break;
+            case "R": requireExpList = requireExpOfR; break;
             case "Q": requireExpList = requireExpOfQ; break;
             case "F": requireExpList = requireExpOfF; break;
             default: return;
@@ -187,29 +172,14 @@ public class claudInventory extends absInventory {
 
             player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.5f, 1);
             player.playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.5f, 1);
+
+            // 강화 성공 후 GUI 갱신 (이미 열려있는 창이므로 runTask 불필요)
             customInvReroll(player, customInv);
-            player.sendMessage(
-                    Component.text("스킬 레벨업 성공!")
-                            .color(NamedTextColor.GREEN)
-            );
+
+            player.sendMessage(Component.text("스킬 레벨업 성공!").color(NamedTextColor.GREEN));
         } else {
             player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.5f, 1);
-            player.sendMessage(
-                    Component.text("경험치(Minecraft EXP) 부족 " + requiredExp + "Exp 필요")
-                            .color(NamedTextColor.RED)
-            );
-        }
-    }
-
-    private void applyAdditionalHealth(Player player, long addHP) {
-
-        AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
-        if (maxHealth != null) {
-            double current = maxHealth.getBaseValue();
-            double newMax = current + addHP;
-
-            maxHealth.setBaseValue(newMax);
-
+            player.sendMessage(Component.text("경험치(Minecraft EXP) 부족 " + requiredExp + "Exp 필요").color(NamedTextColor.RED));
         }
     }
 
@@ -241,8 +211,6 @@ public class claudInventory extends absInventory {
 
     @Override
     protected InventoryWrapper getInventoryWrapper() {
-        return new InventoryWrapper() {
-
-        };
+        return new InventoryWrapper() {};
     }
 }

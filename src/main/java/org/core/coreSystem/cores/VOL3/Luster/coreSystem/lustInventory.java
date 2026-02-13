@@ -1,4 +1,4 @@
-package org.core.coreSystem.cores.VOL3.Claud.coreSystem;
+package org.core.coreSystem.cores.VOL3.Luster.coreSystem;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -12,19 +12,19 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
-import org.core.coreSystem.absInventorySystem.InventoryWrapper;
-import org.core.coreSystem.absInventorySystem.absInventory;
 import org.core.main.Core;
 import org.core.main.coreConfig;
+import org.core.coreSystem.absInventorySystem.InventoryWrapper;
+import org.core.coreSystem.absInventorySystem.absInventory;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class claudInventory extends absInventory {
+public class lustInventory extends absInventory {
 
     private final Core plugin;
 
-    public claudInventory(Core plugin, coreConfig config) {
+    public lustInventory(Core plugin, coreConfig config) {
         super(config);
 
         this.plugin = plugin;
@@ -37,20 +37,21 @@ public class claudInventory extends absInventory {
 
     @Override
     protected boolean contains(Player player) {
-        return tag.Claud.contains(player);
+        return tag.Luster.contains(player);
     }
 
     @Override
     protected boolean isCoreItemClicked(Player player, ItemStack clicked){
-        return clicked.getType() == Material.IRON_CHAIN;
+        return clicked.getType() == Material.HEAVY_CORE;
     }
 
     @Override
     protected Component getName(Player player, String skill) {
+
         return switch (skill) {
-            case "R" -> Component.text("-");
-            case "Q" -> Component.text("Strain");
-            case "F" -> Component.text("CLAUS");
+            case "R" -> Component.text("LusterCannon");
+            case "Q" -> Component.text("Electromotive");
+            case "F" -> Component.text("IRON JUDGEMENT");
             default -> Component.text("???");
         };
     }
@@ -58,9 +59,9 @@ public class claudInventory extends absInventory {
     @Override
     protected Material getTotem(Player player, String skill) {
         return switch (skill) {
-            case "R" -> Material.IRON_SPEAR;
-            case "Q" -> Material.IRON_CHAIN;
-            case "F" -> Material.IRON_BARS;
+            case "R" -> Material.IRON_INGOT;
+            case "Q" -> Material.IRON_BLOCK;
+            case "F" -> Material.IRON_GOLEM_SPAWN_EGG;
             default -> Material.BARRIER;
         };
     }
@@ -92,19 +93,18 @@ public class claudInventory extends absInventory {
                 lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("-").color(NamedTextColor.GREEN));
+                lore.add(Component.text("전방으로 철 블럭을 투사한다.").color(NamedTextColor.GREEN));
                 break;
             case "Q":
                 requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfQ.get((int) level)) : Component.text("Require EXP : MAX");
                 lore.add(requireXp.color(NamedTextColor.AQUA));
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("타입 : 효과").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("시스템 : 재시전").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : 지정형").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("대상 : 적 오브젝트/블럭").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("전방으로 창을 던지며, 창에 피격된 적을 2초간 고정시킨다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("지시전 : 창이 꽂힌 뒤 6초 내 재시전 시, 창이 꽂힌 위치로 순간이동 한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("지정 : 범위 내 설치된 철 관련 블럭을 들어올려 대상에게 투사한다.").color(NamedTextColor.GREEN));
                 break;
             case "F":
                 requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfF.get((int) level)) : Component.text("Require EXP : MAX");
@@ -112,11 +112,11 @@ public class claudInventory extends absInventory {
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
                 lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("시스템 : 피격형").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : 지정형").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("대상 : -/적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("회전베기를 시전하며 후방으로 돌진한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("회전베기 피격 : 피격된 적의 숫자 * 3 만큼 배고픔을 회복하고 이에 비례한 속도만큼 전방으로 돌진한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("좌우에 철골렘을 각각 1 개체씩 소환한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("지정 : 대상을 철골렘의 공격 타깃으로써 지정한다.").color(NamedTextColor.GREEN));
                 break;
             default:
                 break;
@@ -134,9 +134,9 @@ public class claudInventory extends absInventory {
         return player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, skill), PersistentDataType.LONG, 0L);
     }
 
-    public List<Long> requireExpOfR = List.of(22L, 77L, 170L, 257L, 307L, 617L);
-    public List<Long> requireExpOfQ = List.of(22L, 77L, 170L, 257L, 307L, 617L);
-    public List<Long> requireExpOfF = List.of(22L, 77L, 170L, 257L, 307L, 617L);
+    public List<Long> requireExpOfR = List.of(44L, 66L, 103L, 213L, 313L, 447L);
+    public List<Long> requireExpOfQ = List.of(44L, 66L, 103L, 213L, 313L, 447L);
+    public List<Long> requireExpOfF = List.of(44L, 66L, 103L, 213L, 313L, 447L);
 
     @Override
     protected void reinforceSkill(Player player, String skill, Long skillLevel, Inventory customInv) {
@@ -167,9 +167,9 @@ public class claudInventory extends absInventory {
 
         List<Long> requireExpList;
         switch (skill) {
-            case "R": requireExpList = requireExpOfR; applyAdditionalHealth(player, 3); break;
+            case "R": requireExpList = requireExpOfR; break;
             case "Q": requireExpList = requireExpOfQ; break;
-            case "F": requireExpList = requireExpOfF; break;
+            case "F": requireExpList = requireExpOfF; applyAdditionalHealth(player, 2); break;
             default: return;
         }
 
@@ -238,6 +238,7 @@ public class claudInventory extends absInventory {
         else if (level >= 16 && level <= 30) return 5 * level - 38;
         else return 9 * level - 158;
     }
+
 
     @Override
     protected InventoryWrapper getInventoryWrapper() {

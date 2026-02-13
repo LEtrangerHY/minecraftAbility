@@ -1,13 +1,13 @@
-package org.core.coreSystem.cores.VOL1.Pyro.coreSystem;
+package org.core.coreSystem.cores.VOL3.Luster.coreSystem;
 
+import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.Set;
 import java.util.UUID;
 
-public class Pyro {
-
+public class Luster {
     //CoolHashmap
     public HashMap<UUID, Long> R_COOLDOWN = new HashMap<>();
     public HashMap<UUID, Long> Q_COOLDOWN = new HashMap<>();
@@ -18,30 +18,28 @@ public class Pyro {
     //passive
     public HashMap<UUID, Boolean> collision = new HashMap<>();
 
-    public LinkedHashMap<UUID, Integer> causalgia = new LinkedHashMap<>();
-    public long coolCausalgia = 7000;
-    public long burnCoolExtends = 3000;
-    public double burnDownStats = 0.7;
-
     //R
-    public double r_Skill_amp = 2;
-    public double r_Skill_Damage = 1;
-    public long r_Skill_Cool = 10000;
-    public long r_Skill_stun = 3000;
+    public double r_Skill_amp = 0.13;
+    public double r_Skill_Damage = 13;
+    public long r_Skill_Cool = 13000;
 
     //Q
-    public double q_Skill_Damage_Percent = 50;
-    public double q_Skill_Jump = 1.4;
-    public long q_Skill_Cool = 10000;
+    public double q_Skill_amp = 0.13;
+    public double q_Skill_Damage = 2;
+    public long q_Skill_Cool = 13000;
 
     //F
-    public long f_Skill_Cool = 130000;
+    public HashMap<Player, Set<IronGolem>> golems = new HashMap<>();
+    public long f_Skill_Cool = 4000;
 
     public void variableReset(Player player){
 
         R_COOLDOWN.remove(player.getUniqueId());
         Q_COOLDOWN.remove(player.getUniqueId());
         F_COOLDOWN.remove(player.getUniqueId());
+
+        collision.remove(player.getUniqueId());
+        golems.remove(player);
 
     }
 }

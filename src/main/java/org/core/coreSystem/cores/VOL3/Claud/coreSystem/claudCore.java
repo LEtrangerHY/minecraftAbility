@@ -6,8 +6,15 @@ import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.core.cool.Cool;
@@ -59,13 +66,94 @@ public class claudCore extends absCore {
         }, 1L);
     }
 
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onPearlThrow(PlayerInteractEvent event) {
+        Player player = event.getPlayer();
+        if (!contains(player)) return;
+
+        ItemStack item = event.getItem();
+        if (isSpecialPearl(item)) {
+            if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+                event.setCancelled(true);
+                player.updateInventory();
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onPearlDropPrevention(PlayerDropItemEvent event) {
+        Player player = event.getPlayer();
+        if (!contains(player)) return;
+
+        ItemStack item = event.getItemDrop().getItemStack();
+        if (isSpecialPearl(item)) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onInventoryClick(InventoryClickEvent event) {
+        if (!(event.getWhoClicked() instanceof Player player)) return;
+        if (!contains(player)) return;
+
+        Inventory clickedInv = event.getClickedInventory();
+        if (clickedInv == null) return;
+
+        if (event.isShiftClick()) {
+            if (clickedInv.getType() == InventoryType.PLAYER) {
+                if (isSpecialPearl(event.getCurrentItem())) {
+                    if (event.getView().getTopInventory().getType() != InventoryType.CRAFTING) {
+                        event.setCancelled(true);
+                    }
+                }
+            }
+        }
+        else {
+            if (clickedInv.getType() != InventoryType.PLAYER) {
+                if (isSpecialPearl(event.getCursor())) {
+                    event.setCancelled(true);
+                }
+                if (event.getClick().isKeyboardClick()) {
+                    int hotbarSlot = event.getHotbarButton();
+                    if (hotbarSlot >= 0) {
+                        ItemStack item = player.getInventory().getItem(hotbarSlot);
+                        if (isSpecialPearl(item)) {
+                            event.setCancelled(true);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onInventoryDrag(InventoryDragEvent event) {
+        if (!(event.getWhoClicked() instanceof Player player)) return;
+        if (!contains(player)) return;
+
+        if (isSpecialPearl(event.getOldCursor())) {
+            int topSize = event.getView().getTopInventory().getSize();
+            for (int slot : event.getRawSlots()) {
+                if (slot < topSize) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+        }
+    }
+
+    private boolean isSpecialPearl(ItemStack item) {
+        if (item == null || item.getType() != Material.ENDER_PEARL) return false;
+        if (!item.hasItemMeta()) return false;
+
+        NamespacedKey key = new NamespacedKey(plugin, Q.PEARL_KEY);
+        return item.getItemMeta().getPersistentDataContainer().has(key, PersistentDataType.BYTE);
+    }
+
     private void applyAdditionalHealth(Player player, boolean healFull) {
         long addHP =
                 player.getPersistentDataContainer().getOrDefault(
-                        new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L) * 3
-                        +
-                        player.getPersistentDataContainer().getOrDefault(
-                                new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L);
+                        new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L) * 3;
 
         AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
         if (maxHealth != null) {
@@ -105,14 +193,29 @@ public class claudCore extends absCore {
     private boolean hasProperItems(Player player) {
         ItemStack main = player.getInventory().getItemInMainHand();
         ItemStack off = player.getInventory().getItemInOffHand();
-        return main.getType() == Material.IRON_SPEAR && off.getType() == Material.IRON_CHAIN;
+
+        boolean hasChain = (off.getType() == Material.IRON_CHAIN);
+
+        if (Q.isSessionActive(player)) {
+            boolean hasPearl = (main.getType() == Material.ENDER_PEARL);
+            boolean isTeleportPearl = isSpecialPearl(main);
+            return isTeleportPearl && hasChain;
+        } else {
+            boolean hasSpear = (main.getType() == Material.IRON_SPEAR);
+            return hasSpear && hasChain;
+        }
     }
 
-    private boolean canUseRSkill(Player player) { return false; }
+    private boolean canUseRSkill(Player player) { return true; }
 
-    private boolean canUseQSkill(Player player) { return !config.qskill_using.getOrDefault(player.getUniqueId(), false); }
+    private boolean canUseQSkill(Player player) {
+        return !config.isSpearFlying.getOrDefault(player.getUniqueId(), false);
+    }
 
-    private boolean canUseFSkill(Player player) { return true; }
+    private boolean canUseFSkill(Player player) {
+        ItemStack main = player.getInventory().getItemInMainHand();
+        return (main.getType() == Material.IRON_SPEAR);
+    }
 
     @Override
     protected boolean isItemRequired(Player player){
@@ -122,7 +225,13 @@ public class claudCore extends absCore {
     @Override
     protected boolean isDropRequired(Player player, ItemStack droppedItem){
         ItemStack off = player.getInventory().getItemInOffHand();
-        return droppedItem.getType() == Material.IRON_SPEAR && off.getType() == Material.IRON_CHAIN;
+        if (off.getType() != Material.IRON_CHAIN) return false;
+
+        if (Q.isSessionActive(player)) {
+            return isSpecialPearl(droppedItem);
+        } else {
+            return droppedItem.getType() == Material.IRON_SPEAR;
+        }
     }
 
     @Override
