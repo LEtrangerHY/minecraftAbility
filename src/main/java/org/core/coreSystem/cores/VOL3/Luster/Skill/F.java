@@ -35,7 +35,7 @@ public class F implements SkillBase {
 
         ItemStack offhandItem = player.getInventory().getItem(EquipmentSlot.OFF_HAND);
 
-        if (offhandItem.getType() == Material.LODESTONE || (offhandItem.getType() == Material.IRON_INGOT && offhandItem.getAmount() >= 18)) {
+        if (offhandItem.getType() == Material.LODESTONE || (offhandItem.getType() == Material.IRON_INGOT && offhandItem.getAmount() > 18)) {
             final World world = player.getWorld();
             Entity target = getTargetedEntity(player, 13, 0.3);
 
@@ -139,7 +139,7 @@ public class F implements SkillBase {
                 }
             }
 
-            if(offhandItem.getType() == Material.IRON_INGOT && offhandItem.getAmount() >= 18) {
+            if(offhandItem.getType() == Material.IRON_INGOT && offhandItem.getAmount() > 18) {
                 offhandItem.setAmount(offhandItem.getAmount() - 18);
             }
         }else {

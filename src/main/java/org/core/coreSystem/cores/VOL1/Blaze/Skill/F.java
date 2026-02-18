@@ -66,7 +66,7 @@ public class F implements SkillBase {
     @Override
     public void Trigger(Player player) {
         ItemStack offhandItem = player.getInventory().getItem(EquipmentSlot.OFF_HAND);
-        boolean isMaterial = (offhandItem.getType() == Material.SOUL_SAND || offhandItem.getType() == Material.SOUL_SOIL) && offhandItem.getAmount() >= 30;
+        boolean isMaterial = (offhandItem.getType() == Material.SOUL_SAND || offhandItem.getType() == Material.SOUL_SOIL) && offhandItem.getAmount() > 30;
         boolean isLantern = offhandItem.getType() == Material.SOUL_LANTERN;
 
         if (isLantern || isMaterial) {

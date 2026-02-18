@@ -8,6 +8,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.core.cool.Cool;
@@ -35,18 +37,22 @@ public class F implements SkillBase {
 
     @Override
     public void Trigger(Player player) {
-        boolean isSpearActive = rSkill.isSessionActive(player);
-        ItemStack offhandItem = player.getInventory().getItem(EquipmentSlot.OFF_HAND);
-        boolean hasIron = offhandItem.getType() == Material.IRON_NUGGET && offhandItem.getAmount() >= 6;
+        player.removePotionEffect(PotionEffectType.SLOW_FALLING);
 
-        if (isSpearActive && hasIron) {
+        boolean isSpearActive = rSkill.isSessionActive(player);
+        boolean isLeashIntact = rSkill.isLeashIntact(player);
+
+        ItemStack offhandItem = player.getInventory().getItem(EquipmentSlot.OFF_HAND);
+        boolean hasIron = offhandItem.getType() == Material.IRON_NUGGET && offhandItem.getAmount() > 6;
+
+        if (isSpearActive && isLeashIntact && hasIron) {
             grappleManeuver(player, offhandItem);
         }
         else {
-            if (isSpearActive && !hasIron) {
+            if (isSpearActive && isLeashIntact && !hasIron) {
                 Title title = Title.title(
                         Component.empty(),
-                        Component.text("Need 6 Iron Nuggets").color(NamedTextColor.RED),
+                        Component.text("iron needed").color(NamedTextColor.RED),
                         Title.Times.times(Duration.ZERO, Duration.ofMillis(300), Duration.ofMillis(200))
                 );
                 player.showTitle(title);
@@ -57,6 +63,8 @@ public class F implements SkillBase {
 
     private void standardDash(Player player) {
         cool.updateCooldown(player, "F", 10000L);
+
+        config.isDashing.add(player.getUniqueId());
 
         Location startLocation = player.getLocation();
         Vector direction = startLocation.getDirection().normalize().multiply(1.6);
@@ -76,21 +84,16 @@ public class F implements SkillBase {
 
         Location targetLoc = rSkill.retrieveSpearLocation(player);
 
-        rSkill.forceRemoveSession(player);
-        config.isSpearFlying.remove(player.getUniqueId());
-
-        if (player.getInventory().getItemInMainHand().getType() == Material.REDSTONE) {
-            player.getInventory().setItemInMainHand(new ItemStack(Material.BAMBOO));
-        }
+        rSkill.triggerKillReset(player);
 
         if (targetLoc == null) {
             standardDash(player);
             return;
         }
 
-        cool.updateCooldown(player, "F", 500L);
-        cool.updateCooldown(player, "R", 500L);
+        config.isDashing.add(player.getUniqueId());
 
+        cool.updateCooldown(player, "F", 500L);
         config.reloaded.put(player.getUniqueId(), true);
 
         Location currentLoc = player.getLocation();
@@ -119,6 +122,12 @@ public class F implements SkillBase {
             @Override
             public void run() {
                 if (ticks > 8 || player.isDead()) {
+                    config.isDashing.remove(player.getUniqueId());
+
+                    if (player.isOnline() && !player.isDead()) {
+                        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, 40, 0, false, false));
+                    }
+
                     cancel();
                     return;
                 }

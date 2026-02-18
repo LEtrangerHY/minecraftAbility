@@ -36,7 +36,7 @@ public class R implements SkillBase {
     public void Trigger(Player player) {
         ItemStack offhandItem = player.getInventory().getItem(EquipmentSlot.OFF_HAND);
 
-        if (offhandItem.getType() == Material.BLUE_ICE && offhandItem.getAmount() >= 1) {
+        if (offhandItem.getType() == Material.BLUE_ICE && offhandItem.getAmount() > 1) {
             World world = player.getWorld();
             Location playerLocation = player.getLocation();
             Vector direction = playerLocation.getDirection().normalize().multiply(1.4);

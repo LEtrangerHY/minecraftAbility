@@ -17,27 +17,27 @@ public class Bamboo {
 
     public long frozenCool = 10000;
 
+    //R
     public HashMap<UUID, Boolean> reloaded = new HashMap<>();
-
     public HashMap<UUID, HashSet<Entity>> damaged = new HashMap<>();
     public HashMap<UUID, Boolean> r_damaged = new HashMap<>();
     public double r_Skill_amp = 0.12;
     public double r_Skill_damage = 8;
-    public long r_Skill_Cool = 8000;
-
+    public long r_Skill_Cool = 0;
     public Map<UUID, Boolean> isSpearFlying = new HashMap<>();
 
+    //Q
     public long q_Skill_Cool = 7000;
     public double q_Skill_Jump = 2.0;
 
+    //F
     public long f_Skill_Cool = 100;
-
     public HashSet<UUID> moveToSneaking = new HashSet<>();
     public HashSet<UUID> moveToThrow = new HashSet<>();
     public HashSet<UUID> stringOn = new HashSet<>();
     public HashMap<UUID, Integer> stringCount = new HashMap<>();
     public HashMap<UUID, Location> stringPoint = new HashMap<>();
-
+    public HashSet<UUID> isDashing = new HashSet<>();
 
     public void variableReset(Player player){
 
@@ -56,5 +56,8 @@ public class Bamboo {
 
         damaged.remove(player.getUniqueId());
         r_damaged.remove(player.getUniqueId());
+
+        // ★ [추가됨] 초기화 시 제거
+        isDashing.remove(player.getUniqueId());
     }
 }

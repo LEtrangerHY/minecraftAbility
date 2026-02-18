@@ -220,7 +220,11 @@ public class Q implements SkillBase {
         long level = player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L);
         double damage = config.q_Skill_Damage * (1 + config.q_Skill_amp * level);
 
-        DamageSource source = DamageSource.builder(DamageType.MAGIC).withCausingEntity(player).withDirectEntity(player).build();
+        DamageSource source = DamageSource.builder(DamageType.MOB_PROJECTILE)
+                .withCausingEntity(player)
+                .withDirectEntity(spear)
+                .withDamageLocation(spear.getLocation())
+                .build();
         new ForceDamage(target, damage, source, false).applyEffect(player);
         new Grounding(target, 2000).applyEffect(player);
 

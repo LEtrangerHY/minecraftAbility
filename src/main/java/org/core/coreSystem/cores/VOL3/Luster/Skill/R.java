@@ -41,7 +41,7 @@ public class R implements SkillBase {
 
         ItemStack offhandItem = player.getInventory().getItem(EquipmentSlot.OFF_HAND);
 
-        if (offhandItem.getType() == Material.LODESTONE || (offhandItem.getType() == Material.IRON_INGOT && offhandItem.getAmount() >= 4)) {
+        if (offhandItem.getType() == Material.LODESTONE || (offhandItem.getType() == Material.IRON_INGOT && offhandItem.getAmount() > 4)) {
 
             World world = player.getWorld();
 

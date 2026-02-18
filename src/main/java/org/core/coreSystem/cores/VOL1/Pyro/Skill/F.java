@@ -38,7 +38,7 @@ public class F implements SkillBase {
 
         ItemStack offhandItem = player.getInventory().getItem(EquipmentSlot.OFF_HAND);
 
-        if(offhandItem.getType() == Material.BLAZE_POWDER && offhandItem.getAmount() >= 20) {
+        if(offhandItem.getType() == Material.BLAZE_POWDER && offhandItem.getAmount() > 20) {
 
             player.damage(player.getHealth() / 2);
             PotionEffect slowness = new PotionEffect(PotionEffectType.SLOWNESS, 20 * 14, 3, false, false);

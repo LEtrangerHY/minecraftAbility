@@ -48,7 +48,7 @@ public class R implements SkillBase {
 
         ItemStack offhandItem = player.getInventory().getItem(EquipmentSlot.OFF_HAND);
 
-        if (offhandItem.getType() == Material.BLAZE_POWDER && offhandItem.getAmount() >= 4) {
+        if (offhandItem.getType() == Material.BLAZE_POWDER && offhandItem.getAmount() > 4) {
 
             Entity entity = getTargetedEntity(player, 27, 0.3);
 

@@ -35,7 +35,7 @@ public class Q implements SkillBase {
 
         World world = player.getWorld();
 
-        if (offhandItem.getType() == Material.BLUE_ICE && offhandItem.getAmount() >= 7) {
+        if (offhandItem.getType() == Material.BLUE_ICE && offhandItem.getAmount() > 7) {
 
             world.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_BREAK, 1, 1);
             world.playSound(player.getLocation(), Sound.BLOCK_SNOW_BREAK, 1, 1);

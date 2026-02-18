@@ -41,7 +41,7 @@ public class Q implements SkillBase {
 
         ItemStack offhandItem = player.getInventory().getItem(EquipmentSlot.OFF_HAND);
 
-        if(offhandItem.getType() == Material.BLAZE_POWDER && offhandItem.getAmount() >= 7) {
+        if(offhandItem.getType() == Material.BLAZE_POWDER && offhandItem.getAmount() > 7) {
             World world = player.getWorld();
             Location center = player.getLocation();
 

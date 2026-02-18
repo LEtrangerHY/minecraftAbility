@@ -10,9 +10,15 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityUnleashEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.core.cool.Cool;
@@ -21,7 +27,6 @@ import org.core.main.coreConfig;
 import org.core.coreSystem.absCoreSystem.ConfigWrapper;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.absCoreSystem.absCore;
-import org.core.coreSystem.cores.VOL1.Bamboo.Passive.IngReload;
 import org.core.coreSystem.cores.VOL1.Bamboo.Skill.F;
 import org.core.coreSystem.cores.VOL1.Bamboo.Skill.Q;
 import org.core.coreSystem.cores.VOL1.Bamboo.Skill.R;
@@ -30,8 +35,6 @@ public class bambCore extends absCore {
 
     private final Core plugin;
     private final Bamboo config;
-
-    private final IngReload ingreload;
 
     private final R Rskill;
     private final Q Qskill;
@@ -42,8 +45,6 @@ public class bambCore extends absCore {
 
         this.plugin = plugin;
         this.config = config;
-
-        this.ingreload = new IngReload();
 
         this.Rskill = new R(config, plugin, cool);
         this.Qskill = new Q(config, plugin, cool);
@@ -66,6 +67,99 @@ public class bambCore extends absCore {
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             applyAdditionalHealth(player, true);
         }, 1L);
+    }
+
+    @EventHandler
+    public void onLeashBreak(EntityUnleashEvent event) {
+        if (event.getEntity().getScoreboardTags().contains("bamboo_projectile")) {
+            event.setDropLeash(false);
+            if (event.getReason() == EntityUnleashEvent.UnleashReason.DISTANCE) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onDetonatorUse(PlayerInteractEvent event) {
+        Player player = event.getPlayer();
+        if (!contains(player)) return;
+
+        ItemStack item = event.getItem();
+        if (isSpecialItem(item)) {
+            if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+                event.setCancelled(true);
+                player.updateInventory();
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onDetonatorDrop(PlayerDropItemEvent event) {
+        Player player = event.getPlayer();
+        if (!contains(player)) return;
+
+        ItemStack item = event.getItemDrop().getItemStack();
+        if (isSpecialItem(item)) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onInventoryClick(InventoryClickEvent event) {
+        if (!(event.getWhoClicked() instanceof Player player)) return;
+        if (!contains(player)) return;
+
+        Inventory clickedInv = event.getClickedInventory();
+        if (clickedInv == null) return;
+
+        if (event.isShiftClick()) {
+            if (clickedInv.getType() == InventoryType.PLAYER) {
+                if (isSpecialItem(event.getCurrentItem())) {
+                    if (event.getView().getTopInventory().getType() != InventoryType.CRAFTING) {
+                        event.setCancelled(true);
+                    }
+                }
+            }
+        } else {
+            if (clickedInv.getType() != InventoryType.PLAYER) {
+                if (isSpecialItem(event.getCursor())) {
+                    event.setCancelled(true);
+                }
+                if (event.getClick().isKeyboardClick()) {
+                    int hotbarSlot = event.getHotbarButton();
+                    if (hotbarSlot >= 0) {
+                        ItemStack item = player.getInventory().getItem(hotbarSlot);
+                        if (isSpecialItem(item)) {
+                            event.setCancelled(true);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onInventoryDrag(InventoryDragEvent event) {
+        if (!(event.getWhoClicked() instanceof Player player)) return;
+        if (!contains(player)) return;
+
+        if (isSpecialItem(event.getOldCursor())) {
+            int topSize = event.getView().getTopInventory().getSize();
+            for (int slot : event.getRawSlots()) {
+                if (slot < topSize) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+        }
+    }
+
+    private boolean isSpecialItem(ItemStack item) {
+        if (item == null || item.getType() != Material.REDSTONE) return false;
+        if (!item.hasItemMeta()) return false;
+
+        NamespacedKey key = new NamespacedKey(plugin, R.REDSTONE_KEY);
+        return item.getItemMeta().getPersistentDataContainer().has(key, PersistentDataType.BYTE);
     }
 
     private void applyAdditionalHealth(Player player, boolean healFull) {
@@ -95,16 +189,18 @@ public class bambCore extends absCore {
         if (!(event.getDamager() instanceof Player player)) return;
         if (!(event.getEntity() instanceof LivingEntity target)) return;
 
+        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK &&
+                event.getCause() != EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK) {
+            return;
+        }
+
         if(tag.Bamboo.contains(player)) {
             if (hasProperItems(player)) {
-                if (!config.r_damaged.getOrDefault(player.getUniqueId(), false)) {
-                    if (!config.reloaded.getOrDefault(player.getUniqueId(), false)) {
-                        player.playSound(player.getLocation(), Sound.ITEM_TRIDENT_HIT, 1, 1);
-                        event.setDamage(3.0);
-                    } else {
-                        player.playSound(player.getLocation(), Sound.ITEM_TRIDENT_HIT_GROUND, 1, 1);
-                        event.setDamage(6.0);
-                    }
+                if (config.reloaded.getOrDefault(player.getUniqueId(), false)) {
+                    player.playSound(player.getLocation(), Sound.ITEM_TRIDENT_HIT_GROUND, 1, 1);
+                    event.setDamage(6.0);
+                } else {
+                    event.setDamage(3.0);
                 }
             }
         }
@@ -175,15 +271,11 @@ public class bambCore extends absCore {
         ItemStack off = player.getInventory().getItemInOffHand();
         if (off.getType() != Material.IRON_NUGGET) return false;
 
-        if (droppedItem.getType() == Material.BAMBOO) return true;
-
-        if (Rskill.isSessionActive(player)) {
-            if (droppedItem.getType() == Material.REDSTONE && droppedItem.hasItemMeta()) {
-                NamespacedKey key = new NamespacedKey(plugin, R.REDSTONE_KEY);
-                return droppedItem.getItemMeta().getPersistentDataContainer().has(key, PersistentDataType.BYTE);
-            }
+        if (droppedItem.getType() == Material.REDSTONE) {
+            return isSpecialItem(droppedItem);
         }
-        return false;
+
+        return droppedItem.getType() == Material.BAMBOO;
     }
 
     @Override

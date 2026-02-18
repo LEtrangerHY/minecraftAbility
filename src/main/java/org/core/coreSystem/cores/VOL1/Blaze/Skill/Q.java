@@ -36,7 +36,7 @@ public class Q implements SkillBase {
         ItemStack offhandItem = player.getInventory().getItem(EquipmentSlot.OFF_HAND);
         Material type = offhandItem.getType();
 
-        if (type == Material.SOUL_LANTERN || ((type == Material.SOUL_SAND || type == Material.SOUL_SOIL) && offhandItem.getAmount() >= 20)) {
+        if (type == Material.SOUL_LANTERN || ((type == Material.SOUL_SAND || type == Material.SOUL_SOIL) && offhandItem.getAmount() > 20)) {
 
             player.spawnParticle(Particle.SOUL_FIRE_FLAME, player.getLocation().clone().add(0, 0.6, 0), 130, 0.1, 0.1, 0.1, 0.8);
 

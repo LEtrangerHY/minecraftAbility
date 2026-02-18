@@ -39,7 +39,7 @@ public class F implements SkillBase {
 
         ItemStack offhandItem = player.getInventory().getItem(EquipmentSlot.OFF_HAND);
 
-        if (offhandItem.getType() == Material.BLUE_ICE && offhandItem.getAmount() >= 20) {
+        if (offhandItem.getType() == Material.BLUE_ICE && offhandItem.getAmount() > 20) {
             World world = player.getWorld();
             Location center = player.getLocation().clone();
 
