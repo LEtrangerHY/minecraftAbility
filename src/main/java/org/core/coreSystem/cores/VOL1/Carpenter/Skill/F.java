@@ -3,13 +3,11 @@ package org.core.coreSystem.cores.VOL1.Carpenter.Skill;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.core.cool.Cool;
 import org.core.coreSystem.absCoreSystem.SkillBase;
@@ -74,7 +72,10 @@ public class F implements SkillBase {
         world.spawnParticle(Particle.WITCH, player.getLocation().add(0, 1, 0), 43, 0.5, 0.5, 0.5, 0);
         world.spawnParticle(Particle.ENCHANT, player.getLocation().add(0, 1, 0), 43, 0.7, 0.7, 0.7, 0);
 
-        player.heal(config.f_Skill_heal);
+        double amp = config.f_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L);
+        double heal = config.f_Skill_heal * (1 + amp);
+
+        player.heal(heal);
 
     }
 

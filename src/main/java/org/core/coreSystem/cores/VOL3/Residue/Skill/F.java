@@ -1,6 +1,8 @@
-package org.core.coreSystem.cores.VOL3.Claud.Skill;
+package org.core.coreSystem.cores.VOL3.Residue.Skill;
 
 import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
@@ -13,7 +15,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.core.cool.Cool;
 import org.core.coreSystem.absCoreSystem.SkillBase;
-import org.core.coreSystem.cores.VOL3.Claud.coreSystem.Claud;
+import org.core.coreSystem.cores.VOL3.Residue.coreSystem.Residue;
 import org.core.effect.crowdControl.ForceDamage;
 import org.core.effect.crowdControl.Invulnerable;
 
@@ -21,7 +23,7 @@ import java.util.HashSet;
 import java.util.UUID;
 
 public class F implements SkillBase {
-    private final Claud config;
+    private final Residue config;
     private final JavaPlugin plugin;
     private final Cool cool;
     private final NamespacedKey keyF;
@@ -32,7 +34,7 @@ public class F implements SkillBase {
     private static final Particle.DustOptions DUST_ASH = new Particle.DustOptions(Color.fromRGB(110, 110, 110), 0.8f);
     private static final BlockData CHAIN_DATA = Material.IRON_CHAIN.createBlockData();
 
-    public F(Claud config, JavaPlugin plugin, Cool cool) {
+    public F(Residue config, JavaPlugin plugin, Cool cool) {
         this.config = config;
         this.plugin = plugin;
         this.cool = cool;
@@ -54,7 +56,7 @@ public class F implements SkillBase {
 
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             Dash(player);
-        }, 16L);
+        }, 12L);
     }
 
 
@@ -81,6 +83,7 @@ public class F implements SkillBase {
 
         double amp = config.f_Skill_amp * player.getPersistentDataContainer().getOrDefault(keyF, PersistentDataType.LONG, 0L);
         double damage = config.f_Skill_Damage * (1 + amp);
+        double heal = config.f_Skill_Heal * (1 + amp);
 
         DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
                 .withCausingEntity(player)
@@ -97,11 +100,27 @@ public class F implements SkillBase {
 
             @Override
             public void run() {
+                if (ticks < 4)
+                    world.playSound(player.getLocation(), Sound.BLOCK_CHAIN_BREAK, 1.6f, 1.0f);
+
                 if (ticks >= maxTicks || player.isDead()) {
 
+                    int hitCount = damagedSet.size();
                     int dash = config.f_Skill_dash_f.getOrDefault(player.getUniqueId(), 0);
-                    if (dash < 6) config.f_Skill_dash_f.put(player.getUniqueId(), dash + damagedSet.size());
-                    player.setFoodLevel(Math.min(20, player.getFoodLevel() + damagedSet.size() * 3));
+
+                    if (dash < 6) config.f_Skill_dash_f.put(player.getUniqueId(), dash + hitCount);
+
+                    player.setFoodLevel(Math.min(20, player.getFoodLevel() + hitCount * 3));
+
+                    if (hitCount > 0 && !player.isDead()) {
+                        double healAmount = Math.min(6.0, hitCount * heal);
+
+                        AttributeInstance maxHealthAttr = player.getAttribute(Attribute.MAX_HEALTH);
+                        if (maxHealthAttr != null) {
+                            double maxHealth = maxHealthAttr.getValue();
+                            player.setHealth(Math.min(maxHealth, player.getHealth() + healAmount));
+                        }
+                    }
 
                     this.cancel();
                     return;

@@ -18,7 +18,6 @@ import java.util.UUID;
 public class Cool {
 
     private final JavaPlugin plugin;
-    // UUID -> SkillName -> Data
     private final HashMap<UUID, HashMap<String, CooldownData>> cooldowns = new HashMap<>();
 
     public Cool(JavaPlugin plugin) {
@@ -31,7 +30,7 @@ public class Cool {
         long totalDuration;
         long remainingOnPause;
         boolean isPaused;
-        BossBar bossBar; // 보스바 객체 추가
+        BossBar bossBar;
 
         CooldownData(long endTime, long totalDuration, BossBar bossBar) {
             this.endTime = endTime;

@@ -15,6 +15,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.core.cool.Cool;
@@ -115,7 +116,16 @@ public class blossCore extends absCore {
                                 .withDirectEntity(player)
                                 .build();
 
-                        player.heal(2.7);
+                        long level = player.getPersistentDataContainer().getOrDefault(
+                                new NamespacedKey(plugin, "level"),
+                                PersistentDataType.LONG,
+                                0L
+                        );
+
+                        double p = 0.005 * level * level + 0.055 * level;
+                        double amplifiedHeal = 2.7 * (1 + p);
+
+                        player.heal(amplifiedHeal);
 
                         Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(77, 255, 77), 0.7f);
 

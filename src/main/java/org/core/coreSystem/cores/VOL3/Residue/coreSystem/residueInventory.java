@@ -1,4 +1,4 @@
-package org.core.coreSystem.cores.VOL3.Claud.coreSystem;
+package org.core.coreSystem.cores.VOL3.Residue.coreSystem;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -20,11 +20,11 @@ import org.core.main.coreConfig;
 import java.util.ArrayList;
 import java.util.List;
 
-public class claudInventory extends absInventory {
+public class residueInventory extends absInventory {
 
     private final Core plugin;
 
-    public claudInventory(Core plugin, coreConfig config) {
+    public residueInventory(Core plugin, coreConfig config) {
         super(config);
 
         this.plugin = plugin;
@@ -37,7 +37,7 @@ public class claudInventory extends absInventory {
 
     @Override
     protected boolean contains(Player player) {
-        return tag.Claud.contains(player);
+        return tag.Residue.contains(player);
     }
 
     @Override
@@ -49,8 +49,8 @@ public class claudInventory extends absInventory {
     protected Component getName(Player player, String skill) {
         return switch (skill) {
             case "R" -> Component.text("-");
-            case "Q" -> Component.text("Strain");
-            case "F" -> Component.text("CLAUS");
+            case "Q" -> Component.text("Centric");
+            case "F" -> Component.text("ARMSTRONG");
             default -> Component.text("???");
         };
     }

@@ -6,21 +6,27 @@ import net.kyori.adventure.title.Title;
 import org.bukkit.*;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.core.cool.Cool;
-import org.core.effect.crowdControl.ForceDamage;
-import org.core.coreSystem.cores.VOL1.Bamboo.coreSystem.Bamboo;
-import org.core.coreSystem.absCoreSystem.SkillBase;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.RayTraceResult;
+import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
+import org.core.cool.Cool;
+import org.core.coreSystem.absCoreSystem.SkillBase;
+import org.core.coreSystem.cores.VOL1.Bamboo.coreSystem.Bamboo;
+import org.core.effect.crowdControl.ForceDamage;
+import org.joml.AxisAngle4f;
 
 import java.time.Duration;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class R implements SkillBase {
 
@@ -28,107 +34,359 @@ public class R implements SkillBase {
     private final JavaPlugin plugin;
     private final Cool cool;
 
+    private final Map<UUID, BambooSpearInfo> spearSessions = new HashMap<>();
+    public static final String REDSTONE_KEY = "bamboo_detonator";
+
     public R(Bamboo config, JavaPlugin plugin, Cool cool) {
         this.config = config;
         this.plugin = plugin;
         this.cool = cool;
     }
 
-    @Override
-    public void Trigger(Player player) {
-        if(!config.reloaded.getOrDefault(player.getUniqueId(), false)){
+    public boolean isSessionActive(Player player) {
+        return spearSessions.containsKey(player.getUniqueId());
+    }
 
-            ItemStack offhandItem = player.getInventory().getItem(EquipmentSlot.OFF_HAND);
+    public Location retrieveSpearLocation(Player player) {
+        BambooSpearInfo info = spearSessions.get(player.getUniqueId());
+        if (info != null && info.hitbox != null) {
+            return info.hitbox.getLocation();
+        }
+        return null;
+    }
 
-            if (offhandItem.getType() == Material.IRON_NUGGET && offhandItem.getAmount() >= 1) {
-                config.reloaded.put(player.getUniqueId(), true);
-                player.getWorld().playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_IRON, 1, 1);
-                player.getWorld().playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_LEATHER, 1, 1);
+    public void forceRemoveSession(Player player) {
+        BambooSpearInfo info = spearSessions.remove(player.getUniqueId());
+        if (info != null) {
+            if (info.trackingTask != null) info.trackingTask.cancel();
+            if (info.timeoutTask != null) info.timeoutTask.cancel();
 
-                long cools = 300L;
-
-                cool.updateCooldown(player, "R", cools);
-
-                Title title = Title.title(
-                        Component.empty(),
-                        Component.text("Loaded").color(NamedTextColor.GREEN),
-                        Title.Times.times(Duration.ZERO, Duration.ofMillis(1000), Duration.ofMillis(500))
-                );
-                player.showTitle(title);
-
-                offhandItem.setAmount(offhandItem.getAmount() - 1);
-            }else{
-                player.getWorld().playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_LEATHER, 1, 1);
-
-                Title title = Title.title(
-                        Component.empty(),
-                        Component.text("iron needed").color(NamedTextColor.RED),
-                        Title.Times.times(Duration.ZERO, Duration.ofMillis(300), Duration.ofMillis(200))
-                );
-                player.showTitle(title);
-
-                long cools = 500L;
-                cool.updateCooldown(player, "R", cools);
+            if (info.hitbox != null) {
+                info.hitbox.setLeashHolder(null);
+                info.hitbox.remove();
             }
-
-        }else{
-
-            config.reloaded.remove(player.getUniqueId());
-            player.swingMainHand();
-            reUse(player);
-            player.playSound(player.getLocation(), Sound.ITEM_TRIDENT_THROW, 1, 1);
-
+            if (info.display != null) info.display.remove();
         }
     }
 
-    public void reUse(Player player){
-        config.damaged.put(player.getUniqueId(), new HashSet<>());
+    @Override
+    public void Trigger(Player player) {
+        UUID uuid = player.getUniqueId();
 
+        if (config.isSpearFlying.getOrDefault(uuid, false)) {
+            return;
+        }
+
+        BambooSpearInfo info = spearSessions.get(uuid);
+
+        if (info != null && info.landed) {
+            detonateSpear(player, info);
+            return;
+        }
+
+        if (!config.reloaded.getOrDefault(uuid, false)) {
+            reload(player);
+        }
+        else if (info == null) {
+            throwBambooSpear(player);
+        }
+    }
+
+    private void reload(Player player) {
+        ItemStack offhandItem = player.getInventory().getItem(EquipmentSlot.OFF_HAND);
+
+        if (offhandItem.getType() == Material.IRON_NUGGET && offhandItem.getAmount() >= 1) {
+            config.reloaded.put(player.getUniqueId(), true);
+            player.getWorld().playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_IRON, 1, 1);
+            player.getWorld().playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_LEATHER, 1, 1);
+
+            cool.updateCooldown(player, "R", 300L);
+
+            Title title = Title.title(
+                    Component.empty(),
+                    Component.text("Loaded").color(NamedTextColor.GREEN),
+                    Title.Times.times(Duration.ZERO, Duration.ofMillis(1000), Duration.ofMillis(500))
+            );
+            player.showTitle(title);
+
+            offhandItem.setAmount(offhandItem.getAmount() - 1);
+        } else {
+            player.getWorld().playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_LEATHER, 1, 1);
+            Title title = Title.title(
+                    Component.empty(),
+                    Component.text("iron needed").color(NamedTextColor.RED),
+                    Title.Times.times(Duration.ZERO, Duration.ofMillis(300), Duration.ofMillis(200))
+            );
+            player.showTitle(title);
+            cool.updateCooldown(player, "R", 500L);
+        }
+    }
+
+    private void throwBambooSpear(Player player) {
+        World world = player.getWorld();
+        Location eyeLoc = player.getEyeLocation().clone();
+        Vector velocity = eyeLoc.getDirection().clone().normalize().multiply(3.0);
+
+        Bukkit.getScheduler().runTaskLater(plugin, () -> setItemToRedstone(player), 1L);
+
+        ArmorStand hitbox = (ArmorStand) world.spawnEntity(eyeLoc.add(0, -0.5, 0), EntityType.ARMOR_STAND);
+        hitbox.setInvisible(true);
+        hitbox.setGravity(false);
+        hitbox.setMarker(false);
+        hitbox.setSmall(true);
+        hitbox.setBasePlate(false);
+        hitbox.setLeashHolder(player);
+
+        BlockDisplay bambooDisplay = (BlockDisplay) world.spawnEntity(eyeLoc, EntityType.BLOCK_DISPLAY);
+        bambooDisplay.setBlock(Material.BAMBOO.createBlockData());
+        bambooDisplay.setTeleportDuration(1);
+
+        Transformation transform = bambooDisplay.getTransformation();
+        transform.getScale().set(1.0f, 4.0f, 1.0f);
+        transform.getTranslation().set(0, -1.25f, 0);
+        transform.getLeftRotation().set(new AxisAngle4f((float) Math.toRadians(90), 1, 0, 0));
+        bambooDisplay.setTransformation(transform);
+
+        player.playSound(player.getLocation(), Sound.ENTITY_WIND_CHARGE_THROW, 1.2f, 1.2f);
+        player.playSound(player.getLocation(), Sound.ITEM_TRIDENT_THROW, 1.0f, 0.8f);
+
+        config.isSpearFlying.put(player.getUniqueId(), true);
+        config.reloaded.remove(player.getUniqueId());
+
+        BambooSpearInfo info = new BambooSpearInfo(hitbox, bambooDisplay);
+        spearSessions.put(player.getUniqueId(), info);
+
+        cool.updateCooldown(player, "R", 500L);
+
+        new BukkitRunnable() {
+            int ticks = 0;
+            final int maxTicks = 100;
+
+            @Override
+            public void run() {
+                if (!spearSessions.containsKey(player.getUniqueId()) || !hitbox.isValid()) {
+                    cleanupSession(player.getUniqueId(), 0L);
+                    cancel();
+                    return;
+                }
+
+                if (ticks > maxTicks) {
+                    cleanupSession(player.getUniqueId(), 0L);
+                    cancel();
+                    return;
+                }
+
+                Location currentLoc = hitbox.getLocation();
+                Location centerLoc = currentLoc.clone().add(0, 0.8, 0);
+
+                velocity.setY(velocity.getY() - 0.035);
+
+                RayTraceResult ray = world.rayTraceBlocks(centerLoc, velocity, velocity.length(), FluidCollisionMode.NEVER, true);
+                Entity hitEntity = null;
+
+                for (Entity e : world.getNearbyEntities(centerLoc.clone().add(velocity), 1.0, 1.0, 1.0)) {
+                    if (e != player && e instanceof LivingEntity && e != hitbox && e != bambooDisplay) {
+                        hitEntity = e;
+                        break;
+                    }
+                }
+
+                if (hitEntity != null) {
+                    handleHit(player, info, (LivingEntity) hitEntity, null, velocity);
+                    cancel();
+                    return;
+                } else if (ray != null && ray.getHitBlock() != null) {
+                    Location hitPoint = ray.getHitPosition().toLocation(world);
+                    handleHit(player, info, null, hitPoint, velocity);
+                    cancel();
+                    return;
+                }
+
+                hitbox.teleport(currentLoc.add(velocity));
+                updateDisplayTransform(bambooDisplay, hitbox.getLocation().clone().add(0, 0.8, 0), velocity);
+
+                if (!hitbox.isLeashed() || !hitbox.getLeashHolder().equals(player)) {
+                    hitbox.setLeashHolder(player);
+                }
+
+                ticks++;
+            }
+        }.runTaskTimer(plugin, 0L, 1L);
+    }
+
+    private void handleHit(Player player, BambooSpearInfo info, LivingEntity target, Location blockHitLoc, Vector velocity) {
         World world = player.getWorld();
 
-        Location playerLocation = player.getLocation();
-        Vector direction = playerLocation.getDirection().normalize().multiply(1.2);
+        config.isSpearFlying.put(player.getUniqueId(), false);
+        info.landed = true;
+
+        world.playSound(info.hitbox.getLocation(), Sound.ITEM_TRIDENT_HIT_GROUND, 1.0f, 1.0f);
+        world.playSound(info.hitbox.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.5f, 1.5f);
+
+        if (target != null) {
+            info.stuckEntity = target;
+            info.offset = velocity.clone().normalize().multiply(-0.5);
+
+            double damage = 4.0;
+            target.damage(damage, player);
+
+            info.relativeYaw = target.getLocation().getYaw() - info.hitbox.getLocation().getYaw();
+        } else if (blockHitLoc != null) {
+            Location stuckLoc = blockHitLoc.clone().subtract(velocity.clone().normalize().multiply(0.2)).subtract(0, 0.8, 0);
+            info.hitbox.teleport(stuckLoc);
+            updateDisplayTransform(info.display, stuckLoc.clone().add(0, 0.8, 0), velocity);
+        }
+
+        info.trackingTask = new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!player.isOnline()) {
+                    cleanupSession(player.getUniqueId(), 0L);
+                    cancel();
+                    return;
+                }
+
+                if (!info.hitbox.isLeashed() || !info.hitbox.getLeashHolder().equals(player)) {
+                    if (player.getLocation().distance(info.hitbox.getLocation()) < 30) {
+                        info.hitbox.setLeashHolder(player);
+                    } else {
+                        cleanupSession(player.getUniqueId(), config.r_Skill_Cool);
+                        cancel();
+                        return;
+                    }
+                }
+
+                if (info.stuckEntity != null) {
+                    if (!info.stuckEntity.isValid() || info.stuckEntity.isDead()) {
+                        cleanupSession(player.getUniqueId(), 0L);
+                        cancel();
+                        return;
+                    }
+                    Location targetLoc = info.stuckEntity.getLocation().add(0, info.stuckEntity.getHeight()/2, 0).add(info.offset);
+                    info.hitbox.teleport(targetLoc);
+                    updateDisplayTransform(info.display, targetLoc.clone().add(0, 0.8, 0), velocity);
+                }
+            }
+        }.runTaskTimer(plugin, 0L, 1L);
+
+        info.timeoutTask = new BukkitRunnable() {
+            @Override
+            public void run() {
+                cleanupSession(player.getUniqueId(), 500L);
+            }
+        }.runTaskLater(plugin, 160L);
+    }
+
+    private void detonateSpear(Player player, BambooSpearInfo info) {
+        UUID uuid = player.getUniqueId();
+        World world = player.getWorld();
+        Location particleLoc = info.display.getLocation().clone();
+
+        if (info.trackingTask != null) info.trackingTask.cancel();
+        if (info.timeoutTask != null) info.timeoutTask.cancel();
+
+        setItemToBamboo(player);
+
+        world.playSound(particleLoc, Sound.ENTITY_GENERIC_EXPLODE, 4.0f, 1.0f);
+        world.playSound(particleLoc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 3.0f, 0.8f);
+
+        world.spawnParticle(Particle.EXPLOSION_EMITTER, particleLoc, 1, 0.0, 0.0, 0.0, 0.0);
+        world.spawnParticle(Particle.FLASH, particleLoc, 1, 0, 0, 0, 0);
+
+        world.spawnParticle(Particle.FLAME, particleLoc, 80, 0.5, 0.5, 0.5, 0.3);
+        world.spawnParticle(Particle.LARGE_SMOKE, particleLoc, 50, 0.8, 0.8, 0.8, 0.1);
+        world.spawnParticle(Particle.BLOCK, particleLoc, 60, 0.8, 0.8, 0.8, 0.5, Material.BAMBOO.createBlockData());
 
         double amp = config.r_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L);
         double damage = config.r_Skill_damage * (1 + amp);
 
-        DamageSource source = DamageSource.builder(DamageType.MOB_PROJECTILE)
+        DamageSource source = DamageSource.builder(DamageType.PLAYER_EXPLOSION)
                 .withCausingEntity(player)
                 .withDirectEntity(player)
                 .build();
 
-        config.r_damaged.put(player.getUniqueId(), true);
-        for (int ticks = 0; ticks < 40; ticks++) {
-            Location particleLocation = playerLocation.clone()
-                    .add(direction.clone().multiply(ticks * 0.4))
-                    .add(0, 1.5, 0);
+        for (Entity entity : world.getNearbyEntities(particleLoc, 4, 4, 4)) {
+            if (entity.equals(player) || !(entity instanceof LivingEntity)) continue;
 
-            Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(255, 255, 255),  0.8f);
-            world.spawnParticle(Particle.DUST, particleLocation, 6, 0, 0, 0, 0, dustOptions);
-            player.getWorld().spawnParticle(Particle.ENCHANTED_HIT, particleLocation, 6, 0, 0, 0, 0);
+            world.spawnParticle(Particle.EXPLOSION, entity.getLocation().add(0, 1, 0), 1, 0, 0, 0, 0);
 
-            for (Entity entity : world.getNearbyEntities(particleLocation, 0.3, 0.3, 0.3)) {
-                if (entity instanceof LivingEntity target
-                        && entity != player
-                        && !config.damaged.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(entity)) {
+            ForceDamage forceDamage = new ForceDamage((LivingEntity) entity, damage, source, false);
+            forceDamage.applyEffect(player);
 
-                    ForceDamage forceDamage = new ForceDamage(target, damage, source, true);
-                    forceDamage.applyEffect(player);
+            Vector direction = entity.getLocation().toVector().subtract(particleLoc.toVector()).normalize().multiply(1.4);
+            direction.setY(1.0);
+            entity.setVelocity(direction);
+        }
 
-                    config.damaged.computeIfAbsent(player.getUniqueId(), k -> new HashSet<>()).add(target);
+        cleanupSession(uuid, config.r_Skill_Cool);
+    }
+
+    private void cleanupSession(UUID uuid, long cooldown) {
+        BambooSpearInfo info = spearSessions.remove(uuid);
+        if (info != null) {
+            if (info.trackingTask != null) info.trackingTask.cancel();
+            if (info.timeoutTask != null) info.timeoutTask.cancel();
+
+            if (info.hitbox != null) {
+                info.hitbox.setLeashHolder(null);
+                info.hitbox.remove();
+            }
+            if (info.display != null) info.display.remove();
+
+            config.isSpearFlying.remove(uuid);
+
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null) {
+                if (player.getInventory().getItemInMainHand().getType() == Material.REDSTONE) {
+                    setItemToBamboo(player);
                 }
+                cool.updateCooldown(player, "R", cooldown);
             }
         }
-        config.r_damaged.put(player.getUniqueId(), false);
+    }
 
-        config.damaged.remove(player.getUniqueId());
+    private void setItemToRedstone(Player player) {
+        ItemStack item = new ItemStack(Material.REDSTONE);
+        ItemMeta meta = item.getItemMeta();
+        if (meta != null) {
+            meta.displayName(Component.text("Detonator").color(NamedTextColor.RED));
+            NamespacedKey key = new NamespacedKey(plugin, REDSTONE_KEY);
+            meta.getPersistentDataContainer().set(key, PersistentDataType.BYTE, (byte) 1);
+            item.setItemMeta(meta);
+        }
+        player.getInventory().setItemInMainHand(item);
+    }
 
-        Title title = Title.title(
-                Component.empty(),
-                Component.text("Fired!").color(NamedTextColor.DARK_GREEN),
-                Title.Times.times(Duration.ZERO, Duration.ofMillis(500), Duration.ofMillis(200))
-        );
-        player.showTitle(title);
+    private void setItemToBamboo(Player player) {
+        ItemStack item = new ItemStack(Material.BAMBOO);
+        player.getInventory().setItemInMainHand(item);
+    }
 
+    private void updateDisplayTransform(BlockDisplay display, Location newLoc, Vector direction) {
+        if (direction.lengthSquared() < 0.0001) return;
+
+        newLoc.setDirection(direction);
+        display.setRotation(newLoc.getYaw(), newLoc.getPitch());
+
+        Transformation t = display.getTransformation();
+        t.getLeftRotation().set(new AxisAngle4f((float) Math.toRadians(90), 1, 0, 0));
+        display.setTransformation(t);
+        display.teleport(newLoc);
+    }
+
+    private static class BambooSpearInfo {
+        ArmorStand hitbox;
+        BlockDisplay display;
+        LivingEntity stuckEntity;
+        Vector offset;
+        boolean landed = false;
+        BukkitTask trackingTask;
+        BukkitTask timeoutTask;
+        float relativeYaw;
+
+        public BambooSpearInfo(ArmorStand hitbox, BlockDisplay display) {
+            this.hitbox = hitbox;
+            this.display = display;
+        }
     }
 }

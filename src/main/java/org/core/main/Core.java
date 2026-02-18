@@ -1,11 +1,9 @@
 package org.core.main;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.core.command.*;
@@ -13,9 +11,9 @@ import org.core.cool.Cool;
 import org.core.coreSystem.cores.KEY.PLAYER.coreSystem.PLAYER;
 import org.core.coreSystem.cores.KEY.PLAYER.coreSystem.playerCore;
 import org.core.coreSystem.cores.KEY.PLAYER.coreSystem.playerInventory;
-import org.core.coreSystem.cores.VOL3.Claud.coreSystem.Claud;
-import org.core.coreSystem.cores.VOL3.Claud.coreSystem.claudCore;
-import org.core.coreSystem.cores.VOL3.Claud.coreSystem.claudInventory;
+import org.core.coreSystem.cores.VOL3.Residue.coreSystem.Residue;
+import org.core.coreSystem.cores.VOL3.Residue.coreSystem.residueCore;
+import org.core.coreSystem.cores.VOL3.Residue.coreSystem.residueInventory;
 import org.core.coreSystem.cores.VOL3.Lavender.coreSystem.Lavender;
 import org.core.coreSystem.cores.VOL3.Lavender.coreSystem.lavCore;
 import org.core.coreSystem.cores.VOL3.Lavender.coreSystem.lavInventory;
@@ -23,7 +21,6 @@ import org.core.coreSystem.cores.VOL2.Rose.coreSystem.Rose;
 import org.core.coreSystem.cores.VOL2.Rose.coreSystem.roseCore;
 import org.core.coreSystem.cores.VOL2.Rose.coreSystem.roseInventory;
 import org.core.database.dbConnect;
-import org.core.effect.crowdControl.Stiff;
 import org.core.effect.effectPlugin.moveCancelManager;
 import org.core.level.LevelingManager;
 import org.core.coreEntity.absEntityLeveling.EntityLevelingManager;
@@ -116,7 +113,7 @@ public final class Core extends JavaPlugin implements Listener {
     private burstCore burst;
     private lavCore lavender;
     private roseCore rose;
-    private claudCore claud;
+    private residueCore residue;
 
     private playerInventory playerInv;
     private nightInventory nightInv;
@@ -138,7 +135,7 @@ public final class Core extends JavaPlugin implements Listener {
     private burstInventory burstInv;
     private lavInventory lavInv;
     private roseInventory roseInv;
-    private claudInventory claudInv;
+    private residueInventory residueInv;
 
     private EntityLevelingManager Elevel;
 
@@ -175,7 +172,7 @@ public final class Core extends JavaPlugin implements Listener {
         Burst burstConfig = new Burst();
         Lavender lavConfig = new Lavender();
         Rose roseConfig = new Rose();
-        Claud claudConfig = new Claud();
+        Residue residueConfig = new Residue();
 
         this.cool = new Cool(this);
 
@@ -188,106 +185,148 @@ public final class Core extends JavaPlugin implements Listener {
 
         this.player = new playerCore(this, this.config, playerConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.player, this);
+        this.config.registerCore("player", this.player);
+
         this.playerInv = new playerInventory(this, this.config);
         Bukkit.getPluginManager().registerEvents(this.playerInv, this);
 
         this.nightel = new nightCore(this, this.config, nightConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.nightel, this);
+        this.config.registerCore("nightel", this.nightel);
+
         this.nightInv = new nightInventory(this, this.config);
         Bukkit.getPluginManager().registerEvents(this.nightInv, this);
 
         this.bamb = new bambCore(this, this.config, bambConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.bamb, this);
+        this.config.registerCore("bamboo", this.bamb);
+
         this.bambInv = new bambInventory(this, this.config);
         Bukkit.getPluginManager().registerEvents(this.bambInv, this);
 
         this.carp = new carpCore(this, this.config, carpConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.carp, this);
+        this.config.registerCore("carpenter", this.carp);
+
         this.carpInv = new carpInventory(this, this.config);
         Bukkit.getPluginManager().registerEvents(this.carpInv, this);
 
         this.dag = new dagCore(this, this.config, dagConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.dag, this);
+        this.config.registerCore("dagger", this.dag);
+
         this.dagInv = new dagInventory(this, this.config);
         Bukkit.getPluginManager().registerEvents(this.dagInv, this);
 
         this.pyro = new pyroCore(this, config, pyroConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.pyro, this);
+        this.config.registerCore("pyro", this.pyro);
+
         this.pyroInv = new pyroInventory(this, this.config);
         Bukkit.getPluginManager().registerEvents(this.pyroInv, this);
 
         this.glacier = new glaCore(this, config, glaConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.glacier, this);
+        this.config.registerCore("glacier", this.glacier);
+
         this.glaInv = new glaInventory(this, this.config);
         Bukkit.getPluginManager().registerEvents(this.glaInv, this);
 
         this.knight = new knightCore(this, config, knightConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.knight, this);
+        this.config.registerCore("knight", this.knight);
+
         this.knightInv = new knightInventory(this, this.config);
         Bukkit.getPluginManager().registerEvents(this.knightInv, this);
 
         this.luster = new lustCore(this, config, lustConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.luster, this);
+        this.config.registerCore("luster", this.luster);
+
         this.lustInv = new lustInventory(this, this.config);
         Bukkit.getPluginManager().registerEvents(this.lustInv, this);
 
         this.blaze = new blazeCore(this, config, blazeConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.blaze, this);
+        this.config.registerCore("blaze", this.blaze);
+
         this.blazeInv = new blazeInventory(this, this.config);
         Bukkit.getPluginManager().registerEvents(this.blazeInv, this);
 
         this.commander = new comCore(this, config, comConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.commander, this);
+        this.config.registerCore("commander", this.commander);
+
         this.comInv = new comInventory(this, this.config);
         Bukkit.getPluginManager().registerEvents(this.comInv, this);
 
         this.harvester = new harvCore(this, config, harvConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.harvester, this);
+        this.config.registerCore("harvester", this.harvester);
+
         this.harvInv = new harvInventory(this, this.config);
         Bukkit.getPluginManager().registerEvents(this.harvInv, this);
 
         this.bloom = new blossCore(this, config, blossomConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.bloom, this);
+        this.config.registerCore("blossom", this.bloom);
+
         this.bloomInv = new blossInventory(this, this.config);
         Bukkit.getPluginManager().registerEvents(this.bloomInv, this);
 
         this.blue = new blueCore(this, config, blueConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.blue, this);
+        this.config.registerCore("blue", this.blue);
+
         this.blueInv = new blueInventory(this, this.config);
         Bukkit.getPluginManager().registerEvents(this.blueInv, this);
 
         this.swordsman = new swordCore(this, config, swordConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.swordsman, this);
+        this.config.registerCore("swordsman", this.swordsman);
+
         this.swordInv = new swordInventory(this, this.config);
         Bukkit.getPluginManager().registerEvents(this.swordInv, this);
 
         this.saboteur = new sabCore(this, config, sabConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.saboteur, this);
+        this.config.registerCore("saboteur", this.saboteur);
+
         this.sabInv = new sabInventory(this, this.config);
         Bukkit.getPluginManager().registerEvents(this.sabInv, this);
 
         this.burst = new burstCore(this, this.config, burstConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.burst, this);
+        this.config.registerCore("burst", this.burst);
+
         this.burstInv = new burstInventory(this, this.config);
         Bukkit.getPluginManager().registerEvents(this.burstInv, this);
 
         this.lavender = new lavCore(this, this.config, lavConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.lavender, this);
+        this.config.registerCore("lavender", this.lavender);
+
         this.lavInv = new lavInventory(this, this.config);
         Bukkit.getPluginManager().registerEvents(this.lavInv, this);
 
         this.rose = new roseCore(this, this.config, roseConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.rose, this);
+        this.config.registerCore("rose", this.rose);
+
         this.roseInv = new roseInventory(this, this.config);
         Bukkit.getPluginManager().registerEvents(this.roseInv, this);
 
-        this.claud = new claudCore(this, this.config, claudConfig, cool);
-        Bukkit.getPluginManager().registerEvents(this.claud, this);
-        this.claudInv = new claudInventory(this, this.config);
-        Bukkit.getPluginManager().registerEvents(this.claudInv, this);
+        this.residue = new residueCore(this, this.config, residueConfig, cool);
+        Bukkit.getPluginManager().registerEvents(this.residue, this);
+        this.config.registerCore("residue", this.residue);
+
+        this.residueInv = new residueInventory(this, this.config);
+        Bukkit.getPluginManager().registerEvents(this.residueInv, this);
 
         this.benz = new benzCore(this, this.config, benzConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.benz, this);
+        this.config.registerCore("benzene", this.benz);
+
         this.benzInv = new benzInventory(this, this.config);
         Bukkit.getPluginManager().registerEvents(this.benzInv, this);
 
@@ -390,26 +429,5 @@ public final class Core extends JavaPlugin implements Listener {
         player.setInvulnerable(false);
 
         dbConn.insertMember(player);
-    }
-
-    @EventHandler
-    public void onPlayerMove(PlayerMoveEvent e) {
-        Player player = e.getPlayer();
-
-        if (Stiff.isStiff(player)) {
-            Location from = e.getFrom();
-            Location to = e.getTo();
-
-            if (to == null) return;
-
-            if (from.getX() != to.getX() || from.getY() != to.getY() || from.getZ() != to.getZ()) {
-
-                Location fixedLocation = from.clone();
-                fixedLocation.setYaw(to.getYaw());
-                fixedLocation.setPitch(to.getPitch());
-
-                e.setTo(fixedLocation);
-            }
-        }
     }
 }

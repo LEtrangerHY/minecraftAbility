@@ -10,6 +10,7 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -99,6 +100,22 @@ public class blazeCore extends absCore {
     }
 
     @EventHandler
+    public void onDamage(EntityDamageEvent event) {
+        if (!(event.getEntity() instanceof Player player)) return;
+
+        if (tag.Blaze.contains(player)) {
+            if (event.getCause() == EntityDamageEvent.DamageCause.FIRE ||
+                    event.getCause() == EntityDamageEvent.DamageCause.FIRE_TICK ||
+                    event.getCause() == EntityDamageEvent.DamageCause.LAVA ||
+                    event.getCause() == EntityDamageEvent.DamageCause.HOT_FLOOR) {
+
+                event.setCancelled(true);
+                player.setFireTicks(0);
+            }
+        }
+    }
+
+    @EventHandler
     public void projectileEvent(ProjectileHitEvent event) {
         Entity victim = event.getHitEntity();
         Projectile fireball = event.getEntity();
@@ -128,7 +145,7 @@ public class blazeCore extends absCore {
 
     @EventHandler(priority = EventPriority.NORMAL)
     public void passiveAttackEffect(PlayerInteractEvent event) {
-        if (tag.Blaze.contains(event.getPlayer()) && hasProperItems(event.getPlayer())) {
+        if (tag.Blaze.contains(event.getPlayer())) {
             if (!pAttackUsing.contains(event.getPlayer().getUniqueId())) {
 
                 Player player = event.getPlayer();
@@ -235,7 +252,7 @@ public class blazeCore extends absCore {
                                             Block block = particleLoc.clone().add(0, i, 0).getBlock();
                                             Material type = block.getType();
                                             if (block.isBurnable() || type == Material.ICE || type == Material.SNOW || type == Material.BLUE_ICE || type == Material.FROSTED_ICE || type == Material.PACKED_ICE || type == Material.POWDER_SNOW || type == Material.SNOW_BLOCK ||
-                                                type == Material.WHEAT || type == Material.POTATOES || type == Material.CARROTS || type == Material.BEETROOTS) {
+                                                    type == Material.WHEAT || type == Material.POTATOES || type == Material.CARROTS || type == Material.BEETROOTS) {
 
                                                 if (block.getType() == Material.BLUE_ICE) {
                                                     if (Math.random() < 0.06) {

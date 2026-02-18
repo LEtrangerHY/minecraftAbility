@@ -11,8 +11,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent; // 추가됨
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
@@ -92,6 +94,27 @@ public class glaCore extends absCore {
                 player.setHealth(newMax);
             } else if (player.getHealth() > newMax) {
                 player.setHealth(newMax);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onDamage(EntityDamageEvent event) {
+        if (!(event.getEntity() instanceof Player player)) return;
+
+        if (tag.Glacier.contains(player)) {
+            if (event.getCause() == EntityDamageEvent.DamageCause.FREEZE) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onMovePreventFreeze(PlayerMoveEvent event) {
+        Player player = event.getPlayer();
+        if (tag.Glacier.contains(player)) {
+            if (player.getFreezeTicks() > 0) {
+                player.setFreezeTicks(0);
             }
         }
     }

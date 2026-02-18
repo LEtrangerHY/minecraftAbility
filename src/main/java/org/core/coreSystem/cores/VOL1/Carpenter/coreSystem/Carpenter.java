@@ -41,6 +41,7 @@ public class Carpenter {
 
     //F
     public HashMap<UUID, Integer> f_count = new HashMap<>();
+    public double f_Skill_amp = 0.2;
     public double f_Skill_damage = 0;
     public double f_Skill_heal = 3;
     public long f_Skill_Cool = 0;

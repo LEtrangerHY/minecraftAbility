@@ -4,6 +4,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
 import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -73,7 +75,21 @@ public class Q implements SkillBase {
                 if (rangeTarget instanceof LivingEntity target) {
 
                     if (rangeTarget == player) {
-                        ((Player) rangeTarget).heal(player.getHealth() / 2);
+                        AttributeInstance maxHealthAttr = player.getAttribute(Attribute.MAX_HEALTH);
+                        if (maxHealthAttr != null) {
+                            double maxHealth = maxHealthAttr.getValue();
+                            double currentHealth = player.getHealth();
+
+                            double healthPercentage = currentHealth / maxHealth;
+
+                            double healRatio = 0.40 - (0.25 * healthPercentage);
+
+                            healRatio = Math.max(0.15, Math.min(0.40, healRatio));
+
+                            double healAmount = maxHealth * healRatio;
+
+                            player.setHealth(Math.min(maxHealth, currentHealth + healAmount));
+                        }
                     } else {
                         Burn burn = new Burn(target, 3000L);
                         burn.applyEffect(player);

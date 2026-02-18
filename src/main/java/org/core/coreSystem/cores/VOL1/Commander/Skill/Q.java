@@ -111,6 +111,7 @@ public class Q implements SkillBase {
 
         double amp = config.q_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L);
         double damage = config.q_Skill_Damage * (1 + amp);
+        double heal = config.q_Skill_Heal * (1 + amp);
 
         DamageSource source = DamageSource.builder(DamageType.MAGIC)
                 .withCausingEntity(player)
@@ -139,7 +140,7 @@ public class Q implements SkillBase {
 
                 attackLine(player, maxDistance, start, dir);
             }else{
-                ((LivingEntity) entity).heal(2);
+                ((LivingEntity) entity).heal(heal);
                 player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 2.0f, 1);
                 player.spawnParticle(Particle.HAPPY_VILLAGER, player.getLocation().clone().add(0, 1.2, 0), 5, 0.2, 0.2, 0.2, 0);
             }

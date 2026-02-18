@@ -41,6 +41,14 @@ public abstract class absCore implements Listener {
 
     protected abstract ConfigWrapper getConfigWrapper();
 
+    public void manualReset(Player player) {
+        ConfigWrapper wrapper = getConfigWrapper();
+        if (wrapper != null) {
+            wrapper.variableReset(player);
+            wrapper.cooldownReset(player);
+        }
+    }
+
     @EventHandler
     public void variableQuitDelete(PlayerQuitEvent event) {
         Player player = event.getPlayer();

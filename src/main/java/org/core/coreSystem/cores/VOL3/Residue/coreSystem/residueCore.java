@@ -1,4 +1,4 @@
-package org.core.coreSystem.cores.VOL3.Claud.coreSystem;
+package org.core.coreSystem.cores.VOL3.Residue.coreSystem;
 
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
@@ -21,21 +21,21 @@ import org.core.cool.Cool;
 import org.core.coreSystem.absCoreSystem.ConfigWrapper;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.absCoreSystem.absCore;
-import org.core.coreSystem.cores.VOL3.Claud.Skill.F;
-import org.core.coreSystem.cores.VOL3.Claud.Skill.Q;
-import org.core.coreSystem.cores.VOL3.Claud.Skill.R;
+import org.core.coreSystem.cores.VOL3.Residue.Skill.F;
+import org.core.coreSystem.cores.VOL3.Residue.Skill.Q;
+import org.core.coreSystem.cores.VOL3.Residue.Skill.R;
 import org.core.main.Core;
 import org.core.main.coreConfig;
 
-public class claudCore extends absCore {
+public class residueCore extends absCore {
     private final Core plugin;
-    private final Claud config;
+    private final Residue config;
 
     private final R Rskill;
     private final Q Qskill;
     private final F Fskill;
 
-    public claudCore(Core plugin, coreConfig tag, Claud config, Cool cool) {
+    public residueCore(Core plugin, coreConfig tag, Residue config, Cool cool) {
         super(tag, cool);
 
         this.plugin = plugin;
@@ -45,7 +45,7 @@ public class claudCore extends absCore {
         this.Qskill = new Q(config, plugin, cool);
         this.Fskill = new F(config, plugin, cool);
 
-        plugin.getLogger().info("Claud downloaded...");
+        plugin.getLogger().info("Residue downloaded...");
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
@@ -172,7 +172,7 @@ public class claudCore extends absCore {
 
     @Override
     protected boolean contains(Player player) {
-        return tag.Claud.contains(player);
+        return tag.Residue.contains(player);
     }
 
     @Override
@@ -258,11 +258,13 @@ public class claudCore extends absCore {
             }
             @Override
             public void cooldownReset(Player player) {
-                cool.setCooldown(player, config.frozenCool, "R");
+                cool.setCooldown(player, 6000L, "R");
+                cool.pauseCooldown(player, "R");
                 cool.setCooldown(player, config.frozenCool, "Q");
                 cool.setCooldown(player, config.frozenCool, "F");
 
-                cool.updateCooldown(player, "R", config.frozenCool);
+                cool.updateCooldown(player, "R", 6000L);
+                cool.pauseCooldown(player, "R");
                 cool.updateCooldown(player, "Q", config.frozenCool);
                 cool.updateCooldown(player, "F", config.frozenCool);
             }

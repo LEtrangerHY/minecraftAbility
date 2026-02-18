@@ -1,4 +1,4 @@
-package org.core.coreSystem.cores.VOL3.Valenetine.coreSystem;
+package org.core.coreSystem.cores.VOL3.Residue.coreSystem;
 
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
@@ -13,19 +13,20 @@ import org.core.level.Levels;
 import java.util.Collections;
 import java.util.Set;
 
-public class valeneLeveling implements Levels {
+public class residueLeveling implements Levels {
 
     private final JavaPlugin plugin;
     private final Player player;
     private final long exp;
 
-    public valeneLeveling(JavaPlugin plugin, Player player, long exp) {
+
+    public residueLeveling(JavaPlugin plugin, Player player, long exp) {
         this.plugin = plugin;
         this.player = player;
         this.exp = exp;
     }
 
-    public Set<Long> requireExp = Set.of(50L, 100L, 300L, 600L, 1000L, 1600L, 2600L, 3900L, 5300L, 6600L);
+    public Set<Long> requireExp = Set.of(66L, 202L, 363L, 666L, 1001L, 1111L, 2002L, 3003L, 4004L, 6006L);
 
     @Override
     public void addLV(Entity entity){

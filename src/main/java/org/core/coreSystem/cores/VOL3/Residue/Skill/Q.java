@@ -1,4 +1,4 @@
-package org.core.coreSystem.cores.VOL3.Claud.Skill;
+package org.core.coreSystem.cores.VOL3.Residue.Skill;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -19,7 +19,7 @@ import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.core.cool.Cool;
 import org.core.coreSystem.absCoreSystem.SkillBase;
-import org.core.coreSystem.cores.VOL3.Claud.coreSystem.Claud;
+import org.core.coreSystem.cores.VOL3.Residue.coreSystem.Residue;
 import org.core.effect.crowdControl.ForceDamage;
 import org.core.effect.crowdControl.Grounding;
 import org.jetbrains.annotations.NotNull;
@@ -29,16 +29,16 @@ import java.util.Map;
 import java.util.UUID;
 
 public class Q implements SkillBase {
-    private final Claud config;
+    private final Residue config;
     private final JavaPlugin plugin;
     private final Cool cool;
 
     private static final Map<UUID, SpearInfo> spearSessions = new HashMap<>();
     private static final Particle.DustOptions DUST_CHAIN = new Particle.DustOptions(Color.fromRGB(66, 66, 66), 0.6f);
 
-    public static final String PEARL_KEY = "claud_pearl";
+    public static final String PEARL_KEY = "residue_pearl";
 
-    public Q(Claud config, JavaPlugin plugin, Cool cool) {
+    public Q(Residue config, JavaPlugin plugin, Cool cool) {
         this.config = config;
         this.plugin = plugin;
         this.cool = cool;
@@ -70,14 +70,13 @@ public class Q implements SkillBase {
         World world = player.getWorld();
         Location eyeLoc = player.getEyeLocation().clone();
 
-        // 투사체 속도 (3.3)
         Vector velocity = eyeLoc.getDirection().clone().normalize().multiply(3.3);
 
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             setItemToPearl(player);
         }, 1L);
 
-        ArmorStand spearStand = (ArmorStand) world.spawnEntity(eyeLoc.add(0, -1.5, 0), EntityType.ARMOR_STAND);
+        ArmorStand spearStand = (ArmorStand) world.spawnEntity(eyeLoc.add(0, -1.2, 0), EntityType.ARMOR_STAND);
         spearStand.setInvisible(true);
         spearStand.setGravity(false);
         spearStand.setArms(true);
@@ -122,7 +121,7 @@ public class Q implements SkillBase {
                 }
 
                 Location currentLoc = spearStand.getLocation();
-                Location headLoc = currentLoc.clone().add(0, 1.5, 0);
+                Location headLoc = currentLoc.clone().add(0, 1.2, 0);
 
                 velocity.setY(velocity.getY() - gravity);
                 velocity.multiply(0.99);
@@ -130,7 +129,8 @@ public class Q implements SkillBase {
                 RayTraceResult ray = world.rayTraceBlocks(headLoc, velocity, velocity.length(), FluidCollisionMode.NEVER, true);
 
                 Entity hitEntity = null;
-                for (Entity e : world.getNearbyEntities(headLoc.clone().add(velocity), 0.6, 0.6, 0.6)) {
+                Location searchLoc = headLoc.clone().add(velocity.clone().multiply(0.5));
+                for (Entity e : world.getNearbyEntities(searchLoc, 1.2, 1.2, 1.2)) {
                     if (e != player && e instanceof LivingEntity && e != spearStand) {
                         hitEntity = e;
                         break;
@@ -146,7 +146,7 @@ public class Q implements SkillBase {
                     Vector pullback = velocity.clone().normalize().multiply(0.7);
                     Location hitLoc = hitPoint.subtract(pullback);
 
-                    hitLoc.subtract(0, 1.5, 0);
+                    hitLoc.subtract(0, 1.2, 0);
 
                     handleHitBlock(player, spearStand, hitLoc, velocity);
                     cancel();
@@ -218,7 +218,7 @@ public class Q implements SkillBase {
 
     private void handleHitEntity(Player player, ArmorStand spear, LivingEntity target, Vector direction) {
         long level = player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L);
-        double damage = config.q_Skill_Damage * (1 + config.q_Skill_amplify * level);
+        double damage = config.q_Skill_Damage * (1 + config.q_Skill_amp * level);
 
         DamageSource source = DamageSource.builder(DamageType.MAGIC).withCausingEntity(player).withDirectEntity(player).build();
         new ForceDamage(target, damage, source, false).applyEffect(player);
@@ -242,7 +242,6 @@ public class Q implements SkillBase {
         hitLoc.setPitch(0);
         spear.teleport(hitLoc);
 
-        // 블록 박힘 시 파티클 재생 (높이 낮춤)
         chain_qSkill_Particle_Effect(player, spear, 120);
 
         updateSessionToLanded(player, spear, null, null);
@@ -293,16 +292,13 @@ public class Q implements SkillBase {
 
         Location spearLoc = info.spear.getLocation().add(0, 1.5, 0);
 
-        // ★ [거리 기반 쿨타임 로직 추가]
         double distance = player.getLocation().distance(spearLoc);
-        // 기본 16초 + 거리 1블록당 1초 추가, 최대 66초
         long calculatedCooldown = 16000L + (long)(distance * 1000L);
         long finalCooldown = Math.min(66000L, calculatedCooldown);
 
         player.teleport(spearLoc);
         player.getWorld().playSound(spearLoc, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
 
-        // 계산된 쿨타임으로 세션 종료
         cleanupSession(uuid, finalCooldown);
     }
 

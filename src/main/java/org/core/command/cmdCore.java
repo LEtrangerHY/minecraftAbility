@@ -82,7 +82,7 @@ public class cmdCore implements CommandExecutor, TabCompleter {
             suggestions.add("burst");
             suggestions.add("lavender");
             suggestions.add("rose");
-            suggestions.add("claud");
+            suggestions.add("residue");
             suggestions.add("benzene");
         } else if (args.length == 3) {
             suggestions.add("true");

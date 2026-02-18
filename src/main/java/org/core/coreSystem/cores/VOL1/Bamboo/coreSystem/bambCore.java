@@ -47,7 +47,7 @@ public class bambCore extends absCore {
 
         this.Rskill = new R(config, plugin, cool);
         this.Qskill = new Q(config, plugin, cool);
-        this.Fskill = new F(config, plugin, cool);
+        this.Fskill = new F(config, plugin, cool, Rskill);
 
         plugin.getLogger().info("Bamboo downloaded...");
     }
@@ -55,7 +55,6 @@ public class bambCore extends absCore {
     @EventHandler(priority = EventPriority.NORMAL)
     public void onJoin(PlayerJoinEvent event) {
         if(!contains(event.getPlayer())) return;
-
         Player player = event.getPlayer();
         applyAdditionalHealth(player, false);
     }
@@ -63,7 +62,6 @@ public class bambCore extends absCore {
     @EventHandler(priority = EventPriority.NORMAL)
     public void onRespawn(PlayerRespawnEvent event) {
         if(!contains(event.getPlayer())) return;
-
         Player player = event.getPlayer();
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             applyAdditionalHealth(player, true);
@@ -71,25 +69,15 @@ public class bambCore extends absCore {
     }
 
     private void applyAdditionalHealth(Player player, boolean healFull) {
-        long addHP =
-                player.getPersistentDataContainer().getOrDefault(
-                        new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L)
-                        +
-                        player.getPersistentDataContainer().getOrDefault(
-                                new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L);
-
+        long addHP = player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L)
+                + player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L);
         AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
         if (maxHealth != null) {
             double current = maxHealth.getBaseValue();
             double newMax = current + addHP;
-
             maxHealth.setBaseValue(newMax);
-
-            if (healFull) {
-                player.setHealth(newMax);
-            } else if (player.getHealth() > newMax) {
-                player.setHealth(newMax);
-            }
+            if (healFull) player.setHealth(newMax);
+            else if (player.getHealth() > newMax) player.setHealth(newMax);
         }
     }
 
@@ -104,7 +92,6 @@ public class bambCore extends absCore {
 
     @EventHandler
     public void passiveEffect(EntityDamageByEntityEvent event) {
-
         if (!(event.getDamager() instanceof Player player)) return;
         if (!(event.getEntity() instanceof LivingEntity target)) return;
 
@@ -113,7 +100,7 @@ public class bambCore extends absCore {
                 if (!config.r_damaged.getOrDefault(player.getUniqueId(), false)) {
                     if (!config.reloaded.getOrDefault(player.getUniqueId(), false)) {
                         player.playSound(player.getLocation(), Sound.ITEM_TRIDENT_HIT, 1, 1);
-                        event.setDamage(4.0);
+                        event.setDamage(3.0);
                     } else {
                         player.playSound(player.getLocation(), Sound.ITEM_TRIDENT_HIT_GROUND, 1, 1);
                         event.setDamage(6.0);
@@ -126,7 +113,6 @@ public class bambCore extends absCore {
     @EventHandler
     public void onFallDamage(EntityDamageEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
-
         if(tag.Bamboo.contains(player)) {
             if (event.getCause() == EntityDamageEvent.DamageCause.FALL &&
                     player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "noFallDamage"), PersistentDataType.BOOLEAN, false)) {
@@ -139,7 +125,6 @@ public class bambCore extends absCore {
     @EventHandler
     public void onGameModeChange(PlayerGameModeChangeEvent event) {
         Player player = event.getPlayer();
-
         if(tag.Bamboo.contains(player)) {
             if (player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "noFallDamage"), PersistentDataType.BOOLEAN, false)) {
                 player.getPersistentDataContainer().remove(new NamespacedKey(plugin, "noFallDamage"));
@@ -153,37 +138,32 @@ public class bambCore extends absCore {
     }
 
     @Override
-    protected SkillBase getRSkill() {
-        return Rskill;
-    }
-
+    protected SkillBase getRSkill() { return Rskill; }
     @Override
-    protected SkillBase getQSkill() {
-        return Qskill;
-    }
-
+    protected SkillBase getQSkill() { return Qskill; }
     @Override
-    protected SkillBase getFSkill() {
-        return Fskill;
-    }
+    protected SkillBase getFSkill() { return Fskill; }
 
     private boolean hasProperItems(Player player) {
         ItemStack main = player.getInventory().getItemInMainHand();
         ItemStack off = player.getInventory().getItemInOffHand();
-        return main.getType() == Material.BAMBOO && off.getType() == Material.IRON_NUGGET;
+
+        boolean hasIron = (off.getType() == Material.IRON_NUGGET);
+
+        if (main.getType() == Material.BAMBOO) return hasIron;
+
+        if (Rskill.isSessionActive(player)) {
+            if (main.getType() == Material.REDSTONE && main.hasItemMeta()) {
+                NamespacedKey key = new NamespacedKey(plugin, R.REDSTONE_KEY);
+                return main.getItemMeta().getPersistentDataContainer().has(key, PersistentDataType.BYTE) && hasIron;
+            }
+        }
+        return false;
     }
 
-    private boolean canUseRSkill(Player player) {
-        return true;
-    }
-
-    private boolean canUseQSkill(Player player) {
-        return true;
-    }
-
-    private boolean canUseFSkill(Player player) {
-        return true;
-    }
+    private boolean canUseRSkill(Player player) { return true; }
+    private boolean canUseQSkill(Player player) { return true; }
+    private boolean canUseFSkill(Player player) { return true; }
 
     @Override
     protected boolean isItemRequired(Player player){
@@ -193,24 +173,25 @@ public class bambCore extends absCore {
     @Override
     protected boolean isDropRequired(Player player, ItemStack droppedItem){
         ItemStack off = player.getInventory().getItemInOffHand();
-        return droppedItem.getType() == Material.BAMBOO &&
-                off.getType() == Material.IRON_NUGGET;
+        if (off.getType() != Material.IRON_NUGGET) return false;
+
+        if (droppedItem.getType() == Material.BAMBOO) return true;
+
+        if (Rskill.isSessionActive(player)) {
+            if (droppedItem.getType() == Material.REDSTONE && droppedItem.hasItemMeta()) {
+                NamespacedKey key = new NamespacedKey(plugin, R.REDSTONE_KEY);
+                return droppedItem.getItemMeta().getPersistentDataContainer().has(key, PersistentDataType.BYTE);
+            }
+        }
+        return false;
     }
 
     @Override
-    protected boolean isRCondition(Player player) {
-        return canUseRSkill(player);
-    }
-
+    protected boolean isRCondition(Player player) { return canUseRSkill(player); }
     @Override
-    protected boolean isQCondition(Player player) {
-        return canUseQSkill(player);
-    }
-
+    protected boolean isQCondition(Player player) { return canUseQSkill(player); }
     @Override
-    protected boolean isFCondition(Player player) {
-        return canUseFSkill(player);
-    }
+    protected boolean isFCondition(Player player) { return canUseFSkill(player); }
 
     @Override
     protected ConfigWrapper getConfigWrapper() {

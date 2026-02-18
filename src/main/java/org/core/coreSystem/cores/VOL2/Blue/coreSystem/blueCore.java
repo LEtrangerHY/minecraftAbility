@@ -17,6 +17,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.core.cool.Cool;
@@ -115,7 +116,10 @@ public class blueCore extends absCore {
                 world.spawnParticle(Particle.SOUL, target.getLocation().clone().add(0, 1.3, 0), 1, 0.4, 0.4, 0.4, 0);
                 world.spawnParticle(Particle.SOUL, player.getLocation().clone().add(0, 1.3, 0), 1, 0.4, 0.4, 0.4, 0);
 
-                player.heal(0.6);
+                long level = player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L);
+                double heal = 0.6 * (1 + config.q_Skill_amp * level);
+
+                player.heal(heal);
 
             }
         }

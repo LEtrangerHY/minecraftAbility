@@ -232,10 +232,20 @@ public class pyroCore extends absCore {
     }
 
     @EventHandler
-    public void onFallDamage(EntityDamageEvent event) {
+    public void onDamage(EntityDamageEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
 
         if(tag.Pyro.contains(player)) {
+            if (event.getCause() == EntityDamageEvent.DamageCause.FIRE ||
+                    event.getCause() == EntityDamageEvent.DamageCause.FIRE_TICK ||
+                    event.getCause() == EntityDamageEvent.DamageCause.LAVA ||
+                    event.getCause() == EntityDamageEvent.DamageCause.HOT_FLOOR) {
+
+                event.setCancelled(true);
+                player.setFireTicks(0);
+                return;
+            }
+
             if (event.getCause() == EntityDamageEvent.DamageCause.FALL &&
                     player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "noFallDamage"), PersistentDataType.BOOLEAN, false)) {
                 event.setCancelled(true);

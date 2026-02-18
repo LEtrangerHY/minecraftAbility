@@ -1,17 +1,17 @@
-package org.core.coreSystem.cores.VOL3.Claud.Skill;
+package org.core.coreSystem.cores.VOL3.Residue.Skill;
 
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.core.cool.Cool;
 import org.core.coreSystem.absCoreSystem.SkillBase;
-import org.core.coreSystem.cores.VOL3.Claud.coreSystem.Claud;
+import org.core.coreSystem.cores.VOL3.Residue.coreSystem.Residue;
 
 public class R implements SkillBase {
-    private final Claud config;
+    private final Residue config;
     private final JavaPlugin plugin;
     private final Cool cool;
 
-    public R(Claud config, JavaPlugin plugin, Cool cool) {
+    public R(Residue config, JavaPlugin plugin, Cool cool) {
         this.config = config;
         this.plugin = plugin;
         this.cool = cool;

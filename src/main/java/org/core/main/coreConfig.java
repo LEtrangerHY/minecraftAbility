@@ -7,14 +7,19 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.core.cool.Cool;
+import org.core.coreSystem.absCoreSystem.absCore; // 추가됨
 import org.core.playerSettings.persistentPlayerSet;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 public class coreConfig {
 
     private final JavaPlugin plugin;
     private final Cool cool;
+
+    private final Map<String, absCore> coreRegistry = new HashMap<>();
 
     public Set<Player> PLAYER;
     public Set<Player> Nightel;
@@ -36,7 +41,7 @@ public class coreConfig {
     public Set<Player> Burst;
     public Set<Player> Lavender;
     public Set<Player> Rose;
-    public Set<Player> Claud;
+    public Set<Player> Residue;
 
     public coreConfig(JavaPlugin plugin, Cool cool) {
         this.plugin = plugin;
@@ -62,7 +67,11 @@ public class coreConfig {
         this.Burst = new persistentPlayerSet(plugin, "setting_burst");
         this.Lavender = new persistentPlayerSet(plugin, "setting_lavender");
         this.Rose = new persistentPlayerSet(plugin, "setting_rose");
-        this.Claud = new persistentPlayerSet(plugin, "setting_claud");
+        this.Residue = new persistentPlayerSet(plugin, "setting_residue");
+    }
+
+    public void registerCore(String name, absCore core) {
+        coreRegistry.put(name.toLowerCase(), core);
     }
 
     public String getPlayerCore(Player player) {
@@ -86,7 +95,7 @@ public class coreConfig {
         if (Burst.contains(player)) return "BURST";
         if (Lavender.contains(player)) return "LAVENDER";
         if (Rose.contains(player)) return "ROSE";
-        if (Claud.contains(player)) return "CLAUD";
+        if (Residue.contains(player)) return "RESIDUE";
         return "NONE";
     }
 
@@ -126,7 +135,7 @@ public class coreConfig {
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_burst"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_lavender"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_rose"), PersistentDataType.BYTE, (byte) 0);
-        player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_claud"), PersistentDataType.BYTE, (byte) 0);
+        player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_residue"), PersistentDataType.BYTE, (byte) 0);
     }
 
     public void setSetting(Player player, String setting, boolean value) {
@@ -135,6 +144,13 @@ public class coreConfig {
 
         PersistentDataContainer container = player.getPersistentDataContainer();
         container.set(key, PersistentDataType.BYTE, value ? (byte) 1 : (byte) 0);
+
+        if (value) {
+            absCore core = coreRegistry.get(setting.toLowerCase());
+            if (core != null) {
+                core.manualReset(player);
+            }
+        }
     }
 
     private NamespacedKey getSettingKey(String setting) {
@@ -159,7 +175,7 @@ public class coreConfig {
             case "burst" -> new NamespacedKey(plugin, "setting_burst");
             case "lavender" -> new NamespacedKey(plugin, "setting_lavender");
             case "rose" -> new NamespacedKey(plugin, "setting_rose");
-            case "claud" -> new NamespacedKey(plugin, "setting_claud");
+            case "residue" -> new NamespacedKey(plugin, "setting_residue");
             default -> null;
         };
     }

@@ -19,7 +19,7 @@ import org.bukkit.scoreboard.*;
 import org.core.coreSystem.cores.KEY.PLAYER.coreSystem.playerLeveling;
 import org.core.coreSystem.cores.VOL3.Lavender.coreSystem.lavLeveling;
 import org.core.coreSystem.cores.VOL2.Rose.coreSystem.roseLeveling;
-import org.core.coreSystem.cores.VOL3.Claud.coreSystem.claudLeveling;
+import org.core.coreSystem.cores.VOL3.Residue.coreSystem.residueLeveling;
 import org.core.main.coreConfig;
 import org.core.coreSystem.cores.VOL1.Bamboo.coreSystem.bambLeveling;
 import org.core.coreSystem.cores.KEY.Benzene.coreSystem.benzLeveling;
@@ -182,9 +182,9 @@ public class LevelingManager implements Listener {
                     roseLeveling rose = new roseLeveling(plugin, player, exp);
                     rose.addExp(player);
                     break;
-                case "CLAUD" :
-                    claudLeveling claud = new claudLeveling(plugin, player, exp);
-                    claud.addExp(player);
+                case "RESIDUE" :
+                    residueLeveling residue = new residueLeveling(plugin, player, exp);
+                    residue.addExp(player);
                     break;
                 default :
                     break;

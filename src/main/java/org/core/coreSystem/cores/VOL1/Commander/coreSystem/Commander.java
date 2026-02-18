@@ -30,6 +30,7 @@ public class Commander {
     //Q
     public double q_Skill_amp = 0.1;
     public double q_Skill_Damage = 2;
+    public double q_Skill_Heal = 2;
     public long q_Skill_Cool = 9000;
 
     //F

@@ -6,32 +6,30 @@ import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.UUID;
 
 public class Bamboo {
 
-    //CoolHashmap
     public HashMap<UUID, Long> R_COOLDOWN = new HashMap<>();
     public HashMap<UUID, Long> Q_COOLDOWN = new HashMap<>();
     public HashMap<UUID, Long> F_COOLDOWN = new HashMap<>();
 
     public long frozenCool = 10000;
 
-    //passive
     public HashMap<UUID, Boolean> reloaded = new HashMap<>();
 
-    //R
     public HashMap<UUID, HashSet<Entity>> damaged = new HashMap<>();
     public HashMap<UUID, Boolean> r_damaged = new HashMap<>();
     public double r_Skill_amp = 0.12;
-    public double r_Skill_damage = 12;
-    public long r_Skill_Cool = 7000;
+    public double r_Skill_damage = 8;
+    public long r_Skill_Cool = 8000;
 
-    //Q
+    public Map<UUID, Boolean> isSpearFlying = new HashMap<>();
+
     public long q_Skill_Cool = 7000;
     public double q_Skill_Jump = 2.0;
 
-    //F
     public long f_Skill_Cool = 100;
 
     public HashSet<UUID> moveToSneaking = new HashSet<>();
@@ -48,6 +46,8 @@ public class Bamboo {
         F_COOLDOWN.remove(player.getUniqueId());
 
         reloaded.remove(player.getUniqueId());
+        isSpearFlying.remove(player.getUniqueId());
+
         stringOn.remove(player.getUniqueId());
         moveToSneaking.remove(player.getUniqueId());
         moveToThrow.remove(player.getUniqueId());
@@ -57,5 +57,4 @@ public class Bamboo {
         damaged.remove(player.getUniqueId());
         r_damaged.remove(player.getUniqueId());
     }
-
 }
