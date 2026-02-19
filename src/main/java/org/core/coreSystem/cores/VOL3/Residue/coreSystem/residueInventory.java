@@ -116,7 +116,8 @@ public class residueInventory extends absInventory {
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
                 lore.add(Component.text("회전베기를 시전하며 후방으로 돌진한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("회전베기 피격 : 피격된 적의 숫자 * 3 만큼 배고픔을 회복하고 이에 비례한 속도만큼 전방으로 돌진한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("회전베기 피격 : 피격된 적의 숫자 만큼 체력을 회복하고 같은 수치의 300% 만큼 만큼 배고픔을 회복한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("회전베기 피격 : 피격된 적의 숫자에 비례한 속도만큼 전방으로 돌진한다.").color(NamedTextColor.GREEN));
                 break;
             default:
                 break;
