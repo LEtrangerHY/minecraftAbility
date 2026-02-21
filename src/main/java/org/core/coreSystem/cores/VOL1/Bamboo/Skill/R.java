@@ -73,7 +73,9 @@ public class R implements SkillBase {
             }
             if (info.display != null) info.display.remove();
 
-            cool.setCooldown(player, 0L, "Bamboo Hit", "boss");
+            if (player != null && player.isOnline()) {
+                cool.setCooldown(player, 0L, "Bamboo Hit", "boss");
+            }
         }
     }
 
@@ -110,8 +112,7 @@ public class R implements SkillBase {
 
         if (!config.reloaded.getOrDefault(uuid, false)) {
             reload(player);
-        }
-        else {
+        } else {
             throwBambooSpear(player);
         }
     }
@@ -153,16 +154,17 @@ public class R implements SkillBase {
 
         setItemToRedstone(player);
 
-        LivingEntity hitbox = (LivingEntity) world.spawnEntity(eyeLoc.add(0, -0.5, 0), EntityType.CHICKEN);
+        Location hitboxLoc = getTailLocation(eyeLoc, velocity);
+        LivingEntity hitbox = (LivingEntity) world.spawnEntity(hitboxLoc, EntityType.CHICKEN);
         hitbox.setInvisible(true);
         hitbox.setAI(false);
+        hitbox.setGravity(false);
         hitbox.setSilent(true);
         hitbox.setInvulnerable(true);
         hitbox.setCollidable(false);
         if (hitbox instanceof Ageable) ((Ageable) hitbox).setAdult();
 
         hitbox.addScoreboardTag("bamboo_projectile");
-
         hitbox.setLeashHolder(player);
 
         BlockDisplay bambooDisplay = (BlockDisplay) world.spawnEntity(eyeLoc, EntityType.BLOCK_DISPLAY);
@@ -171,7 +173,7 @@ public class R implements SkillBase {
 
         Transformation transform = bambooDisplay.getTransformation();
         transform.getScale().set(1.0f, 4.0f, 1.0f);
-        transform.getTranslation().set(0, -1.25f, 0);
+        transform.getTranslation().set(-0.5f, 0.5f, -1.0f);
         transform.getLeftRotation().set(new AxisAngle4f((float) Math.toRadians(90), 1, 0, 0));
         bambooDisplay.setTransformation(transform);
 
@@ -204,20 +206,23 @@ public class R implements SkillBase {
                     return;
                 }
 
-                Location currentLoc = hitbox.getLocation();
-                Location centerLoc = currentLoc.clone().add(0, 0.5, 0);
+                Location displayLoc = bambooDisplay.getLocation();
+                Location headLoc = getHeadLocation(displayLoc, velocity);
 
                 velocity.setY(velocity.getY() - 0.035);
 
-                if (!info.isLeashBroken && player.getLocation().distance(currentLoc) > 40.0) {
+                if (!info.isLeashBroken && player.isOnline() && player.getLocation().distance(hitbox.getLocation()) > 40.0) {
                     hitbox.setLeashHolder(null);
                     info.isLeashBroken = true;
                 }
 
-                RayTraceResult ray = world.rayTraceBlocks(centerLoc, velocity, velocity.length(), FluidCollisionMode.NEVER, true);
+                Location sweepStart = (ticks == 0) ? displayLoc : headLoc;
+                double sweepDist = (ticks == 0) ? velocity.length() + 3.0 : velocity.length();
+
+                RayTraceResult ray = world.rayTraceBlocks(sweepStart, velocity, sweepDist, FluidCollisionMode.NEVER, true);
                 Entity hitEntity = null;
 
-                for (Entity e : world.getNearbyEntities(centerLoc.clone().add(velocity), 1.3, 1.3, 1.3)) {
+                for (Entity e : world.getNearbyEntities(headLoc.clone().add(velocity), 1.5, 1.5, 1.5)) {
                     if (e != player && e instanceof LivingEntity && e != hitbox && e != bambooDisplay) {
                         hitEntity = e;
                         break;
@@ -235,8 +240,9 @@ public class R implements SkillBase {
                     return;
                 }
 
-                hitbox.teleport(currentLoc.add(velocity));
-                updateDisplayTransform(bambooDisplay, hitbox.getLocation().clone().add(0, 0.5, 0), velocity);
+                Location nextPos = displayLoc.clone().add(velocity);
+                updateDisplayTransform(bambooDisplay, nextPos, velocity);
+                hitbox.teleport(getTailLocation(nextPos, velocity));
 
                 ticks++;
             }
@@ -249,14 +255,29 @@ public class R implements SkillBase {
         config.isSpearFlying.put(player.getUniqueId(), false);
         info.landed = true;
 
-        cool.setCooldown(player, 6000L, "Bamboo Hit", "boss");
+        if (player.isOnline()) {
+            cool.setCooldown(player, 6000L, "Bamboo Hit", "boss");
+            player.playSound(player.getLocation(), Sound.ITEM_TRIDENT_HIT_GROUND, 1.0f, 1.0f);
+        }
 
-        world.playSound(info.hitbox.getLocation(), Sound.ITEM_TRIDENT_HIT_GROUND, 1.0f, 1.0f);
-        world.playSound(info.hitbox.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.5f, 1.5f);
+        world.playSound(info.display.getLocation(), Sound.ITEM_TRIDENT_HIT_GROUND, 1.0f, 1.0f);
+        world.playSound(info.display.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.5f, 1.5f);
 
         if (target != null) {
             info.stuckEntity = target;
-            info.offset = velocity.clone().normalize().multiply(-0.5);
+
+            Location targetLoc = target.getLocation();
+            Location targetCenter = targetLoc.clone().add(0, target.getHeight() / 2.0, 0);
+            Location idealOrigin = targetCenter.clone().subtract(velocity.clone().normalize().multiply(1.4));
+            idealOrigin.setDirection(velocity);
+
+            info.stuckOffset = idealOrigin.toVector().subtract(targetLoc.toVector());
+            info.initialEntityYaw = targetLoc.getYaw();
+            info.initialSpearYaw = idealOrigin.getYaw();
+            info.originalPitch = idealOrigin.getPitch();
+
+            updateDisplayTransform(info.display, idealOrigin, velocity);
+            info.hitbox.teleport(getTailLocation(idealOrigin, velocity));
 
             double amp = config.r_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L);
             double damage = config.r_Skill_damage * (1 + amp);
@@ -282,12 +303,12 @@ public class R implements SkillBase {
                 return;
             }
 
-            info.relativeYaw = target.getLocation().getYaw() - info.hitbox.getLocation().getYaw();
         } else if (blockHitLoc != null) {
-            Location stuckLoc = blockHitLoc.clone().subtract(velocity.clone().normalize().multiply(0.8));
+            Location stuckLoc = blockHitLoc.clone().subtract(velocity.clone().normalize().multiply(1.4));
             stuckLoc.setDirection(velocity);
-            info.hitbox.teleport(stuckLoc);
-            updateDisplayTransform(info.display, stuckLoc.clone().add(0, 0.5, 0), velocity);
+
+            updateDisplayTransform(info.display, stuckLoc, velocity);
+            info.hitbox.teleport(getTailLocation(info.display.getLocation(), velocity));
         }
 
         info.trackingTask = new BukkitRunnable() {
@@ -310,9 +331,21 @@ public class R implements SkillBase {
                         cancel();
                         return;
                     }
-                    Location targetLoc = info.stuckEntity.getLocation().add(0, info.stuckEntity.getHeight()/2, 0).add(info.offset);
-                    info.hitbox.teleport(targetLoc);
-                    updateDisplayTransform(info.display, targetLoc.clone().add(0, 0.5, 0), velocity);
+
+                    Location currentTargetLoc = info.stuckEntity.getLocation();
+                    float yawDelta = currentTargetLoc.getYaw() - info.initialEntityYaw;
+
+                    Vector rotatedOffset = info.stuckOffset.clone();
+                    rotatedOffset.rotateAroundY(Math.toRadians(-yawDelta));
+
+                    Location newSpearLoc = currentTargetLoc.clone().add(rotatedOffset);
+                    newSpearLoc.setYaw(info.initialSpearYaw + yawDelta);
+                    newSpearLoc.setPitch(info.originalPitch);
+
+                    Vector newDir = newSpearLoc.getDirection();
+
+                    updateDisplayTransform(info.display, newSpearLoc, newDir);
+                    info.hitbox.teleport(getTailLocation(newSpearLoc, newDir));
                 }
             }
         }.runTaskTimer(plugin, 0L, 1L);
@@ -333,14 +366,12 @@ public class R implements SkillBase {
         if (info.trackingTask != null) info.trackingTask.cancel();
         if (info.timeoutTask != null) info.timeoutTask.cancel();
 
-        // ★ [수정됨] 중복 아이템 지급 방지를 위해 여기서 호출하지 않음
-        // cleanupSession이 마지막에 호출되며 아이템을 복구함
+        player.playSound(player.getLocation(), Sound.BLOCK_STONE_BUTTON_CLICK_ON, 2.0f, 1.0f);
 
         world.playSound(particleLoc, Sound.ENTITY_GENERIC_EXPLODE, 4.0f, 1.0f);
         world.playSound(particleLoc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 3.0f, 0.8f);
 
         world.spawnParticle(Particle.EXPLOSION_EMITTER, particleLoc, 1, 0.0, 0.0, 0.0, 0.0);
-
         world.spawnParticle(Particle.FLAME, particleLoc, 10, 0.5, 0.5, 0.5, 0.3);
         world.spawnParticle(Particle.LARGE_SMOKE, particleLoc, 10, 0.8, 0.8, 0.8, 0.1);
         world.spawnParticle(Particle.BLOCK, particleLoc, 10, 0.8, 0.8, 0.8, 0.5, Material.BAMBOO.createBlockData());
@@ -384,10 +415,9 @@ public class R implements SkillBase {
 
             config.isSpearFlying.remove(uuid);
 
-            cool.setCooldown(Objects.requireNonNull(Bukkit.getPlayer(uuid)), 0L, "Bamboo Hit", "boss");
-
             Player player = Bukkit.getPlayer(uuid);
-            if (player != null) {
+            if (player != null && player.isOnline()) {
+                cool.setCooldown(player, 0L, "Bamboo Hit", "boss");
                 setItemToBamboo(player);
                 cool.updateCooldown(player, "R", cooldown);
             }
@@ -452,29 +482,36 @@ public class R implements SkillBase {
 
     private void updateDisplayTransform(BlockDisplay display, Location newLoc, Vector direction) {
         if (direction.lengthSquared() < 0.0001) return;
-
         newLoc.setDirection(direction);
-        display.setRotation(newLoc.getYaw(), newLoc.getPitch());
-
-        Transformation t = display.getTransformation();
-        t.getScale().set(1.0f, 4.0f, 1.0f);
-        t.getTranslation().set(0, -1.25f, 0);
-        t.getLeftRotation().set(new AxisAngle4f((float) Math.toRadians(90), 1, 0, 0));
-        display.setTransformation(t);
-
         display.teleport(newLoc);
+    }
+
+    private Location getTailLocation(Location baseLoc, Vector direction) {
+        Vector dir = direction.clone().normalize();
+        Location tail = baseLoc.clone().subtract(dir.multiply(1.0));
+        tail.subtract(0, 0.45, 0);
+        return tail;
+    }
+
+    private Location getHeadLocation(Location baseLoc, Vector direction) {
+        Vector dir = direction.clone().normalize();
+        return baseLoc.clone().add(dir.multiply(3.0));
     }
 
     private static class BambooSpearInfo {
         LivingEntity hitbox;
         BlockDisplay display;
         LivingEntity stuckEntity;
-        Vector offset;
+
+        Vector stuckOffset;
+        float initialEntityYaw;
+        float initialSpearYaw;
+        float originalPitch;
+
         boolean landed = false;
         boolean isLeashBroken = false;
         BukkitTask trackingTask;
         BukkitTask timeoutTask;
-        float relativeYaw;
 
         public BambooSpearInfo(LivingEntity hitbox, BlockDisplay display) {
             this.hitbox = hitbox;

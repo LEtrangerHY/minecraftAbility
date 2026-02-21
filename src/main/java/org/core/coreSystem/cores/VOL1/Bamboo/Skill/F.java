@@ -125,7 +125,9 @@ public class F implements SkillBase {
                     config.isDashing.remove(player.getUniqueId());
 
                     if (player.isOnline() && !player.isDead()) {
-                        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, 40, 0, false, false));
+                        if (isGrapple) {
+                            player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, 30, 0, false, false));
+                        }
                     }
 
                     cancel();
