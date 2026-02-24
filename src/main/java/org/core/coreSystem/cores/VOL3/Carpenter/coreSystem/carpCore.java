@@ -1,4 +1,4 @@
-package org.core.coreSystem.cores.VOL1.Carpenter.coreSystem;
+package org.core.coreSystem.cores.VOL3.Carpenter.coreSystem;
 
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
@@ -22,10 +22,10 @@ import org.core.main.coreConfig;
 import org.core.coreSystem.absCoreSystem.ConfigWrapper;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.absCoreSystem.absCore;
-import org.core.coreSystem.cores.VOL1.Carpenter.Passive.Christmas;
-import org.core.coreSystem.cores.VOL1.Carpenter.Skill.F;
-import org.core.coreSystem.cores.VOL1.Carpenter.Skill.Q;
-import org.core.coreSystem.cores.VOL1.Carpenter.Skill.R;
+import org.core.coreSystem.cores.VOL3.Carpenter.Passive.Christmas;
+import org.core.coreSystem.cores.VOL3.Carpenter.Skill.F;
+import org.core.coreSystem.cores.VOL3.Carpenter.Skill.Q;
+import org.core.coreSystem.cores.VOL3.Carpenter.Skill.R;
 
 public class carpCore extends absCore {
     private final Core plugin;

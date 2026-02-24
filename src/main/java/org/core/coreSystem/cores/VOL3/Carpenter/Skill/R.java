@@ -1,7 +1,5 @@
-package org.core.coreSystem.cores.VOL1.Carpenter.Skill;
+package org.core.coreSystem.cores.VOL3.Carpenter.Skill;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
@@ -19,7 +17,7 @@ import org.core.effect.crowdControl.ForceDamage;
 import org.core.effect.crowdControl.Invulnerable;
 import org.core.effect.crowdControl.Stun;
 import org.core.coreSystem.absCoreSystem.SkillBase;
-import org.core.coreSystem.cores.VOL1.Carpenter.coreSystem.Carpenter;
+import org.core.coreSystem.cores.VOL3.Carpenter.coreSystem.Carpenter;
 
 import java.util.*;
 import java.util.List;

@@ -158,14 +158,14 @@ public class blazeCore extends absCore {
                             return;
                         }
 
-                        double damage = 0.4;
+                        double damage = 0.13;
 
                         if(config.BurstBlaze.getOrDefault(player.getUniqueId(), false)){
-                            double amp = config.q_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L);
-                            damage = 0.4 * (1 + amp);
+                            double amp = config.q_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L);
+                            damage = 0.13 * (1 + amp);
                             player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(1 / 1.3);
                             cool.setCooldown(player, 1300L, "blaze");
-                        }else {
+                        } else {
                             player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(1 / 2.6);
                             cool.setCooldown(player, 2600L, "blaze");
                         }
@@ -186,6 +186,7 @@ public class blazeCore extends absCore {
 
                         double maxDistance = (config.BurstBlaze.getOrDefault(player.getUniqueId(), false)) ? 11.0 : 9.0;
                         double coneAngle = (config.BurstBlaze.getOrDefault(player.getUniqueId(), false)) ? 360.0 : 60.0;
+                        double angleStep = (config.BurstBlaze.getOrDefault(player.getUniqueId(), false)) ? 20.0 : 10.0;
 
                         if(config.BurstBlaze.getOrDefault(player.getUniqueId(), false)){
                             player.spawnParticle(Particle.SOUL_FIRE_FLAME, player.getLocation().clone().add(0, 0.6, 0), 44, 0.1, 0.1, 0.1, 0.8);
@@ -217,13 +218,13 @@ public class blazeCore extends absCore {
                                     return;
                                 }
 
-                                for (double angle = -coneAngle / 2; angle <= coneAngle / 2; angle += 8) {
+                                for (double angle = -coneAngle / 2; angle <= coneAngle / 2; angle += angleStep) {
                                     Vector dir = (config.BurstBlaze.getOrDefault(player.getUniqueId(), false)) ? forward.clone().setY(0).rotateAroundY(Math.toRadians(angle)): forward.clone().rotateAroundY(Math.toRadians(angle));
                                     Location particleLoc = origin.clone().add(dir.multiply(distance));
 
                                     world.spawnParticle(Particle.SOUL_FIRE_FLAME, particleLoc, 2, 0.2, 0.1, 0.2, 0.04);
 
-                                    double dist = (config.BurstBlaze.getOrDefault(player.getUniqueId(), false)) ? 2 : 0.6;
+                                    double dist = (config.BurstBlaze.getOrDefault(player.getUniqueId(), false)) ? 1.0 : 0.6;
 
                                     for (Entity entity : world.getNearbyEntities(particleLoc, dist, dist, dist)) {
                                         if (entity instanceof LivingEntity target && entity != player) {

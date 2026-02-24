@@ -1,4 +1,4 @@
-package org.core.coreSystem.cores.VOL1.Carpenter.Skill;
+package org.core.coreSystem.cores.VOL3.Carpenter.Skill;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -11,7 +11,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.core.cool.Cool;
 import org.core.coreSystem.absCoreSystem.SkillBase;
-import org.core.coreSystem.cores.VOL1.Carpenter.coreSystem.Carpenter;
+import org.core.coreSystem.cores.VOL3.Carpenter.coreSystem.Carpenter;
 
 import java.time.Duration;
 

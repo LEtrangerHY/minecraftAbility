@@ -59,7 +59,6 @@ public class F implements SkillBase {
         }, 12L);
     }
 
-
     public void Slash(Player player) {
         World world = player.getWorld();
         UUID uuid = player.getUniqueId();
@@ -68,14 +67,10 @@ public class F implements SkillBase {
 
         double slashLength = 4.8;
         double maxAngleRad = Math.toRadians(90);
-        maxAngleRad = -maxAngleRad;
-
-        double angleIncrease = -Math.toRadians(2);
         double maxTicks = 6;
         double innerRadius = 2.6;
 
-        double absMaxAngle = Math.abs(maxAngleRad);
-        double hitThreshold = Math.cos(absMaxAngle + 0.25);
+        double hitThreshold = Math.cos(maxAngleRad + 0.25);
 
         HashSet<Entity> damagedSet = new HashSet<>();
         config.damaged.put(uuid, damagedSet);
@@ -91,9 +86,14 @@ public class F implements SkillBase {
                 .build();
 
         Location origin = player.getEyeLocation().add(0, -0.6, 0);
-        Vector direction = player.getLocation().getDirection().setY(0).normalize();
 
-        double finalMaxAngle = maxAngleRad;
+        Vector direction = player.getLocation().getDirection().setY(0).normalize();
+        double dirX = direction.getX();
+        double dirZ = direction.getZ();
+
+        double originX = origin.getX();
+        double originY = origin.getY();
+        double originZ = origin.getZ();
 
         new BukkitRunnable() {
             int ticks = 0;
@@ -126,51 +126,41 @@ public class F implements SkillBase {
                     return;
                 }
 
-                double progress = (ticks + 1) * (finalMaxAngle * 2 / maxTicks) - finalMaxAngle;
-                Vector rotatedDir = direction.clone().rotateAroundY(progress);
-
                 for (Entity e : world.getNearbyEntities(origin, slashLength + 0.5, slashLength + 0.5, slashLength + 0.5)) {
-                    if (e instanceof LivingEntity target && e != player) {
-                        if (!damagedSet.contains(target)) {
+                    if (!(e instanceof LivingEntity target) || e == player || damagedSet.contains(target)) continue;
 
-                            Vector toEntity = target.getLocation().toVector().subtract(origin.toVector());
+                    Vector toTarget = target.getLocation().toVector().subtract(origin.toVector());
+                    toTarget.setY(0);
 
-                            if (toEntity.lengthSquared() <= (slashLength + 0.5) * (slashLength + 0.5)) {
+                    if (toTarget.lengthSquared() <= (slashLength + 0.5) * (slashLength + 0.5)) {
+                        Vector toTargetDir = toTarget.normalize();
+                        double dotProduct = direction.dot(toTargetDir);
 
-                                Vector toEntityDir = toEntity.clone().setY(0).normalize();
-                                double dotProduct = rotatedDir.dot(toEntityDir);
-
-                                if (dotProduct >= hitThreshold) {
-                                    ForceDamage forceDamage = new ForceDamage(target, damage, source, true);
-                                    forceDamage.applyEffect(player);
-                                    damagedSet.add(target);
-                                }
-                            }
+                        if (dotProduct >= hitThreshold) {
+                            ForceDamage forceDamage = new ForceDamage(target, damage, source, true);
+                            forceDamage.applyEffect(player);
+                            damagedSet.add(target);
                         }
                     }
                 }
 
-                Location particleLocation = origin.clone();
-                double originX = origin.getX();
-                double originY = origin.getY();
-                double originZ = origin.getZ();
+                double progress = (ticks + 1) * (maxAngleRad * 2 / maxTicks) - maxAngleRad;
 
-                for (double length = 0; length <= slashLength; length += 0.1) {
-                    if (length < innerRadius) continue;
+                for (double length = innerRadius; length <= slashLength; length += 0.15) {
+                    for (double angle = -maxAngleRad; angle <= maxAngleRad; angle += Math.toRadians(2.5)) {
 
-                    for (double angle = -finalMaxAngle; angle >= finalMaxAngle; angle += angleIncrease) {
-                        Vector angleDir = rotatedDir.clone().rotateAroundY(angle);
+                        double totalAngle = progress + angle;
+                        double sinA = Math.sin(totalAngle);
+                        double cosA = Math.cos(totalAngle);
 
-                        double valX = angleDir.getX() * length;
-                        double valY = angleDir.getY() * length;
-                        double valZ = angleDir.getZ() * length;
+                        double finalX = dirX * cosA - dirZ * sinA;
+                        double finalZ = dirX * sinA + dirZ * cosA;
 
-                        particleLocation.setX(originX + valX);
-                        particleLocation.setY(originY + valY);
-                        particleLocation.setZ(originZ + valZ);
+                        double pX = originX + finalX * length;
+                        double pZ = originZ + finalZ * length;
 
                         Particle.DustOptions opt = (Math.random() < 0.11) ? DUST_SLASH : DUST_SLASH_GRA;
-                        world.spawnParticle(Particle.DUST, particleLocation, 1, 0, 0, 0, 0, opt);
+                        world.spawnParticle(Particle.DUST, pX, originY, pZ, 1, 0, 0, 0, 0, opt);
                     }
                 }
                 ticks++;
