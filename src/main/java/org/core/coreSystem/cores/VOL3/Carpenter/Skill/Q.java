@@ -36,7 +36,6 @@ public class Q implements SkillBase {
     @Override
     public void Trigger(Player player) {
         if(!config.q_using.getOrDefault(player.getUniqueId(), false)){
-            player.sendActionBar(Component.text("Q click to smash").color(NamedTextColor.YELLOW));
             Load(player);
         }else{
             config.crash.put(player.getUniqueId(), true);
@@ -49,7 +48,7 @@ public class Q implements SkillBase {
 
         player.getWorld().playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.0f, 1.0f);
 
-        cool.setCooldown(player, config.q_Skill_Load, "q -normal distribution-");
+        cool.setCooldown(player, config.q_Skill_Load, "Q -normal distribution-", "boss");
 
         PotionEffect resistance = new PotionEffect(PotionEffectType.RESISTANCE, 20 * 5, 1, false, false, false);
         player.addPotionEffect(resistance);
@@ -66,7 +65,7 @@ public class Q implements SkillBase {
 
                 if(ticks >= 100 || config.crash.getOrDefault(player.getUniqueId(), false)){
                     long cools = 50L;
-                    cool.updateCooldown(player, "q -normal distribution-", cools);
+                    cool.updateCooldown(player, "q -normal distribution-", cools, "boss");
                     config.q_using.remove(player.getUniqueId());
                     config.crash.remove(player.getUniqueId());
                     this.cancel();
