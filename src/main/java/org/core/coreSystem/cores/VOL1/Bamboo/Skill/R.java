@@ -139,7 +139,7 @@ public class R implements SkillBase {
             player.getWorld().playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_LEATHER, 1, 1);
             Title title = Title.title(
                     Component.empty(),
-                    Component.text("iron needed").color(NamedTextColor.RED),
+                    Component.text("iron nugget needed").color(NamedTextColor.RED),
                     Title.Times.times(Duration.ZERO, Duration.ofMillis(300), Duration.ofMillis(200))
             );
             player.showTitle(title);

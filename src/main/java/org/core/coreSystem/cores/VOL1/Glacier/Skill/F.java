@@ -73,7 +73,7 @@ public class F implements SkillBase {
 
             Title title = Title.title(
                     Component.empty(),
-                    Component.text("Shortage(BlueIce)").color(NamedTextColor.RED),
+                    Component.text("blue ice needed").color(NamedTextColor.RED),
                     Title.Times.times(Duration.ZERO, Duration.ofMillis(300), Duration.ofMillis(200))
             );
             player.showTitle(title);

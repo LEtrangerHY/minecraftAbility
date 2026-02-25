@@ -41,14 +41,15 @@ public class dagInventory extends absInventory {
     }
 
     @Override
-    protected boolean isCoreItemClicked(Player player, ItemStack clicked){
-        return clicked.getType() == Material.ECHO_SHARD;
+    protected Material getMainTotem(Player player) {
+        return Material.ECHO_SHARD;
     }
 
     @Override
     protected Component getName(Player player, String skill) {
 
         return switch (skill) {
+            case "main" -> Component.text("DAGGER");
             case "R" -> Component.text("Stab");
             case "Q" -> Component.text("Overdrive");
             case "F" -> Component.text("X-SLASH");
@@ -70,6 +71,17 @@ public class dagInventory extends absInventory {
     protected List<Component> getTotemLore(Player player, String skill) {
 
         List<Component> lore = new ArrayList<>();
+
+        if (skill.equals("main")) {
+            lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+            lore.add(Component.text("타입 : 암살자").color(NamedTextColor.LIGHT_PURPLE));
+            lore.add(Component.text("장착 : 메인핸드에 메아리 조각 장착, 오프핸드는 장착 금지.").color(NamedTextColor.LIGHT_PURPLE));
+            lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+            lore.add(Component.text(""));
+            lore.add(Component.text("메뉴북 아이템 없어도 인벤토리 화면에서 메아리 조각을 우클릭해서 메뉴 화면 진입 가능").color(NamedTextColor.AQUA));
+            return lore;
+        }
+
         long level = getSkillLevel(player, skill);
         long playerLevel = player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "level"), PersistentDataType.LONG, 0L);
 
@@ -132,6 +144,7 @@ public class dagInventory extends absInventory {
 
     @Override
     protected Long getSkillLevel(Player player, String skill) {
+        if (skill.equals("main")) return 0L;
         return player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, skill), PersistentDataType.LONG, 0L);
     }
 

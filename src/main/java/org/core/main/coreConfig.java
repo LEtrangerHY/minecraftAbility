@@ -1,13 +1,19 @@
 package org.core.main;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.core.cool.Cool;
-import org.core.coreSystem.absCoreSystem.absCore; // 추가됨
+import org.core.coreSystem.absCoreSystem.absCore;
 import org.core.playerSettings.persistentPlayerSet;
 
 import java.util.HashMap;
@@ -151,6 +157,16 @@ public class coreConfig {
                 core.manualReset(player);
             }
         }
+
+        ItemStack dataLoreBook = new ItemStack(Material.ENCHANTED_BOOK);
+        ItemMeta meta = dataLoreBook.getItemMeta();
+        if (meta != null) {
+            meta.displayName(Component.text("DataMenu")
+                    .color(NamedTextColor.LIGHT_PURPLE)
+                    .decoration(TextDecoration.ITALIC, false));
+            dataLoreBook.setItemMeta(meta);
+        }
+        player.getInventory().addItem(dataLoreBook);
     }
 
     private NamespacedKey getSettingKey(String setting) {

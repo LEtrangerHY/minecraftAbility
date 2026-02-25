@@ -23,11 +23,6 @@ import org.core.coreSystem.cores.KEY.PLAYER.Skill.R;
 import org.core.main.Core;
 import org.core.main.coreConfig;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.UUID;
-
 public class playerCore extends absCore {
 
     private final Core plugin;

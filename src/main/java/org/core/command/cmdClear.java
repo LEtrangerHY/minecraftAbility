@@ -34,13 +34,13 @@ public class cmdClear implements CommandExecutor, TabCompleter {
             }
             this.config.clearPlayerCore(target);
             level.levelScoreBoard(target);
-            sender.sendMessage("§c" + target.getName() + " 소유의 core을 모두 제거했습니다");
+            sender.sendMessage("§c" + target.getName() + " 에게 할당된 data를 모두 제거했습니다");
             return true;
         } else if (args.length == 0) {
             if (!(sender instanceof Player player)) return true;
             this.config.clearPlayerCore(player);
             level.levelScoreBoard(player);
-            sender.sendMessage("§c본인 소유의 core을 모두 제거했습니다.");
+            sender.sendMessage("§c본인에게 할당된 data를 모두 제거했습니다.");
             return true;
         } else {
             sender.sendMessage("§c사용법: /coreclear <플레이어 닉네임|공백>");

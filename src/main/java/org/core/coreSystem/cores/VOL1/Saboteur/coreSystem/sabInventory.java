@@ -41,8 +41,8 @@ public class sabInventory extends absInventory {
     }
 
     @Override
-    protected boolean isCoreItemClicked(Player player, ItemStack clicked){
-        return clicked.getType() == Material.SHEARS;
+    protected Material getMainTotem(Player player) {
+        return Material.SHEARS;
     }
 
     @Override
@@ -70,6 +70,17 @@ public class sabInventory extends absInventory {
     protected List<Component> getTotemLore(Player player, String skill) {
 
         List<Component> lore = new ArrayList<>();
+
+        if (skill.equals("main")) {
+            lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+            lore.add(Component.text("타입 : 디버프 암살자").color(NamedTextColor.LIGHT_PURPLE));
+            lore.add(Component.text("장착 : 메인핸드에 가위 장착, 오프핸드는 장착 금지.").color(NamedTextColor.LIGHT_PURPLE));
+            lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+            lore.add(Component.text(""));
+            lore.add(Component.text("메뉴북 아이템 없어도 인벤토리 화면에서 가위를 우클릭해서 메뉴 화면 진입 가능").color(NamedTextColor.AQUA));
+            return lore;
+        }
+
         long level = getSkillLevel(player, skill);
         long playerLevel = player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "level"), PersistentDataType.LONG, 0L);
 
@@ -137,6 +148,7 @@ public class sabInventory extends absInventory {
 
     @Override
     protected Long getSkillLevel(Player player, String skill) {
+        if (skill.equals("main")) return 0L;
         return player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, skill), PersistentDataType.LONG, 0L);
     }
 

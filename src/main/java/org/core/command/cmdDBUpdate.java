@@ -40,7 +40,7 @@ public class cmdDBUpdate implements CommandExecutor, TabCompleter {
         }
 
         dbConn.insertMember(target);
-        sender.sendMessage("§a" + "현재 " + target.getName() + " 소유의 core를 데이터베이스에 업데이트 하였습니다.");
+        sender.sendMessage("§a" + "현재 " + target.getName() + " 에게 할당된 data를 데이터베이스에 업데이트 하였습니다.");
         return true;
     }
 

@@ -41,14 +41,15 @@ public class glaInventory extends absInventory {
     }
 
     @Override
-    protected boolean isCoreItemClicked(Player player, ItemStack clicked){
-        return clicked.getType() == Material.BREEZE_ROD;
+    protected Material getMainTotem(Player player) {
+        return Material.BREEZE_ROD;
     }
 
     @Override
     protected Component getName(Player player, String skill) {
 
         return switch (skill) {
+            case "main" -> Component.text("GLACIER");
             case "R" -> Component.text("Freeze");
             case "Q" -> Component.text("SnowScape");
             case "F" -> Component.text("FROSTBITE");
@@ -70,6 +71,17 @@ public class glaInventory extends absInventory {
     protected List<Component> getTotemLore(Player player, String skill) {
 
         List<Component> lore = new ArrayList<>();
+
+        if (skill.equals("main")) {
+            lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+            lore.add(Component.text("타입 : 컨트롤러").color(NamedTextColor.LIGHT_PURPLE));
+            lore.add(Component.text("장착 : 메인핸드에 브리즈 막대 장착, 오프핸드는 푸른 얼음 장전.").color(NamedTextColor.LIGHT_PURPLE));
+            lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+            lore.add(Component.text(""));
+            lore.add(Component.text("메뉴북 아이템 없어도 인벤토리 화면에서 브리즈 막대를 우클릭해서 메뉴 화면 진입 가능").color(NamedTextColor.AQUA));
+            return lore;
+        }
+
         long level = getSkillLevel(player, skill);
         long playerLevel = player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "level"), PersistentDataType.LONG, 0L);
 
@@ -133,6 +145,7 @@ public class glaInventory extends absInventory {
 
     @Override
     protected Long getSkillLevel(Player player, String skill) {
+        if (skill.equals("main")) return 0L;
         return player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, skill), PersistentDataType.LONG, 0L);
     }
 

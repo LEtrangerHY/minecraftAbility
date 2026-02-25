@@ -71,7 +71,7 @@ public class R implements SkillBase {
             player.getWorld().playSound(player.getLocation(), Sound.ITEM_FLINTANDSTEEL_USE, 1, 1);
             Title title = Title.title(
                     Component.empty(),
-                    Component.text("powder needed").color(NamedTextColor.RED),
+                    Component.text("blaze powder needed").color(NamedTextColor.RED),
                     Title.Times.times(Duration.ZERO, Duration.ofMillis(300), Duration.ofMillis(200))
             );
             player.showTitle(title);

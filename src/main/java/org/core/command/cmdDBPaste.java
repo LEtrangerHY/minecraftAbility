@@ -44,7 +44,7 @@ public class cmdDBPaste implements CommandExecutor, TabCompleter {
 
         dbConn.db_PastePlayerInfo(target);
         level.applyLevelHealth(target, true);
-        sender.sendMessage("§a" + target.getName() + " 소유의 core를 데이터베이스 수치로 붙여넣었습니다.");
+        sender.sendMessage("§a" + target.getName() + " 에게 할당된 data를 데이터베이스 수치로 붙여넣었습니다.");
         return true;
     }
 

@@ -147,7 +147,7 @@ public class F implements SkillBase {
 
             Title title = Title.title(
                     Component.empty(),
-                    Component.text("iron needed").color(NamedTextColor.RED),
+                    Component.text("iron ingot needed").color(NamedTextColor.RED),
                     Title.Times.times(Duration.ZERO, Duration.ofMillis(300), Duration.ofMillis(200))
             );
             player.showTitle(title);

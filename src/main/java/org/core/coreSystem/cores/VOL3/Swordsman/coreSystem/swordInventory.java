@@ -41,14 +41,15 @@ public class swordInventory extends absInventory {
     }
 
     @Override
-    protected boolean isCoreItemClicked(Player player, ItemStack clicked){
-        return clicked.getType() == Material.IRON_SWORD;
+    protected Material getMainTotem(Player player) {
+        return Material.IRON_SWORD;
     }
 
     @Override
     protected Component getName(Player player, String skill) {
 
         return switch (skill) {
+            case "main" -> Component.text("SWORDSMAN");
             case "R" -> Component.text("RapidSlash/QuickDraw");
             case "Q" -> Component.text("SwallowSweep/SwallowCounter");
             case "F" -> Component.text("CONVERGENCE");
@@ -70,6 +71,17 @@ public class swordInventory extends absInventory {
     protected List<Component> getTotemLore(Player player, String skill) {
 
         List<Component> lore = new ArrayList<>();
+
+        if (skill.equals("main")) {
+            lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+            lore.add(Component.text("타입 : 브루저").color(NamedTextColor.LIGHT_PURPLE));
+            lore.add(Component.text("장착 : 메인핸드에 철검 장착, 오프핸드에 꾸러미 장착.").color(NamedTextColor.LIGHT_PURPLE));
+            lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+            lore.add(Component.text(""));
+            lore.add(Component.text("메뉴북 아이템 없어도 인벤토리 화면에서 철검을 우클릭해서 메뉴 화면 진입 가능").color(NamedTextColor.AQUA));
+            return lore;
+        }
+
         long level = getSkillLevel(player, skill);
         long playerLevel = player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "level"), PersistentDataType.LONG, 0L);
 
@@ -136,6 +148,7 @@ public class swordInventory extends absInventory {
 
     @Override
     protected Long getSkillLevel(Player player, String skill) {
+        if (skill.equals("main")) return 0L;
         return player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, skill), PersistentDataType.LONG, 0L);
     }
 

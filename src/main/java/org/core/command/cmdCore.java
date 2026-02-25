@@ -12,12 +12,19 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class cmdCore implements CommandExecutor, TabCompleter {
 
     private final coreConfig config;
     private final LevelingManager level;
+
+    private static final List<String> VALID_SETTINGS = Arrays.asList(
+            "player", "nightel", "knight", "pyro", "glacier", "dagger", "carpenter",
+            "bamboo", "luster", "blaze", "commander", "harvester", "blossom", "blue",
+            "swordsman", "saboteur", "burst", "lavender", "rose", "residue", "benzene"
+    );
 
     public cmdCore(coreConfig config, LevelingManager level) {
         this.config = config;
@@ -38,6 +45,12 @@ public class cmdCore implements CommandExecutor, TabCompleter {
         }
 
         String setting = args[1].toLowerCase();
+
+        if (!VALID_SETTINGS.contains(setting)) {
+            sender.sendMessage("§c해당 data 는 존재하지 않습니다.");
+            return true;
+        }
+
         boolean value;
         if (args[2].equalsIgnoreCase("true")) {
             value = true;
@@ -51,6 +64,7 @@ public class cmdCore implements CommandExecutor, TabCompleter {
         this.config.setSetting(target, setting, value);
         level.levelScoreBoard(target);
         sender.sendMessage("§a" + target.getName() + "의 " + setting + " 값을 " + value + "로 설정했습니다.");
+        sender.sendMessage("§b" + "DataMenu 를 들고 우클릭하여 설정한 data의 상세정보를 확인할 수 있습니다.");
         return true;
     }
 
@@ -60,33 +74,19 @@ public class cmdCore implements CommandExecutor, TabCompleter {
 
         if (args.length == 1) {
             for (Player p : Bukkit.getOnlinePlayers()) {
-                suggestions.add(p.getName());
+                if (p.getName().toLowerCase().startsWith(args[0].toLowerCase())) {
+                    suggestions.add(p.getName());
+                }
             }
         } else if (args.length == 2) {
-            suggestions.add("player");
-            suggestions.add("nightel");
-            suggestions.add("knight");
-            suggestions.add("pyro");
-            suggestions.add("glacier");
-            suggestions.add("dagger");
-            suggestions.add("carpenter");
-            suggestions.add("bamboo");
-            suggestions.add("luster");
-            suggestions.add("blaze");
-            suggestions.add("commander");
-            suggestions.add("harvester");
-            suggestions.add("blossom");
-            suggestions.add("blue");
-            suggestions.add("swordsman");
-            suggestions.add("saboteur");
-            suggestions.add("burst");
-            suggestions.add("lavender");
-            suggestions.add("rose");
-            suggestions.add("residue");
-            suggestions.add("benzene");
+            for (String s : VALID_SETTINGS) {
+                if (s.toLowerCase().startsWith(args[1].toLowerCase())) {
+                    suggestions.add(s);
+                }
+            }
         } else if (args.length == 3) {
-            suggestions.add("true");
-            suggestions.add("false");
+            if ("true".startsWith(args[2].toLowerCase())) suggestions.add("true");
+            if ("false".startsWith(args[2].toLowerCase())) suggestions.add("false");
         }
         return suggestions;
     }

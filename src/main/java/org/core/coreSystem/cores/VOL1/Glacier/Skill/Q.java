@@ -50,7 +50,7 @@ public class Q implements SkillBase {
 
             Title title = Title.title(
                     Component.empty(),
-                    Component.text("Blue Ice needed").color(NamedTextColor.RED),
+                    Component.text("blue Ice needed").color(NamedTextColor.RED),
                     Title.Times.times(Duration.ZERO, Duration.ofMillis(300), Duration.ofMillis(200))
             );
             player.showTitle(title);

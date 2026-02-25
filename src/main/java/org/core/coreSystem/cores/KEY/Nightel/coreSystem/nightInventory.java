@@ -7,9 +7,8 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.plugin.Plugin; // Import 추가
+import org.bukkit.plugin.Plugin;
 import org.core.main.Core;
 import org.core.main.coreConfig;
 import org.core.coreSystem.absInventorySystem.InventoryWrapper;
@@ -38,14 +37,15 @@ public class nightInventory extends absInventory {
     }
 
     @Override
-    protected boolean isCoreItemClicked(Player player, ItemStack clicked){
-        return clicked.getType() == Material.IRON_SWORD;
+    protected Material getMainTotem(Player player) {
+        return Material.IRON_SWORD;
     }
 
     @Override
     protected Component getName(Player player, String skill) {
         return switch (skill) {
-            case "R" -> Component.text("Dusk");
+            case "main" -> Component.text("NIGHTEL");
+            case "R" -> Component.text("Twilight");
             case "Q" -> Component.text("Illusion");
             case "F" -> Component.text("NIGHTSHADE");
             default -> Component.text("???");
@@ -65,6 +65,17 @@ public class nightInventory extends absInventory {
     @Override
     protected List<Component> getTotemLore(Player player, String skill) {
         List<Component> lore = new ArrayList<>();
+
+        if (skill.equals("main")) {
+            lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+            lore.add(Component.text("타입 : 기동형 암살자").color(NamedTextColor.LIGHT_PURPLE));
+            lore.add(Component.text("장착 : 메인핸드에 철검 장착, 오프핸드는 장착 금지.").color(NamedTextColor.LIGHT_PURPLE));
+            lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+            lore.add(Component.text(""));
+            lore.add(Component.text("메뉴북 아이템 없어도 인벤토리 화면에서 철검을 우클릭해서 메뉴 화면 진입 가능").color(NamedTextColor.AQUA));
+            return lore;
+        }
+
         long level = getSkillLevel(player, skill);
         long playerLevel = player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "level"), PersistentDataType.LONG, 0L);
 
@@ -107,8 +118,8 @@ public class nightInventory extends absInventory {
                 lore.add(Component.text("시스템 : 지정형").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("지정 : 대상을 중심으로 계몽 수만큼 연쇄 참격을 시전한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("시전 후 계몽과 해당 스킬을 제외한 모든 스킬의 쿨타임을 초기화한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("지정 : 대상을 중심으로 체인 수만큼 연쇄 참격을 시전한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("시전 후 해당 스킬을 제외한 모든 스킬의 쿨타임을 초기화한다.").color(NamedTextColor.GREEN));
                 break;
             default:
                 break;
@@ -123,6 +134,7 @@ public class nightInventory extends absInventory {
 
     @Override
     protected Long getSkillLevel(Player player, String skill) {
+        if (skill.equals("main")) return 0L;
         return player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, skill), PersistentDataType.LONG, 0L);
     }
 
@@ -133,10 +145,10 @@ public class nightInventory extends absInventory {
     @Override
     protected void reinforceSkill(Player player, String skill, Long skillLevel, Inventory customInv) {
         if (skillLevel >= 6 || !contains(player)) return;
+        if (skill.equals("main")) return;
 
         long level = player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "level"), PersistentDataType.LONG, 0L);
 
-        // 레벨 제한 체크
         if (skillLevel == 3 && level < 6L){
             player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.5f, 1);
             player.sendMessage(Component.text("승급 필요 : CORE LEVEL -> 6").color(NamedTextColor.RED));
@@ -173,7 +185,6 @@ public class nightInventory extends absInventory {
             player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.5f, 1);
             player.playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.5f, 1);
 
-            // 강화 성공 후 GUI 갱신 (이미 열려있는 창이므로 runTask 불필요)
             customInvReroll(player, customInv);
 
             player.sendMessage(Component.text("스킬 레벨업 성공!").color(NamedTextColor.GREEN));

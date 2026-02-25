@@ -29,11 +29,11 @@ public class cmdCheck implements CommandExecutor, TabCompleter {
                 sender.sendMessage("§c해당 플레이어를 찾을 수 없습니다.");
                 return true;
             }
-            sender.sendMessage("§a" + target.getName() + " 소유의 core : " + this.config.getPlayerCore(target));
+            sender.sendMessage("§a" + target.getName() + " 에게 할당된 data : " + this.config.getPlayerCore(target));
             return true;
         } else if (args.length == 0) {
             if (!(sender instanceof Player player)) return true;
-            sender.sendMessage("§a본인 소유의 core : " + this.config.getPlayerCore(player));
+            sender.sendMessage("§a본인에게 할당된 data : " + this.config.getPlayerCore(player));
             return true;
         } else {
             sender.sendMessage("§c사용법: /corecheck <플레이어 닉네임|공백>");
