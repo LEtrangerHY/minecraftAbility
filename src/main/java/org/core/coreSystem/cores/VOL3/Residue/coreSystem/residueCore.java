@@ -4,6 +4,7 @@ import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
@@ -74,13 +75,13 @@ public class residueCore extends absCore {
         ItemStack item = event.getItem();
         if (isSpecialPearl(item)) {
             if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-                event.setCancelled(true);
+                event.setUseItemInHand(Event.Result.DENY);
                 player.updateInventory();
             }
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPearlDropPrevention(PlayerDropItemEvent event) {
         Player player = event.getPlayer();
         if (!contains(player)) return;
@@ -88,6 +89,11 @@ public class residueCore extends absCore {
         ItemStack item = event.getItemDrop().getItemStack();
         if (isSpecialPearl(item)) {
             event.setCancelled(true);
+            if (Q.isSessionActive(player) && Q.isLanded(player)) {
+                if (cool.isReloading(player, "Q Reuse")) {
+                    Qskill.Trigger(player);
+                }
+            }
         }
     }
 
@@ -142,7 +148,7 @@ public class residueCore extends absCore {
         }
     }
 
-    private boolean isSpecialPearl(ItemStack item) {
+    public boolean isSpecialPearl(ItemStack item) {
         if (item == null || item.getType() != Material.ENDER_PEARL) return false;
         if (!item.hasItemMeta()) return false;
 
@@ -197,7 +203,6 @@ public class residueCore extends absCore {
         boolean hasChain = (off.getType() == Material.IRON_CHAIN);
 
         if (Q.isSessionActive(player)) {
-            boolean hasPearl = (main.getType() == Material.ENDER_PEARL);
             boolean isTeleportPearl = isSpecialPearl(main);
             return isTeleportPearl && hasChain;
         } else {
@@ -209,6 +214,9 @@ public class residueCore extends absCore {
     private boolean canUseRSkill(Player player) { return true; }
 
     private boolean canUseQSkill(Player player) {
+        if (Q.isSessionActive(player) && Q.isLanded(player)) {
+            return true;
+        }
         return !config.isSpearFlying.getOrDefault(player.getUniqueId(), false);
     }
 

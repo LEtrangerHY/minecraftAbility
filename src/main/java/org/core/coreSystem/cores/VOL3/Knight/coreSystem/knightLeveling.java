@@ -1,4 +1,4 @@
-package org.core.coreSystem.cores.VOL2.Knight.coreSystem;
+package org.core.coreSystem.cores.VOL3.Knight.coreSystem;
 
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;

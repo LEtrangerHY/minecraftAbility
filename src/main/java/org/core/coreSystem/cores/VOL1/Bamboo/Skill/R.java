@@ -377,7 +377,7 @@ public class R implements SkillBase {
         world.spawnParticle(Particle.BLOCK, particleLoc, 10, 0.8, 0.8, 0.8, 0.5, Material.BAMBOO.createBlockData());
 
         double amp = config.r_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L);
-        double damage = config.r_Skill_damage * (1 + amp);
+        double damage = config.r_Skill_damage * 1.5 * (1 + amp);
 
         DamageSource source = DamageSource.builder(DamageType.PLAYER_EXPLOSION)
                 .withCausingEntity(player)

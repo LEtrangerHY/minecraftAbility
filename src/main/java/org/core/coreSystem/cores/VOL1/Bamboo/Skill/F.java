@@ -110,11 +110,13 @@ public class F implements SkillBase {
 
         player.setVelocity(direction.normalize().multiply(speed));
 
-        player.getWorld().playSound(currentLoc, Sound.ITEM_TRIDENT_RIPTIDE_3, 1.0f, 1.2f);
-        player.getWorld().playSound(currentLoc, Sound.BLOCK_CHAIN_BREAK, 1.0f, 1.5f);
+        player.getWorld().playSound(currentLoc, Sound.ENTITY_BREEZE_SHOOT, 1.0f, 1.5f);
 
-        Invulnerable invulnerable = new Invulnerable(player, 600);
-        invulnerable.applyEffect(player);
+        if (distance >= 10.0) {
+            player.getWorld().playSound(currentLoc, Sound.ITEM_TRIDENT_RIPTIDE_3, 1.0f, 1.2f);
+            Invulnerable invulnerable = new Invulnerable(player, 600);
+            invulnerable.applyEffect(player);
+        }
 
         detect(player, true);
     }

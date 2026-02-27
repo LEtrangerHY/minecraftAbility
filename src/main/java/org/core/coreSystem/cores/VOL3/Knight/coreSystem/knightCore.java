@@ -1,4 +1,4 @@
-package org.core.coreSystem.cores.VOL2.Knight.coreSystem;
+package org.core.coreSystem.cores.VOL3.Knight.coreSystem;
 
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
@@ -31,9 +31,9 @@ import org.core.main.coreConfig;
 import org.core.coreSystem.absCoreSystem.ConfigWrapper;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.absCoreSystem.absCore;
-import org.core.coreSystem.cores.VOL2.Knight.Skill.F;
-import org.core.coreSystem.cores.VOL2.Knight.Skill.Q;
-import org.core.coreSystem.cores.VOL2.Knight.Skill.R;
+import org.core.coreSystem.cores.VOL3.Knight.Skill.F;
+import org.core.coreSystem.cores.VOL3.Knight.Skill.Q;
+import org.core.coreSystem.cores.VOL3.Knight.Skill.R;
 
 public class knightCore extends absCore {
     private final Core plugin;

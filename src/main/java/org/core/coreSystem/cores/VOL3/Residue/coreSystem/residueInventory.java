@@ -42,7 +42,7 @@ public class residueInventory extends absInventory {
 
     @Override
     protected Material getMainTotem(Player player) {
-        return Material.IRON_CHAIN;
+        return Material.IRON_SPEAR;
     }
 
     @Override
@@ -59,7 +59,7 @@ public class residueInventory extends absInventory {
     @Override
     protected Material getTotem(Player player, String skill) {
         return switch (skill) {
-            case "R" -> Material.IRON_SPEAR;
+            case "R" -> Material.WOODEN_SPEAR;
             case "Q" -> Material.IRON_CHAIN;
             case "F" -> Material.IRON_BARS;
             default -> Material.BARRIER;

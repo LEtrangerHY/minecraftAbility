@@ -1,4 +1,4 @@
-package org.core.coreSystem.cores.VOL2.Knight.Skill;
+package org.core.coreSystem.cores.VOL3.Knight.Skill;
 
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -17,7 +17,7 @@ import org.core.cool.Cool;
 import org.core.effect.crowdControl.ForceDamage;
 import org.core.effect.crowdControl.Stun;
 import org.core.coreSystem.absCoreSystem.SkillBase;
-import org.core.coreSystem.cores.VOL2.Knight.coreSystem.Knight;
+import org.core.coreSystem.cores.VOL3.Knight.coreSystem.Knight;
 
 import java.util.HashSet;
 import java.util.Set;

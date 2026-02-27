@@ -78,9 +78,13 @@ public class bloodPetal implements Listener {
 
     public void Sweep(Player player, double healAmount) {
 
-        long currentLeft = cool.getRemainCooldown(player, "Q");
-        long reducedTime = Math.max(0, currentLeft - 2000);
-        if (cool.isReloading(player, "Q")) cool.updateCooldown(player, "Q", reducedTime);
+        long currentLeftQ = cool.getRemainCooldown(player, "Q");
+        long reducedTimeQ = Math.max(0, currentLeftQ - 2000);
+        if (cool.isReloading(player, "Q")) cool.updateCooldown(player, "Q", reducedTimeQ);
+
+        long currentLeftF = cool.getRemainCooldown(player, "F");
+        long reducedTimeF = Math.max(0, currentLeftF - 2000);
+        if (cool.isReloading(player, "F")) cool.updateCooldown(player, "F", reducedTimeF);
 
         if (healAmount > 0) {
             double maxHealth = Objects.requireNonNull(player.getAttribute(Attribute.MAX_HEALTH)).getValue();

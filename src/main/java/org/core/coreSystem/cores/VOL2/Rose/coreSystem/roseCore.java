@@ -101,6 +101,10 @@ public class roseCore extends absCore {
 
             if (currentHand == null) return;
 
+            long currentLeftF = cool.getRemainCooldown(player, "F");
+            long reducedTimeF = Math.max(0, currentLeftF - 2000);
+            if (cool.isReloading(player, "F")) cool.updateCooldown(player, "F", reducedTimeF);
+
             String lastHand = config.atkType.get(player.getUniqueId());
 
             boolean procPetal = false;

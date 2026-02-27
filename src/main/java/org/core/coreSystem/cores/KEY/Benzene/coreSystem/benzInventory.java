@@ -42,7 +42,7 @@ public class benzInventory extends absInventory {
 
     @Override
     protected Material getMainTotem(Player player) {
-        return Material.IRON_CHAIN;
+        return Material.IRON_SWORD;
     }
 
     @Override

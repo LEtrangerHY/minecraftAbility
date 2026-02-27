@@ -1,4 +1,4 @@
-package org.core.coreSystem.cores.VOL2.Knight.Skill;
+package org.core.coreSystem.cores.VOL3.Knight.Skill;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -24,7 +24,7 @@ import org.bukkit.util.Vector;
 import org.core.cool.Cool;
 import org.core.effect.crowdControl.ForceDamage;
 import org.core.coreSystem.absCoreSystem.SkillBase;
-import org.core.coreSystem.cores.VOL2.Knight.coreSystem.Knight;
+import org.core.coreSystem.cores.VOL3.Knight.coreSystem.Knight;
 
 import java.time.Duration;
 import java.util.*;

@@ -22,7 +22,7 @@ public class Bamboo {
     public HashMap<UUID, HashSet<Entity>> damaged = new HashMap<>();
     public HashMap<UUID, Boolean> r_damaged = new HashMap<>();
     public double r_Skill_amp = 0.12;
-    public double r_Skill_damage = 8;
+    public double r_Skill_damage = 4;
     public long r_Skill_Cool = 0;
     public Map<UUID, Boolean> isSpearFlying = new HashMap<>();
 

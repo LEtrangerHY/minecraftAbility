@@ -31,7 +31,7 @@ import org.core.coreSystem.cores.VOL1.Commander.coreSystem.comLeveling;
 import org.core.coreSystem.cores.VOL1.Dagger.coreSystem.dagLeveling;
 import org.core.coreSystem.cores.VOL1.Glacier.coreSystem.glaLeveling;
 import org.core.coreSystem.cores.VOL1.Harvester.coreSystem.harvLeveling;
-import org.core.coreSystem.cores.VOL2.Knight.coreSystem.knightLeveling;
+import org.core.coreSystem.cores.VOL3.Knight.coreSystem.knightLeveling;
 import org.core.coreSystem.cores.VOL3.Luster.coreSystem.lustLeveling;
 import org.core.coreSystem.cores.KEY.Nightel.coreSystem.nightLeveling;
 import org.core.coreSystem.cores.VOL1.Pyro.coreSystem.pyroLeveling;

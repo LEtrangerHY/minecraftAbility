@@ -30,7 +30,7 @@ public class Rose {
     public double q_Skill_dash = 1.7;
     public double q_Skill_amp = 0.2;
     public double q_Skill_damage = 2;
-    public long q_Skill_Cool = 7000;
+    public long q_Skill_Cool = 6000;
 
     //F
     public double f_Skill_amp = 0.1;

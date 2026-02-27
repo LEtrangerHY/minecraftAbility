@@ -2,6 +2,7 @@ package org.core.coreSystem.cores.VOL3.Residue.Skill;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.title.Title;
 import org.bukkit.*;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
@@ -24,6 +25,7 @@ import org.core.effect.crowdControl.ForceDamage;
 import org.core.effect.crowdControl.Grounding;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -46,6 +48,11 @@ public class Q implements SkillBase {
 
     public static boolean isSessionActive(Player player) {
         return spearSessions.containsKey(player.getUniqueId());
+    }
+
+    public static boolean isLanded(Player player) {
+        SpearInfo info = spearSessions.get(player.getUniqueId());
+        return info != null && info.landed;
     }
 
     @Override
@@ -97,9 +104,8 @@ public class Q implements SkillBase {
 
         config.isSpearFlying.put(player.getUniqueId(), true);
 
-        SpearInfo initialInfo = new SpearInfo(spearStand, null, null);
-        initialInfo.landed = false;
-        spearSessions.put(player.getUniqueId(), initialInfo);
+        SpearInfo info = new SpearInfo(spearStand);
+        spearSessions.put(player.getUniqueId(), info);
 
         cool.updateCooldown(player, "Q", 500L);
 
@@ -138,17 +144,12 @@ public class Q implements SkillBase {
                 }
 
                 if (hitEntity != null) {
-                    handleHitEntity(player, spearStand, (LivingEntity) hitEntity, velocity.clone().normalize());
+                    handleHitEntity(player, info, (LivingEntity) hitEntity, velocity);
                     cancel();
                     return;
                 } else if (ray != null && ray.getHitBlock() != null) {
                     Location hitPoint = ray.getHitPosition().toLocation(world);
-                    Vector pullback = velocity.clone().normalize().multiply(0.7);
-                    Location hitLoc = hitPoint.subtract(pullback);
-
-                    hitLoc.subtract(0, 1.2, 0);
-
-                    handleHitBlock(player, spearStand, hitLoc, velocity);
+                    handleHitBlock(player, info, hitPoint, velocity);
                     cancel();
                     return;
                 }
@@ -160,6 +161,173 @@ public class Q implements SkillBase {
                 ticks++;
             }
         }.runTaskTimer(plugin, 0L, 1L);
+    }
+
+    private void handleHitEntity(Player player, SpearInfo info, LivingEntity target, Vector velocity) {
+        long level = player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L);
+        double damage = config.q_Skill_Damage * (1 + config.q_Skill_amp * level);
+
+        DamageSource source = DamageSource.builder(DamageType.MOB_PROJECTILE)
+                .withCausingEntity(player)
+                .withDirectEntity(info.spear)
+                .withDamageLocation(info.spear.getLocation())
+                .build();
+        new ForceDamage(target, damage, source, false).applyEffect(player);
+        new Grounding(target, 2000).applyEffect(player);
+
+        target.setVelocity(new Vector(0, 0, 0));
+        target.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 40, 0, false, false));
+
+        player.playSound(target.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 1);
+        player.getWorld().playSound(target.getLocation(), Sound.ITEM_TRIDENT_HIT_GROUND, 1.6f, 1.0f);
+        player.playSound(player.getLocation(), Sound.ITEM_TRIDENT_HIT_GROUND, 1.2f, 1.0f);
+
+        info.stuckEntity = target;
+        info.landed = true;
+
+        Location targetLoc = target.getLocation();
+        Location targetCenter = targetLoc.clone().add(0, target.getHeight() / 2.0, 0);
+
+        Location idealHeadLoc = targetCenter.clone().subtract(velocity.clone().normalize().multiply(0.7));
+        Location idealOrigin = idealHeadLoc.clone().subtract(0, 1.2, 0);
+        idealOrigin.setDirection(velocity);
+
+        info.stuckOffset = idealOrigin.toVector().subtract(targetLoc.toVector());
+        info.initialEntityYaw = targetLoc.getYaw();
+        info.initialSpearYaw = idealOrigin.getYaw();
+        info.originalArmPose = info.spear.getRightArmPose();
+
+        updateSpearRotation(info.spear, velocity);
+        info.spear.teleport(idealOrigin);
+
+        chain_qSkill_Particle_Effect(player, info.spear, 40);
+        cool.setCooldown(player, 6000L, "Q Reuse", "boss");
+
+        if (target.isDead()) {
+            triggerKillReset(player);
+            return;
+        }
+
+        info.trackingTask = new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!player.isOnline()) {
+                    cleanupSession(player.getUniqueId(), 500L);
+                    cancel();
+                    return;
+                }
+
+                if (!info.stuckEntity.isValid() || info.stuckEntity.isDead()) {
+                    triggerKillReset(player);
+                    cancel();
+                    return;
+                }
+
+                Location currentTargetLoc = info.stuckEntity.getLocation();
+                float yawDelta = currentTargetLoc.getYaw() - info.initialEntityYaw;
+
+                Vector rotatedOffset = info.stuckOffset.clone();
+                rotatedOffset.rotateAroundY(Math.toRadians(-yawDelta));
+
+                Location newSpearLoc = currentTargetLoc.clone().add(rotatedOffset);
+                newSpearLoc.setYaw(info.initialSpearYaw + yawDelta);
+
+                info.spear.teleport(newSpearLoc);
+                info.spear.setRightArmPose(info.originalArmPose);
+            }
+        }.runTaskTimer(plugin, 0L, 1L);
+
+        info.timeoutTask = new BukkitRunnable() {
+            @Override
+            public void run() { cleanupSession(player.getUniqueId(), 500L); }
+        }.runTaskLater(plugin, 120L);
+    }
+
+    private void handleHitBlock(Player player, SpearInfo info, Location hitPoint, Vector velocity) {
+        player.playSound(hitPoint.clone().add(0, 1.5, 0), Sound.ITEM_TRIDENT_HIT_GROUND, 1.2f, 0.8f);
+        player.playSound(player.getLocation(), Sound.ITEM_TRIDENT_HIT_GROUND, 1.2f, 0.8f);
+
+        Location idealHeadLoc = hitPoint.clone().subtract(velocity.clone().normalize().multiply(0.7));
+        Location idealOrigin = idealHeadLoc.clone().subtract(0, 1.2, 0);
+        idealOrigin.setDirection(velocity);
+
+        updateSpearRotation(info.spear, velocity);
+        info.spear.teleport(idealOrigin);
+
+        info.landed = true;
+        chain_qSkill_Particle_Effect(player, info.spear, 120);
+        cool.setCooldown(player, 6000L, "Q Reuse", "boss");
+
+        info.timeoutTask = new BukkitRunnable() {
+            @Override
+            public void run() { cleanupSession(player.getUniqueId(), 500L); }
+        }.runTaskLater(plugin, 120L);
+    }
+
+    private void updateSpearRotation(ArmorStand stand, Vector velocity) {
+        if (velocity.lengthSquared() < 0.001) return;
+        Location dirLoc = stand.getLocation().clone();
+        dirLoc.setDirection(velocity);
+        stand.setRotation(dirLoc.getYaw(), 0);
+        stand.setRightArmPose(new EulerAngle(Math.toRadians(dirLoc.getPitch()), 0, 0));
+    }
+
+    private void teleportToSpear(Player player) {
+        UUID uuid = player.getUniqueId();
+        SpearInfo info = spearSessions.get(uuid);
+        if (info == null || !info.spear.isValid()) return;
+
+        Location spearLoc = info.spear.getLocation().add(0, 1.5, 0);
+
+        double distance = player.getLocation().distance(spearLoc);
+
+        long calculatedCooldown = 12000L + (long)(32.1 * distance * distance);
+        long finalCooldown = Math.min(333000L, calculatedCooldown);
+
+        player.teleport(spearLoc);
+        player.getWorld().playSound(spearLoc, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
+
+        cleanupSession(uuid, finalCooldown);
+    }
+
+    private void triggerKillReset(Player player) {
+        cleanupSession(player.getUniqueId(), 0L);
+
+        player.getWorld().playSound(player.getLocation(), Sound.ITEM_TRIDENT_RETURN, 1.0f, 1.0f);
+
+        Title title = Title.title(
+                Component.empty(),
+                Component.text("Reset!").color(NamedTextColor.GREEN),
+                Title.Times.times(Duration.ZERO, Duration.ofMillis(500), Duration.ofMillis(200))
+        );
+        player.showTitle(title);
+    }
+
+    private void cleanupSession(UUID uuid, long cooldownTime) {
+        SpearInfo info = spearSessions.remove(uuid);
+
+        if (info != null) {
+            if (info.timeoutTask != null && !info.timeoutTask.isCancelled()) info.timeoutTask.cancel();
+            if (info.trackingTask != null && !info.trackingTask.isCancelled()) info.trackingTask.cancel();
+            if (info.spear != null) info.spear.remove();
+
+            config.isSpearFlying.remove(uuid);
+
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null && player.isOnline()) {
+                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    setItemToSpear(player);
+                }, 1L);
+                cool.updateCooldown(player, "Q Reuse", 0L, "boss");
+                cool.updateCooldown(player, "Q", cooldownTime);
+            }
+        }
+    }
+
+    private void removeSpearAndCooldown(Player player, ArmorStand spear, BukkitRunnable task, long cooldownTime) {
+        if(spear != null) spear.remove();
+        if(task != null) task.cancel();
+        cleanupSession(player.getUniqueId(), cooldownTime);
     }
 
     private void setItemToPearl(Player player) {
@@ -177,8 +345,8 @@ public class Q implements SkillBase {
 
     private void setItemToSpear(Player player) {
         ItemStack spear;
-        try { spear = new ItemStack(Material.IRON_SPEAR); }
-        catch (NoSuchFieldError e) { spear = new ItemStack(Material.TRIDENT); }
+        try { spear = new ItemStack(Material.valueOf("IRON_SPEAR")); }
+        catch (IllegalArgumentException | NoSuchFieldError e) { spear = new ItemStack(Material.TRIDENT); }
 
         NamespacedKey key = new NamespacedKey(plugin, PEARL_KEY);
         boolean found = false;
@@ -206,131 +374,6 @@ public class Q implements SkillBase {
 
         if (!found) player.getInventory().setItemInMainHand(spear);
         player.updateInventory();
-    }
-
-    private void updateSpearRotation(ArmorStand stand, Vector velocity) {
-        if (velocity.lengthSquared() < 0.001) return;
-        Location dirLoc = stand.getLocation().clone();
-        dirLoc.setDirection(velocity);
-        stand.setRotation(dirLoc.getYaw(), 0);
-        stand.setRightArmPose(new EulerAngle(Math.toRadians(dirLoc.getPitch()), 0, 0));
-    }
-
-    private void handleHitEntity(Player player, ArmorStand spear, LivingEntity target, Vector direction) {
-        long level = player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L);
-        double damage = config.q_Skill_Damage * (1 + config.q_Skill_amp * level);
-
-        DamageSource source = DamageSource.builder(DamageType.MOB_PROJECTILE)
-                .withCausingEntity(player)
-                .withDirectEntity(spear)
-                .withDamageLocation(spear.getLocation())
-                .build();
-        new ForceDamage(target, damage, source, false).applyEffect(player);
-        new Grounding(target, 2000).applyEffect(player);
-
-        target.setVelocity(new Vector(0, 0, 0));
-        target.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 40, 0, false, false));
-
-        chain_qSkill_Particle_Effect(player, target, 40);
-
-        player.playSound(target.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 1);
-        player.getWorld().playSound(target.getLocation(), Sound.ITEM_TRIDENT_HIT_GROUND, 1.6f, 1.0f);
-
-        updateSessionToLanded(player, spear, target, direction.clone().multiply(-0.25));
-    }
-
-    private void handleHitBlock(Player player, ArmorStand spear, Location hitLoc, Vector velocity) {
-        player.playSound(hitLoc.clone().add(0, 1.5, 0), Sound.ITEM_TRIDENT_HIT_GROUND, 1.2f, 0.8f);
-        updateSpearRotation(spear, velocity);
-        hitLoc.setYaw(spear.getLocation().getYaw());
-        hitLoc.setPitch(0);
-        spear.teleport(hitLoc);
-
-        chain_qSkill_Particle_Effect(player, spear, 120);
-
-        updateSessionToLanded(player, spear, null, null);
-    }
-
-    private void updateSessionToLanded(Player player, ArmorStand spear, LivingEntity stuckEntity, Vector offset) {
-        UUID uuid = player.getUniqueId();
-        config.isSpearFlying.put(uuid, false);
-
-        SpearInfo info = spearSessions.get(uuid);
-        if (info == null) return;
-
-        info.landed = true;
-        info.stuckEntity = stuckEntity;
-        info.offset = offset;
-        info.finalYaw = spear.getLocation().getYaw();
-        info.finalArmPose = spear.getRightArmPose();
-
-        cool.setCooldown(player, 6000L, "Q Reuse", "boss");
-
-        info.timeoutTask = new BukkitRunnable() {
-            @Override
-            public void run() { cleanupSession(uuid, 500L); }
-        }.runTaskLater(plugin, 20L * 6);
-
-        if (stuckEntity != null) {
-            info.trackingTask = new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (!stuckEntity.isValid() || stuckEntity.isDead()) {
-                        cleanupSession(uuid, 500L);
-                        cancel();
-                        return;
-                    }
-                    Location targetLoc = stuckEntity.getLocation().add(0, stuckEntity.getHeight() / 1.8 - 1.5, 0).add(offset);
-                    targetLoc.setYaw(info.finalYaw);
-                    spear.setRightArmPose(info.finalArmPose);
-                    spear.teleport(targetLoc);
-                }
-            }.runTaskTimer(plugin, 0L, 1L);
-        }
-    }
-
-    private void teleportToSpear(Player player) {
-        UUID uuid = player.getUniqueId();
-        SpearInfo info = spearSessions.get(uuid);
-        if (info == null || !info.spear.isValid()) return;
-
-        Location spearLoc = info.spear.getLocation().add(0, 1.5, 0);
-
-        double distance = player.getLocation().distance(spearLoc);
-        long calculatedCooldown = 16000L + (long)(distance * 1000L);
-        long finalCooldown = Math.min(66000L, calculatedCooldown);
-
-        player.teleport(spearLoc);
-        player.getWorld().playSound(spearLoc, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
-
-        cleanupSession(uuid, finalCooldown);
-    }
-
-    private void cleanupSession(UUID uuid, long cooldownTime) {
-        SpearInfo info = spearSessions.remove(uuid);
-
-        if (info != null) {
-            if (info.timeoutTask != null && !info.timeoutTask.isCancelled()) info.timeoutTask.cancel();
-            if (info.trackingTask != null && !info.trackingTask.isCancelled()) info.trackingTask.cancel();
-            if (info.spear != null) info.spear.remove();
-
-            config.isSpearFlying.remove(uuid);
-
-            Player player = Bukkit.getPlayer(uuid);
-            if (player != null) {
-                Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                    setItemToSpear(player);
-                }, 1L);
-                cool.updateCooldown(player, "Q Reuse", 0L, "boss");
-                cool.updateCooldown(player, "Q", cooldownTime);
-            }
-        }
-    }
-
-    private void removeSpearAndCooldown(Player player, ArmorStand spear, BukkitRunnable task, long cooldownTime) {
-        if(spear != null) spear.remove();
-        if(task != null) task.cancel();
-        cleanupSession(player.getUniqueId(), cooldownTime);
     }
 
     public void chain_qSkill_Particle_Effect(Player player, Entity entity, int time) {
@@ -366,18 +409,18 @@ public class Q implements SkillBase {
     private static class SpearInfo {
         ArmorStand spear;
         LivingEntity stuckEntity;
-        Vector offset;
-        boolean landed;
-        float finalYaw;
-        EulerAngle finalArmPose;
-        @NotNull BukkitTask timeoutTask;
-        BukkitTask trackingTask;
 
-        public SpearInfo(ArmorStand spear, LivingEntity stuckEntity, Vector offset) {
+        Vector stuckOffset;
+        float initialEntityYaw;
+        float initialSpearYaw;
+        EulerAngle originalArmPose;
+
+        boolean landed = false;
+        BukkitTask trackingTask;
+        BukkitTask timeoutTask;
+
+        public SpearInfo(ArmorStand spear) {
             this.spear = spear;
-            this.stuckEntity = stuckEntity;
-            this.offset = offset;
-            this.landed = false;
         }
     }
 }

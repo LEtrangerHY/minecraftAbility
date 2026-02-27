@@ -27,7 +27,7 @@ public class Residue {
     public HashMap<UUID, Boolean> isSpearFlying = new HashMap<>();
     public long q_Skill_Cool = 500;
     public double q_Skill_amp = 0.2;
-    public double q_Skill_Damage = 6.0;
+    public double q_Skill_Damage = 12.0;
 
     // F
     public HashMap<UUID, Set<Entity>> damaged = new HashMap<>();
