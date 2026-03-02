@@ -1,8 +1,12 @@
 package org.core.coreSystem.cores.VOL1.Blossom.Skill;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.title.Title;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
@@ -18,6 +22,7 @@ import org.core.effect.crowdControl.ForceDamage;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.cores.VOL1.Blossom.coreSystem.Blossom;
 
+import java.time.Duration;
 import java.util.*;
 
 public class F implements SkillBase {
@@ -31,6 +36,18 @@ public class F implements SkillBase {
         this.cool = cool;
     }
 
+    private boolean isUniqueBlock(Material mat) {
+        String name = mat.name();
+        return name.endsWith("DIAMOND_BLOCK") || name.endsWith("NETHERITE_BLOCK") ||
+                name.endsWith("EMERALD_BLOCK") || name.endsWith("GOLD_BLOCK") ||
+                name.endsWith("IRON_BLOCK") || name.endsWith("LAPIS_BLOCK") ||
+                name.endsWith("REDSTONE_BLOCK") || name.endsWith("COAL_BLOCK") ||
+                name.endsWith("COPPER_BLOCK") || name.equals("ANCIENT_DEBRIS") ||
+                name.endsWith("QUARTZ_BLOCK") || name.endsWith("AMETHYST_BLOCK") ||
+                name.endsWith("ORE") || name.contains("RAW_IRON") ||
+                name.contains("RAW_GOLD") || name.contains("RAW_COPPER");
+    }
+
     @Override
     public void Trigger(Player player) {
         Block targetBlock = getCustomTargetBlock(player, 15);
@@ -39,6 +56,21 @@ public class F implements SkillBase {
             return;
         }
 
+        if (isUniqueBlock(targetBlock.getType())) {
+            player.getWorld().playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_LEATHER, 1, 1);
+            Title title = Title.title(
+                    Component.empty(),
+                    Component.text("this is unique block!").color(NamedTextColor.RED),
+                    Title.Times.times(Duration.ZERO, Duration.ofMillis(300), Duration.ofMillis(200))
+            );
+            player.showTitle(title);
+            cool.updateCooldown(player, "F", 500L);
+            return;
+        }
+
+        BlockData originalData = targetBlock.getBlockData();
+        targetBlock.setType(Material.DIRT);
+
         World world = player.getWorld();
         Location baseLoc = targetBlock.getLocation().add(0, 1, 0);
         config.treeLoc.put(player.getUniqueId(), baseLoc);
@@ -46,6 +78,7 @@ public class F implements SkillBase {
         Set<Location> beforeBlocks = getNearbyNonAirBlocks(baseLoc, 8);
 
         if (!world.generateTree(baseLoc, TreeType.CHERRY)) {
+            targetBlock.setBlockData(originalData);
             cool.updateCooldown(player, "F", 500L);
             return;
         }
@@ -56,17 +89,20 @@ public class F implements SkillBase {
         world.playSound(baseLoc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.4f, 1);
         world.playSound(baseLoc, Sound.BLOCK_GRASS_PLACE, 1.4f, 1);
 
+        cool.setCooldown(player, 25500L, "Tree Duration", "boss");
+
         new BukkitRunnable() {
             @Override
             public void run() {
-                removeTreeBlocks(afterBlocks);
+                removeTreeBlocks(afterBlocks, targetBlock, originalData);
+                cool.updateCooldown(player, "Tree Duration", 0L, "boss");
             }
-        }.runTaskLater(plugin, 20L * 30);
+        }.runTaskLater(plugin, 510L);
 
-        startEffectLogic(player, baseLoc, afterBlocks);
+        startEffectLogic(player, baseLoc, afterBlocks, targetBlock, originalData);
     }
 
-    private void startEffectLogic(Player owner, Location treeCenter, Set<Location> treeBlocks) {
+    private void startEffectLogic(Player owner, Location treeCenter, Set<Location> treeBlocks, Block targetBlock, BlockData originalData) {
 
         World world = owner.getWorld();
 
@@ -88,8 +124,9 @@ public class F implements SkillBase {
             public void run() {
 
                 if (timer <= 0 || !owner.isOnline() || owner.isDead() || !owner.getWorld().equals(treeCenter.getWorld())) {
-                    removeTreeBlocks(treeBlocks);
+                    removeTreeBlocks(treeBlocks, targetBlock, originalData);
                     config.treeLoc.remove(owner.getUniqueId());
+                    cool.updateCooldown(owner, "Tree Duration", 0L, "boss");
                     cancel();
                     return;
                 }
@@ -128,7 +165,7 @@ public class F implements SkillBase {
         }.runTaskTimer(plugin, 0L, 17L);
     }
 
-    private void removeTreeBlocks(Set<Location> blocks) {
+    private void removeTreeBlocks(Set<Location> blocks, Block targetBlock, BlockData originalData) {
         for (Location loc : blocks) {
             Block block = loc.getBlock();
             Material type = block.getType();
@@ -138,6 +175,10 @@ public class F implements SkillBase {
                     type == Material.CHERRY_SAPLING) {
                 block.setType(Material.AIR, false);
             }
+        }
+
+        if (targetBlock != null && targetBlock.getType() == Material.DIRT) {
+            targetBlock.setBlockData(originalData);
         }
     }
 

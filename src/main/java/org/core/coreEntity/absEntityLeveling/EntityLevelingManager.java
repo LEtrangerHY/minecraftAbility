@@ -24,6 +24,7 @@ public class EntityLevelingManager implements Listener {
 
     private final JavaPlugin plugin;
     private final NamespacedKey levelKey;
+    private final NamespacedKey allyKey;
 
     private final Queue<LivingEntity> spawnQueue = new ConcurrentLinkedQueue<>();
     private final Map<Integer, NamedTextColor> levelColorCache = new HashMap<>();
@@ -37,6 +38,7 @@ public class EntityLevelingManager implements Listener {
     public EntityLevelingManager(JavaPlugin plugin) {
         this.plugin = plugin;
         this.levelKey = new NamespacedKey(plugin, "entity_level");
+        this.allyKey = new NamespacedKey(plugin, "ally");
 
         Bukkit.getScheduler().runTaskTimer(plugin, this::processSpawnQueue, 1L, 2L);
         Bukkit.getPluginManager().registerEvents(this, plugin);
@@ -111,9 +113,13 @@ public class EntityLevelingManager implements Listener {
                 else return NamedTextColor.RED;
             });
 
+            if (data.has(allyKey, PersistentDataType.BYTE)) {
+                color = NamedTextColor.AQUA;
+            }
+
             String readableName = getReadableName(entity);
 
-            if (level > 0) {
+            if (level > 0 && !data.has(allyKey, PersistentDataType.BYTE)) {
                 AttributeInstance healthAttr = entity.getAttribute(Attribute.MAX_HEALTH);
                 if (healthAttr != null) {
                     double baseHealth = healthAttr.getBaseValue();
@@ -155,7 +161,12 @@ public class EntityLevelingManager implements Listener {
         String name = getReadableName(entity);
         NamedTextColor color = levelColorCache.getOrDefault(level, NamedTextColor.WHITE);
 
-        Bukkit.getScheduler().runTaskLater(plugin, () -> updateHealthName(entity, name, level, color), 1L);
+        if (data.has(allyKey, PersistentDataType.BYTE)) {
+            color = NamedTextColor.AQUA;
+        }
+
+        NamedTextColor finalColor = color;
+        Bukkit.getScheduler().runTaskLater(plugin, () -> updateHealthName(entity, name, level, finalColor), 1L);
     }
 
     @EventHandler
@@ -169,7 +180,12 @@ public class EntityLevelingManager implements Listener {
         String name = getReadableName(entity);
         NamedTextColor color = levelColorCache.getOrDefault(level, NamedTextColor.WHITE);
 
-        Bukkit.getScheduler().runTaskLater(plugin, () -> updateHealthName(entity, name, level, color), 1L);
+        if (data.has(allyKey, PersistentDataType.BYTE)) {
+            color = NamedTextColor.AQUA;
+        }
+
+        NamedTextColor finalColor = color;
+        Bukkit.getScheduler().runTaskLater(plugin, () -> updateHealthName(entity, name, level, finalColor), 1L);
     }
 
     @EventHandler
@@ -183,7 +199,12 @@ public class EntityLevelingManager implements Listener {
         String name = getReadableName(entity);
         NamedTextColor color = levelColorCache.getOrDefault(level, NamedTextColor.WHITE);
 
-        Bukkit.getScheduler().runTaskLater(plugin, () -> updateHealthName(entity, name, level, color), 1L);
+        if (data.has(allyKey, PersistentDataType.BYTE)) {
+            color = NamedTextColor.AQUA;
+        }
+
+        NamedTextColor finalColor = color;
+        Bukkit.getScheduler().runTaskLater(plugin, () -> updateHealthName(entity, name, level, finalColor), 1L);
     }
 
     @EventHandler
@@ -195,6 +216,8 @@ public class EntityLevelingManager implements Listener {
 
         int level = data.get(levelKey, PersistentDataType.INTEGER);
         if (level <= 0) return;
+
+        if (data.has(allyKey, PersistentDataType.BYTE)) return;
 
         double p = (0.005 * level * level + 0.055 * level);
         double originalDamage = event.getDamage();
@@ -211,6 +234,11 @@ public class EntityLevelingManager implements Listener {
         if (deadEntity instanceof Player) return;
         PersistentDataContainer data = deadEntity.getPersistentDataContainer();
         if (!data.has(levelKey, PersistentDataType.INTEGER)) return;
+
+        if (data.has(allyKey, PersistentDataType.BYTE)) {
+            event.setDroppedExp(0);
+            return;
+        }
 
         int level = data.get(levelKey, PersistentDataType.INTEGER);
         int baseExp = event.getDroppedExp();
@@ -248,6 +276,11 @@ public class EntityLevelingManager implements Listener {
 
             int level = data.get(levelKey, PersistentDataType.INTEGER);
             NamedTextColor color = levelColorCache.getOrDefault(level, NamedTextColor.WHITE);
+
+            if (data.has(allyKey, PersistentDataType.BYTE)) {
+                color = NamedTextColor.AQUA;
+            }
+
             String name = getReadableName(entity);
             updateHealthName(entity, name, level, color);
         }
@@ -265,6 +298,11 @@ public class EntityLevelingManager implements Listener {
 
                 int level = data.get(levelKey, PersistentDataType.INTEGER);
                 NamedTextColor color = levelColorCache.getOrDefault(level, NamedTextColor.WHITE);
+
+                if (data.has(allyKey, PersistentDataType.BYTE)) {
+                    color = NamedTextColor.AQUA;
+                }
+
                 String name = getReadableName(targeted);
                 updateHealthName(targeted, name, level, color);
             }

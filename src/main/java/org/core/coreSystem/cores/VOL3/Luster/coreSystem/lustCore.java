@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -31,8 +32,10 @@ import org.core.coreSystem.cores.VOL3.Luster.Skill.F;
 import org.core.coreSystem.cores.VOL3.Luster.Skill.Q;
 import org.core.coreSystem.cores.VOL3.Luster.Skill.R;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 public class lustCore extends absCore {
     private final Core plugin;
@@ -41,7 +44,6 @@ public class lustCore extends absCore {
     private final R Rskill;
     private final Q Qskill;
     private final F Fskill;
-
 
     public lustCore(Core plugin, coreConfig tag, Luster config, Cool cool) {
         super(tag, cool);
@@ -96,20 +98,69 @@ public class lustCore extends absCore {
 
     @EventHandler
     public void onGolemDeath(EntityDeathEvent event) {
-        if (event.getEntity() instanceof IronGolem golem) {
+        if (event.getEntity() instanceof IronGolem deadGolem) {
             Player owner = null;
+            UUID deadUUID = deadGolem.getUniqueId();
 
             for (Map.Entry<Player, Set<IronGolem>> entry : config.golems.entrySet()) {
-                if (entry.getValue().remove(golem)) {
-                    owner = entry.getKey();
+                Set<IronGolem> golemSet = entry.getValue();
+                Iterator<IronGolem> iterator = golemSet.iterator();
+
+                while (iterator.hasNext()) {
+                    IronGolem golem = iterator.next();
+                    if (golem.getUniqueId().equals(deadUUID)) {
+                        iterator.remove();
+                        owner = entry.getKey();
+                        break;
+                    }
+                }
+
+                if (owner != null) {
                     break;
                 }
             }
 
-            if (owner != null && config.golems.get(owner).isEmpty() && tag.Luster.contains(owner)) {
-                long cools = 60000L;
-                cool.updateCooldown(owner, "F", cools);
-                config.golems.remove(owner);
+            if (owner != null) {
+                event.getDrops().clear();
+                event.setDroppedExp(0);
+
+                boolean allDead = true;
+                for (IronGolem golem : config.golems.get(owner)) {
+                    if (golem != null && !golem.isDead()) {
+                        allDead = false;
+                        break;
+                    }
+                }
+
+                if (allDead && tag.Luster.contains(owner)) {
+                    cool.updateCooldown(owner, "Golem Duration", 0L, "boss");
+                    long cools = 66000L;
+                    cool.updateCooldown(owner, "F", cools);
+                    config.golems.remove(owner);
+                }
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onGolemDamage(EntityDamageByEntityEvent event) {
+        if (event.getDamager() instanceof IronGolem attackingGolem) {
+            boolean isPlayerOwned = false;
+            UUID attackingUUID = attackingGolem.getUniqueId();
+
+            for (Set<IronGolem> ownedGolems : config.golems.values()) {
+                for (IronGolem golem : ownedGolems) {
+                    if (golem != null && golem.getUniqueId().equals(attackingUUID)) {
+                        isPlayerOwned = true;
+                        break;
+                    }
+                }
+                if (isPlayerOwned) break;
+            }
+
+            if (isPlayerOwned) {
+                double originalDamage = event.getDamage();
+                event.setDamage(originalDamage * 0.66);
             }
         }
     }

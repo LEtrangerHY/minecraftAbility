@@ -26,7 +26,6 @@ import org.joml.AxisAngle4f;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 
 public class R implements SkillBase {
@@ -149,12 +148,12 @@ public class R implements SkillBase {
 
     private void throwBambooSpear(Player player) {
         World world = player.getWorld();
-        Location eyeLoc = player.getEyeLocation().clone();
-        Vector velocity = eyeLoc.getDirection().clone().normalize().multiply(3.0);
+        Location spawnLoc = player.getEyeLocation().clone().add(0, 0.3, 0);
+        Vector velocity = spawnLoc.getDirection().clone().normalize().multiply(3.0);
 
         setItemToRedstone(player);
 
-        Location hitboxLoc = getTailLocation(eyeLoc, velocity);
+        Location hitboxLoc = getTailLocation(spawnLoc, velocity);
         LivingEntity hitbox = (LivingEntity) world.spawnEntity(hitboxLoc, EntityType.CHICKEN);
         hitbox.setInvisible(true);
         hitbox.setAI(false);
@@ -167,7 +166,7 @@ public class R implements SkillBase {
         hitbox.addScoreboardTag("bamboo_projectile");
         hitbox.setLeashHolder(player);
 
-        BlockDisplay bambooDisplay = (BlockDisplay) world.spawnEntity(eyeLoc, EntityType.BLOCK_DISPLAY);
+        BlockDisplay bambooDisplay = (BlockDisplay) world.spawnEntity(spawnLoc, EntityType.BLOCK_DISPLAY);
         bambooDisplay.setBlock(Material.BAMBOO.createBlockData());
         bambooDisplay.setTeleportDuration(1);
 
@@ -267,7 +266,7 @@ public class R implements SkillBase {
             info.stuckEntity = target;
 
             Location targetLoc = target.getLocation();
-            Location targetCenter = targetLoc.clone().add(0, target.getHeight() / 2.0, 0);
+            Location targetCenter = targetLoc.clone().add(0, (target.getHeight() / 2.0) + 0.35, 0);
             Location idealOrigin = targetCenter.clone().subtract(velocity.clone().normalize().multiply(1.4));
             idealOrigin.setDirection(velocity);
 
