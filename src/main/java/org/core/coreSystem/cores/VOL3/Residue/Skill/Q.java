@@ -204,7 +204,7 @@ public class Q implements SkillBase {
         cool.setCooldown(player, 6000L, "Q Reuse", "boss");
 
         if (target.isDead()) {
-            triggerKillReset(player);
+            triggerKillReset(player, target.getLocation());
             return;
         }
 
@@ -218,7 +218,7 @@ public class Q implements SkillBase {
                 }
 
                 if (!info.stuckEntity.isValid() || info.stuckEntity.isDead()) {
-                    triggerKillReset(player);
+                    triggerKillReset(player, info.stuckEntity.getLocation());
                     cancel();
                     return;
                 }
@@ -290,10 +290,17 @@ public class Q implements SkillBase {
         cleanupSession(uuid, finalCooldown);
     }
 
-    private void triggerKillReset(Player player) {
+    private void triggerKillReset(Player player, Location targetLocation) {
+        Location tpLoc = targetLocation.clone();
+        tpLoc.setYaw(player.getLocation().getYaw());
+        tpLoc.setPitch(player.getLocation().getPitch());
+
+        player.teleport(tpLoc);
+
         cleanupSession(player.getUniqueId(), 0L);
 
         player.getWorld().playSound(player.getLocation(), Sound.ITEM_TRIDENT_RETURN, 1.0f, 1.0f);
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1.0f, 1.0f);
 
         Title title = Title.title(
                 Component.empty(),
