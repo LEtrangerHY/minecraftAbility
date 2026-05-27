@@ -133,7 +133,7 @@ public class benzInventory extends absInventory {
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
                 lore.add(Component.text("공통 : 전방으로 강한 참격을 가한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("지정 : ⏣을 1개 소모해 대상에게 연쇄방향을 1회 중첩한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("지정 : ⏣을 1개 소모해 대상에게 연쇄반향을 1회 중첩한다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("지정 : 대상을 중심으로 소모한 ⏣의 수만큼 연쇄 참격을 시전한다.").color(NamedTextColor.GREEN));
                 break;
             default:
