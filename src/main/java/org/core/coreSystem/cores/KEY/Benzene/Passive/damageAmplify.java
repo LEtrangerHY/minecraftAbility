@@ -6,6 +6,7 @@ import org.core.coreSystem.cores.KEY.Benzene.coreSystem.Benzene;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.UUID;
 
 public class damageAmplify {
 
@@ -19,9 +20,10 @@ public class damageAmplify {
         double amplifiedDamage = originalDamage;
 
         int t = 0;
+        UUID targetUUID = entity.getUniqueId();
 
-        for (Entity chainedEntity : new ArrayList<>(config.chainRes.getOrDefault(player.getUniqueId(), new LinkedHashMap<>()).values())) {
-            if (chainedEntity == entity) {
+        for (UUID chainedUUID : new ArrayList<>(config.chainRes.getOrDefault(player.getUniqueId(), new LinkedHashMap<>()).values())) {
+            if (chainedUUID.equals(targetUUID)) {
                 t++;
             }
         }
@@ -36,11 +38,11 @@ public class damageAmplify {
             default -> amplifiedDamage;
         };
 
-        if(config.q_Skill_effect_1.containsValue(entity)){
-            amplifiedDamage = amplifiedDamage * ((double) 5/3);
+        UUID qTargetUUID = config.q_Skill_effect_1.get(player.getUniqueId());
+        if (qTargetUUID != null && qTargetUUID.equals(targetUUID)) {
+            amplifiedDamage = amplifiedDamage * (5.0 / 3.0);
         }
 
         return amplifiedDamage;
     }
-
 }

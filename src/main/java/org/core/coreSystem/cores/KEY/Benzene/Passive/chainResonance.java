@@ -45,8 +45,9 @@ public class chainResonance {
     }
 
     public void increase(Player player, Entity entity) {
-        LinkedHashMap<Integer, Entity> playerChain = config.chainRes.computeIfAbsent(player.getUniqueId(), k -> new LinkedHashMap<>());
+        LinkedHashMap<Integer, UUID> playerChain = config.chainRes.computeIfAbsent(player.getUniqueId(), k -> new LinkedHashMap<>());
         int count = playerChain.size();
+        UUID targetUUID = entity.getUniqueId();
 
         if (!activeTasks.containsKey(player.getUniqueId())) {
             updateChainResList(player);
@@ -58,30 +59,30 @@ public class chainResonance {
 
             player.getWorld().spawnParticle(Particle.BLOCK, entity.getLocation().add(0, 1.2, 0), 12, 0.3, 0.3, 0.3, CHAIN_DATA);
 
-            playerChain.put(chainCount, entity);
+            playerChain.put(chainCount, targetUUID);
 
         } else {
             removeFirstEntryFromLinkedHashMap(config.chainRes, player.getUniqueId(), player);
 
             int chainCount = config.crCount.getOrDefault(player.getUniqueId(), 0) + 1;
             config.crCount.put(player.getUniqueId(), chainCount);
-            playerChain.put(chainCount, entity);
+            playerChain.put(chainCount, targetUUID);
 
-            int t = countIndivChain(player, entity);
+            int t = countIndivChain(player, targetUUID);
 
             player.getWorld().spawnParticle(Particle.BLOCK, entity.getLocation().add(0, t * 0.2, 0), 6, 0.3, 0.3, 0.3, CHAIN_DATA);
         }
 
         sendBar(player, config.chainRes.get(player.getUniqueId()).size());
 
-        if (!particleUse.containsKey(entity)) {
+        if (!particleUse.containsKey(targetUUID)) {
             chainParticle(player, entity);
         }
     }
 
-    public void decrease(Entity targetEntity) {
+    public void decrease(UUID targetUUID) {
         config.chainRes.forEach((uuid, entityMap) -> {
-            boolean isRemoved = entityMap.values().removeIf(entity -> entity.equals(targetEntity));
+            boolean isRemoved = entityMap.values().removeIf(uuidValue -> uuidValue.equals(targetUUID));
 
             if (isRemoved) {
                 Player player = Bukkit.getPlayer(uuid);
@@ -115,13 +116,21 @@ public class chainResonance {
 
         if (chainMap != null && !chainMap.isEmpty()) {
             Integer firstKey = chainMap.keySet().iterator().next();
-            Entity firstKeyEntity = config.chainRes.getOrDefault(player.getUniqueId(), new LinkedHashMap<>()).get(firstKey);
+
+            UUID firstKeyUUID = (UUID) config.chainRes.getOrDefault(player.getUniqueId(), new LinkedHashMap<>()).get(firstKey);
+            Entity firstKeyEntity = Bukkit.getEntity(firstKeyUUID);
+
+            if (firstKeyEntity == null || !firstKeyEntity.isValid() || firstKeyEntity.isDead()) {
+                chainMap.remove(firstKey);
+                updateChainResList(player);
+                return;
+            }
 
             Location pLoc = player.getLocation();
             Location eLoc = firstKeyEntity.getLocation();
             double distSq = distanceSquared(pLoc, eLoc, player.getHeight(), firstKeyEntity.getHeight());
 
-            int t = countIndivChain(player, firstKeyEntity);
+            int t = countIndivChain(player, firstKeyUUID);
 
             if (distSq <= 484) {
                 Stun stun = new Stun(firstKeyEntity, 100L * t);
@@ -143,9 +152,11 @@ public class chainResonance {
         return x * x + y * y + z * z;
     }
 
-    private final Map<Entity, BukkitRunnable> particleUse = new HashMap<>();
+    private final Map<UUID, BukkitRunnable> particleUse = new HashMap<>();
 
     public void chainParticle(Player player, Entity target) {
+        UUID targetUUID = target.getUniqueId();
+
         BukkitRunnable particle = new BukkitRunnable() {
             final double tiltAngle = Math.toRadians(16);
             final double cosTilt = Math.cos(tiltAngle);
@@ -153,14 +164,15 @@ public class chainResonance {
 
             @Override
             public void run() {
-                LinkedHashMap<Integer, Entity> chainMap = config.chainRes.get(player.getUniqueId());
-                if (target.isDead() || !player.isOnline() || chainMap == null || !chainMap.containsValue(target)) {
-                    particleUse.remove(target);
+                LinkedHashMap<Integer, UUID> chainMap = config.chainRes.get(player.getUniqueId());
+
+                if (target.isDead() || !target.isValid() || !player.isOnline() || chainMap == null || !chainMap.containsValue(targetUUID)) {
+                    particleUse.remove(targetUUID);
                     this.cancel();
                     return;
                 }
 
-                int t = countIndivChain(player, target);
+                int t = countIndivChain(player, targetUUID);
 
                 Location pLoc = player.getLocation();
                 Location tLoc = target.getLocation();
@@ -210,17 +222,17 @@ public class chainResonance {
             }
         };
 
-        particleUse.put(target, particle);
+        particleUse.put(targetUUID, particle);
         particle.runTaskTimer(plugin, 0L, 3L);
     }
 
-    public int countIndivChain(Player player, Entity target) {
+    public int countIndivChain(Player player, UUID targetUUID) {
         int t = 0;
-        LinkedHashMap<Integer, Entity> map = config.chainRes.get(player.getUniqueId());
+        LinkedHashMap<Integer, UUID> map = config.chainRes.get(player.getUniqueId());
         if (map == null) return 0;
 
-        for (Entity chainedEntity : map.values()) {
-            if (chainedEntity == target) {
+        for (UUID chainedUUID : map.values()) {
+            if (chainedUUID.equals(targetUUID)) {
                 t++;
             }
         }
@@ -266,7 +278,8 @@ public class chainResonance {
 
                 int startScore = 7;
 
-                LinkedHashMap<Integer, Entity> playerChain = config.chainRes.computeIfAbsent(player.getUniqueId(), k -> new LinkedHashMap<>());
+                // 💡 [자료형 변경] LinkedHashMap<Integer, Entity> -> LinkedHashMap<Integer, UUID>
+                LinkedHashMap<Integer, UUID> playerChain = config.chainRes.computeIfAbsent(player.getUniqueId(), k -> new LinkedHashMap<>());
                 int count = playerChain.size();
                 String benzene = (count >= 6) ? "§7⌬" : BENZENE_ICONS[count];
 
@@ -274,11 +287,13 @@ public class chainResonance {
                 score1.setScore(startScore--);
 
                 if (!playerChain.isEmpty()) {
-                    List<Entity> rawEntities = new ArrayList<>(playerChain.values());
+                    // 💡 [자료형 변경] List<Entity> -> List<UUID>
+                    List<UUID> rawUUIDs = new ArrayList<>(playerChain.values());
 
                     Map<UUID, Integer> groupFrequencies = new LinkedHashMap<>();
-                    for (Entity e : rawEntities) {
-                        groupFrequencies.put(e.getUniqueId(), groupFrequencies.getOrDefault(e.getUniqueId(), 0) + 1);
+                    // 💡 [자료형 변경] Entity -> UUID 추출로 빈도수 맵핑
+                    for (UUID u : rawUUIDs) {
+                        groupFrequencies.put(u, groupFrequencies.getOrDefault(u, 0) + 1);
                     }
 
                     int globalIndex = 0;
@@ -288,19 +303,23 @@ public class chainResonance {
                         String rings = "⏣".repeat(freq);
 
                         for (int i = 0; i < freq; i++) {
-                            Entity currentEntity = rawEntities.get(globalIndex);
+                            // 💡 [자료형 변경] UUID를 가져와서 Entity로 변환
+                            UUID currentUUID = rawUUIDs.get(globalIndex);
+                            Entity currentEntity = Bukkit.getEntity(currentUUID);
 
-                            Location pLoc = player.getLocation();
-                            Location eLoc = currentEntity.getLocation();
-                            double distSq = distanceSquared(pLoc, eLoc, player.getHeight(), currentEntity.getHeight());
+                            if (currentEntity != null) {
+                                Location pLoc = player.getLocation();
+                                Location eLoc = currentEntity.getLocation();
+                                double distSq = distanceSquared(pLoc, eLoc, player.getHeight(), currentEntity.getHeight());
 
-                            String baseName = (currentEntity instanceof Player) ? currentEntity.getName() : currentEntity.getType().name();
-                            String finalDisplay = baseName + groupCounter + rings;
+                                String baseName = (currentEntity instanceof Player) ? currentEntity.getName() : currentEntity.getType().name();
+                                String finalDisplay = baseName + groupCounter + rings;
 
-                            Score score = (distSq <= 484)
-                                    ? objective.getScore(finalDisplay)
-                                    : objective.getScore("§7§m" + finalDisplay);
-                            score.setScore(startScore--);
+                                Score score = (distSq <= 484)
+                                        ? objective.getScore(finalDisplay)
+                                        : objective.getScore("§7§m" + finalDisplay);
+                                score.setScore(startScore--);
+                            }
 
                             globalIndex++;
                         }

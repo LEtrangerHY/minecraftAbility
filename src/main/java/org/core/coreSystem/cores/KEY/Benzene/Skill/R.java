@@ -112,7 +112,7 @@ public class R implements SkillBase {
                             if (!target.isDead()) {
                                 chainResonance.increase(player, target);
                                 if (target.isDead()) {
-                                    chainResonance.decrease(target);
+                                    chainResonance.decrease(target.getUniqueId());
                                 }
                             }
                         }

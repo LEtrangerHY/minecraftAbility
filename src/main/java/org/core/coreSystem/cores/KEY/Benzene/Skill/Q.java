@@ -16,6 +16,9 @@ import org.core.effect.crowdControl.Grounding;
 import org.core.coreSystem.cores.KEY.Benzene.coreSystem.Benzene;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 
+import java.util.HashSet;
+import java.util.UUID;
+
 public class Q implements SkillBase {
 
     private final Benzene config;
@@ -57,7 +60,7 @@ public class Q implements SkillBase {
 
         entity.addPotionEffect(GLOW_EFFECT);
 
-        config.q_Skill_effect_1.put(player.getUniqueId(), entity);
+        config.q_Skill_effect_1.put(player.getUniqueId(), entity.getUniqueId());
         world.playSound(entity.getLocation(), Sound.ITEM_TRIDENT_HIT_GROUND, 1.6f, 1.0f);
 
         new BukkitRunnable() {
@@ -86,6 +89,7 @@ public class Q implements SkillBase {
         world.playSound(pLoc, Sound.ITEM_TRIDENT_HIT_GROUND, 1.0f, 1.0f);
 
         int hitCount = 0;
+        UUID playerUUID = player.getUniqueId();
 
         for (Entity rangeTarget : world.getNearbyEntities(pLoc, 6.0, 6.0, 6.0)) {
             if (rangeTarget instanceof LivingEntity target && rangeTarget != player) {
@@ -105,7 +109,9 @@ public class Q implements SkillBase {
 
                 target.addPotionEffect(GLOW_EFFECT);
 
-                config.q_Skill_effect_2.put(player.getUniqueId(), target);
+                HashSet<UUID> areaTargets = config.q_Skill_effect_2.computeIfAbsent(playerUUID, k -> new HashSet<>());
+                areaTargets.add(target.getUniqueId());
+
                 hitCount++;
             }
         }
@@ -130,15 +136,25 @@ public class Q implements SkillBase {
 
     public void chain_qSkill_Particle_Effect(Player player, Entity entity, int time) {
         World world = player.getWorld();
+        UUID playerUUID = player.getUniqueId();
+        UUID targetUUID = entity.getUniqueId();
 
         new BukkitRunnable() {
             int tick = 0;
 
             @Override
             public void run() {
-                if (tick > time || entity.isDead()) {
-                    config.q_Skill_effect_1.remove(player.getUniqueId(), entity);
-                    config.q_Skill_effect_2.remove(player.getUniqueId(), entity);
+                if (tick > time || entity.isDead() || !entity.isValid()) {
+
+                    config.q_Skill_effect_1.remove(playerUUID, targetUUID);
+
+                    HashSet<UUID> areaTargets = config.q_Skill_effect_2.get(playerUUID);
+                    if (areaTargets != null) {
+                        areaTargets.remove(targetUUID);
+                        if (areaTargets.isEmpty()) {
+                            config.q_Skill_effect_2.remove(playerUUID);
+                        }
+                    }
                     cancel();
                     return;
                 }

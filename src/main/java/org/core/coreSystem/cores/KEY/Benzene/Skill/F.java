@@ -90,7 +90,7 @@ public class F implements SkillBase {
             world.spawnParticle(Particle.ENCHANTED_HIT, initialTarget.getLocation().add(0, 1, 0), 22, 0.6, 0, 0.6, 1);
             if (!initialTarget.isDead()) {
                 chainResonance.increase(player, initialTarget);
-                if (initialTarget.isDead()) chainResonance.decrease(initialTarget);
+                if (initialTarget.isDead()) chainResonance.decrease(initialTarget.getUniqueId());
             }
         }
 
@@ -140,7 +140,8 @@ public class F implements SkillBase {
                         if (canBreakBlock) {
                             if (!target.isDead()) {
                                 chainResonance.increase(player, target);
-                                if (target.isDead()) chainResonance.decrease(target);
+                                // 💡 [수정] Entity -> UUID 파라미터 변경 대응
+                                if (target.isDead()) chainResonance.decrease(target.getUniqueId());
                             }
                         }
                     }
@@ -182,7 +183,7 @@ public class F implements SkillBase {
                 int chainNum = config.chainRes.getOrDefault(player.getUniqueId(), new LinkedHashMap<>()).size();
                 config.damaged_2.remove(player.getUniqueId());
 
-                if (target != null && chainNum >= 2) {
+                if (target != null && target.isValid() && !target.isDead() && chainNum >= 2) {
                     Special_Attack(player, player.getLocation(), player.getGameMode(), target, chainNum);
                 }
 
@@ -245,7 +246,7 @@ public class F implements SkillBase {
 
             @Override
             public void run() {
-                if (tick >= chainNum || player.isDead()) {
+                if (tick >= chainNum || player.isDead() || !entity.isValid() || entity.isDead()) {
                     config.damaged_2.remove(player.getUniqueId());
                     config.fskill_using.remove(player.getUniqueId());
 
@@ -326,6 +327,7 @@ public class F implements SkillBase {
                 for (Entity entity : world.getNearbyEntities(player.getLocation(), slashLength, slashLength, slashLength)) {
 
                     if (!(entity instanceof LivingEntity target) || entity == player) continue;
+
                     if (config.damaged_2.get(player.getUniqueId()).contains(entity)) continue;
 
                     Vector toTarget = target.getLocation().toVector().subtract(player.getLocation().toVector());

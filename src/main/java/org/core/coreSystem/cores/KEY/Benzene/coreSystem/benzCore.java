@@ -46,12 +46,14 @@ public class benzCore extends absCore {
     private final Benzene config;
 
     private final chainResonance chainResonance;
-    private final org.core.coreSystem.cores.KEY.Benzene.Passive.damageAmplify damageAmplify;
-    private final org.core.coreSystem.cores.KEY.Benzene.Passive.damageShare damageShare;
+    private final damageAmplify damageAmplify;
+    private final damageShare damageShare;
 
     private final R Rskill;
     private final Q Qskill;
     private final F Fskill;
+
+    private final NamespacedKey lockKey;
 
     public benzCore(Core plugin, coreConfig tag, Benzene config, Cool cool) {
         super(tag, cool);
@@ -66,6 +68,8 @@ public class benzCore extends absCore {
         this.Rskill = new R(config, plugin, cool, chainResonance);
         this.Qskill = new Q(config, plugin, cool);
         this.Fskill = new F(config, plugin, cool, chainResonance);
+
+        this.lockKey = new NamespacedKey(plugin, "benzene_chain_lock");
 
         plugin.getLogger().info("Benzene downloaded...");
     }
@@ -210,7 +214,7 @@ public class benzCore extends absCore {
 
         if (!tag.Benzene.contains(player) && !player.isDead()) return;
 
-        LinkedHashMap<Integer, Entity> playerChain = config.chainRes.getOrDefault(player.getUniqueId(), new LinkedHashMap<>());
+        LinkedHashMap<Integer, UUID> playerChain = config.chainRes.getOrDefault(player.getUniqueId(), new LinkedHashMap<>());
         int count = playerChain.size();
 
         double reductionPercentage = 0.66 - 0.11 * count;
@@ -258,11 +262,16 @@ public class benzCore extends absCore {
             }
         }
 
-        if(config.chainRes.getOrDefault(player.getUniqueId(), new LinkedHashMap<>()).containsValue(target) && distance <= 22){
+        if(config.chainRes.getOrDefault(player.getUniqueId(), new LinkedHashMap<>()).containsValue(target.getUniqueId()) && distance <= 22){
             double originalDamage = event.getDamage();
             double amplifiedDamage = damageAmplify.Amplify(player, target, originalDamage);
 
             event.setDamage(amplifiedDamage);
+
+            String activeSession = target.getPersistentDataContainer().get(lockKey, PersistentDataType.STRING);
+            if (activeSession != null && activeSession.equals(player.getUniqueId().toString())) {
+                return;
+            }
 
             damageShare.damageShareTrigger(player, target, originalDamage);
         }
@@ -272,7 +281,7 @@ public class benzCore extends absCore {
     public void chainDelete(EntityDeathEvent event) {
         Entity death = event.getEntity();
 
-        chainResonance.decrease(death);
+        chainResonance.decrease(death.getUniqueId());
 
         if(event.getEntity() instanceof Player player && tag.Benzene.contains(player)){
             config.variableReset(player);
@@ -283,7 +292,9 @@ public class benzCore extends absCore {
     public void chainedCreeperExplode(EntityExplodeEvent event) {
         Entity ex = event.getEntity();
 
-        chainResonance.decrease(ex);
+        if (ex != null) {
+            chainResonance.decrease(ex.getUniqueId());
+        }
     }
 
     @Override

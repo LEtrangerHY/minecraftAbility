@@ -57,7 +57,6 @@ public class Bamboo {
         damaged.remove(player.getUniqueId());
         r_damaged.remove(player.getUniqueId());
 
-        // ★ [추가됨] 초기화 시 제거
         isDashing.remove(player.getUniqueId());
     }
 }

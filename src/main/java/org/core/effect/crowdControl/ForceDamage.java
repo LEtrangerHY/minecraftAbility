@@ -26,7 +26,7 @@ public class ForceDamage implements Effects, Listener {
     public void applyEffect(Entity entity) {
         if(target.isInvulnerable()) return;
 
-        target.setNoDamageTicks(1);
+        target.setNoDamageTicks(0);
         target.damage(damage, damageSource);
         if(isNonKnock) target.setVelocity(new Vector(0, 0, 0));
         target.setNoDamageTicks(10);
