@@ -278,7 +278,6 @@ public class chainResonance {
 
                 int startScore = 7;
 
-                // 💡 [자료형 변경] LinkedHashMap<Integer, Entity> -> LinkedHashMap<Integer, UUID>
                 LinkedHashMap<Integer, UUID> playerChain = config.chainRes.computeIfAbsent(player.getUniqueId(), k -> new LinkedHashMap<>());
                 int count = playerChain.size();
                 String benzene = (count >= 6) ? "§7⌬" : BENZENE_ICONS[count];
@@ -287,11 +286,9 @@ public class chainResonance {
                 score1.setScore(startScore--);
 
                 if (!playerChain.isEmpty()) {
-                    // 💡 [자료형 변경] List<Entity> -> List<UUID>
                     List<UUID> rawUUIDs = new ArrayList<>(playerChain.values());
 
                     Map<UUID, Integer> groupFrequencies = new LinkedHashMap<>();
-                    // 💡 [자료형 변경] Entity -> UUID 추출로 빈도수 맵핑
                     for (UUID u : rawUUIDs) {
                         groupFrequencies.put(u, groupFrequencies.getOrDefault(u, 0) + 1);
                     }
@@ -303,7 +300,6 @@ public class chainResonance {
                         String rings = "⏣".repeat(freq);
 
                         for (int i = 0; i < freq; i++) {
-                            // 💡 [자료형 변경] UUID를 가져와서 Entity로 변환
                             UUID currentUUID = rawUUIDs.get(globalIndex);
                             Entity currentEntity = Bukkit.getEntity(currentUUID);
 
