@@ -23,7 +23,8 @@ public class cmdCore implements CommandExecutor, TabCompleter {
     private static final List<String> VALID_SETTINGS = Arrays.asList(
             "player", "nightel", "knight", "pyro", "glacier", "dagger", "carpenter",
             "bamboo", "luster", "blaze", "commander", "harvester", "blossom", "blue",
-            "swordsman", "saboteur", "burst", "lavender", "rose", "residue", "benzene"
+            "swordsman", "saboteur", "burst", "lavender", "rose", "residue", "darmes",
+            "benzene"
     );
 
     public cmdCore(coreConfig config, LevelingManager level) {

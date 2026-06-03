@@ -11,6 +11,9 @@ import org.core.cool.Cool;
 import org.core.coreSystem.cores.KEY.PLAYER.coreSystem.PLAYER;
 import org.core.coreSystem.cores.KEY.PLAYER.coreSystem.playerCore;
 import org.core.coreSystem.cores.KEY.PLAYER.coreSystem.playerInventory;
+import org.core.coreSystem.cores.VOL3.Darmes.coreSystem.Darmes;
+import org.core.coreSystem.cores.VOL3.Darmes.coreSystem.darmesCore;
+import org.core.coreSystem.cores.VOL3.Darmes.coreSystem.darmesInventory;
 import org.core.coreSystem.cores.VOL3.Residue.coreSystem.Residue;
 import org.core.coreSystem.cores.VOL3.Residue.coreSystem.residueCore;
 import org.core.coreSystem.cores.VOL3.Residue.coreSystem.residueInventory;
@@ -114,6 +117,7 @@ public final class Core extends JavaPlugin implements Listener {
     private lavCore lavender;
     private roseCore rose;
     private residueCore residue;
+    private darmesCore darmes;
 
     private playerInventory playerInv;
     private nightInventory nightInv;
@@ -136,6 +140,7 @@ public final class Core extends JavaPlugin implements Listener {
     private lavInventory lavInv;
     private roseInventory roseInv;
     private residueInventory residueInv;
+    private darmesInventory darmesInv;
 
     private EntityLevelingManager Elevel;
 
@@ -173,6 +178,7 @@ public final class Core extends JavaPlugin implements Listener {
         Lavender lavConfig = new Lavender();
         Rose roseConfig = new Rose();
         Residue residueConfig = new Residue();
+        Darmes darmesConfig = new Darmes();
 
         this.cool = new Cool(this);
 
@@ -322,6 +328,13 @@ public final class Core extends JavaPlugin implements Listener {
 
         this.residueInv = new residueInventory(this, this.config);
         Bukkit.getPluginManager().registerEvents(this.residueInv, this);
+
+        this.darmes = new darmesCore(this, this.config, darmesConfig, cool);
+        Bukkit.getPluginManager().registerEvents(this.darmes, this);
+        this.config.registerCore("darmes", this.darmes);
+
+        this.darmesInv = new darmesInventory(this, this.config);
+        Bukkit.getPluginManager().registerEvents(this.darmesInv, this);
 
         this.benz = new benzCore(this, this.config, benzConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.benz, this);

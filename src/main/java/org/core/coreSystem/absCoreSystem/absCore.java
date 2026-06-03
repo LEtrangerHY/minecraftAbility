@@ -86,7 +86,7 @@ public abstract class absCore implements Listener {
         if (event.getAction() != Action.LEFT_CLICK_AIR && event.getAction() != Action.LEFT_CLICK_BLOCK) {
             if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 
-                if (main.getType() != Material.IRON_SPEAR) event.setCancelled(true);
+                if (main.getType() != Material.IRON_SPEAR && main.getType() != Material.MACE) event.setCancelled(true);
 
                 if(!pAttackUsing.contains(player.getUniqueId())) {
                     pAttackUsing.add(player.getUniqueId());

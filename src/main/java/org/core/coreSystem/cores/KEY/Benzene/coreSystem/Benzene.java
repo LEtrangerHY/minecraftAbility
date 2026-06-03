@@ -32,6 +32,7 @@ public class Benzene {
     public HashMap<UUID, HashSet<UUID>> q_Skill_effect_2 = new HashMap<>();
     public long q_Skill_Cool = 3000;
 
+    // F
     public HashMap<UUID, HashSet<Entity>> damaged_2 = new HashMap<>();
     public HashMap<UUID, Boolean> blockBreak = new HashMap<>();
     public HashMap<UUID, Boolean> canBlockBreak = new HashMap<>();

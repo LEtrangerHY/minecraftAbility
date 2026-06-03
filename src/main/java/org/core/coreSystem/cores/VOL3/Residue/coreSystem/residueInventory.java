@@ -116,7 +116,7 @@ public class residueInventory extends absInventory {
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
                 lore.add(Component.text("전방으로 창을 던지며, 창에 피격된 적을 2초간 고정시킨다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("지시전 : 창이 꽂힌 뒤 6초 내 재시전 시, 창이 꽂힌 위치로 순간이동 한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("재시전 : 창이 꽂힌 뒤 6초 내 재시전 시, 창이 꽂힌 위치로 순간이동 한다.").color(NamedTextColor.GREEN));
                 break;
             case "F":
                 requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfF.get((int) level)) : Component.text("Require EXP : MAX");
