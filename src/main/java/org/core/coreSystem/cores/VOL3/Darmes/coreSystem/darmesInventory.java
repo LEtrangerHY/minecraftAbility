@@ -55,7 +55,7 @@ public class darmesInventory extends absInventory {
         return switch (skill) {
             case "main" -> Component.text("DARMES");
             case "R" -> Component.text("-");
-            case "Q" -> Component.text("");
+            case "Q" -> Component.text("HardLand");
             case "F" -> Component.text("DEWAR");
             default -> Component.text("???");
         };
@@ -64,7 +64,7 @@ public class darmesInventory extends absInventory {
     @Override
     protected Material getTotem(Player player, String skill) {
         return switch (skill) {
-            case "R" -> Material.MACE;
+            case "R" -> Material.BREEZE_ROD;
             case "Q" -> Material.IRON_CHAIN;
             case "F" -> Material.HEAVY_CORE;
             default -> Material.BARRIER;
@@ -82,7 +82,7 @@ public class darmesInventory extends absInventory {
             lore.add(Component.text("장착 : 메인핸드에 철퇴 장착, 오프핸드에 사슬 장착.").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text(""));
-            lore.add(Component.text("메뉴북 아이템 없어도 인벤토리 화면에서 철 창을 우클릭해서 메뉴 화면 진입 가능").color(NamedTextColor.AQUA));
+            lore.add(Component.text("메뉴북 아이템 없어도 인벤토리 화면에서 철퇴를 우클릭해서 메뉴 화면 진입 가능").color(NamedTextColor.AQUA));
             return lore;
         }
 

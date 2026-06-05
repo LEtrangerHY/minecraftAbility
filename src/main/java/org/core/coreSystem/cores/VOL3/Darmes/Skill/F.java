@@ -54,7 +54,7 @@ public class F implements SkillBase {
 
         double slashLength = 4.8;
         double maxTicks = 6;
-        double innerRadius = 2.0;
+        double innerRadius = 2.6;
 
         HashSet<Entity> damagedSet = new HashSet<>();
 
@@ -152,7 +152,7 @@ public class F implements SkillBase {
                         player.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, Integer.MAX_VALUE, amplifier, false, false, false));
                         player.setAbsorptionAmount(newAbsorption);
 
-                        double defaultHeal = Math.min(6.0, hitCount * 1.0);
+                        double defaultHeal = Math.min(6.0, hitCount * config.f_Skill_Heal);
 
                         double finalHeal = defaultHeal * ampMultiplier;
 

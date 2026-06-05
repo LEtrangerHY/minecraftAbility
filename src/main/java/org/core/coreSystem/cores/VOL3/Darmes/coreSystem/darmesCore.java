@@ -223,10 +223,10 @@ public class darmesCore extends absCore {
 
         double fallHeight = Math.max(0, startY - loc.getY());
 
-        double ratio = Math.min(fallHeight / 26.0, 1.0);
-        double baseDamage = 6.0 + (16.0 * Math.pow(ratio, 2));
+        double ratio = Math.min(fallHeight / 24.0, 1.0);
+        double baseDamage = 6.0 + (10.0 * Math.pow(ratio, 2));
 
-        double damageRatio = baseDamage / 22.0;
+        double damageRatio = baseDamage / 16.0;
         int expCount = Math.max(1, (int) (6 * damageRatio));
         int chainCount = Math.max(1, (int) (40 * damageRatio));
         int smokeCount = Math.max(1, (int) (10 * damageRatio));
@@ -251,7 +251,7 @@ public class darmesCore extends absCore {
             }
         }.runTaskTimer(plugin, 0L, 2L);
 
-        double radius = 3.6;
+        double radius = 3.3;
 
         long qLevel = player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L);
         double amp = config.q_Skill_amp * qLevel;

@@ -35,8 +35,8 @@ public class Darmes {
     public double blowParapeterInc = 0.2;
     public long f_Skill_Cool = 1000;
     public double f_Skill_amp = 0.2;
-    public double f_Skill_Heal= 1;
-    public double f_Skill_Damage = 2;
+    public double f_Skill_Heal= 1.0;
+    public double f_Skill_Damage = 2.0;
 
     public void variableReset(Player player) {
         R_COOLDOWN.remove(player.getUniqueId());

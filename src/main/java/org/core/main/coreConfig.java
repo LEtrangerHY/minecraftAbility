@@ -49,6 +49,7 @@ public class coreConfig {
     public Set<Player> Rose;
     public Set<Player> Residue;
     public Set<Player> Darmes;
+    public Set<Player> Charlotte;
 
     public coreConfig(JavaPlugin plugin, Cool cool) {
         this.plugin = plugin;
@@ -76,6 +77,7 @@ public class coreConfig {
         this.Rose = new persistentPlayerSet(plugin, "setting_rose");
         this.Residue = new persistentPlayerSet(plugin, "setting_residue");
         this.Darmes = new persistentPlayerSet(plugin, "setting_darmes");
+        this.Charlotte = new persistentPlayerSet(plugin, "setting_charlotte");
     }
 
     public void registerCore(String name, absCore core) {
@@ -105,6 +107,7 @@ public class coreConfig {
         if (Rose.contains(player)) return "ROSE";
         if (Residue.contains(player)) return "RESIDUE";
         if (Darmes.contains(player)) return "DARMES";
+        if (Charlotte.contains(player)) return "CHARLOTTE";
         return "NONE";
     }
 
@@ -146,6 +149,7 @@ public class coreConfig {
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_rose"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_residue"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_darmes"), PersistentDataType.BYTE, (byte) 0);
+        player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_charlotte"), PersistentDataType.BYTE, (byte) 0);
     }
 
     public void setSetting(Player player, String setting, boolean value) {
@@ -197,6 +201,7 @@ public class coreConfig {
             case "rose" -> new NamespacedKey(plugin, "setting_rose");
             case "residue" -> new NamespacedKey(plugin, "setting_residue");
             case "darmes" -> new NamespacedKey(plugin, "setting_darmes");
+            case "charlotte" -> new NamespacedKey(plugin, "setting_charlotte");
             default -> null;
         };
     }
