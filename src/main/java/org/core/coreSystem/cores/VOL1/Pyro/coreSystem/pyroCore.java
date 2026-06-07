@@ -11,7 +11,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -34,9 +33,6 @@ import org.core.coreSystem.cores.VOL1.Pyro.Skill.F;
 import org.core.coreSystem.cores.VOL1.Pyro.Skill.Q;
 import org.core.coreSystem.cores.VOL1.Pyro.Skill.R;
 
-import static org.bukkit.Bukkit.getPlayer;
-
-
 public class pyroCore extends absCore {
     private final Core plugin;
     private final Pyro config;
@@ -46,7 +42,6 @@ public class pyroCore extends absCore {
     private final R Rskill;
     private final Q Qskill;
     private final F Fskill;
-
 
     public pyroCore(Core plugin, coreConfig tag, Pyro config, Cool cool) {
         super(tag, cool);
@@ -102,106 +97,7 @@ public class pyroCore extends absCore {
         }
     }
 
-    @EventHandler(priority = EventPriority.NORMAL)
-    public void passiveAttackEffect(PlayerInteractEvent event) {
-
-        if(tag.Pyro.contains(event.getPlayer())) {
-            if (!pAttackUsing.contains(event.getPlayer().getUniqueId())) {
-
-                Player player = event.getPlayer();
-
-                if (hasProperItems(player)) {
-                    if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
-
-                        if (cool.isReloading(player, "flame")) {
-                            player.getWorld().playSound(player.getLocation(), Sound.ITEM_FLINTANDSTEEL_USE, 1, 1);
-                            return;
-                        }
-
-                        cool.setCooldown(player, 1400L, "flame");
-
-                        World world = player.getWorld();
-                        Location playerLocation = player.getLocation();
-                        Vector direction = playerLocation.getDirection().normalize().multiply(1.3);
-
-                        player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(1 / 1.4);
-                        world.playSound(player.getLocation(), Sound.ITEM_FIRECHARGE_USE, 1, 1);
-
-                        config.collision.put(player.getUniqueId(), false);
-
-                        DamageSource source = DamageSource.builder(DamageType.MAGIC)
-                                .withCausingEntity(player)
-                                .withDirectEntity(player)
-                                .build();
-
-                        new BukkitRunnable() {
-                            int ticks = 0;
-
-                            @Override
-                            public void run() {
-
-                                if (ticks >= 17 || config.collision.getOrDefault(player.getUniqueId(), true)) {
-                                    config.collision.remove(player.getUniqueId());
-                                    this.cancel();
-                                    return;
-                                }
-
-                                Location particleLocation = playerLocation.clone()
-                                        .add(direction.clone().multiply(ticks * 1.5))
-                                        .add(0, 1.4, 0);
-
-                                world.spawnParticle(Particle.FLAME, particleLocation, 7, 0.5, 0.5, 0.5, 0);
-                                world.spawnParticle(Particle.SMOKE, particleLocation, 3, 0.3, 0.3, 0.3, 0);
-
-                                Block block = particleLocation.getBlock();
-
-                                if (block.isBurnable() || block.getType() == Material.ICE || block.getType() == Material.SNOW || block.getType() == Material.BLUE_ICE || block.getType() == Material.FROSTED_ICE || block.getType() == Material.PACKED_ICE || block.getType() == Material.POWDER_SNOW || block.getType() == Material.SNOW_BLOCK) {
-                                    if(block.getType() == Material.BLUE_ICE) {
-                                        if(Math.random() < 0.06) {
-                                            block.setType(Material.FIRE);
-                                        }
-                                    }else{
-                                        block.setType(Material.FIRE);
-                                    }
-                                    if(Math.random() < 0.2) {
-                                        block.getWorld().playSound(block.getLocation(), Sound.ENTITY_GENERIC_BURN, 1, 1);
-                                    }
-                                }
-
-
-                                if(!block.isPassable()){
-                                    Burst(player, particleLocation);
-                                    config.collision.put(player.getUniqueId(), true);
-                                }
-
-                                for (Entity entity : world.getNearbyEntities(particleLocation, 0.7, 0.7, 0.7)) {
-                                    if (entity instanceof LivingEntity target && entity != player) {
-
-                                        ForceDamage forceDamage = new ForceDamage(target, 5.0, source, false);
-                                        forceDamage.applyEffect(player);
-                                        Burst(player, particleLocation);
-                                        config.collision.put(player.getUniqueId(), true);
-                                        break;
-                                    }
-                                }
-
-                                ticks++;
-                            }
-                        }.runTaskTimer(plugin, 0L, 1L);
-
-                        event.setCancelled(true);
-                    }
-                } else {
-                    player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(4.0);
-                }
-            } else {
-                pAttackUsing.remove(event.getPlayer().getUniqueId());
-            }
-        }
-    }
-
     public void Burst(Player player, Location burstLoction){
-
         World world = player.getWorld();
 
         world.playSound(player.getLocation(), Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1, 1);
@@ -226,7 +122,6 @@ public class pyroCore extends absCore {
 
                 Vector direction = entity.getLocation().toVector().subtract(burstLoction.toVector()).normalize().multiply(0.5);
                 direction.setY(0.5);
-
             }
         }
     }
@@ -271,6 +166,91 @@ public class pyroCore extends absCore {
     }
 
     @Override
+    protected boolean isCustomAttackUser(Player player) {
+        return true;
+    }
+
+    @Override
+    protected void onLSkillCooldown(PlayerInteractEvent event, Player player) {
+        player.getWorld().playSound(player.getLocation(), Sound.ITEM_FLINTANDSTEEL_USE, 1, 1);
+    }
+
+    @Override
+    protected void LSkill(PlayerInteractEvent event, Player player) {
+        event.setCancelled(true);
+
+        World world = player.getWorld();
+        Location playerLocation = player.getLocation();
+        Vector direction = playerLocation.getDirection().normalize().multiply(1.3);
+
+        AttributeInstance attackSpeed = player.getAttribute(Attribute.ATTACK_SPEED);
+        if (attackSpeed != null) attackSpeed.setBaseValue(1 / 1.4);
+
+        world.playSound(player.getLocation(), Sound.ITEM_FIRECHARGE_USE, 1, 1);
+
+        config.collision.put(player.getUniqueId(), false);
+
+        DamageSource source = DamageSource.builder(DamageType.MAGIC)
+                .withCausingEntity(player)
+                .withDirectEntity(player)
+                .build();
+
+        new BukkitRunnable() {
+            int ticks = 0;
+
+            @Override
+            public void run() {
+
+                if (ticks >= 17 || config.collision.getOrDefault(player.getUniqueId(), true)) {
+                    config.collision.remove(player.getUniqueId());
+                    this.cancel();
+                    return;
+                }
+
+                Location particleLocation = playerLocation.clone()
+                        .add(direction.clone().multiply(ticks * 1.5))
+                        .add(0, 1.4, 0);
+
+                world.spawnParticle(Particle.FLAME, particleLocation, 7, 0.5, 0.5, 0.5, 0);
+                world.spawnParticle(Particle.SMOKE, particleLocation, 3, 0.3, 0.3, 0.3, 0);
+
+                Block block = particleLocation.getBlock();
+
+                if (block.isBurnable() || block.getType() == Material.ICE || block.getType() == Material.SNOW || block.getType() == Material.BLUE_ICE || block.getType() == Material.FROSTED_ICE || block.getType() == Material.PACKED_ICE || block.getType() == Material.POWDER_SNOW || block.getType() == Material.SNOW_BLOCK) {
+                    if(block.getType() == Material.BLUE_ICE) {
+                        if(Math.random() < 0.06) {
+                            block.setType(Material.FIRE);
+                        }
+                    } else {
+                        block.setType(Material.FIRE);
+                    }
+                    if(Math.random() < 0.2) {
+                        block.getWorld().playSound(block.getLocation(), Sound.ENTITY_GENERIC_BURN, 1, 1);
+                    }
+                }
+
+                if(!block.isPassable()){
+                    Burst(player, particleLocation);
+                    config.collision.put(player.getUniqueId(), true);
+                }
+
+                for (Entity entity : world.getNearbyEntities(particleLocation, 0.7, 0.7, 0.7)) {
+                    if (entity instanceof LivingEntity target && entity != player) {
+
+                        ForceDamage forceDamage = new ForceDamage(target, 5.0, source, false);
+                        forceDamage.applyEffect(player);
+                        Burst(player, particleLocation);
+                        config.collision.put(player.getUniqueId(), true);
+                        break;
+                    }
+                }
+
+                ticks++;
+            }
+        }.runTaskTimer(plugin, 0L, 1L);
+    }
+
+    @Override
     protected SkillBase getRSkill() {
         return Rskill;
     }
@@ -298,8 +278,14 @@ public class pyroCore extends absCore {
     private boolean canUseFSkill(Player player) { return true; }
 
     @Override
-    protected boolean isItemRequired(Player player){
-        return hasProperItems(player);
+    protected boolean isItemRequired(Player player) {
+        if (hasProperItems(player)) {
+            return true;
+        } else {
+            AttributeInstance attackSpeed = player.getAttribute(Attribute.ATTACK_SPEED);
+            if (attackSpeed != null) attackSpeed.setBaseValue(4.0);
+            return false;
+        }
     }
 
     @Override
@@ -325,6 +311,16 @@ public class pyroCore extends absCore {
     }
 
     @Override
+    protected boolean isRAnimated(Player player) {
+        return true;
+    }
+
+    @Override
+    protected boolean isFAnimated(Player player) {
+        return false;
+    }
+
+    @Override
     protected ConfigWrapper getConfigWrapper() {
         return new ConfigWrapper() {
             @Override
@@ -341,6 +337,11 @@ public class pyroCore extends absCore {
                 cool.updateCooldown(player, "R", config.frozenCool);
                 cool.updateCooldown(player, "Q", config.frozenCool);
                 cool.updateCooldown(player, "F", config.frozenCool);
+            }
+
+            @Override
+            public long getLcooldown(Player player) {
+                return 1400L;
             }
 
             @Override

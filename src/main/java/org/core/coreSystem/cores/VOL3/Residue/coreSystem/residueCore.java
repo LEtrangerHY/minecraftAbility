@@ -182,6 +182,19 @@ public class residueCore extends absCore {
     }
 
     @Override
+    protected boolean isCustomAttackUser(Player player) {
+        return false;
+    }
+
+    @Override
+    protected void onLSkillCooldown(PlayerInteractEvent event, Player player) {
+    }
+
+    @Override
+    protected void LSkill(PlayerInteractEvent event, Player player) {
+    }
+
+    @Override
     protected SkillBase getRSkill() {
         return Rskill;
     }
@@ -258,6 +271,16 @@ public class residueCore extends absCore {
     }
 
     @Override
+    protected boolean isRAnimated(Player player) {
+        return false;
+    }
+
+    @Override
+    protected boolean isFAnimated(Player player) {
+        return false;
+    }
+
+    @Override
     protected ConfigWrapper getConfigWrapper() {
         return new ConfigWrapper() {
             @Override
@@ -275,6 +298,11 @@ public class residueCore extends absCore {
                 cool.pauseCooldown(player, "R");
                 cool.updateCooldown(player, "Q", config.frozenCool);
                 cool.updateCooldown(player, "F", config.frozenCool);
+            }
+
+            @Override
+            public long getLcooldown(Player player) {
+                return 0L;
             }
 
             @Override

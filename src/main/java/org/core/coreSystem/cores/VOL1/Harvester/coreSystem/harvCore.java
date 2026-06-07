@@ -94,18 +94,8 @@ public class harvCore extends absCore {
         }
     }
 
-    @EventHandler(priority = EventPriority.NORMAL)
-    public void passiveAttackEffect(PlayerInteractEvent event) {
-        if(tag.Harvester.contains(event.getPlayer())){
-            if (pAttackUsing.contains(event.getPlayer().getUniqueId())) {
-                pAttackUsing.remove(event.getPlayer().getUniqueId());
-            }
-        }
-    }
-
     @EventHandler
     public void passiveDamage(EntityDamageByEntityEvent event) {
-
         if (!(event.getDamager() instanceof Player player)) return;
         if (!(event.getEntity() instanceof LivingEntity target)) return;
 
@@ -120,7 +110,6 @@ public class harvCore extends absCore {
 
                 player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
                 event.setDamage(4.0);
-
             }
         }
     }
@@ -140,12 +129,24 @@ public class harvCore extends absCore {
             }
             player.setInvisible(bountiful.bushCheck(player));
         }
-
     }
 
     @Override
     protected boolean contains(Player player) {
         return tag.Harvester.contains(player);
+    }
+
+    @Override
+    protected boolean isCustomAttackUser(Player player) {
+        return false;
+    }
+
+    @Override
+    protected void onLSkillCooldown(PlayerInteractEvent event, Player player) {
+    }
+
+    @Override
+    protected void LSkill(PlayerInteractEvent event, Player player) {
     }
 
     @Override
@@ -180,6 +181,7 @@ public class harvCore extends absCore {
     private boolean canUseFSkill(Player player) {
         return true;
     }
+
     @Override
     protected boolean isItemRequired(Player player){
         return hasProperItems(player);
@@ -208,6 +210,16 @@ public class harvCore extends absCore {
     }
 
     @Override
+    protected boolean isRAnimated(Player player) {
+        return false;
+    }
+
+    @Override
+    protected boolean isFAnimated(Player player) {
+        return false;
+    }
+
+    @Override
     protected ConfigWrapper getConfigWrapper() {
         return new ConfigWrapper() {
             @Override
@@ -224,6 +236,11 @@ public class harvCore extends absCore {
                 cool.updateCooldown(player, "R", config.frozenCool);
                 cool.updateCooldown(player, "Q", config.frozenCool);
                 cool.updateCooldown(player, "F", config.frozenCool);
+            }
+
+            @Override
+            public long getLcooldown(Player player) {
+                return 0;
             }
 
             @Override

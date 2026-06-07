@@ -10,11 +10,10 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent; // 추가됨
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
@@ -39,7 +38,6 @@ public class glaCore extends absCore {
     private final R Rskill;
     private final Q Qskill;
     private final F Fskill;
-
 
     public glaCore(Core plugin, coreConfig tag, Glacier config, Cool cool) {
         super(tag, cool);
@@ -73,15 +71,12 @@ public class glaCore extends absCore {
     }
 
     private void applyAdditionalHealth(Player player, boolean healFull) {
-        long addHP =
-                player.getPersistentDataContainer().getOrDefault(
-                        new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L)
-                        +
-                        player.getPersistentDataContainer().getOrDefault(
-                                new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L)
-                        +
-                        player.getPersistentDataContainer().getOrDefault(
-                                new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L) * 2;
+        long addHP = player.getPersistentDataContainer().getOrDefault(
+                new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L)
+                + player.getPersistentDataContainer().getOrDefault(
+                new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L)
+                + player.getPersistentDataContainer().getOrDefault(
+                new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L) * 2;
 
         AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
         if (maxHealth != null) {
@@ -119,93 +114,81 @@ public class glaCore extends absCore {
         }
     }
 
-    @EventHandler(priority = EventPriority.NORMAL)
-    public void passiveAttackEffect(PlayerInteractEvent event) {
-
-        if(tag.Glacier.contains(event.getPlayer())) {
-            if (!pAttackUsing.contains(event.getPlayer().getUniqueId())) {
-
-                Player player = event.getPlayer();
-
-                if (hasProperItems(player)) {
-                    if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
-
-                        if (cool.isReloading(player, "frost")) {
-                            player.playSound(player.getLocation(), Sound.BLOCK_GLASS_PLACE, 1, 1);
-                            return;
-                        }
-
-                        cool.setCooldown(player, 800L, "frost");
-
-                        World world = player.getWorld();
-                        Location playerLocation = player.getLocation();
-                        Vector direction = playerLocation.getDirection().normalize().multiply(1.3);
-
-                        player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(1.25);
-                        world.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_BREAK, 1, 1);
-
-                        DamageSource source = DamageSource.builder(DamageType.MAGIC)
-                                .withCausingEntity(player)
-                                .withDirectEntity(player)
-                                .build();
-
-                        config.collision.put(player.getUniqueId(), false);
-
-                        new BukkitRunnable() {
-                            int ticks = 0;
-
-                            @Override
-                            public void run() {
-                                if (ticks >= 6 || config.collision.getOrDefault(player.getUniqueId(), true)) {
-                                    config.collision.remove(player.getUniqueId());
-                                    this.cancel();
-                                    return;
-                                }
-
-                                Location particleLocation = playerLocation.clone()
-                                        .add(direction.clone().multiply(ticks * 1.5))
-                                        .add(0, 1.4, 0);
-
-                                Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(0, 255, 255), 0.6f);
-                                world.spawnParticle(Particle.SNOWFLAKE, particleLocation, 6, 0.5, 0.5, 0.5, 0);
-                                world.spawnParticle(Particle.DUST, particleLocation, 3, 0.3, 0.3, 0.3, 0, dustOptions);
-
-                                for (Entity entity : world.getNearbyEntities(particleLocation, 0.6, 0.6, 0.6)) {
-                                    if (entity instanceof LivingEntity target && entity != player) {
-
-                                        world.playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 1);
-
-                                        ForceDamage forceDamage = new ForceDamage(target, 3.0, source, false);
-                                        forceDamage.applyEffect(player);
-
-                                        if (Math.random() < 0.6) {
-                                            Frost frostbite = new Frost(target, 10000L);
-                                            frostbite.applyEffect(player);
-                                        }
-
-                                        config.collision.put(player.getUniqueId(), true);
-                                        break;
-                                    }
-                                }
-
-                                ticks++;
-                            }
-                        }.runTaskTimer(plugin, 0L, 1L);
-
-                        event.setCancelled(true);
-                    }
-                } else {
-                    player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(4.0);
-                }
-            } else {
-                pAttackUsing.remove(event.getPlayer().getUniqueId());
-            }
-        }
-    }
-
     @Override
     protected boolean contains(Player player) {
         return tag.Glacier.contains(player);
+    }
+
+    @Override
+    protected boolean isCustomAttackUser(Player player) {
+        return true;
+    }
+
+    @Override
+    protected void onLSkillCooldown(PlayerInteractEvent event, Player player) {
+        player.playSound(player.getLocation(), Sound.BLOCK_GLASS_PLACE, 1, 1);
+    }
+
+    @Override
+    protected void LSkill(PlayerInteractEvent event, Player player) {
+        event.setCancelled(true);
+
+        World world = player.getWorld();
+        Location playerLocation = player.getLocation();
+        Vector direction = playerLocation.getDirection().normalize().multiply(1.3);
+
+        AttributeInstance attackSpeed = player.getAttribute(Attribute.ATTACK_SPEED);
+        if (attackSpeed != null) attackSpeed.setBaseValue(1.25);
+
+        world.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_BREAK, 1, 1);
+
+        DamageSource source = DamageSource.builder(DamageType.MAGIC)
+                .withCausingEntity(player)
+                .withDirectEntity(player)
+                .build();
+
+        config.collision.put(player.getUniqueId(), false);
+
+        new BukkitRunnable() {
+            int ticks = 0;
+
+            @Override
+            public void run() {
+                if (ticks >= 6 || config.collision.getOrDefault(player.getUniqueId(), true)) {
+                    config.collision.remove(player.getUniqueId());
+                    this.cancel();
+                    return;
+                }
+
+                Location particleLocation = playerLocation.clone()
+                        .add(direction.clone().multiply(ticks * 1.5))
+                        .add(0, 1.4, 0);
+
+                Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(0, 255, 255), 0.6f);
+                world.spawnParticle(Particle.SNOWFLAKE, particleLocation, 6, 0.5, 0.5, 0.5, 0);
+                world.spawnParticle(Particle.DUST, particleLocation, 3, 0.3, 0.3, 0.3, 0, dustOptions);
+
+                for (Entity entity : world.getNearbyEntities(particleLocation, 0.6, 0.6, 0.6)) {
+                    if (entity instanceof LivingEntity target && entity != player) {
+
+                        world.playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 1);
+
+                        ForceDamage forceDamage = new ForceDamage(target, 3.0, source, false);
+                        forceDamage.applyEffect(player);
+
+                        if (Math.random() < 0.6) {
+                            Frost frostbite = new Frost(target, 10000L);
+                            frostbite.applyEffect(player);
+                        }
+
+                        config.collision.put(player.getUniqueId(), true);
+                        break;
+                    }
+                }
+
+                ticks++;
+            }
+        }.runTaskTimer(plugin, 0L, 1L);
     }
 
     @Override
@@ -236,8 +219,14 @@ public class glaCore extends absCore {
     private boolean canUseFSkill(Player player) { return true; }
 
     @Override
-    protected boolean isItemRequired(Player player){
-        return hasProperItems(player);
+    protected boolean isItemRequired(Player player) {
+        if (hasProperItems(player)) {
+            return true;
+        } else {
+            AttributeInstance attackSpeed = player.getAttribute(Attribute.ATTACK_SPEED);
+            if (attackSpeed != null) attackSpeed.setBaseValue(4.0);
+            return false;
+        }
     }
 
     @Override
@@ -263,6 +252,16 @@ public class glaCore extends absCore {
     }
 
     @Override
+    protected boolean isRAnimated(Player player) {
+        return false;
+    }
+
+    @Override
+    protected boolean isFAnimated(Player player) {
+        return false;
+    }
+
+    @Override
     protected ConfigWrapper getConfigWrapper() {
         return new ConfigWrapper() {
             @Override
@@ -279,6 +278,11 @@ public class glaCore extends absCore {
                 cool.updateCooldown(player, "R", config.frozenCool);
                 cool.updateCooldown(player, "Q", config.frozenCool);
                 cool.updateCooldown(player, "F", config.frozenCool);
+            }
+
+            @Override
+            public long getLcooldown(Player player) {
+                return 800L;
             }
 
             @Override

@@ -10,8 +10,9 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.player.*;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Vector;
@@ -67,7 +68,7 @@ public class burstCore extends absCore {
 
     private void applyAdditionalHealth(Player player, boolean healFull) {
         long addHP = player.getPersistentDataContainer().getOrDefault(
-                        new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L) * 2;
+                new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L) * 2;
 
         AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
         if (maxHealth != null) {
@@ -84,85 +85,70 @@ public class burstCore extends absCore {
         }
     }
 
-    @EventHandler(priority = EventPriority.NORMAL)
-    public void passiveAttackEffect(PlayerInteractEvent event) {
-
-        if(tag.Burst.contains(event.getPlayer())) {
-            if (!pAttackUsing.contains(event.getPlayer().getUniqueId())) {
-
-                Player player = event.getPlayer();
-
-                if (hasProperItems(player)) {
-                    if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
-
-                        if (cool.isReloading(player, "burst")) {
-                            player.playSound(player.getLocation(), Sound.ITEM_FIRECHARGE_USE, 1, 1);
-                            return;
-                        }
-
-                        cool.setCooldown(player, 2000L, "burst");
-
-                        World world = player.getWorld();
-
-                        DamageSource selfSource = DamageSource.builder(DamageType.EXPLOSION)
-                                .build();
-
-                        player.damage(1.4, selfSource);
-                        player.setVelocity(new Vector(0, 0, 0));
-
-                        world.playSound(player.getLocation(), Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 2, 1);
-                        world.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 1);
-                        world.spawnParticle(Particle.FLAME, player.getLocation().clone().add(0, 0.6, 0), 67, 0.1, 0.1, 0.1, 0.4);
-                        world.spawnParticle(Particle.SMOKE, player.getLocation().clone().add(0, 0.6, 0), 24, 0.1, 0.1, 0.1, 0.8);
-
-                        Location center = player.getLocation();
-
-                        DamageSource source = DamageSource.builder(DamageType.PLAYER_EXPLOSION)
-                                .withCausingEntity(player)
-                                .withDirectEntity(player)
-                                .build();
-
-                        for (Entity entity : world.getNearbyEntities(center, 6, 6, 6)) {
-                            if (entity.equals(player) || !(entity instanceof LivingEntity)) continue;
-
-
-                            ForceDamage forceDamage = new ForceDamage((LivingEntity) entity, 6.0, source, false);
-                            forceDamage.applyEffect(player);
-
-                            Vector direction = entity.getLocation().toVector().subtract(center.toVector()).normalize().multiply(0.8);
-                            direction.setY(0.4);
-
-                            entity.setVelocity(direction);
-                        }
-
-                        for (Entity entity : world.getNearbyEntities(center, 3, 3, 3)) {
-                            if (entity.equals(player) || !(entity instanceof LivingEntity)) continue;
-
-                            world.spawnParticle(Particle.EXPLOSION, entity.getLocation().clone().add(0, 1, 0), 1, 0, 0, 0, 0);
-
-                            ForceDamage forceDamage = new ForceDamage((LivingEntity) entity, 7.0, source, false);
-                            forceDamage.applyEffect(player);
-
-                            Vector direction = entity.getLocation().toVector().subtract(center.toVector()).normalize().multiply(1.3);
-                            direction.setY(0.6);
-
-                            entity.setVelocity(direction);
-                        }
-
-                        event.setCancelled(true);
-                    }
-                } else {
-                    player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(4.0);
-                }
-            } else {
-                pAttackUsing.remove(event.getPlayer().getUniqueId());
-            }
-        }
-    }
-
     @Override
     protected boolean contains(Player player) {
         return tag.Burst.contains(player);
+    }
+
+    @Override
+    protected boolean isCustomAttackUser(Player player) {
+        return true;
+    }
+
+    @Override
+    protected void onLSkillCooldown(PlayerInteractEvent event, Player player) {
+        player.playSound(player.getLocation(), Sound.ITEM_FIRECHARGE_USE, 1, 1);
+    }
+
+    @Override
+    protected void LSkill(PlayerInteractEvent event, Player player) {
+        event.setCancelled(true);
+
+        World world = player.getWorld();
+
+        DamageSource selfSource = DamageSource.builder(DamageType.EXPLOSION)
+                .build();
+
+        player.damage(1.4, selfSource);
+        player.setVelocity(new Vector(0, 0, 0));
+
+        world.playSound(player.getLocation(), Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 2, 1);
+        world.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 1);
+        world.spawnParticle(Particle.FLAME, player.getLocation().clone().add(0, 0.6, 0), 67, 0.1, 0.1, 0.1, 0.4);
+        world.spawnParticle(Particle.SMOKE, player.getLocation().clone().add(0, 0.6, 0), 24, 0.1, 0.1, 0.1, 0.8);
+
+        Location center = player.getLocation();
+
+        DamageSource source = DamageSource.builder(DamageType.PLAYER_EXPLOSION)
+                .withCausingEntity(player)
+                .withDirectEntity(player)
+                .build();
+
+        for (Entity entity : world.getNearbyEntities(center, 6, 6, 6)) {
+            if (entity.equals(player) || !(entity instanceof LivingEntity)) continue;
+
+            ForceDamage forceDamage = new ForceDamage((LivingEntity) entity, 6.0, source, false);
+            forceDamage.applyEffect(player);
+
+            Vector direction = entity.getLocation().toVector().subtract(center.toVector()).normalize().multiply(0.8);
+            direction.setY(0.4);
+
+            entity.setVelocity(direction);
+        }
+
+        for (Entity entity : world.getNearbyEntities(center, 3, 3, 3)) {
+            if (entity.equals(player) || !(entity instanceof LivingEntity)) continue;
+
+            world.spawnParticle(Particle.EXPLOSION, entity.getLocation().clone().add(0, 1, 0), 1, 0, 0, 0, 0);
+
+            ForceDamage forceDamage = new ForceDamage((LivingEntity) entity, 7.0, source, false);
+            forceDamage.applyEffect(player);
+
+            Vector direction = entity.getLocation().toVector().subtract(center.toVector()).normalize().multiply(1.3);
+            direction.setY(0.6);
+
+            entity.setVelocity(direction);
+        }
     }
 
     @Override
@@ -193,8 +179,14 @@ public class burstCore extends absCore {
     private boolean canUseFSkill(Player player) { return true; }
 
     @Override
-    protected boolean isItemRequired(Player player){
-        return hasProperItems(player);
+    protected boolean isItemRequired(Player player) {
+        if (hasProperItems(player)) {
+            return true;
+        } else {
+            AttributeInstance attackSpeed = player.getAttribute(Attribute.ATTACK_SPEED);
+            if (attackSpeed != null) attackSpeed.setBaseValue(4.0);
+            return false;
+        }
     }
 
     @Override
@@ -219,6 +211,16 @@ public class burstCore extends absCore {
     }
 
     @Override
+    protected boolean isRAnimated(Player player) {
+        return false;
+    }
+
+    @Override
+    protected boolean isFAnimated(Player player) {
+        return false;
+    }
+
+    @Override
     protected ConfigWrapper getConfigWrapper() {
         return new ConfigWrapper() {
             @Override
@@ -235,6 +237,11 @@ public class burstCore extends absCore {
                 cool.updateCooldown(player, "R", config.frozenCool);
                 cool.updateCooldown(player, "Q", config.frozenCool);
                 cool.updateCooldown(player, "F", config.frozenCool);
+            }
+
+            @Override
+            public long getLcooldown(Player player) {
+                return 2000L;
             }
 
             @Override

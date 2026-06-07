@@ -10,7 +10,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -32,7 +31,6 @@ import org.core.coreSystem.cores.VOL1.Dagger.Skill.R;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-
 
 public class dagCore extends absCore {
     private final Core plugin;
@@ -95,18 +93,8 @@ public class dagCore extends absCore {
         }
     }
 
-    @EventHandler(priority = EventPriority.NORMAL)
-    public void passiveAttackEffect(PlayerInteractEvent event) {
-        if(tag.Dagger.contains(event.getPlayer())){
-            if (pAttackUsing.contains(event.getPlayer().getUniqueId())) {
-                pAttackUsing.remove(event.getPlayer().getUniqueId());
-            }
-        }
-    }
-
     @EventHandler
     public void passiveDamage(EntityDamageByEntityEvent event) {
-
         if (!(event.getDamager() instanceof Player player)) return;
         if (!(event.getEntity() instanceof LivingEntity target)) return;
 
@@ -121,93 +109,77 @@ public class dagCore extends absCore {
 
                 player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
                 event.setDamage(4.0);
-
             }
-        }
-    }
-
-    @EventHandler
-    public void fskillEffect(PlayerInteractEvent event){
-
-        Player player = event.getPlayer();
-        Action action = event.getAction();
-
-        if(!tag.Dagger.contains(player)) return;
-
-        if(!cool.isReloading(player, "slash") && config.f_using.getOrDefault(player.getUniqueId(), false) && config.f_slash.getOrDefault(player.getUniqueId(), 0) < 2) {
-
-            World world = player.getWorld();
-
-            Location playerLocation = player.getLocation();
-            Vector direction = playerLocation.getDirection().normalize().multiply(1.3);
-
-            if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
-
-                if(action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK){
-                    return;
-                }
-
-                if(!hasProperItems(player)){
-                    return;
-                }
-
-                config.f_damaged.put(player.getUniqueId(), new HashSet<>());
-
-                DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
-                        .withCausingEntity(player)
-                        .withDirectEntity(player)
-                        .build();
-
-                player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
-                event.setCancelled(true);
-
-                new BukkitRunnable() {
-                    int ticks = 0;
-
-                    @Override
-                    public void run() {
-                        if (ticks >= 10 || !config.f_using.getOrDefault(player.getUniqueId(), false)) {
-                            config.f_slash.put(player.getUniqueId(), config.f_slash.getOrDefault(player.getUniqueId(), 0) + 1);
-                            this.cancel();
-                            return;
-                        }
-
-                        Location particleLocation = playerLocation.clone()
-                                .add(direction.clone().multiply(ticks * 1.8))
-                                .add(0, 1.5, 0);
-
-                        world.spawnParticle(Particle.SWEEP_ATTACK, particleLocation, 1, 0, 0, 0, 0);
-                        world.spawnParticle(Particle.SMOKE, particleLocation, 1, 0, 0, 0, 0);
-
-                        for (Entity entity : world.getNearbyEntities(particleLocation, 0.6, 0.6, 0.6)) {
-                            if (entity instanceof LivingEntity target
-                                    && entity != player
-                                    && !config.f_damaged.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(entity)) {
-
-                                config.f_damaging.put(player.getUniqueId(), true);
-
-                                ForceDamage forceDamage = new ForceDamage(target, config.f_Skill_Damage, source, true);
-                                forceDamage.applyEffect(player);
-                                config.f_damaging.remove(player.getUniqueId());
-
-                                config.f_damaged.computeIfAbsent(player.getUniqueId(), k -> new HashSet<>()).add(target);
-
-                                config.dash_object.computeIfAbsent(player.getUniqueId(), k -> new LinkedHashSet<>()).add(target);
-                            }
-                        }
-
-                        ticks++;
-                    }
-                }.runTaskTimer(plugin, 0L, 1L);
-            }
-
-            cool.setCooldown(player, 400L, "slash", "boss");
         }
     }
 
     @Override
     protected boolean contains(Player player) {
         return tag.Dagger.contains(player);
+    }
+
+    @Override
+    protected boolean isCustomAttackUser(Player player) {
+        return config.f_using.getOrDefault(player.getUniqueId(), false) && config.f_slash.getOrDefault(player.getUniqueId(), 0) < 2;
+    }
+
+    @Override
+    protected void onLSkillCooldown(PlayerInteractEvent event, Player player) {}
+
+    @Override
+    protected void LSkill(PlayerInteractEvent event, Player player) {
+        World world = player.getWorld();
+        Location playerLocation = player.getLocation();
+        Vector direction = playerLocation.getDirection().normalize().multiply(1.3);
+
+        config.f_damaged.put(player.getUniqueId(), new HashSet<>());
+
+        DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
+                .withCausingEntity(player)
+                .withDirectEntity(player)
+                .build();
+
+        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
+        event.setCancelled(true);
+
+        new BukkitRunnable() {
+            int ticks = 0;
+
+            @Override
+            public void run() {
+                if (ticks >= 10 || !config.f_using.getOrDefault(player.getUniqueId(), false)) {
+                    config.f_slash.put(player.getUniqueId(), config.f_slash.getOrDefault(player.getUniqueId(), 0) + 1);
+                    this.cancel();
+                    return;
+                }
+
+                Location particleLocation = playerLocation.clone()
+                        .add(direction.clone().multiply(ticks * 1.8))
+                        .add(0, 1.5, 0);
+
+                world.spawnParticle(Particle.SWEEP_ATTACK, particleLocation, 1, 0, 0, 0, 0);
+                world.spawnParticle(Particle.SMOKE, particleLocation, 1, 0, 0, 0, 0);
+
+                for (Entity entity : world.getNearbyEntities(particleLocation, 0.6, 0.6, 0.6)) {
+                    if (entity instanceof LivingEntity target
+                            && entity != player
+                            && !config.f_damaged.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(entity)) {
+
+                        config.f_damaging.put(player.getUniqueId(), true);
+
+                        ForceDamage forceDamage = new ForceDamage(target, config.f_Skill_Damage, source, true);
+                        forceDamage.applyEffect(player);
+                        config.f_damaging.remove(player.getUniqueId());
+
+                        config.f_damaged.computeIfAbsent(player.getUniqueId(), k -> new HashSet<>()).add(target);
+
+                        config.dash_object.computeIfAbsent(player.getUniqueId(), k -> new LinkedHashSet<>()).add(target);
+                    }
+                }
+
+                ticks++;
+            }
+        }.runTaskTimer(plugin, 0L, 1L);
     }
 
     @Override
@@ -265,6 +237,16 @@ public class dagCore extends absCore {
     }
 
     @Override
+    protected boolean isRAnimated(Player player) {
+        return true;
+    }
+
+    @Override
+    protected boolean isFAnimated(Player player) {
+        return true;
+    }
+
+    @Override
     protected ConfigWrapper getConfigWrapper() {
         return new ConfigWrapper() {
             @Override
@@ -281,6 +263,11 @@ public class dagCore extends absCore {
                 cool.updateCooldown(player, "R", config.frozenCool);
                 cool.updateCooldown(player, "Q", config.frozenCool);
                 cool.updateCooldown(player, "F", config.frozenCool);
+            }
+
+            @Override
+            public long getLcooldown(Player player) {
+                return 400L;
             }
 
             @Override

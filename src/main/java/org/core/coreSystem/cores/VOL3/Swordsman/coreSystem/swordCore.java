@@ -94,15 +94,6 @@ public class swordCore extends absCore {
         }
     }
 
-    @EventHandler(priority = EventPriority.NORMAL)
-    public void passiveAttackEffect(PlayerInteractEvent event) {
-        if(tag.Swordsman.contains(event.getPlayer())){
-            if (pAttackUsing.contains(event.getPlayer().getUniqueId())) {
-                pAttackUsing.remove(event.getPlayer().getUniqueId());
-            }
-        }
-    }
-
     private final Map<UUID, BossBar> activeChargeBars = new HashMap<>();
     private final Map<UUID, BukkitRunnable> activeChargeTasks = new HashMap<>();
 
@@ -188,6 +179,19 @@ public class swordCore extends absCore {
     @Override
     protected boolean contains(Player player) {
         return tag.Swordsman.contains(player);
+    }
+
+    @Override
+    protected boolean isCustomAttackUser(Player player) {
+        return false;
+    }
+
+    @Override
+    protected void onLSkillCooldown(PlayerInteractEvent event, Player player) {
+    }
+
+    @Override
+    protected void LSkill(PlayerInteractEvent event, Player player) {
     }
 
     @Override
@@ -307,6 +311,16 @@ public class swordCore extends absCore {
     }
 
     @Override
+    protected boolean isRAnimated(Player player) {
+        return true;
+    }
+
+    @Override
+    protected boolean isFAnimated(Player player) {
+        return true;
+    }
+
+    @Override
     protected ConfigWrapper getConfigWrapper() {
         return new ConfigWrapper() {
             @Override
@@ -323,6 +337,11 @@ public class swordCore extends absCore {
                 cool.updateCooldown(player, "R", config.frozenCool);
                 cool.updateCooldown(player, "Q", config.frozenCool);
                 cool.updateCooldown(player, "F", config.frozenCool);
+            }
+
+            @Override
+            public long getLcooldown(Player player) {
+                return 0L;
             }
 
             @Override

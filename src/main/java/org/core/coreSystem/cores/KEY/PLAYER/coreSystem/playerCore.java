@@ -10,7 +10,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.player.*;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.core.cool.Cool;
@@ -64,9 +66,8 @@ public class playerCore extends absCore {
     }
 
     private void applyAdditionalHealth(Player player, boolean healFull) {
-        long addHP =
-                player.getPersistentDataContainer().getOrDefault(
-                        new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L);
+        long addHP = player.getPersistentDataContainer().getOrDefault(
+                new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L);
 
         AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
         if (maxHealth != null) {
@@ -81,18 +82,8 @@ public class playerCore extends absCore {
         }
     }
 
-    @EventHandler(priority = EventPriority.NORMAL)
-    public void passiveAttackEffect(PlayerInteractEvent event) {
-        if(tag.PLAYER.contains(event.getPlayer())){
-            if (pAttackUsing.contains(event.getPlayer().getUniqueId())) {
-                pAttackUsing.remove(event.getPlayer().getUniqueId());
-            }
-        }
-    }
-
     @EventHandler(priority = EventPriority.LOW)
     public void passiveEffect(EntityDamageByEntityEvent event) {
-
         if (!(event.getDamager() instanceof Player player)) return;
         if (!(event.getEntity() instanceof LivingEntity target)) return;
 
@@ -109,6 +100,15 @@ public class playerCore extends absCore {
     @Override
     protected boolean contains(Player player) {
         return tag.PLAYER.contains(player);
+    }
+
+    @Override
+    protected boolean isCustomAttackUser(Player player) {
+        return false;
+    }
+
+    @Override
+    protected void LSkill(PlayerInteractEvent event, Player player) {
     }
 
     @Override
@@ -172,6 +172,16 @@ public class playerCore extends absCore {
     }
 
     @Override
+    protected boolean isRAnimated(Player player) {
+        return true;
+    }
+
+    @Override
+    protected boolean isFAnimated(Player player) {
+        return true;
+    }
+
+    @Override
     protected ConfigWrapper getConfigWrapper() {
         return new ConfigWrapper() {
             @Override
@@ -188,6 +198,11 @@ public class playerCore extends absCore {
                 cool.updateCooldown(player, "R", config.frozenCool);
                 cool.updateCooldown(player, "Q", config.frozenCool);
                 cool.updateCooldown(player, "F", config.frozenCool);
+            }
+
+            @Override
+            public long getLcooldown(Player player) {
+                return 0;
             }
 
             @Override

@@ -11,7 +11,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -42,7 +41,6 @@ public class knightCore extends absCore {
     private final R Rskill;
     private final Q Qskill;
     private final F Fskill;
-
 
     public knightCore(Core plugin, coreConfig tag, Knight config, Cool cool) {
         super(tag, cool);
@@ -76,12 +74,10 @@ public class knightCore extends absCore {
     }
 
     private void applyAdditionalHealth(Player player, boolean healFull) {
-        long addHP =
-                player.getPersistentDataContainer().getOrDefault(
-                        new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L)
-                        +
-                        player.getPersistentDataContainer().getOrDefault(
-                                new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L) * 2;
+        long addHP = player.getPersistentDataContainer().getOrDefault(
+                new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L)
+                + player.getPersistentDataContainer().getOrDefault(
+                new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L) * 2;
 
         AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
         if (maxHealth != null) {
@@ -137,7 +133,7 @@ public class knightCore extends absCore {
                     ((LivingEntity) attacker).addPotionEffect(glowing);
 
                     world.spawnParticle(Particle.ENCHANTED_HIT, damager.getLocation().clone().add(0, 1, 0), 21, 0.4, 0.4, 0.4, 1);
-                    world.spawnParticle(Particle.SWEEP_ATTACK, damager.getLocation().clone().add(0, 1, 0), 1, 0., 0, 0, 0);
+                    world.spawnParticle(Particle.SWEEP_ATTACK, damager.getLocation().clone().add(0, 1, 0), 1, 0.0, 0, 0, 0);
 
                     world.playSound(playerLoc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
                     world.playSound(playerLoc, Sound.ENTITY_IRON_GOLEM_REPAIR, 1, 1);
@@ -160,96 +156,85 @@ public class knightCore extends absCore {
         player.setHealth(originalMax);
     }
 
-    @EventHandler(priority = EventPriority.NORMAL)
-    public void passiveAttackEffect(PlayerInteractEvent event) {
-
-        if(tag.Knight.contains(event.getPlayer())) {
-
-            if (!pAttackUsing.contains(event.getPlayer().getUniqueId()) && !config.q_Skill_Using.getOrDefault(event.getPlayer().getUniqueId(), false)) {
-
-                Player player = event.getPlayer();
-
-                if (hasProperItems(player)) {
-                    if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
-
-                        if (cool.isReloading(player, "cutting")) {
-                            player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_WEAK, 1, 1);
-                            return;
-                        }
-
-                        cool.setCooldown(player, 625L, "cutting");
-
-                        World world = player.getWorld();
-                        Location playerLocation = player.getLocation();
-                        Vector direction = playerLocation.getDirection().normalize().multiply(1.3);
-
-                        world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
-
-                        config.collision.put(player.getUniqueId(), false);
-
-                        DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
-                                .withCausingEntity(player)
-                                .withDirectEntity(player)
-                                .build();
-
-                        new BukkitRunnable() {
-                            int ticks = 0;
-
-                            @Override
-                            public void run() {
-                                if (ticks >= 7 || config.collision.getOrDefault(player.getUniqueId(), true)) {
-                                    config.collision.remove(player.getUniqueId());
-                                    this.cancel();
-                                    return;
-                                }
-
-                                Location particleLocation = playerLocation.clone()
-                                        .add(direction.clone().multiply(ticks * 1.4))
-                                        .add(0, 1.4, 0);
-
-                                world.spawnParticle(Particle.SWEEP_ATTACK, particleLocation, 1, 0, 0, 0, 0);
-                                world.spawnParticle(Particle.ENCHANTED_HIT, particleLocation, 7, 0.3, 0.1, 0.3, 0);
-
-                                for (Entity entity : world.getNearbyEntities(particleLocation, 0.7, 0.3, 0.7)) {
-                                    if (entity instanceof LivingEntity target && entity != player) {
-
-                                        ForceDamage forceDamage = new ForceDamage(target, 3.0, source, false);
-                                        forceDamage.applyEffect(player);
-
-                                        config.collision.put(player.getUniqueId(), true);
-                                        break;
-                                    }
-                                }
-
-                                ticks++;
-                            }
-                        }.runTaskTimer(plugin, 0L, 1L);
-
-                        ItemStack offHand = player.getInventory().getItemInOffHand();
-                        ItemMeta meta = offHand.getItemMeta();
-                        if (meta instanceof Damageable && offHand.getType().getMaxDurability() > 0) {
-                            Damageable damageable = (Damageable) meta;
-                            int newDamage = damageable.getDamage() + 1;
-                            damageable.setDamage(newDamage);
-                            offHand.setItemMeta(meta);
-
-                            if (newDamage >= offHand.getType().getMaxDurability()) {
-                                player.getInventory().setItemInOffHand(null);
-                            }
-                        }
-
-                        event.setCancelled(true);
-                    }
-                }
-            } else {
-                pAttackUsing.remove(event.getPlayer().getUniqueId());
-            }
-        }
-    }
-
     @Override
     protected boolean contains(Player player) {
         return tag.Knight.contains(player);
+    }
+
+    @Override
+    protected boolean isCustomAttackUser(Player player) {
+        return !config.q_Skill_Using.getOrDefault(player.getUniqueId(), false);
+    }
+
+    @Override
+    protected void onLSkillCooldown(PlayerInteractEvent event, Player player) {
+        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_WEAK, 1, 1);
+    }
+
+    @Override
+    protected void LSkill(PlayerInteractEvent event, Player player) {
+        event.setCancelled(true);
+
+        World world = player.getWorld();
+        Location playerLocation = player.getLocation();
+        Vector direction = playerLocation.getDirection().normalize().multiply(1.3);
+
+        world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
+
+        config.collision.put(player.getUniqueId(), false);
+
+        DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
+                .withCausingEntity(player)
+                .withDirectEntity(player)
+                .build();
+
+        new BukkitRunnable() {
+            int ticks = 0;
+
+            @Override
+            public void run() {
+                if (ticks >= 7 || config.collision.getOrDefault(player.getUniqueId(), true)) {
+                    config.collision.remove(player.getUniqueId());
+                    this.cancel();
+                    return;
+                }
+
+                Location particleLocation = playerLocation.clone()
+                        .add(direction.clone().multiply(ticks * 1.4))
+                        .add(0, 1.4, 0);
+
+                world.spawnParticle(Particle.SWEEP_ATTACK, particleLocation, 1, 0, 0, 0, 0);
+                world.spawnParticle(Particle.ENCHANTED_HIT, particleLocation, 7, 0.3, 0.1, 0.3, 0);
+
+                for (Entity entity : world.getNearbyEntities(particleLocation, 0.7, 0.3, 0.7)) {
+                    if (entity instanceof LivingEntity target && entity != player) {
+
+                        ForceDamage forceDamage = new ForceDamage(target, 3.0, source, false);
+                        forceDamage.applyEffect(player);
+
+                        config.collision.put(player.getUniqueId(), true);
+                        break;
+                    }
+                }
+
+                ticks++;
+            }
+        }.runTaskTimer(plugin, 0L, 1L);
+
+        ItemStack offHand = player.getInventory().getItemInOffHand();
+        if (offHand != null && offHand.hasItemMeta()) {
+            ItemMeta meta = offHand.getItemMeta();
+            if (meta instanceof Damageable && offHand.getType().getMaxDurability() > 0) {
+                Damageable damageable = (Damageable) meta;
+                int newDamage = damageable.getDamage() + 1;
+                damageable.setDamage(newDamage);
+                offHand.setItemMeta(meta);
+
+                if (newDamage >= offHand.getType().getMaxDurability()) {
+                    player.getInventory().setItemInOffHand(null);
+                }
+            }
+        }
     }
 
     @Override
@@ -312,6 +297,16 @@ public class knightCore extends absCore {
     }
 
     @Override
+    protected boolean isRAnimated(Player player) {
+        return false;
+    }
+
+    @Override
+    protected boolean isFAnimated(Player player) {
+        return true;
+    }
+
+    @Override
     protected ConfigWrapper getConfigWrapper() {
         return new ConfigWrapper() {
             @Override
@@ -328,6 +323,11 @@ public class knightCore extends absCore {
                 cool.updateCooldown(player, "R", config.frozenCool);
                 cool.updateCooldown(player, "Q", config.frozenCool);
                 cool.updateCooldown(player, "F", config.frozenCool);
+            }
+
+            @Override
+            public long getLcooldown(Player player) {
+                return 625L;
             }
 
             @Override

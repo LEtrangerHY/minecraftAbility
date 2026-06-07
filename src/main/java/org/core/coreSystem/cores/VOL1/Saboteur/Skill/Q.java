@@ -138,8 +138,6 @@ public class Q implements SkillBase {
 
     public void hackDash(Player player){
 
-        player.swingMainHand();
-
         Location startLocation = player.getLocation();
 
         Vector direction = startLocation.getDirection().normalize().multiply(config.q_Skill_Dash_HACK);

@@ -72,7 +72,6 @@ public class Q implements SkillBase {
         boolean duelSlash = (slashTimes > 1);
 
         if (duelSlash && slashCount == 1) laido.Draw(player);
-        player.swingMainHand();
         world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
 
         double slashLength = 4.4;

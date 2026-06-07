@@ -71,9 +71,8 @@ public class carpCore extends absCore {
     }
 
     private void applyAdditionalHealth(Player player, boolean healFull) {
-        long addHP =
-                player.getPersistentDataContainer().getOrDefault(
-                        new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L) * 3;
+        long addHP = player.getPersistentDataContainer().getOrDefault(
+                new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L) * 3;
 
         AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
         if (maxHealth != null) {
@@ -90,18 +89,8 @@ public class carpCore extends absCore {
         }
     }
 
-    @EventHandler(priority = EventPriority.NORMAL)
-    public void passiveAttackEffect(PlayerInteractEvent event) {
-        if(tag.Carpenter.contains(event.getPlayer())){
-            if (pAttackUsing.contains(event.getPlayer().getUniqueId())) {
-                pAttackUsing.remove(event.getPlayer().getUniqueId());
-            }
-        }
-    }
-
     @EventHandler
     public void passiveDamage(EntityDamageByEntityEvent event) {
-
         if (!(event.getDamager() instanceof Player player)) return;
         if (!(event.getEntity() instanceof LivingEntity target)) return;
 
@@ -124,7 +113,6 @@ public class carpCore extends absCore {
 
     @EventHandler
     public void passiveTotem(EntityResurrectEvent event){
-
         if (event.isCancelled()) return;
 
         Entity entity = event.getEntity();
@@ -140,6 +128,19 @@ public class carpCore extends absCore {
     @Override
     protected boolean contains(Player player) {
         return tag.Carpenter.contains(player);
+    }
+
+    @Override
+    protected boolean isCustomAttackUser(Player player) {
+        return false;
+    }
+
+    @Override
+    protected void onLSkillCooldown(PlayerInteractEvent event, Player player) {
+    }
+
+    @Override
+    protected void LSkill(PlayerInteractEvent event, Player player) {
     }
 
     @Override
@@ -201,6 +202,16 @@ public class carpCore extends absCore {
     }
 
     @Override
+    protected boolean isRAnimated(Player player) {
+        return true;
+    }
+
+    @Override
+    protected boolean isFAnimated(Player player) {
+        return false;
+    }
+
+    @Override
     protected ConfigWrapper getConfigWrapper() {
         return new ConfigWrapper() {
             @Override
@@ -217,6 +228,11 @@ public class carpCore extends absCore {
                 cool.updateCooldown(player, "R", config.frozenCool);
                 cool.updateCooldown(player, "Q", config.frozenCool);
                 cool.updateCooldown(player, "F", config.frozenCool);
+            }
+
+            @Override
+            public long getLcooldown(Player player) {
+                return 0;
             }
 
             @Override

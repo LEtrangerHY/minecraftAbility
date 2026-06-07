@@ -91,8 +91,6 @@ public class Q implements SkillBase {
 
     public void Crash(Player player){
 
-        player.swingMainHand();
-
         World world = player.getWorld();
 
         config.q_damaged.put(player.getUniqueId(), new HashSet<>());

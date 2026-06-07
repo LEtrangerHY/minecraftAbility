@@ -10,7 +10,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -91,11 +90,9 @@ public class blueCore extends absCore {
 
     @EventHandler
     public void passiveDamage(EntityDamageEvent event) {
-
         if (!(event.getEntity() instanceof Player player)) return;
 
         if (tag.Blue.contains(player)) {
-
             if (event.getCause() == EntityDamageEvent.DamageCause.WITHER) {
                 event.setCancelled(true);
             }
@@ -104,7 +101,6 @@ public class blueCore extends absCore {
 
     @EventHandler
     public void qSkillAbsorb(EntityDamageByEntityEvent event) {
-
         if (!(event.getDamager() instanceof Player player)) return;
         if (!(event.getEntity() instanceof LivingEntity target)) return;
 
@@ -120,99 +116,6 @@ public class blueCore extends absCore {
                 double heal = 0.6 * (1 + config.q_Skill_amp * level);
 
                 player.heal(heal);
-
-            }
-        }
-    }
-
-    @EventHandler(priority = EventPriority.NORMAL)
-    public void passiveAttackEffect(PlayerInteractEvent event) {
-
-        if(tag.Blue.contains(event.getPlayer()) && hasProperItems(event.getPlayer())) {
-            if (!pAttackUsing.contains(event.getPlayer().getUniqueId())) {
-
-                Player player = event.getPlayer();
-
-                if (hasProperItems(player)) {
-                    if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
-
-                        if (cool.isReloading(player, "soul")) {
-                            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 1.3f, 1.0f);
-                            return;
-                        }
-
-                        cool.setCooldown(player, 1300L, "soul");
-
-                        World world = player.getWorld();
-                        Location playerLocation = player.getLocation();
-                        Vector direction = playerLocation.getDirection().normalize().multiply(1.3);
-
-                        player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(1/1.3);
-                        world.playSound(player.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 1.3f, 1.0f);
-
-                        Particle.DustOptions dustOption_flowerDust = new Particle.DustOptions(Color.AQUA, 0.6f);
-                        Particle.DustOptions dustOption_flowerDust_gra = new Particle.DustOptions(Color.NAVY, 0.6f);
-
-                        DamageSource source = DamageSource.builder(DamageType.MAGIC)
-                                .withCausingEntity(player)
-                                .withDirectEntity(player)
-                                .build();
-
-                        if(config.qSoulAbsorb.getOrDefault(player.getUniqueId(), false)){
-
-                            world.spawnParticle(Particle.SMOKE, player.getLocation().add(0, 1.0, 0), 66, 0.4, 0.4, 0.4, 0.64);
-
-                            if (Math.random() < 0.6) {
-                                world.spawnParticle(Particle.DUST, player.getLocation().add(0, 1.0, 0), 66, 0.4, 0.6, 0.4, 0.64, dustOption_flowerDust_gra);
-                            }else{
-                                world.spawnParticle(Particle.DUST, player.getLocation().add(0, 1.0, 0), 66, 0.4, 0.6, 0.4, 0.64, dustOption_flowerDust);
-                            }
-
-                            for (Entity entity : world.getNearbyEntities(player.getLocation(), 6.0, 4, 6.0)) {
-                                if (entity instanceof LivingEntity target && entity != player) {
-                                    ForceDamage forceDamage = new ForceDamage(target, 2.6, source, false);
-                                    forceDamage.applyEffect(player);
-                                }
-                            }
-                        }
-
-                        new BukkitRunnable() {
-                            int ticks = 0;
-
-                            @Override
-                            public void run() {
-
-                                if (ticks >= 13) {
-                                    this.cancel();
-                                    return;
-                                }
-
-                                Location particleLocation = playerLocation.clone()
-                                        .add(direction.clone().multiply(ticks * 1.3))
-                                        .add(0, 1.4, 0);
-
-                                world.spawnParticle(Particle.SOUL, particleLocation, 2, 0.4, 0.4, 0.4, 0);
-                                world.spawnParticle(Particle.SOUL_FIRE_FLAME, particleLocation, 4, 0.4, 0.4, 0.4, 0);
-
-                                for (Entity entity : world.getNearbyEntities(particleLocation, 1.3, 1.3, 1.3)) {
-                                    if (entity instanceof LivingEntity target && entity != player) {
-
-                                        ForceDamage forceDamage = new ForceDamage(target, 3.0, source, false);
-                                        forceDamage.applyEffect(player);
-                                    }
-                                }
-
-                                ticks++;
-                            }
-                        }.runTaskTimer(plugin, 0L, 1L);
-
-                        event.setCancelled(true);
-                    }
-                } else {
-                    player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(4.0);
-                }
-            } else {
-                pAttackUsing.remove(event.getPlayer().getUniqueId());
             }
         }
     }
@@ -220,6 +123,86 @@ public class blueCore extends absCore {
     @Override
     protected boolean contains(Player player) {
         return tag.Blue.contains(player);
+    }
+
+    @Override
+    protected boolean isCustomAttackUser(Player player) {
+        return true;
+    }
+
+    @Override
+    protected void onLSkillCooldown(PlayerInteractEvent event, Player player) {
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 1.3f, 1.0f);
+    }
+
+    @Override
+    protected void LSkill(PlayerInteractEvent event, Player player) {
+        event.setCancelled(true);
+
+        World world = player.getWorld();
+        Location playerLocation = player.getLocation();
+        Vector direction = playerLocation.getDirection().normalize().multiply(1.3);
+
+        AttributeInstance attackSpeed = player.getAttribute(Attribute.ATTACK_SPEED);
+        if (attackSpeed != null) attackSpeed.setBaseValue(1/1.3);
+
+        world.playSound(player.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 1.3f, 1.0f);
+
+        Particle.DustOptions dustOption_flowerDust = new Particle.DustOptions(Color.AQUA, 0.6f);
+        Particle.DustOptions dustOption_flowerDust_gra = new Particle.DustOptions(Color.NAVY, 0.6f);
+
+        DamageSource source = DamageSource.builder(DamageType.MAGIC)
+                .withCausingEntity(player)
+                .withDirectEntity(player)
+                .build();
+
+        if(config.qSoulAbsorb.getOrDefault(player.getUniqueId(), false)){
+
+            world.spawnParticle(Particle.SMOKE, player.getLocation().add(0, 1.0, 0), 66, 0.4, 0.4, 0.4, 0.64);
+
+            if (Math.random() < 0.6) {
+                world.spawnParticle(Particle.DUST, player.getLocation().add(0, 1.0, 0), 66, 0.4, 0.6, 0.4, 0.64, dustOption_flowerDust_gra);
+            } else {
+                world.spawnParticle(Particle.DUST, player.getLocation().add(0, 1.0, 0), 66, 0.4, 0.6, 0.4, 0.64, dustOption_flowerDust);
+            }
+
+            for (Entity entity : world.getNearbyEntities(player.getLocation(), 6.0, 4, 6.0)) {
+                if (entity instanceof LivingEntity target && entity != player) {
+                    ForceDamage forceDamage = new ForceDamage(target, 2.6, source, false);
+                    forceDamage.applyEffect(player);
+                }
+            }
+        }
+
+        new BukkitRunnable() {
+            int ticks = 0;
+
+            @Override
+            public void run() {
+
+                if (ticks >= 13) {
+                    this.cancel();
+                    return;
+                }
+
+                Location particleLocation = playerLocation.clone()
+                        .add(direction.clone().multiply(ticks * 1.3))
+                        .add(0, 1.4, 0);
+
+                world.spawnParticle(Particle.SOUL, particleLocation, 2, 0.4, 0.4, 0.4, 0);
+                world.spawnParticle(Particle.SOUL_FIRE_FLAME, particleLocation, 4, 0.4, 0.4, 0.4, 0);
+
+                for (Entity entity : world.getNearbyEntities(particleLocation, 1.3, 1.3, 1.3)) {
+                    if (entity instanceof LivingEntity target && entity != player) {
+
+                        ForceDamage forceDamage = new ForceDamage(target, 3.0, source, false);
+                        forceDamage.applyEffect(player);
+                    }
+                }
+
+                ticks++;
+            }
+        }.runTaskTimer(plugin, 0L, 1L);
     }
 
     @Override
@@ -250,8 +233,14 @@ public class blueCore extends absCore {
     private boolean canUseFSkill(Player player) { return true; }
 
     @Override
-    protected boolean isItemRequired(Player player){
-        return hasProperItems(player);
+    protected boolean isItemRequired(Player player) {
+        if (hasProperItems(player)) {
+            return true;
+        } else {
+            AttributeInstance attackSpeed = player.getAttribute(Attribute.ATTACK_SPEED);
+            if (attackSpeed != null) attackSpeed.setBaseValue(4.0);
+            return false;
+        }
     }
 
     @Override
@@ -277,6 +266,16 @@ public class blueCore extends absCore {
     }
 
     @Override
+    protected boolean isRAnimated(Player player) {
+        return false;
+    }
+
+    @Override
+    protected boolean isFAnimated(Player player) {
+        return false;
+    }
+
+    @Override
     protected ConfigWrapper getConfigWrapper() {
         return new ConfigWrapper() {
             @Override
@@ -293,6 +292,11 @@ public class blueCore extends absCore {
                 cool.updateCooldown(player, "R", config.frozenCool);
                 cool.updateCooldown(player, "Q", config.frozenCool);
                 cool.updateCooldown(player, "F", config.frozenCool);
+            }
+
+            @Override
+            public long getLcooldown(Player player) {
+                return 1300L;
             }
 
             @Override

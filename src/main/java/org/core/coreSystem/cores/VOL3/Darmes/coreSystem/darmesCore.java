@@ -17,6 +17,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -403,6 +404,19 @@ public class darmesCore extends absCore {
     protected boolean contains(Player player) { return tag.Darmes.contains(player); }
 
     @Override
+    protected boolean isCustomAttackUser(Player player) {
+        return false;
+    }
+
+    @Override
+    protected void onLSkillCooldown(PlayerInteractEvent event, Player player) {
+    }
+
+    @Override
+    protected void LSkill(PlayerInteractEvent event, Player player) {
+    }
+
+    @Override
     protected SkillBase getRSkill() { return Rskill; }
 
     @Override
@@ -442,6 +456,16 @@ public class darmesCore extends absCore {
     protected boolean isFCondition(Player player) { return canUseFSkill(player); }
 
     @Override
+    protected boolean isRAnimated(Player player) {
+        return false;
+    }
+
+    @Override
+    protected boolean isFAnimated(Player player) {
+        return true;
+    }
+
+    @Override
     protected ConfigWrapper getConfigWrapper() {
         return new ConfigWrapper() {
             @Override
@@ -460,6 +484,12 @@ public class darmesCore extends absCore {
                 cool.updateCooldown(player, "Q", config.frozenCool);
                 cool.updateCooldown(player, "F", config.frozenCool);
             }
+
+            @Override
+            public long getLcooldown(Player player) {
+                return 0L;
+            }
+
             @Override
             public long getRcooldown(Player player) { return config.R_COOLDOWN.getOrDefault(player.getUniqueId(), config.r_Skill_Cool); }
             @Override

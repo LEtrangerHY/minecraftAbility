@@ -175,15 +175,6 @@ public class bambCore extends absCore {
         }
     }
 
-    @EventHandler(priority = EventPriority.NORMAL)
-    public void passiveAttackEffect(PlayerInteractEvent event) {
-        if(tag.Bamboo.contains(event.getPlayer())){
-            if (pAttackUsing.contains(event.getPlayer().getUniqueId())) {
-                pAttackUsing.remove(event.getPlayer().getUniqueId());
-            }
-        }
-    }
-
     @EventHandler
     public void passiveEffect(EntityDamageByEntityEvent event) {
         if (!(event.getDamager() instanceof Player player)) return;
@@ -231,6 +222,15 @@ public class bambCore extends absCore {
     @Override
     protected boolean contains(Player player) {
         return tag.Bamboo.contains(player);
+    }
+
+    @Override
+    protected boolean isCustomAttackUser(Player player) {
+        return false;
+    }
+
+    @Override
+    protected void LSkill(PlayerInteractEvent event, Player player) {
     }
 
     @Override
@@ -286,6 +286,16 @@ public class bambCore extends absCore {
     protected boolean isFCondition(Player player) { return canUseFSkill(player); }
 
     @Override
+    protected boolean isRAnimated(Player player) {
+        return false;
+    }
+
+    @Override
+    protected boolean isFAnimated(Player player) {
+        return false;
+    }
+
+    @Override
     protected ConfigWrapper getConfigWrapper() {
         return new ConfigWrapper() {
             @Override
@@ -302,6 +312,11 @@ public class bambCore extends absCore {
                 cool.updateCooldown(player, "R", config.frozenCool);
                 cool.updateCooldown(player, "Q", config.frozenCool);
                 cool.updateCooldown(player, "F", config.frozenCool);
+            }
+
+            @Override
+            public long getLcooldown(Player player) {
+                return 0;
             }
 
             @Override

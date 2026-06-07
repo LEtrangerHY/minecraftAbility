@@ -10,7 +10,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -93,79 +92,73 @@ public class lavCore extends absCore {
         }
     }
 
-    @EventHandler(priority = EventPriority.NORMAL)
-    public void passiveAttackRange(PlayerInteractEvent event) {
-
-        if(tag.Lavender.contains(event.getPlayer())) {
-            if (!pAttackUsing.contains(event.getPlayer().getUniqueId())) {
-
-                Player player = event.getPlayer();
-
-                if (hasProperItems(player) && !config.r_Skill_using.containsKey(player.getUniqueId())) {
-                    if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
-
-                        World world = player.getWorld();
-
-                        boolean coolSet = player.getAttackCooldown() >= 1.0;
-                        double extendedRange = coolSet ? 9.0 : 6.6;
-                        double damage = coolSet ? 4.0 : 2.0;
-
-                        RayTraceResult result =
-                                player.getWorld().rayTrace(player.getEyeLocation(), player.getEyeLocation().getDirection(),
-                                        extendedRange, FluidCollisionMode.NEVER, true, 0.6,
-                                        entity -> entity != player && entity instanceof LivingEntity);
-
-                        if (result != null && result.getHitEntity() != null) {
-                            LivingEntity target = (LivingEntity) result.getHitEntity();
-
-                            BlockData amethyst = Material.AMETHYST_BLOCK.createBlockData();
-
-                            double distance = player.getLocation().distance(target.getLocation());
-
-                            if (distance <= 3.5) return;
-
-                            DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
-                                    .withCausingEntity(player)
-                                    .withDirectEntity(player)
-                                    .build();
-
-                            target.damage(damage, source);
-
-                            ItemStack mainHand = player.getInventory().getItemInMainHand();
-                            ItemMeta meta = mainHand.getItemMeta();
-                            if (meta instanceof Damageable && mainHand.getType().getMaxDurability() > 0) {
-                                Damageable damageable = (Damageable) meta;
-                                int newDamage = damageable.getDamage() + 1;
-                                damageable.setDamage(newDamage);
-                                mainHand.setItemMeta(meta);
-
-                                if (newDamage >= mainHand.getType().getMaxDurability()) {
-                                    player.getInventory().setItemInMainHand(null);
-                                }
-                            }
-
-                            if(coolSet) {
-                                world.spawnParticle(Particle.BLOCK, target.getLocation().clone().add(0, 1.2, 0), 12, 0.6, 0.6, 0.6, amethyst);
-                                world.spawnParticle(Particle.SWEEP_ATTACK, target.getLocation().clone().add(0, 1.2, 0), 1, 0, 0, 0, 1);
-                                world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.0f, 1.0f);
-                                world.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_BREAK, 1.0f, 1.0f);
-                            }else{
-                                world.spawnParticle(Particle.BLOCK, target.getLocation().clone().add(0, 1.2, 0), 6, 0.6, 0.6, 0.6, amethyst);
-                                world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_WEAK, 1.0f, 1.0f);
-                                world.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1.6f, 1.0f);
-                            }
-                        }
-                    }
-                }
-            } else {
-                pAttackUsing.remove(event.getPlayer().getUniqueId());
-            }
-        }
-    }
-
     @Override
     protected boolean contains(Player player) {
         return tag.Lavender.contains(player);
+    }
+
+    @Override
+    protected boolean isCustomAttackUser(Player player) {
+        return !config.r_Skill_using.containsKey(player.getUniqueId());
+    }
+
+    @Override
+    protected void onLSkillCooldown(PlayerInteractEvent event, Player player) {
+    }
+
+    @Override
+    protected void LSkill(PlayerInteractEvent event, Player player) {
+        World world = player.getWorld();
+
+        boolean coolSet = player.getAttackCooldown() >= 1.0;
+        double extendedRange = coolSet ? 9.0 : 6.6;
+        double damage = coolSet ? 4.0 : 2.0;
+
+        RayTraceResult result =
+                player.getWorld().rayTrace(player.getEyeLocation(), player.getEyeLocation().getDirection(),
+                        extendedRange, FluidCollisionMode.NEVER, true, 0.6,
+                        entity -> entity != player && entity instanceof LivingEntity);
+
+        if (result != null && result.getHitEntity() != null) {
+            LivingEntity target = (LivingEntity) result.getHitEntity();
+
+            BlockData amethyst = Material.AMETHYST_BLOCK.createBlockData();
+
+            double distance = player.getLocation().distance(target.getLocation());
+
+            if (distance <= 3.5) return;
+
+            DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
+                    .withCausingEntity(player)
+                    .withDirectEntity(player)
+                    .build();
+
+            target.damage(damage, source);
+
+            ItemStack mainHand = player.getInventory().getItemInMainHand();
+            ItemMeta meta = mainHand.getItemMeta();
+            if (meta instanceof Damageable && mainHand.getType().getMaxDurability() > 0) {
+                Damageable damageable = (Damageable) meta;
+                int newDamage = damageable.getDamage() + 1;
+                damageable.setDamage(newDamage);
+                mainHand.setItemMeta(meta);
+
+                if (newDamage >= mainHand.getType().getMaxDurability()) {
+                    player.getInventory().setItemInMainHand(null);
+                }
+            }
+
+            if(coolSet) {
+                world.spawnParticle(Particle.BLOCK, target.getLocation().clone().add(0, 1.2, 0), 12, 0.6, 0.6, 0.6, amethyst);
+                world.spawnParticle(Particle.SWEEP_ATTACK, target.getLocation().clone().add(0, 1.2, 0), 1, 0, 0, 0, 1);
+                world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.0f, 1.0f);
+                world.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_BREAK, 1.0f, 1.0f);
+            } else {
+                world.spawnParticle(Particle.BLOCK, target.getLocation().clone().add(0, 1.2, 0), 6, 0.6, 0.6, 0.6, amethyst);
+                world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_WEAK, 1.0f, 1.0f);
+                world.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1.6f, 1.0f);
+            }
+        }
     }
 
     @Override
@@ -229,6 +222,16 @@ public class lavCore extends absCore {
     }
 
     @Override
+    protected boolean isRAnimated(Player player) {
+        return true;
+    }
+
+    @Override
+    protected boolean isFAnimated(Player player) {
+        return false;
+    }
+
+    @Override
     protected ConfigWrapper getConfigWrapper() {
         return new ConfigWrapper() {
             @Override
@@ -245,6 +248,11 @@ public class lavCore extends absCore {
                 cool.updateCooldown(player, "R", config.frozenCool);
                 cool.updateCooldown(player, "Q", config.frozenCool);
                 cool.updateCooldown(player, "F", config.frozenCool);
+            }
+
+            @Override
+            public long getLcooldown(Player player) {
+                return 0L;
             }
 
             @Override

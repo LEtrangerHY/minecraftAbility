@@ -9,6 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
@@ -87,7 +88,6 @@ public class roseCore extends absCore {
 
     @EventHandler
     public void passiveDamage(EntityDamageByEntityEvent event) {
-
         if (!(event.getDamager() instanceof Player player)) return;
         if (!(event.getEntity() instanceof LivingEntity target)) return;
 
@@ -109,8 +109,7 @@ public class roseCore extends absCore {
 
             boolean procPetal = false;
 
-            if (lastHand == null) {
-            } else {
+            if (lastHand != null) {
                 if (!lastHand.equals(currentHand)) {
                     procPetal = true;
                 }
@@ -166,6 +165,19 @@ public class roseCore extends absCore {
     }
 
     @Override
+    protected boolean isCustomAttackUser(Player player) {
+        return false;
+    }
+
+    @Override
+    protected void onLSkillCooldown(PlayerInteractEvent event, Player player) {
+    }
+
+    @Override
+    protected void LSkill(PlayerInteractEvent event, Player player) {
+    }
+
+    @Override
     protected SkillBase getRSkill() { return Rskill; }
 
     @Override
@@ -206,6 +218,16 @@ public class roseCore extends absCore {
     protected boolean isFCondition(Player player) { return canUseFSkill(player); }
 
     @Override
+    protected boolean isRAnimated(Player player) {
+        return false;
+    }
+
+    @Override
+    protected boolean isFAnimated(Player player) {
+        return false;
+    }
+
+    @Override
     protected ConfigWrapper getConfigWrapper() {
         return new ConfigWrapper() {
             @Override
@@ -222,6 +244,11 @@ public class roseCore extends absCore {
                 cool.updateCooldown(player, "R", 0L);
                 cool.updateCooldown(player, "Q", config.frozenCool);
                 cool.updateCooldown(player, "F", config.frozenCool);
+            }
+
+            @Override
+            public long getLcooldown(Player player) {
+                return 0;
             }
 
             @Override

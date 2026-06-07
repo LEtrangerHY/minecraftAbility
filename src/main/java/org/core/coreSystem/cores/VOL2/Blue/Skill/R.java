@@ -39,25 +39,26 @@ public class R implements SkillBase {
 
         World world = player.getWorld();
 
-        if(cool.isReloading(player, "R Reuse")) {
-            world.spawnParticle(Particle.WITCH, player.getLocation().clone().add(0, 1, 0), 80, 1.5, 1.5, 1.5, 0.1);
-            world.spawnParticle(Particle.SMOKE, player.getLocation().clone().add(0, 1, 0), 80, 1.5, 1.5, 1.5, 1);
-
-            world.playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.6f, 1.0f);
-            world.playSound(player.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 1.3f, 1.0f);
-            cool.updateCooldown(player, "R Reuse", 0L, "boss");
-            slowFlower(player, config.Flower.getOrDefault(player.getUniqueId(), new ArrayList<>()));
-            return;
-
-        }else{
+        if(!cool.isReloading(player, "R Reuse")) {
             world.spawnParticle(Particle.WITCH, player.getLocation().clone().add(0, 1, 0), 80, 1.5, 1.5, 1.5, 0.1);
             world.spawnParticle(Particle.SMOKE, player.getLocation().clone().add(0, 1, 0), 80, 1.5, 1.5, 1.5, 1);
 
             world.playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1, 1);
             world.playSound(player.getLocation(), Sound.BLOCK_GRASS_PLACE, 1, 1);
-            cool.updateCooldown(player, "R", 0L);
-            cool.setCooldown(player, 4000L, "R Reuse", "boss");
+
             placeWitherFlower(player, 10.0, 44.0);
+
+            cool.setCooldown(player, 4000L, "R Reuse", "boss");
+            cool.updateCooldown(player, "R", 0L);
+        }else{
+            world.spawnParticle(Particle.WITCH, player.getLocation().clone().add(0, 1, 0), 80, 1.5, 1.5, 1.5, 0.1);
+            world.spawnParticle(Particle.SMOKE, player.getLocation().clone().add(0, 1, 0), 80, 1.5, 1.5, 1.5, 1);
+
+            world.playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.6f, 1.0f);
+            world.playSound(player.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 1.3f, 1.0f);
+
+            slowFlower(player, config.Flower.getOrDefault(player.getUniqueId(), new ArrayList<>()));
+            cool.updateCooldown(player, "R Reuse", 0L, "boss");
         }
 
     }

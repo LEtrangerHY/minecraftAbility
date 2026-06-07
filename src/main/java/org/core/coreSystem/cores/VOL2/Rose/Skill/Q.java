@@ -39,8 +39,6 @@ public class Q implements SkillBase {
     public void Trigger(Player player) {
         UUID uuid = player.getUniqueId();
 
-        player.swingMainHand();
-
         Location startLocation = player.getLocation();
         Vector direction = startLocation.getDirection().normalize().multiply(config.q_Skill_dash);
 

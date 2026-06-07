@@ -97,9 +97,8 @@ public class benzCore extends absCore {
     }
 
     private void applyAdditionalHealth(Player player, boolean healFull) {
-        long addHP =
-                player.getPersistentDataContainer().getOrDefault(
-                        new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L);
+        long addHP = player.getPersistentDataContainer().getOrDefault(
+                new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L);
 
         AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
         if (maxHealth != null) {
@@ -110,15 +109,6 @@ public class benzCore extends absCore {
 
             if (healFull) {
                 player.setHealth(newMax);
-            }
-        }
-    }
-
-    @EventHandler(priority = EventPriority.NORMAL)
-    public void passiveAttackEffect(PlayerInteractEvent event) {
-        if(tag.Benzene.contains(event.getPlayer())){
-            if (pAttackUsing.contains(event.getPlayer().getUniqueId())) {
-                pAttackUsing.remove(event.getPlayer().getUniqueId());
             }
         }
     }
@@ -194,7 +184,6 @@ public class benzCore extends absCore {
 
     @EventHandler
     public void rSkillPassive(PlayerMoveEvent event){
-
         Player player = event.getPlayer();
 
         if (tag.Benzene.contains(player)) {
@@ -230,7 +219,6 @@ public class benzCore extends absCore {
 
     @EventHandler(priority = EventPriority.LOW)
     public void passiveEffect(EntityDamageByEntityEvent event) {
-
         if (!(event.getDamager() instanceof Player player)) return;
         if (!(event.getEntity() instanceof LivingEntity target)) return;
 
@@ -303,6 +291,15 @@ public class benzCore extends absCore {
     }
 
     @Override
+    protected boolean isCustomAttackUser(Player player) {
+        return false;
+    }
+
+    @Override
+    protected void LSkill(PlayerInteractEvent event, Player player) {
+    }
+
+    @Override
     protected SkillBase getRSkill() {
         return Rskill;
     }
@@ -337,12 +334,12 @@ public class benzCore extends absCore {
     }
 
     @Override
-    protected boolean isItemRequired(Player player){
+    protected boolean isItemRequired(Player player) {
         return hasProperItems(player);
     }
 
     @Override
-    protected boolean isDropRequired(Player player, ItemStack droppedItem){
+    protected boolean isDropRequired(Player player, ItemStack droppedItem) {
         ItemStack off = player.getInventory().getItemInOffHand();
         return droppedItem.getType() == Material.IRON_SWORD &&
                 off.getType() == Material.IRON_CHAIN;
@@ -361,6 +358,16 @@ public class benzCore extends absCore {
     @Override
     protected boolean isFCondition(Player player) {
         return canUseFSkill(player);
+    }
+
+    @Override
+    protected boolean isRAnimated(Player player) {
+        return true;
+    }
+
+    @Override
+    protected boolean isFAnimated(Player player) {
+        return true;
     }
 
     @Override
@@ -384,6 +391,11 @@ public class benzCore extends absCore {
                 cool.pauseCooldown(player, "R");
                 cool.updateCooldown(player, "Q", config.frozenCool);
                 cool.updateCooldown(player, "F", config.frozenCool);
+            }
+
+            @Override
+            public long getLcooldown(Player player) {
+                return 0;
             }
 
             @Override

@@ -35,8 +35,6 @@ public class Q implements SkillBase {
 
     @Override
     public void Trigger(Player player) {
-        player.swingMainHand();
-
         Location startLocation = player.getLocation();
 
         Vector direction = startLocation.getDirection().normalize().multiply(config.q_Skill_dash);
@@ -102,8 +100,6 @@ public class Q implements SkillBase {
     }
 
     public void largeDash(Player player){
-        player.swingMainHand();
-
         Location startLocation = player.getLocation();
 
         Vector direction = startLocation.getDirection().normalize().multiply(config.q_Skill_dash_2);
