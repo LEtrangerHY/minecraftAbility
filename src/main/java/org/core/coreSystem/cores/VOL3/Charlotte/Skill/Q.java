@@ -21,6 +21,7 @@ import org.core.cool.Cool;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.cores.VOL3.Charlotte.coreSystem.Charlotte;
 import org.core.effect.crowdControl.ForceDamage;
+import org.core.effect.crowdControl.Grounding;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -40,6 +41,7 @@ public class Q implements SkillBase {
     private final NamespacedKey keyQ;
 
     private static final BlockData WHITE_STAINED_GLASS = Material.WHITE_STAINED_GLASS.createBlockData();
+    private static final Particle.DustOptions DUST_CHAIN = new Particle.DustOptions(Color.fromRGB(66, 66, 66), 0.6f);
     private static final Map<UUID, QSession> glassSessions = new HashMap<>();
 
     public Q(Charlotte config, JavaPlugin plugin, Cool cool) {
@@ -104,8 +106,8 @@ public class Q implements SkillBase {
         World world = player.getWorld();
         Location startLoc = player.getLocation();
 
-        Vector forward = startLoc.getDirection().clone();
-        forward.setY(0).normalize();
+        double yaw = Math.toRadians(startLoc.getYaw());
+        Vector forward = new Vector(-Math.sin(yaw), 0, Math.cos(yaw)).normalize();
 
         Vector up = new Vector(0, 1, 0);
         Vector right = forward.clone().crossProduct(up).normalize();
@@ -113,7 +115,6 @@ public class Q implements SkillBase {
         BlockDisplay[] displays = new BlockDisplay[15];
         for (int i = 0; i < 15; i++) {
             BlockDisplay display = (BlockDisplay) world.spawnEntity(startLoc, EntityType.BLOCK_DISPLAY);
-            // [수정] 꽉 찬 색유리 블럭 세팅
             display.setBlock(WHITE_STAINED_GLASS);
             display.setTeleportDuration(1);
             display.setTransformation(new Transformation(
@@ -142,8 +143,23 @@ public class Q implements SkillBase {
                 }
 
                 Location currentCenter = startLoc.clone().add(forward.clone().multiply(ticks * speed));
-                updateDisplays(session, currentCenter);
 
+                if (checkWallHitBlock(currentCenter, session.right, session.up, session.forward, speed)) {
+                    placeBlocks(session, currentCenter, world);
+                    session.landed = true;
+                    session.centerLoc = currentCenter;
+                    cool.setCooldown(player, 12000L, "Q Reuse", "boss");
+
+                    session.timeoutTask = new BukkitRunnable() {
+                        @Override
+                        public void run() { cleanupSession(uuid, config.q_Skill_Cool); }
+                    }.runTaskLater(plugin, 240L);
+
+                    this.cancel();
+                    return;
+                }
+
+                updateDisplays(session, currentCenter);
                 handleWallCollision(player, currentCenter, forward, right, up);
 
                 if (ticks >= maxTicks) {
@@ -203,12 +219,19 @@ public class Q implements SkillBase {
                 }
 
                 Location currentCenter = baseStartLoc.clone().add(session.forward.clone().multiply(ticks * speed));
+
+                if (checkWallHitBlock(currentCenter, session.right, session.up, session.forward, speed)) {
+                    triggerBurst(player, session, currentCenter);
+                    cleanupSession(uuid, config.q_Skill_Cool);
+                    this.cancel();
+                    return;
+                }
+
                 updateDisplays(session, currentCenter);
                 handleWallCollision(player, currentCenter, session.forward, session.right, session.up);
 
                 if (ticks >= maxTicks) {
                     triggerBurst(player, session, currentCenter);
-
                     cleanupSession(uuid, config.q_Skill_Cool);
                     this.cancel();
                 }
@@ -217,16 +240,38 @@ public class Q implements SkillBase {
         }.runTaskTimer(plugin, 0L, 1L);
     }
 
+    private boolean checkWallHitBlock(Location center, Vector right, Vector up, Vector forward, double checkDist) {
+        World world = center.getWorld();
+        Vector dir = forward.clone().normalize();
+
+        for (int row = 0; row < 3; row++) {
+            for (int col = -2; col <= 2; col++) {
+                Vector offset = right.clone().multiply(col).add(up.clone().multiply(row));
+                Location checkLoc = center.clone().add(offset);
+
+                Block currentBlock = checkLoc.getBlock();
+                Block nextBlock = checkLoc.clone().add(dir.clone().multiply(checkDist)).getBlock();
+
+                if (!currentBlock.isPassable() || !nextBlock.isPassable()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     private void triggerBurst(Player player, QSession session, Location centerLoc) {
         World world = player.getWorld();
 
-        world.playSound(centerLoc, Sound.BLOCK_GLASS_BREAK, 2.0f, 0.5f);
-        world.playSound(centerLoc, Sound.BLOCK_AMETHYST_CLUSTER_BREAK, 2.0f, 1.2f);
-        world.playSound(centerLoc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1.5f, 1.5f);
+        Location burstCenter = centerLoc.clone().add(0, 1.0, 0);
 
-        world.spawnParticle(Particle.BLOCK, centerLoc, 150, 2.5, 1.5, 2.5, 0.5, WHITE_STAINED_GLASS);
-        world.spawnParticle(Particle.END_ROD, centerLoc, 80, 1.5, 1.0, 1.5, 0.4);
-        world.spawnParticle(Particle.ENCHANTED_HIT, centerLoc, 100, 2.0, 1.5, 2.0, 0.5);
+        world.playSound(burstCenter, Sound.BLOCK_GLASS_BREAK, 2.0f, 0.5f);
+        world.playSound(burstCenter, Sound.BLOCK_AMETHYST_CLUSTER_BREAK, 2.0f, 1.2f);
+        world.playSound(burstCenter, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1.5f, 1.5f);
+
+        world.spawnParticle(Particle.BLOCK, burstCenter, 150, 2.5, 1.5, 2.5, 0.5, WHITE_STAINED_GLASS);
+        world.spawnParticle(Particle.END_ROD, burstCenter, 80, 1.5, 1.0, 1.5, 0.4);
+        world.spawnParticle(Particle.ENCHANTED_HIT, burstCenter, 100, 2.0, 1.5, 2.0, 0.5);
 
         long level = player.getPersistentDataContainer().getOrDefault(keyQ, PersistentDataType.LONG, 0L);
         double damage = config.q_Skill_Damage * (1 + (config.q_Skill_amp * level));
@@ -236,12 +281,15 @@ public class Q implements SkillBase {
                 .withDirectEntity(player)
                 .build();
 
-        for (Entity entity : world.getNearbyEntities(centerLoc, 6.0, 6.0, 6.0)) {
+        for (Entity entity : world.getNearbyEntities(burstCenter, 6.0, 6.0, 6.0)) {
             if (entity instanceof LivingEntity target && !entity.equals(player)) {
                 ForceDamage forceDamage = new ForceDamage(target, damage, source, false);
                 forceDamage.applyEffect(player);
+                new Grounding(target, 2000).applyEffect(player);
 
-                Vector knockbackDir = entity.getLocation().toVector().subtract(centerLoc.toVector());
+                chain_qSkill_Particle_Effect(player, target, 40);
+
+                Vector knockbackDir = entity.getLocation().toVector().subtract(burstCenter.toVector());
                 if (knockbackDir.lengthSquared() < 0.01) {
                     knockbackDir = session.forward.clone();
                 }
@@ -249,6 +297,36 @@ public class Q implements SkillBase {
                 target.setVelocity(knockbackDir);
             }
         }
+    }
+
+    public void chain_qSkill_Particle_Effect(Player player, Entity entity, int time) {
+        World world = player.getWorld();
+
+        new BukkitRunnable() {
+            int tick = 0;
+            @Override
+            public void run() {
+                if (tick > time || !entity.isValid()) { cancel(); return; }
+
+                Location baseLoc;
+                if (entity instanceof ArmorStand) {
+                    baseLoc = entity.getLocation().add(0, 0.5, 0);
+                } else {
+                    baseLoc = entity.getLocation();
+                }
+
+                for (int i = 0; i < 33; i += 2) {
+                    double yOffset = i / 10.0;
+                    world.spawnParticle(Particle.DUST, baseLoc.clone().add(0, yOffset, 0), 1, 0, 0, 0, 0, DUST_CHAIN);
+
+                    if (i % 3 == 0) {
+                        double hitY = 3.3 - (i * 0.12);
+                        world.spawnParticle(Particle.ENCHANTED_HIT, baseLoc.clone().add(0, hitY, 0), 1, 0, 0, 0, 0);
+                    }
+                }
+                tick++;
+            }
+        }.runTaskTimer(plugin, 0L, 1L);
     }
 
     private void handleWallCollision(Player player, Location center, Vector forward, Vector right, Vector up) {
@@ -281,7 +359,6 @@ public class Q implements SkillBase {
                     proj.remove();
                 } else if (entity instanceof LivingEntity) {
                     Vector pushVector = forward.clone().multiply(0.8);
-                    pushVector.setY(0.2);
                     entity.setVelocity(pushVector);
                 }
             }
@@ -289,8 +366,10 @@ public class Q implements SkillBase {
     }
 
     private void updateDisplays(QSession session, Location center) {
-        float playerYaw = center.getYaw();
-        float playerPitch = center.getPitch();
+        float yaw = center.getYaw();
+        if (yaw == 0) {
+            yaw = (float) Math.toDegrees(Math.atan2(-session.forward.getX(), session.forward.getZ()));
+        }
 
         int index = 0;
         for (int row = 0; row < 3; row++) {
@@ -298,8 +377,8 @@ public class Q implements SkillBase {
                 Vector offset = session.right.clone().multiply(col).add(session.up.clone().multiply(row));
                 Location targetLoc = center.clone().add(offset);
 
-                targetLoc.setYaw(playerYaw);
-                targetLoc.setPitch(playerPitch);
+                targetLoc.setYaw(yaw);
+                targetLoc.setPitch(0f);
 
                 BlockDisplay display = session.displays[index];
                 if (display != null && display.isValid()) {

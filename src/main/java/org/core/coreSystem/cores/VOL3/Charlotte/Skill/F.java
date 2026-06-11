@@ -99,6 +99,9 @@ public class F implements SkillBase {
                                 ForceDamage forceDamage = new ForceDamage(target, damage, source, false);
                                 forceDamage.applyEffect(player);
 
+                                long qCooldown = cool.getRemainCooldown(player, "Q");
+                                cool.updateCooldown(player, "Q", Math.max(qCooldown - 1000L, 0L));
+
                                 cool.updateCooldown(player, "Prism", 3000L, "boss");
                                 startPrismDecayTask(player);
 
