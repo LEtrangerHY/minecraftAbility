@@ -41,7 +41,7 @@ public class charInventory extends absInventory {
 
     @Override
     protected Material getMainTotem(Player player) {
-        return Material.GLASS;
+        return Material.PRISMARINE_CRYSTALS;
     }
 
     @Override
@@ -55,7 +55,7 @@ public class charInventory extends absInventory {
         return switch (skill) {
             case "main" -> Component.text("CHARLOTTE");
             case "R" -> Component.text("-");
-            case "Q" -> Component.text("");
+            case "Q" -> Component.text("PRISM");
             case "F" -> Component.text("PRISMANE");
             default -> Component.text("???");
         };
@@ -64,9 +64,9 @@ public class charInventory extends absInventory {
     @Override
     protected Material getTotem(Player player, String skill) {
         return switch (skill) {
-            case "R" -> Material.GLASS_PANE;
-            case "Q" -> Material.WHITE_STAINED_GLASS;
-            case "F" -> Material.HEAVY_CORE;
+            case "R" -> Material.PRISMARINE_SHARD;
+            case "Q" -> Material.PRISMARINE;
+            case "F" -> Material.SEA_LANTERN;
             default -> Material.BARRIER;
         };
     }
@@ -78,11 +78,11 @@ public class charInventory extends absInventory {
 
         if (skill.equals("main")) {
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-            lore.add(Component.text("타입 : 브루저").color(NamedTextColor.LIGHT_PURPLE));
-            lore.add(Component.text("장착 : 메인핸드에 철퇴 장착, 오프핸드에 사슬 장착.").color(NamedTextColor.LIGHT_PURPLE));
+            lore.add(Component.text("타입 : 메이지").color(NamedTextColor.LIGHT_PURPLE));
+            lore.add(Component.text("장착 : 메인핸드에 프리즈머린 크리스탈 장착, 오프핸드에 사슬 장착.").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text(""));
-            lore.add(Component.text("메뉴북 아이템 없어도 인벤토리 화면에서 유리를 우클릭해서 메뉴 화면 진입 가능").color(NamedTextColor.AQUA));
+            lore.add(Component.text("메뉴북 아이템 없어도 인벤토리 화면에서 프리즈머린 크리스탈을 우클릭해서 메뉴 화면 진입 가능").color(NamedTextColor.AQUA));
             return lore;
         }
 
@@ -105,9 +105,9 @@ public class charInventory extends absInventory {
                 lore.add(requireXp.color(NamedTextColor.AQUA));
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("타입 : 효과").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("대상 : 플레이어").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
                 lore.add(Component.text("-").color(NamedTextColor.GREEN));
                 break;
@@ -116,12 +116,12 @@ public class charInventory extends absInventory {
                 lore.add(requireXp.color(NamedTextColor.AQUA));
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("타입 : 효과").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("타입 : 효과/공격").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("시스템 : 재시전").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("플레이어 주위의 적들에게 피해를 주고 위로 도약한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("재시전 : 지면으로 강하게 착지한 후, 주위의 적들에게 피해를 가하고 2초간 고정시킨다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("플레이어 전방에 투사체를 굴절 및 반사시키는 유리벽을 설치한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("재시전 : 설치된 유리벽을 바라보는 방향으로 밀어낸 후 유리벽을 붕괴시킨다.").color(NamedTextColor.GREEN));
                 break;
             case "F":
                 requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfF.get((int) level)) : Component.text("Require EXP : MAX");
@@ -132,10 +132,10 @@ public class charInventory extends absInventory {
                 lore.add(Component.text("시스템 : 피격형").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("전방으로 철퇴를 휘둘러 지면을 강타한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("강타 피격 : 스킬을 사용할 때마다 강타에 피격된 적의 숫자에 비례한 수치가 점점 축척된다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("강타 피격 : 피격된 적의 숫자만큼의 흡수 효과를 부여받으며, 체력을 회복한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("강타 피격 : 축척된 강타 수치에 비례하여 다음 1회의 점프의 점프력이 강화된다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("전방으로 축척된 프리즘 수치만큼의 유리파편을 연속으로 투사한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("유리벽 피격 : 스킬 시전 시 투사되는 유리파편이 유리벽에 피격될 때마다 프리즘 수치가 1씩 증가한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("유리벽 피격 : 프리즘 수치는 최대 12개까지 증가한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("유리벽 피격 : 평타 시전 시 평타 투사체 피해량을 축척된 프리즘 수치 배수만큼 상승시키고 프리즘 수치를 초기화시킨다.").color(NamedTextColor.GREEN));
                 break;
             default:
                 break;

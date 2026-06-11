@@ -100,7 +100,7 @@ public class pyroCore extends absCore {
     public void Burst(Player player, Location burstLoction){
         World world = player.getWorld();
 
-        world.playSound(player.getLocation(), Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1, 1);
+        world.playSound(burstLoction, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1, 1);
         world.spawnParticle(Particle.FLAME, burstLoction, 28, 0, 0, 0, 0.7);
         world.spawnParticle(Particle.SOUL_FIRE_FLAME, burstLoction, 14, 0, 0, 0, 0.7);
 

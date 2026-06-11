@@ -433,10 +433,7 @@ public class darmesCore extends absCore {
 
     private boolean canUseRSkill(Player player) { return true; }
     private boolean canUseQSkill(Player player) { return true; }
-    private boolean canUseFSkill(Player player) {
-        ItemStack main = player.getInventory().getItemInMainHand();
-        return (main.getType() == Material.MACE);
-    }
+    private boolean canUseFSkill(Player player) { return true; }
 
     @Override
     protected boolean isItemRequired(Player player){ return hasProperItems(player); }

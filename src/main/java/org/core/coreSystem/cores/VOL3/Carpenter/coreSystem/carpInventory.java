@@ -125,7 +125,7 @@ public class carpInventory extends absInventory {
                 lore.add(requireXp.color(NamedTextColor.AQUA));
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("타입 : 회복").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("타입 : 효과").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("시스템 : 횟수").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("대상 : 플레이어").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));

@@ -23,11 +23,12 @@ public class Charlotte {
 
     // Q
     public HashMap<UUID, HashSet<Entity>> q_damaged = new HashMap<>();
-    public long q_Skill_Cool = 12000;
+    public long q_Skill_Cool = 33000;
     public double q_Skill_amp = 0.2;
-    public double q_Skill_Damage = 3.0;
+    public double q_Skill_Damage = 6.0;
 
     // F
+    public HashMap<UUID, Integer> f_prism = new HashMap<>();
     public long f_Skill_Cool = 1000;
     public double f_Skill_amp = 0.2;
     public double f_Skill_Damage = 2;
