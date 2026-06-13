@@ -137,7 +137,7 @@ public class benzCore extends absCore {
             activeChargeBars.remove(player.getUniqueId());
         }
 
-        BossBar bossBar = Bukkit.createBossBar("F skill Charge", BarColor.PURPLE, BarStyle.SOLID);
+        BossBar bossBar = Bukkit.createBossBar("F skill Charge", BarColor.PURPLE, BarStyle.SEGMENTED_6);
         bossBar.setProgress(0.0);
         bossBar.addPlayer(player);
         activeChargeBars.put(player.getUniqueId(), bossBar);

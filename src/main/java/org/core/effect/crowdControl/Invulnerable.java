@@ -6,12 +6,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashSet;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Objects;
-import java.util.Set;
 
 public class Invulnerable implements Effects, Listener {
-    public static Set<Entity> invulnerablePlayers = new HashSet<>();
+
+    public static Map<Entity, Long> invulnerablePlayers = new HashMap<>();
 
     private final Player player;
     private final long duration;
@@ -23,21 +24,32 @@ public class Invulnerable implements Effects, Listener {
 
     @Override
     public void applyEffect(Entity entity) {
+        long newEndTime = System.currentTimeMillis() + duration;
 
-        invulnerablePlayers.add(player);
-        long endTime = System.currentTimeMillis() + duration;
+        Long currentEndTime = invulnerablePlayers.get(entity);
 
-        entity.setInvulnerable(true);
+        if (currentEndTime != null) {
+            invulnerablePlayers.put(entity, Math.max(currentEndTime, newEndTime));
+        } else {
+            invulnerablePlayers.put(entity, newEndTime);
+            entity.setInvulnerable(true);
+        }
 
         new BukkitRunnable() {
             @Override
             public void run() {
+                if (!player.isOnline()) {
+                    removeEffect(player);
+                    cancel();
+                    return;
+                }
 
-                if (System.currentTimeMillis() >= endTime || !player.isOnline()) {
+                long maxEndTime = invulnerablePlayers.getOrDefault(entity, 0L);
+
+                if (System.currentTimeMillis() >= maxEndTime) {
                     removeEffect(player);
                     cancel();
                 }
-
             }
         }.runTaskTimer(Objects.requireNonNull(Bukkit.getPluginManager().getPlugin("Core")), 0L, 1L);
     }
@@ -49,6 +61,6 @@ public class Invulnerable implements Effects, Listener {
     }
 
     public static boolean isInvulnerable(Player player) {
-        return invulnerablePlayers.contains(player);
+        return invulnerablePlayers.containsKey(player);
     }
 }

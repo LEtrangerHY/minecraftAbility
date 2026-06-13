@@ -11,6 +11,9 @@ import org.core.cool.Cool;
 import org.core.coreSystem.cores.KEY.PLAYER.coreSystem.PLAYER;
 import org.core.coreSystem.cores.KEY.PLAYER.coreSystem.playerCore;
 import org.core.coreSystem.cores.KEY.PLAYER.coreSystem.playerInventory;
+import org.core.coreSystem.cores.VOL2.Undead.coreSystem.Undead;
+import org.core.coreSystem.cores.VOL2.Undead.coreSystem.undeadCore;
+import org.core.coreSystem.cores.VOL2.Undead.coreSystem.undeadInventory;
 import org.core.coreSystem.cores.VOL3.Charlotte.coreSystem.Charlotte;
 import org.core.coreSystem.cores.VOL3.Charlotte.coreSystem.charCore;
 import org.core.coreSystem.cores.VOL3.Charlotte.coreSystem.charInventory;
@@ -122,6 +125,7 @@ public final class Core extends JavaPlugin implements Listener {
     private residueCore residue;
     private darmesCore darmes;
     private charCore charlotte;
+    private undeadCore undead;
 
     private playerInventory playerInv;
     private nightInventory nightInv;
@@ -146,6 +150,7 @@ public final class Core extends JavaPlugin implements Listener {
     private residueInventory residueInv;
     private darmesInventory darmesInv;
     private charInventory charInv;
+    private undeadInventory undeadInv;
 
     private EntityLevelingManager Elevel;
 
@@ -185,6 +190,7 @@ public final class Core extends JavaPlugin implements Listener {
         Residue residueConfig = new Residue();
         Darmes darmesConfig = new Darmes();
         Charlotte charConfig = new Charlotte();
+        Undead undeadConfig = new Undead();
 
         this.cool = new Cool(this);
 
@@ -348,6 +354,13 @@ public final class Core extends JavaPlugin implements Listener {
 
         this.charInv = new charInventory(this, this.config);
         Bukkit.getPluginManager().registerEvents(this.charInv, this);
+
+        this.undead = new undeadCore(this, this.config, undeadConfig, cool);
+        Bukkit.getPluginManager().registerEvents(this.undead, this);
+        this.config.registerCore("undead", this.undead);
+
+        this.undeadInv = new undeadInventory(this, this.config);
+        Bukkit.getPluginManager().registerEvents(this.undeadInv, this);
 
         this.benz = new benzCore(this, this.config, benzConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.benz, this);

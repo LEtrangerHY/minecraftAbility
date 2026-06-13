@@ -17,6 +17,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.*;
 import org.core.coreSystem.cores.KEY.PLAYER.coreSystem.playerLeveling;
+import org.core.coreSystem.cores.VOL2.Undead.coreSystem.undeadLeveling;
 import org.core.coreSystem.cores.VOL3.Charlotte.coreSystem.charLeveling;
 import org.core.coreSystem.cores.VOL3.Darmes.coreSystem.darmesLeveling;
 import org.core.coreSystem.cores.VOL3.Lavender.coreSystem.lavLeveling;
@@ -194,6 +195,9 @@ public class LevelingManager implements Listener {
                 case "CHARLOTTE":
                     charLeveling charlotte = new charLeveling(plugin, player, exp);
                     charlotte.addExp(player);
+                case "Undead":
+                    undeadLeveling undead = new undeadLeveling(plugin, player, exp);
+                    undead.addExp(player);
                 default :
                     break;
             }

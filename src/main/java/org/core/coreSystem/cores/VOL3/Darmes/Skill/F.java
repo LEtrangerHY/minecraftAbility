@@ -149,7 +149,7 @@ public class F implements SkillBase {
 
                         int amplifier = Math.max(0, (newAbsorption / 2) - 1);
 
-                        player.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, Integer.MAX_VALUE, amplifier, false, false, false));
+                        player.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, PotionEffect.INFINITE_DURATION, amplifier, false, false, false));
                         player.setAbsorptionAmount(newAbsorption);
 
                         double defaultHeal = Math.min(6.0, hitCount * config.f_Skill_Heal);

@@ -69,7 +69,7 @@ public class R implements SkillBase {
         double amp = config.r_Skill_amp * player.getPersistentDataContainer().getOrDefault(keyR, PersistentDataType.LONG, 0L);
         double damage = config.r_Skill_damage * (1 + amp);
 
-        DamageSource source = DamageSource.builder(DamageType.GENERIC)
+        DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
                 .withCausingEntity(player)
                 .withDirectEntity(player)
                 .build();

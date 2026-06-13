@@ -140,7 +140,6 @@ public class F implements SkillBase {
                         if (canBreakBlock) {
                             if (!target.isDead()) {
                                 chainResonance.increase(player, target);
-                                // 💡 [수정] Entity -> UUID 파라미터 변경 대응
                                 if (target.isDead()) chainResonance.decrease(target.getUniqueId());
                             }
                         }

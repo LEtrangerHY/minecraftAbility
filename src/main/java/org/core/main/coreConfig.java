@@ -50,6 +50,7 @@ public class coreConfig {
     public Set<Player> Residue;
     public Set<Player> Darmes;
     public Set<Player> Charlotte;
+    public Set<Player> Undead;
 
     public coreConfig(JavaPlugin plugin, Cool cool) {
         this.plugin = plugin;
@@ -78,6 +79,7 @@ public class coreConfig {
         this.Residue = new persistentPlayerSet(plugin, "setting_residue");
         this.Darmes = new persistentPlayerSet(plugin, "setting_darmes");
         this.Charlotte = new persistentPlayerSet(plugin, "setting_charlotte");
+        this.Undead = new persistentPlayerSet(plugin, "setting_undead");
     }
 
     public void registerCore(String name, absCore core) {
@@ -108,6 +110,7 @@ public class coreConfig {
         if (Residue.contains(player)) return "RESIDUE";
         if (Darmes.contains(player)) return "DARMES";
         if (Charlotte.contains(player)) return "CHARLOTTE";
+        if (Undead.contains(player)) return "Undead";
         return "NONE";
     }
 
@@ -150,6 +153,7 @@ public class coreConfig {
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_residue"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_darmes"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_charlotte"), PersistentDataType.BYTE, (byte) 0);
+        player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_undead"), PersistentDataType.BYTE, (byte) 0);
     }
 
     public void setSetting(Player player, String setting, boolean value) {
@@ -202,6 +206,7 @@ public class coreConfig {
             case "residue" -> new NamespacedKey(plugin, "setting_residue");
             case "darmes" -> new NamespacedKey(plugin, "setting_darmes");
             case "charlotte" -> new NamespacedKey(plugin, "setting_charlotte");
+            case "undead" -> new NamespacedKey(plugin, "setting_undead");
             default -> null;
         };
     }

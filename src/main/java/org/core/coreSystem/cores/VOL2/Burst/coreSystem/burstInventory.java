@@ -127,7 +127,7 @@ public class burstInventory extends absInventory {
                 lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("돌진하며 지나간 거리에 차지된 TNT를 떨어트린다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("상공에서 돌진하며 지나간 거리에 차지된 TNT를 떨어트린다.").color(NamedTextColor.GREEN));
                 break;
             default:
                 break;

@@ -139,7 +139,7 @@ public class Q implements SkillBase {
                                     int currentAbsorption = player.getAbsorptionAmount() > 0 ? (int) player.getAbsorptionAmount() : 0;
                                     int newAbsorption = Math.min(currentAbsorption + 1, 8);
                                     int amplifier = (newAbsorption / 2) - 1;
-                                    player.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, Integer.MAX_VALUE, amplifier, false, false, false));
+                                    player.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, PotionEffect.INFINITE_DURATION, amplifier, false, false, false));
 
                                     damagedSet.add(target);
                                 }
