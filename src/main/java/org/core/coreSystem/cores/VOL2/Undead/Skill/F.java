@@ -70,17 +70,29 @@ public class F implements SkillBase {
             player.setWalkSpeed(newSpeed);
         }
 
+        double chargeTime = chargeRate * 4.0;
+
+        final int durationTicks;
+
+        if (chargeTime >= 1.0) {
+            double clampedTime = Math.min(chargeTime, 4.0);
+            durationTicks = (int) (6 + (7 * ((clampedTime - 1.0) / 3.0)));
+        } else {
+            durationTicks = (int) Math.max(1, 6 * chargeTime);
+        }
+
         final double maxHealth = maxHealthAttr.getValue();
         final double totalHealAmount = maxHealth * chargeRate;
-        final int durationTicks = (int) (6 + (7 * chargeRate));
         final double healPerTick = totalHealAmount / durationTicks;
 
         World world = player.getWorld();
         world.playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1.0f, 0.7f);
 
-        long invulnDurationMs = durationTicks * 50L;
-        Invulnerable invulnerable = new Invulnerable(player, invulnDurationMs);
-        invulnerable.applyEffect(player);
+        if (chargeTime >= 1.0) {
+            long invulnDurationMs = durationTicks * 50L;
+            Invulnerable invulnerable = new Invulnerable(player, invulnDurationMs);
+            invulnerable.applyEffect(player);
+        }
 
         new BukkitRunnable() {
             int currentTick = 0;

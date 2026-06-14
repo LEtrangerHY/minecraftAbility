@@ -36,7 +36,6 @@ public class R_shovel implements SkillBase {
 
     private final Random random = new Random();
 
-    // Q 스킬의 철제 질감 파티클
     private static final Particle.DustOptions DUST_IRON = new Particle.DustOptions(Color.fromRGB(160, 160, 160), 0.6f);
     private static final Particle.DustOptions DUST_MID = new Particle.DustOptions(Color.fromRGB(140, 140, 140), 0.6f);
     private static final Particle.DustOptions DUST_DECAY = new Particle.DustOptions(Color.fromRGB(60, 60, 60), 0.3f);
@@ -108,9 +107,6 @@ public class R_shovel implements SkillBase {
                             ForceDamage forceDamage = new ForceDamage(target, damage, source, true);
                             forceDamage.applyEffect(player);
 
-                            Vector push = target.getLocation().toVector().subtract(player.getLocation().toVector()).normalize().multiply(1.2).setY(0.3);
-                            target.setVelocity(push);
-
                             world.playSound(target.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 0.8f, 1.2f);
                             damagedSet.add(target);
                         }
@@ -177,6 +173,9 @@ public class R_shovel implements SkillBase {
                         ForceDamage forceDamage = new ForceDamage(target, damage, source, true);
                         forceDamage.applyEffect(player);
 
+                        Vector push = target.getLocation().toVector().subtract(player.getLocation().toVector()).normalize().multiply(1.1).setY(0.3);
+                        target.setVelocity(push);
+
                         world.playSound(target.getLocation(), Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.2f, 1.0f);
                         world.spawnParticle(Particle.CRIT, target.getLocation().add(0, 1.2, 0), 15, 0.4, 0.4, 0.4, 0.1);
 
@@ -196,7 +195,7 @@ public class R_shovel implements SkillBase {
                 for (int i = 0; i <= steps; i++) {
                     double currentDeg = startDeg + (endDeg - startDeg) * ((double) i / steps);
 
-                    for (double len = innerRadius; len <= slashLength; len += 0.2) {
+                    for (double len = innerRadius; len <= slashLength; len += 0.06) {
                         Vector offset = finalDirection.clone().rotateAroundY(currentDeg).multiply(len);
                         Location pLoc = origin.clone().add(offset);
 
@@ -208,7 +207,7 @@ public class R_shovel implements SkillBase {
                         world.spawnParticle(Particle.DUST, pLoc, 1, 0.13, 0.13, 0.13, 0, opt);
                     }
 
-                    if (Math.random() < 0.2) {
+                    if (Math.random() < 0.22) {
                         Vector sweepOffset = finalDirection.clone().rotateAroundY(currentDeg).multiply(slashLength);
                         world.spawnParticle(Particle.SWEEP_ATTACK, origin.clone().add(sweepOffset), 1, 0, 0, 0, 0);
                     }

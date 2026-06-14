@@ -130,8 +130,8 @@ public class R_axe implements SkillBase {
                 .build();
 
         double slashLength = 4.4;
-        double maxTicks = 6;
-        double innerRadius = 1.3;
+        double maxTicks = 4;
+        double innerRadius = 2.0;
 
         Location origin = player.getEyeLocation().add(0, -0.4, 0);
         Vector direction = player.getLocation().getDirection().setY(0).normalize();

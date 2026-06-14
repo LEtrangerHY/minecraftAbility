@@ -29,7 +29,7 @@ public class R_scythe implements SkillBase {
 
     private static final Particle.DustOptions DUST_IRON = new Particle.DustOptions(Color.fromRGB(160, 160, 160), 0.6f);
     private static final Particle.DustOptions DUST_MID = new Particle.DustOptions(Color.fromRGB(140, 140, 140), 0.6f);
-    private static final Particle.DustOptions DUST_DECAY = new Particle.DustOptions(Color.fromRGB(60, 60, 60), 0.3f);
+    private static final Particle.DustOptions DUST_DECAY = new Particle.DustOptions(Color.fromRGB(100, 100, 100), 0.6f);
 
     private static final BlockData BLOOD_DATA = Material.REDSTONE_BLOCK.createBlockData();
     private static final Particle.DustOptions CELL_RED = new Particle.DustOptions(Color.fromRGB(180, 20, 20), 1.2f);
@@ -77,15 +77,19 @@ public class R_scythe implements SkillBase {
         Vector backDash = player.getLocation().getDirection().setY(0).normalize().multiply(-1.3);
         player.setVelocity(backDash);
 
+        final Vector initialForward = player.getLocation().getDirection().setY(0).normalize();
+        if (initialForward.lengthSquared() == 0) initialForward.setX(1);
+
         World world = player.getWorld();
         player.swingMainHand();
         world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.2f, 1.0f);
         world.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_FLAP, 0.8f, 1.2f);
 
         HashSet<Entity> damagedSet = new HashSet<>();
-        final int maxTicks = 6;
+        final int maxTicks = 8;
         final double slashLength = 4.0;
         final double innerRadius = 1.3;
+        Location center = player.getLocation().add(0, 1.0, 0);
 
         new BukkitRunnable() {
             int ticks = 0;
@@ -97,21 +101,19 @@ public class R_scythe implements SkillBase {
                     return;
                 }
 
-                Location center = player.getLocation().add(0, 1.0, 0);
-                Vector forward = player.getLocation().getDirection().setY(0).normalize();
-                if (forward.lengthSquared() == 0) forward = new Vector(1, 0, 0);
+                Vector forward = initialForward;
 
                 double sweepPerTick = 360.0 / maxTicks;
                 double startDeg = -90.0 + (ticks * sweepPerTick);
                 double endDeg = -90.0 + ((ticks + 1) * sweepPerTick);
 
-                int steps = (int) (sweepPerTick / 6.0);
+                int steps = (int) (sweepPerTick / 3.0);
                 double range = slashLength - innerRadius;
 
                 for (int i = 0; i <= steps; i++) {
                     double currentDeg = startDeg + (endDeg - startDeg) * ((double) i / steps);
 
-                    for (double len = innerRadius; len <= slashLength; len += 0.1) {
+                    for (double len = innerRadius; len <= slashLength; len += 0.06) {
                         Vector offset = forward.clone().rotateAroundY(Math.toRadians(currentDeg)).multiply(len);
                         Location pLoc = center.clone().add(offset);
 
@@ -148,7 +150,6 @@ public class R_scythe implements SkillBase {
     }
 
     public void Reuse(Player player) {
-
         double amp = config.r_Skill_amp * player.getPersistentDataContainer().getOrDefault(keyR, PersistentDataType.LONG, 0L);
         double damage = 4.0 * (1 + amp);
 
@@ -166,15 +167,19 @@ public class R_scythe implements SkillBase {
         Vector forwardDash = player.getLocation().getDirection().setY(0).normalize().multiply(1.6);
         player.setVelocity(forwardDash);
 
+        final Vector initialForward = player.getLocation().getDirection().setY(0).normalize();
+        if (initialForward.lengthSquared() == 0) initialForward.setX(1);
+
         World world = player.getWorld();
         player.swingMainHand();
         world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.4f, 0.8f);
         world.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_FLAP, 1.0f, 0.9f);
 
         HashSet<Entity> damagedSet = new HashSet<>();
-        final int maxTicks = 5;
+        final int maxTicks = 8;
         final double slashLength = 4.0;
-        final double innerRadius = 2.4;
+        final double innerRadius = 1.3;
+        Location center = player.getLocation().add(0, 1.0, 0);
 
         new BukkitRunnable() {
             int ticks = 0;
@@ -186,21 +191,19 @@ public class R_scythe implements SkillBase {
                     return;
                 }
 
-                Location center = player.getLocation().add(0, 1.0, 0);
-                Vector forward = player.getLocation().getDirection().setY(0).normalize();
-                if (forward.lengthSquared() == 0) forward = new Vector(1, 0, 0);
+                Vector forward = initialForward;
 
                 double sweepPerTick = 360.0 / maxTicks;
                 double startDeg = 90.0 - (ticks * sweepPerTick);
                 double endDeg = 90.0 - ((ticks + 1) * sweepPerTick);
 
-                int steps = (int) (sweepPerTick / 6.0);
+                int steps = (int) (sweepPerTick / 3.0);
                 double range = slashLength - innerRadius;
 
                 for (int i = 0; i <= steps; i++) {
                     double currentDeg = startDeg + (endDeg - startDeg) * ((double) i / steps);
 
-                    for (double len = innerRadius; len <= slashLength; len += 0.15) {
+                    for (double len = innerRadius; len <= slashLength; len += 0.06) {
                         Vector offset = forward.clone().rotateAroundY(Math.toRadians(currentDeg)).multiply(len);
                         Location pLoc = center.clone().add(offset);
 

@@ -10,6 +10,7 @@ import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -105,7 +106,7 @@ public class R_pistol implements SkillBase {
             }
         }.runTaskTimer(plugin, 0L, 1L);
 
-        Vector spawnOffset = dir.clone().multiply(0.8).add(new Vector(0, -0.3, 0));
+        Vector spawnOffset = dir.clone().multiply(0.2).add(new Vector(0, -0.3, 0));
         Location spawnLoc = player.getEyeLocation().add(spawnOffset);
 
         BlockDisplay bulletDisplay = world.spawn(spawnLoc, BlockDisplay.class, entity -> {
@@ -124,7 +125,7 @@ public class R_pistol implements SkillBase {
         world.playSound(spawnLoc, Sound.ENTITY_GENERIC_EXPLODE, 1.2f, 2.0f);
         world.spawnParticle(Particle.SMOKE, spawnLoc, 6, 0.1, 0.1, 0.1, 0.05);
 
-        DamageSource source = DamageSource.builder(DamageType.MOB_PROJECTILE)
+        DamageSource source = DamageSource.builder(DamageType.MAGIC)
                 .withCausingEntity(player)
                 .withDirectEntity(player)
                 .build();
@@ -151,10 +152,31 @@ public class R_pistol implements SkillBase {
                 for (Entity nearby : world.getNearbyEntities(currentLoc, 1.3, 1.3, 1.3)) {
                     if (nearby instanceof LivingEntity target && nearby != player) {
 
-                        double targetCurrentHp = target.getHealth();
-                        double damage = targetCurrentHp * 0.25;
+                        if (target instanceof org.bukkit.entity.ArmorStand || target.isInvulnerable() || target.isDead() || target.hasMetadata("NPC")) {
+                            continue;
+                        }
 
-                        ForceDamage forceDamage = new ForceDamage(target, damage, source, false);
+                        long level = player.getPersistentDataContainer().getOrDefault(
+                                new NamespacedKey(plugin, "level"),
+                                PersistentDataType.LONG,
+                                0L
+                        );
+                        if (level < 0) level = 0L;
+                        if (level > 10) level = 10L;
+
+                        double p = 0.005 * level * level + 0.055 * level;
+                        double levelMultiplier = 1.0 + p;
+
+                        double fBuffRate = config.f_buff_rate.getOrDefault(player.getUniqueId(), 0.0);
+                        double fBuffMultiplier = 1.0 + fBuffRate;
+
+                        double totalMultiplier = levelMultiplier * fBuffMultiplier;
+
+                        double targetCurrentHp = target.getHealth();
+                        double targetDamage = targetCurrentHp * 0.25;
+                        double reverseCalculatedDamage = targetDamage / totalMultiplier;
+
+                        ForceDamage forceDamage = new ForceDamage(target, reverseCalculatedDamage, source, false);
                         forceDamage.applyEffect(player);
 
                         Stun stun = new Stun(target, 2000L);

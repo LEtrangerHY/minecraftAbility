@@ -139,6 +139,9 @@ public class R_pickaxe implements SkillBase {
                 world.spawnParticle(Particle.BLOCK, impactLoc, 30, 0.5, 0.2, 0.5, groundMat.createBlockData());
             }
 
+            ItemStack pickaxeItem = new ItemStack(Material.IRON_PICKAXE);
+            world.spawnParticle(Particle.ITEM, impactLoc, 10, 0.3, 0.3, 0.3, 0.1, pickaxeItem);
+
             ForceDamage forceDamage = new ForceDamage(target, damage, source, true);
             forceDamage.applyEffect(player);
 
