@@ -2,6 +2,7 @@ package org.core.coreSystem.cores.VOL2.Undead.coreSystem;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask; // BukkitTask 임포트 추가
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,6 +33,7 @@ public class Undead {
     public double r_Skill_amp = 0.2;
     public double r_Skill_Damage = 0;
     public long r_Skill_Cool = 13000;
+    public long r_Skill_Cool_re = 4000;
 
     //Q
     public double q_Skill_amp = 0.2;
@@ -48,6 +50,17 @@ public class Undead {
             case IRON_AXE -> "R_axe";
             case IRON_HOE -> "R_scythe";
             case IRON_HORSE_ARMOR, STICK -> "R_pistol";
+            default -> null;
+        };
+    }
+
+    public String getWeaponRCoolKey(Material material) {
+        return switch (material) {
+            case IRON_SHOVEL -> "R_shovel_re";
+            case IRON_PICKAXE -> "R_pickaxe_re";
+            case IRON_AXE -> "R_axe_re";
+            case IRON_HOE -> "R_scythe_re";
+            case IRON_HORSE_ARMOR, STICK -> "R_pistol_re";
             default -> null;
         };
     }

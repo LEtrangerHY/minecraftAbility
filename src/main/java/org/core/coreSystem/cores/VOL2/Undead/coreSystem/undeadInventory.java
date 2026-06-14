@@ -41,7 +41,7 @@ public class undeadInventory extends absInventory {
 
     @Override
     protected Material getMainTotem(Player player) {
-        return Material.NETHER_WART;
+        return Material.IRON_AXE;
     }
 
     @Override
@@ -59,9 +59,9 @@ public class undeadInventory extends absInventory {
     @Override
     protected Material getTotem(Player player, String skill) {
         return switch (skill) {
-            case "R" -> Material.TNT;
-            case "Q" -> Material.WIND_CHARGE;
-            case "F" -> Material.GLOWSTONE;
+            case "R" -> Material.STICK;
+            case "Q" -> Material.IRON_INGOT;
+            case "F" -> Material.CRIMSON_HYPHAE;
             default -> Material.BARRIER;
         };
     }
@@ -107,25 +107,23 @@ public class undeadInventory extends absInventory {
                 lore.add(Component.text("시전하기 전 메인핸드에 장착된 아이템을 기준으로 개별적으로 쿨타임이 작동한다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("1. 삽").color(NamedTextColor.GREEN));
                 lore.add(Component.text("전방으로 돌진하며 적들을 밀쳐내며 피해를 가한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("재사용 : 자신을 중심으로 회전베기를 시전한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("피격 : 피격당한 적들의 수에 비례해 자신의 체력을 회복한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("재사용 : 전방으로 삽을 휘두른다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("피격 : 피격당한 적의 메인 핸드의 아이템을 무장해제 시킨다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("2. 곡괭이").color(NamedTextColor.GREEN));
                 lore.add(Component.text("전방으로 돌진한다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("재사용 : 전방을 곡괭이로 내리찍어 피격당한 대상에게 피해를 가한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("피격 : 1회 한정으로 대상의 전체 체력을 영구적으로 4 감소시킨다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("피격 : 대상의 방어구중 무작위 1개를 무장해재 시킨다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("3. 도끼").color(NamedTextColor.GREEN));
                 lore.add(Component.text("전방으로 돌진하며 처음 충돌한 적의 이동속도를 90% 감소시키고 피해를 가한다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("재사용 : 전방을 도끼로 내리찍어 피격당한 대상에게 피해를 가하고 2초간 기절시킨다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("4. 낫").color(NamedTextColor.GREEN));
                 lore.add(Component.text("회전베기를 시전하며 후방으로 돌진한다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("재사용 : 회전베기를 시전하며 전방으로 돌진한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("피격 : 피격 당한 적에게 입힌 피해의 40% 만큼 체력을 회복한다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("5. 피스톨").color(NamedTextColor.GREEN));
                 lore.add(Component.text("코스트 : 전체 체력의 13%").color(NamedTextColor.GREEN));
                 lore.add(Component.text("전방으로 남은 체력의 25%의 피해를 가하고 2초간 기절시키는 탄환을 발사한다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("탄환에 피격된 적의 남은 체력에 비례해 일정 시간동안 이동속도가 증가한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("6. 둔기(?)").color(NamedTextColor.GREEN));
-                lore.add(Component.text("전방으로 돌진하며 적들을 밀쳐낸다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("재사용 : 전방을 둔기를 휘두른다. 4번까지 휘두를 수 있다.").color(NamedTextColor.GREEN));
                 break;
             case "Q":
                 requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfQ.get((int) level)) : Component.text("Require EXP : MAX");
@@ -150,7 +148,7 @@ public class undeadInventory extends absInventory {
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
                 lore.add(Component.text("차징 : 회복할 체력 수치(0~100%)를 결정한다. 차징을 할수록 수치가 상승한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("차징 : 차징하는 동안 입는 피해량이 60% 감소한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("차징 : 차징하는 동안 입는 피해량이 차징 시간에 따라 16~64% 감소한다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("스킬 시전 시 차징된 수치만큼 체력을 회복한다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("회복 후 차징된 수치만큼 일정 시간동안 본인이 입는 피해량이 대폭 상승하지만, 이에 따라 공격력과 이동속도 또한 상승한다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("입는 피해량 상승 효과는 합법칙으로 중첩된다. 최대 444% 까지 누적될 수 있으며 매초 2% 씩 감소한다.").color(NamedTextColor.GREEN));

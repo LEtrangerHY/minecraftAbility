@@ -286,7 +286,7 @@ public class Q implements SkillBase {
             case IRON_AXE -> 9.0;
             case IRON_SHOVEL -> 4.5;
             case IRON_PICKAXE -> 4.0;
-            case IRON_HOE, STICK -> 1.0;
+            case IRON_HOE -> 1.0;
             default -> 1.0;
         };
     }

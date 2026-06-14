@@ -29,7 +29,7 @@ import org.core.coreSystem.absCoreSystem.absCore;
 import org.core.coreSystem.cores.VOL2.Undead.Passive.Boost;
 import org.core.coreSystem.cores.VOL2.Undead.Skill.F;
 import org.core.coreSystem.cores.VOL2.Undead.Skill.Q;
-import org.core.coreSystem.cores.VOL2.Undead.Skill.R;
+import org.core.coreSystem.cores.VOL2.Undead.Skill.DeadlyWeapons.R;
 import org.core.main.Core;
 import org.core.main.coreConfig;
 
@@ -330,8 +330,7 @@ public class undeadCore extends absCore {
                 material == Material.IRON_PICKAXE ||
                 material == Material.IRON_AXE ||
                 material == Material.IRON_HOE ||
-                material == Material.IRON_HORSE_ARMOR ||
-                material == Material.STICK;
+                material == Material.IRON_HORSE_ARMOR;
     }
 
     private boolean isUndeadOrAir(Material material) {
@@ -388,7 +387,7 @@ public class undeadCore extends absCore {
 
     @Override
     protected boolean isRAnimated(Player player) {
-        return false;
+        return true;
     }
 
     @Override
