@@ -33,12 +33,12 @@ public class Undead {
     public double r_Skill_amp = 0.2;
     public double r_Skill_Damage = 0;
     public long r_Skill_Cool = 13000;
-    public long r_Skill_Cool_re = 4000;
+    public long r_Skill_Cool_re = 4000L;
 
     //Q
     public double q_Skill_amp = 0.2;
     public double q_Skill_Damage = 0;
-    public long q_Skill_Cool = 13000;
+    public long q_Skill_Cool = 13000L;
 
     //F
     public long f_Skill_Cool = 0;

@@ -59,6 +59,33 @@ public class R_scythe implements SkillBase {
             cool.setCooldown(player, config.r_Skill_Cool_re, coolKey_re, "boss");
             cool.setCooldown(player, 0L, coolKey);
             cool.setCooldown(player, 0L, "R");
+
+            final long expireTime = System.currentTimeMillis() + config.r_Skill_Cool_re;
+
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (!player.isOnline() || !player.isValid()) {
+                        this.cancel();
+                        return;
+                    }
+
+                    if (System.currentTimeMillis() >= expireTime) {
+                        Material handMat_2 = player.getInventory().getItemInMainHand().getType();
+                        if (handMat_2 == handMat) cool.setCooldown(player, config.r_Skill_Cool, "R");
+
+                        cool.updateCooldown(player, coolKey_re, 0L, "boss");
+                        cool.setCooldown(player, config.r_Skill_Cool, coolKey);
+
+                        this.cancel();
+                        return;
+                    }
+
+                    if (!cool.isReloading(player, coolKey_re)) {
+                        this.cancel();
+                    }
+                }
+            }.runTaskTimer(plugin, 0L, 1L);
         }
     }
 
@@ -89,7 +116,6 @@ public class R_scythe implements SkillBase {
         final int maxTicks = 8;
         final double slashLength = 4.0;
         final double innerRadius = 1.3;
-        Location center = player.getLocation().add(0, 1.0, 0);
 
         new BukkitRunnable() {
             int ticks = 0;
@@ -101,11 +127,16 @@ public class R_scythe implements SkillBase {
                     return;
                 }
 
+                Location center = player.getLocation().add(0, 1.0, 0);
                 Vector forward = initialForward;
 
                 double sweepPerTick = 360.0 / maxTicks;
                 double startDeg = -90.0 + (ticks * sweepPerTick);
                 double endDeg = -90.0 + ((ticks + 1) * sweepPerTick);
+
+                double midDeg = -90.0 + (ticks * sweepPerTick) + (sweepPerTick / 2.0);
+                Vector currentTickDir = forward.clone().rotateAroundY(Math.toRadians(midDeg));
+                double hitThreshold = Math.cos(Math.toRadians((sweepPerTick / 2.0) + 20.0));
 
                 int steps = (int) (sweepPerTick / 3.0);
                 double range = slashLength - innerRadius;
@@ -126,22 +157,37 @@ public class R_scythe implements SkillBase {
                     }
                 }
 
-                for (Entity entity : player.getNearbyEntities(slashLength, 2.0, slashLength)) {
-                    if (entity instanceof LivingEntity target && entity != player) {
-                        if (!damagedSet.contains(target)) {
-                            new ForceDamage(target, damage, source, true).applyEffect(player);
-                            damagedSet.add(target);
+                for (Entity entity : world.getNearbyEntities(center, slashLength + 1.0, 2.0, slashLength + 1.0)) {
+                    if (!(entity instanceof LivingEntity target) || entity == player || damagedSet.contains(target)) continue;
 
-                            if (currentHealed[0] < maxHeal) {
-                                double healAmount = damage * 0.4;
-                                double actualHeal = Math.min(healAmount, maxHeal - currentHealed[0]);
-                                applyLifesteal(player, actualHeal);
-                                currentHealed[0] += actualHeal;
-                            }
+                    Vector toTarget = target.getLocation().toVector().subtract(center.toVector());
+                    toTarget.setY(0);
 
-                            world.playSound(target.getLocation(), Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.0f, 1.1f);
-                            world.spawnParticle(Particle.ENCHANTED_HIT, target.getLocation().add(0, 1.0, 0), 15, 0.4, 0.4, 0.4, 0.1);
+                    if (toTarget.lengthSquared() > (slashLength + 1.0) * (slashLength + 1.0)) continue;
+
+                    boolean isHit = false;
+                    if (toTarget.lengthSquared() < 0.25) {
+                        isHit = true;
+                    } else {
+                        Vector toTargetDir = toTarget.normalize();
+                        if (currentTickDir.dot(toTargetDir) > hitThreshold) {
+                            isHit = true;
                         }
+                    }
+
+                    if (isHit) {
+                        new ForceDamage(target, damage, source, true).applyEffect(player);
+                        damagedSet.add(target);
+
+                        if (currentHealed[0] < maxHeal) {
+                            double healAmount = damage * 0.4;
+                            double actualHeal = Math.min(healAmount, maxHeal - currentHealed[0]);
+                            applyLifesteal(player, actualHeal);
+                            currentHealed[0] += actualHeal;
+                        }
+
+                        world.playSound(target.getLocation(), Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.0f, 1.1f);
+                        world.spawnParticle(Particle.ENCHANTED_HIT, target.getLocation().add(0, 1.0, 0), 15, 0.4, 0.4, 0.4, 0.1);
                     }
                 }
                 ticks++;
@@ -179,7 +225,6 @@ public class R_scythe implements SkillBase {
         final int maxTicks = 8;
         final double slashLength = 4.0;
         final double innerRadius = 1.3;
-        Location center = player.getLocation().add(0, 1.0, 0);
 
         new BukkitRunnable() {
             int ticks = 0;
@@ -191,11 +236,16 @@ public class R_scythe implements SkillBase {
                     return;
                 }
 
+                Location center = player.getLocation().add(0, 1.0, 0);
                 Vector forward = initialForward;
 
                 double sweepPerTick = 360.0 / maxTicks;
                 double startDeg = 90.0 - (ticks * sweepPerTick);
                 double endDeg = 90.0 - ((ticks + 1) * sweepPerTick);
+
+                double midDeg = 90.0 - (ticks * sweepPerTick) - (sweepPerTick / 2.0);
+                Vector currentTickDir = forward.clone().rotateAroundY(Math.toRadians(midDeg));
+                double hitThreshold = Math.cos(Math.toRadians((sweepPerTick / 2.0) + 20.0));
 
                 int steps = (int) (sweepPerTick / 3.0);
                 double range = slashLength - innerRadius;
@@ -221,22 +271,37 @@ public class R_scythe implements SkillBase {
                     }
                 }
 
-                for (Entity entity : player.getNearbyEntities(slashLength, 2.0, slashLength)) {
-                    if (entity instanceof LivingEntity target && entity != player) {
-                        if (!damagedSet.contains(target)) {
-                            new ForceDamage(target, damage, source, true).applyEffect(player);
-                            damagedSet.add(target);
+                for (Entity entity : world.getNearbyEntities(center, slashLength + 1.0, 2.0, slashLength + 1.0)) {
+                    if (!(entity instanceof LivingEntity target) || entity == player || damagedSet.contains(target)) continue;
 
-                            if (currentHealed[0] < maxHeal) {
-                                double healAmount = damage * 0.4;
-                                double actualHeal = Math.min(healAmount, maxHeal - currentHealed[0]);
-                                applyLifesteal(player, actualHeal);
-                                currentHealed[0] += actualHeal;
-                            }
+                    Vector toTarget = target.getLocation().toVector().subtract(center.toVector());
+                    toTarget.setY(0);
 
-                            world.playSound(target.getLocation(), Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.0f, 1.1f);
-                            world.spawnParticle(Particle.ENCHANTED_HIT, target.getLocation().add(0, 1.0, 0), 15, 0.4, 0.4, 0.4, 0.1);
+                    if (toTarget.lengthSquared() > (slashLength + 1.0) * (slashLength + 1.0)) continue;
+
+                    boolean isHit = false;
+                    if (toTarget.lengthSquared() < 0.25) {
+                        isHit = true;
+                    } else {
+                        Vector toTargetDir = toTarget.normalize();
+                        if (currentTickDir.dot(toTargetDir) > hitThreshold) {
+                            isHit = true;
                         }
+                    }
+
+                    if (isHit) {
+                        new ForceDamage(target, damage, source, true).applyEffect(player);
+                        damagedSet.add(target);
+
+                        if (currentHealed[0] < maxHeal) {
+                            double healAmount = damage * 0.4;
+                            double actualHeal = Math.min(healAmount, maxHeal - currentHealed[0]);
+                            applyLifesteal(player, actualHeal);
+                            currentHealed[0] += actualHeal;
+                        }
+
+                        world.playSound(target.getLocation(), Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.0f, 1.1f);
+                        world.spawnParticle(Particle.ENCHANTED_HIT, target.getLocation().add(0, 1.0, 0), 15, 0.4, 0.4, 0.4, 0.1);
                     }
                 }
                 ticks++;

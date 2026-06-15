@@ -1,11 +1,6 @@
 package org.core.coreSystem.cores.VOL2.Undead.Skill.DeadlyWeapons;
 
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
@@ -14,7 +9,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.NamespacedKey;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -65,6 +59,34 @@ public class R_shovel implements SkillBase {
             cool.setCooldown(player, config.r_Skill_Cool_re, coolKey_re, "boss");
             cool.setCooldown(player, 0L, coolKey);
             cool.setCooldown(player, 0L, "R");
+
+            final long expireTime = System.currentTimeMillis() + config.r_Skill_Cool_re;
+
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (!player.isOnline() || !player.isValid()) {
+                        this.cancel();
+                        return;
+                    }
+
+                    if (System.currentTimeMillis() >= expireTime) {
+
+                        Material handMat_2 = player.getInventory().getItemInMainHand().getType();
+                        if (handMat_2 == handMat) cool.setCooldown(player, config.r_Skill_Cool, "R");
+
+                        cool.updateCooldown(player, coolKey_re, 0L, "boss");
+                        cool.setCooldown(player, config.r_Skill_Cool, coolKey);
+
+                        this.cancel();
+                    }
+
+                    if (!cool.isReloading(player, coolKey_re)) {
+                        this.cancel();
+                        return;
+                    }
+                }
+            }.runTaskTimer(plugin, 0L, 1L);
         }
     }
 

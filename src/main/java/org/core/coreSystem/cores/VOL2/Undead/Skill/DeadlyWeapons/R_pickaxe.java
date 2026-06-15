@@ -3,11 +3,7 @@ package org.core.coreSystem.cores.VOL2.Undead.Skill.DeadlyWeapons;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Damageable;
@@ -17,7 +13,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.NamespacedKey;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
@@ -66,20 +61,17 @@ public class R_pickaxe implements SkillBase {
             cool.setCooldown(player, config.r_Skill_Cool, "R");
             Reuse(player);
         } else {
-            Effect(player);
-            cool.setCooldown(player, config.r_Skill_Cool_re, coolKey_re, "boss");
-            cool.setCooldown(player, 0L, coolKey);
-            cool.setCooldown(player, 0L, "R");
+            Effect(player, coolKey, coolKey_re, handMat);
         }
     }
 
-    public void Effect(Player player) {
+    public void Effect(Player player, String coolKey, String coolKey_re, Material formalHand) {
         World world = player.getWorld();
 
         Invulnerable invulnerable = new Invulnerable(player, 400);
         invulnerable.applyEffect(player);
 
-        Vector dashDir = player.getLocation().getDirection().normalize().multiply(1.8).setY(0.2);
+        Vector dashDir = player.getLocation().getDirection().normalize().multiply(1.8);
         player.setVelocity(dashDir);
 
         world.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_IRON, 1.2f, 0.8f);
@@ -92,6 +84,40 @@ public class R_pickaxe implements SkillBase {
             @Override
             public void run() {
                 if (ticks > 8 || player.isDead() || hit) {
+                    Material handMat = player.getInventory().getItemInMainHand().getType();
+                    if (handMat == formalHand) cool.setCooldown(player, 0L, "R");
+
+                    cool.setCooldown(player, 0L, coolKey);
+                    cool.setCooldown(player, config.r_Skill_Cool_re, coolKey_re, "boss");
+
+                    final long expireTime = System.currentTimeMillis() + config.r_Skill_Cool_re;
+
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            if (!player.isOnline() || !player.isValid()) {
+                                this.cancel();
+                                return;
+                            }
+
+                            if (System.currentTimeMillis() >= expireTime) {
+
+                                Material handMat_2 = player.getInventory().getItemInMainHand().getType();
+                                if (handMat_2 == formalHand) cool.setCooldown(player, config.r_Skill_Cool, "R");
+
+                                cool.updateCooldown(player, coolKey_re, 0L, "boss");
+                                cool.setCooldown(player, config.r_Skill_Cool, coolKey);
+
+                                this.cancel();
+                            }
+
+                            if (!cool.isReloading(player, coolKey_re)) {
+                                this.cancel();
+                                return;
+                            }
+                        }
+                    }.runTaskTimer(plugin, 0L, 1L);
+
                     this.cancel();
                     return;
                 }

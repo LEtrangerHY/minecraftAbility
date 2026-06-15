@@ -53,14 +53,11 @@ public class R_axe implements SkillBase {
             cool.setCooldown(player, config.r_Skill_Cool, "R");
             Reuse(player);
         } else {
-            Effect(player);
-            cool.setCooldown(player, config.r_Skill_Cool_re, coolKey_re, "boss");
-            cool.setCooldown(player, 0L, coolKey);
-            cool.setCooldown(player, 0L, "R");
+            Effect(player, coolKey, coolKey_re, handMat);
         }
     }
 
-    public void Effect(Player player) {
+    public void Effect(Player player, String coolKey, String coolKey_re, Material formalHand) {
         double amp = config.r_Skill_amp * player.getPersistentDataContainer().getOrDefault(keyR, PersistentDataType.LONG, 0L);
         double damage = 3.0 * (1 + amp);
 
@@ -85,6 +82,40 @@ public class R_axe implements SkillBase {
             @Override
             public void run() {
                 if (ticks > 8 || player.isDead() || hit) {
+                    Material handMat = player.getInventory().getItemInMainHand().getType();
+                    if (handMat == formalHand) cool.setCooldown(player, 0L, "R");
+
+                    cool.setCooldown(player, 0L, coolKey);
+                    cool.setCooldown(player, config.r_Skill_Cool_re, coolKey_re, "boss");
+
+                    final long expireTime = System.currentTimeMillis() + config.r_Skill_Cool_re;
+
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            if (!player.isOnline() || !player.isValid()) {
+                                this.cancel();
+                                return;
+                            }
+
+                            if (System.currentTimeMillis() >= expireTime) {
+
+                                Material handMat_2 = player.getInventory().getItemInMainHand().getType();
+                                if (handMat_2 == formalHand) cool.setCooldown(player, config.r_Skill_Cool, "R");
+
+                                cool.updateCooldown(player, coolKey_re, 0L, "boss");
+                                cool.setCooldown(player, config.r_Skill_Cool, coolKey);
+
+                                this.cancel();
+                            }
+
+                            if (!cool.isReloading(player, coolKey_re)) {
+                                this.cancel();
+                                return;
+                            }
+                        }
+                    }.runTaskTimer(plugin, 0L, 1L);
+
                     this.cancel();
                     return;
                 }
