@@ -36,7 +36,7 @@ public class undeadInventory extends absInventory {
 
     @Override
     protected boolean contains(Player player) {
-        return tag.Burst.contains(player);
+        return tag.Undead.contains(player);
     }
 
     @Override

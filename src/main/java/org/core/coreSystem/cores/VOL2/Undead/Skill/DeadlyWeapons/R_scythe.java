@@ -117,6 +117,8 @@ public class R_scythe implements SkillBase {
         final double slashLength = 4.0;
         final double innerRadius = 1.3;
 
+        Location center = player.getLocation().add(0, 1.0, 0);
+
         new BukkitRunnable() {
             int ticks = 0;
 
@@ -126,8 +128,6 @@ public class R_scythe implements SkillBase {
                     this.cancel();
                     return;
                 }
-
-                Location center = player.getLocation().add(0, 1.0, 0);
                 Vector forward = initialForward;
 
                 double sweepPerTick = 360.0 / maxTicks;
@@ -157,7 +157,7 @@ public class R_scythe implements SkillBase {
                     }
                 }
 
-                for (Entity entity : world.getNearbyEntities(center, slashLength + 1.0, 2.0, slashLength + 1.0)) {
+                for (Entity entity : world.getNearbyEntities(center, slashLength, 1.3, slashLength)) {
                     if (!(entity instanceof LivingEntity target) || entity == player || damagedSet.contains(target)) continue;
 
                     Vector toTarget = target.getLocation().toVector().subtract(center.toVector());
@@ -226,6 +226,8 @@ public class R_scythe implements SkillBase {
         final double slashLength = 4.0;
         final double innerRadius = 1.3;
 
+        Location center = player.getLocation().add(0, 1.0, 0);
+
         new BukkitRunnable() {
             int ticks = 0;
 
@@ -236,7 +238,6 @@ public class R_scythe implements SkillBase {
                     return;
                 }
 
-                Location center = player.getLocation().add(0, 1.0, 0);
                 Vector forward = initialForward;
 
                 double sweepPerTick = 360.0 / maxTicks;
@@ -271,7 +272,7 @@ public class R_scythe implements SkillBase {
                     }
                 }
 
-                for (Entity entity : world.getNearbyEntities(center, slashLength + 1.0, 2.0, slashLength + 1.0)) {
+                for (Entity entity : world.getNearbyEntities(center, slashLength, 1.3, slashLength)) {
                     if (!(entity instanceof LivingEntity target) || entity == player || damagedSet.contains(target)) continue;
 
                     Vector toTarget = target.getLocation().toVector().subtract(center.toVector());
