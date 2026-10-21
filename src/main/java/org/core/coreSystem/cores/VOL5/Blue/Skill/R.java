@@ -211,7 +211,7 @@ public class R implements SkillBase {
                 .withDirectEntity(player)
                 .build();
 
-        config.r_damaged.putIfAbsent(player.getUniqueId(), new HashSet<>());
+        HashSet<Entity> hitEntities = config.r_damaged.computeIfAbsent(player.getUniqueId(), k -> new HashSet<>());
 
         new BukkitRunnable() {
             int index = 0;
@@ -223,7 +223,7 @@ public class R implements SkillBase {
                     List<Entity> nearbyEntities = (List<Entity>) blocksToPlace.get(index).getLocation().getNearbyEntities(0.5, 0.5, 0.5);
 
                     for (Entity entity : nearbyEntities) {
-                        if (entity instanceof LivingEntity target && entity != player && !config.r_damaged.get(player.getUniqueId()).contains(target)) {
+                        if (entity instanceof LivingEntity target && entity != player && !hitEntities.contains(target)) {
 
                             PotionEffect slowness = new PotionEffect(PotionEffectType.SLOWNESS, 80, 3, false, false);
                             target.addPotionEffect(slowness);
@@ -231,7 +231,7 @@ public class R implements SkillBase {
                             ForceDamage forceDamage = new ForceDamage(target, damage, source, false);
                             forceDamage.applyEffect(player);
 
-                            config.r_damaged.get(player.getUniqueId()).add(target);
+                            hitEntities.add(target);
                         }
                     }
 
@@ -240,7 +240,7 @@ public class R implements SkillBase {
                 }
 
                 if (index >= blocksToPlace.size()){
-                    config.r_damaged.remove(player.getUniqueId());
+                    config.r_damaged.remove(player.getUniqueId(), hitEntities);
                     cancel();
                 }
             }
