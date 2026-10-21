@@ -10,9 +10,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -24,7 +21,7 @@ import org.core.coreSystem.cores.VOL1.Commander.coreSystem.Commander;
 
 import java.util.HashSet;
 
-public class R implements SkillBase, Listener {
+public class R implements SkillBase {
 
     private final Commander config;
     private final JavaPlugin plugin;
@@ -151,14 +148,5 @@ public class R implements SkillBase, Listener {
                 }
             }
         }.runTaskTimer(plugin, 0L, 1L);
-    }
-
-    @EventHandler
-    public void CollideChange(EntityChangeBlockEvent event){
-        Block block = event.getBlock();
-
-        if(block.getType() == Material.COMMAND_BLOCK){
-            event.setCancelled(true);
-        }
     }
 }

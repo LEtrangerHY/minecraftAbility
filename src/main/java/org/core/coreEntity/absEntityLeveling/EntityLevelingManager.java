@@ -41,7 +41,6 @@ public class EntityLevelingManager implements Listener {
         this.allyKey = new NamespacedKey(plugin, "ally");
 
         Bukkit.getScheduler().runTaskTimer(plugin, this::processSpawnQueue, 1L, 2L);
-        Bukkit.getPluginManager().registerEvents(this, plugin);
 
         startNameTagUpdater();
 

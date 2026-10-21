@@ -8,6 +8,7 @@ import org.bukkit.damage.DamageType;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -46,6 +47,13 @@ public class comCore extends absCore {
         this.Fskill = new F(config, plugin, cool);
 
         plugin.getLogger().info("Commander downloaded...");
+    }
+
+    @EventHandler
+    public void preventCommandBlockLanding(EntityChangeBlockEvent event) {
+        if (event.getEntity() instanceof FallingBlock && event.getTo() == Material.COMMAND_BLOCK) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
