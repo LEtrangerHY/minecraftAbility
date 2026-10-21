@@ -67,7 +67,8 @@ public class F implements SkillBase {
 
         double hitThreshold = Math.cos(maxAngle + 0.2);
 
-        config.damaged_2.put(player.getUniqueId(), new HashSet<>());
+        HashSet<Entity> hitEntities = new HashSet<>();
+        config.damaged_2.put(player.getUniqueId(), hitEntities);
 
         double amp = config.f_Skill_Amp * player.getPersistentDataContainer()
                 .getOrDefault(new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L);
@@ -113,7 +114,7 @@ public class F implements SkillBase {
                 if (ticks < 2)
                     world.playSound(player.getLocation(), Sound.BLOCK_CHAIN_BREAK, 1.6f, 1.0f);
 
-                if (ticks > maxTicks || player.isDead()) {
+                if (ticks > maxTicks || player.isDead() || !player.isOnline()) {
                     finishSkill(player, initialTarget);
                     this.cancel();
                     return;
@@ -127,7 +128,7 @@ public class F implements SkillBase {
                 double step = -Math.toRadians(2);
 
                 boolean canBreakBlock = config.canBlockBreak.getOrDefault(player.getUniqueId(), false);
-                Set<Entity> damagedEntities = config.damaged_2.get(player.getUniqueId());
+                Set<Entity> damagedEntities = hitEntities;
 
                 Vector currentTickDirection = forward.clone().rotateAroundAxis(up, progressAngle);
 
