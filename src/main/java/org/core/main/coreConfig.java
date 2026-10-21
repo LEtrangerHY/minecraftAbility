@@ -13,6 +13,7 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.core.cool.Cool;
+import org.core.effect.effectPlugin.swingEchoGuard;
 import org.core.coreSystem.absCoreSystem.absCore;
 import org.core.playerSettings.persistentPlayerSet;
 
@@ -127,6 +128,7 @@ public class coreConfig {
     }
 
     public void clearPlayerCore(Player player){
+        swingEchoGuard.reset(player);
         player.setWalkSpeed(0.2f);
         player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(4.0);
         player.setInvisible(false);

@@ -13,6 +13,8 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -24,14 +26,47 @@ public class swingEchoGuard implements Listener {
     private static final Map<UUID, Integer> pendingEchoes = new HashMap<>();
     private static final Set<UUID> inventoryDrops = new HashSet<>();
 
+    private static Method getHandleMethod;
+    private static Field swingTimeField;
+    private static boolean reflectionUnavailable = false;
+
     public static void swingMainHand(Player player) {
-        expectEcho(player);
         player.swingMainHand();
+        if (wasBroadcast(player)) expectEcho(player);
     }
 
     public static void swingOffHand(Player player) {
-        expectEcho(player);
         player.swingOffHand();
+        if (wasBroadcast(player)) expectEcho(player);
+    }
+
+    private static boolean wasBroadcast(Player player) {
+        if (reflectionUnavailable) return true;
+        try {
+            if (getHandleMethod == null) {
+                getHandleMethod = player.getClass().getMethod("getHandle");
+            }
+            Object handle = getHandleMethod.invoke(player);
+            if (swingTimeField == null) {
+                swingTimeField = findField(handle.getClass(), "swingTime");
+            }
+            return swingTimeField.getInt(handle) < 0;
+        } catch (ReflectiveOperationException | RuntimeException e) {
+            reflectionUnavailable = true;
+            return true;
+        }
+    }
+
+    private static Field findField(Class<?> type, String name) throws NoSuchFieldException {
+        for (Class<?> c = type; c != null; c = c.getSuperclass()) {
+            try {
+                Field field = c.getDeclaredField(name);
+                field.setAccessible(true);
+                return field;
+            } catch (NoSuchFieldException ignored) {
+            }
+        }
+        throw new NoSuchFieldException(name);
     }
 
     public static void expectEcho(Player player) {
@@ -42,7 +77,7 @@ public class swingEchoGuard implements Listener {
         return pendingEchoes.getOrDefault(player.getUniqueId(), 0) > 0;
     }
 
-    private static void reset(Player player) {
+    public static void reset(Player player) {
         pendingEchoes.remove(player.getUniqueId());
         inventoryDrops.remove(player.getUniqueId());
     }
