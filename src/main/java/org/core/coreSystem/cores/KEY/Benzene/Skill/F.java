@@ -91,7 +91,6 @@ public class F implements SkillBase {
             world.spawnParticle(Particle.ENCHANTED_HIT, initialTarget.getLocation().add(0, 1, 0), 22, 0.6, 0, 0.6, 1);
             if (!initialTarget.isDead()) {
                 chainResonance.increase(player, initialTarget);
-
                 if (Invulnerable.invulnerablePlayers.containsKey(initialTarget) || initialTarget.isInvulnerable()) {
                     Invulnerable.invulnerablePlayers.remove(initialTarget);
                     initialTarget.setInvulnerable(false);
