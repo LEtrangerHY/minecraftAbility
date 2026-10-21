@@ -181,10 +181,11 @@ public class glaInventory extends absInventory {
                 .getOrDefault(new NamespacedKey(plugin, skill), PersistentDataType.LONG, 0L);
 
         List<Long> requireExpList;
+        long hpBonus = 0;
         switch (skill) {
-            case "R": requireExpList = requireExpOfR; applyAdditionalHealth(player, 1); break;
-            case "Q": requireExpList = requireExpOfQ; applyAdditionalHealth(player, 1); break;
-            case "F": requireExpList = requireExpOfF; applyAdditionalHealth(player, 2); break;
+            case "R": requireExpList = requireExpOfR; hpBonus = 1; break;
+            case "Q": requireExpList = requireExpOfQ; hpBonus = 1; break;
+            case "F": requireExpList = requireExpOfF; hpBonus = 2; break;
             default: return;
         }
 
@@ -193,6 +194,7 @@ public class glaInventory extends absInventory {
 
         if (totalExp >= requiredExp) {
             deductExp(player, requiredExp);
+            if (hpBonus > 0) applyAdditionalHealth(player, hpBonus);
 
             player.getPersistentDataContainer().set(
                     new NamespacedKey(plugin, skill),

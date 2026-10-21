@@ -188,9 +188,10 @@ public class knightInventory extends absInventory {
                 .getOrDefault(new NamespacedKey(plugin, skill), PersistentDataType.LONG, 0L);
 
         List<Long> requireExpList;
+        long hpBonus = 0;
         switch (skill) {
-            case "R": requireExpList = requireExpOfR; applyAdditionalHealth(player, 1); break;
-            case "Q": requireExpList = requireExpOfQ; applyAdditionalHealth(player, 2); break;
+            case "R": requireExpList = requireExpOfR; hpBonus = 1; break;
+            case "Q": requireExpList = requireExpOfQ; hpBonus = 2; break;
             case "F": requireExpList = requireExpOfF; break;
             default: return;
         }
@@ -200,6 +201,7 @@ public class knightInventory extends absInventory {
 
         if (totalExp >= requiredExp) {
             deductExp(player, requiredExp);
+            if (hpBonus > 0) applyAdditionalHealth(player, hpBonus);
 
             player.getPersistentDataContainer().set(
                     new NamespacedKey(plugin, skill),

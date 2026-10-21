@@ -32,9 +32,6 @@ public class Q implements SkillBase {
     private static final Set<Material> ironRelatedMaterials = new HashSet<>();
     private static boolean initialized = false;
 
-    private final List<BlockDisplay> liftedBlocks = new ArrayList<>();
-    private final List<LivingEntity> liftedEntities = new ArrayList<>();
-
     public Q(Luster config, JavaPlugin plugin, Cool cool) {
         this.config = config;
         this.plugin = plugin;
@@ -124,6 +121,8 @@ public class Q implements SkillBase {
     }
 
     public void Upward(Player player, LivingEntity target) {
+        final List<BlockDisplay> liftedBlocks = new ArrayList<>();
+        final List<LivingEntity> liftedEntities = new ArrayList<>();
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_ATTACK, 1, 1);
         player.getWorld().playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.4f, 1.0f);
 
@@ -307,15 +306,15 @@ public class Q implements SkillBase {
             @Override
             public void run() {
                 if (target == null || target.isDead() || !target.isValid() || !player.isOnline()) {
-                    cancelAttackAndDrop(player);
+                    cancelAttackAndDrop(player, liftedBlocks, liftedEntities);
                     return;
                 }
-                Attack(player, target, naturalBlockCount, entityCount);
+                Attack(player, target, naturalBlockCount, entityCount, liftedBlocks, liftedEntities);
             }
         }.runTaskLater(plugin, 23L);
     }
 
-    private void cancelAttackAndDrop(Player player) {
+    private void cancelAttackAndDrop(Player player, List<BlockDisplay> liftedBlocks, List<LivingEntity> liftedEntities) {
         for (BlockDisplay bd : liftedBlocks) {
             if (bd != null && !bd.isDead()) {
                 if (bd.getPersistentDataContainer().has(new NamespacedKey(plugin, "summoned_block"), PersistentDataType.BYTE)) {
@@ -341,7 +340,7 @@ public class Q implements SkillBase {
         liftedEntities.clear();
     }
 
-    public void Attack(Player player, LivingEntity target, int naturalBlockCount, int entityCount) {
+    public void Attack(Player player, LivingEntity target, int naturalBlockCount, int entityCount, List<BlockDisplay> liftedBlocks, List<LivingEntity> liftedEntities) {
         if (target == null) return;
 
         if (naturalBlockCount > 0 || entityCount > 0) {

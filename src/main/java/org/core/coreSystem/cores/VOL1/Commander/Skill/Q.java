@@ -120,7 +120,6 @@ public class Q implements SkillBase {
 
                 ForceDamage forceDamage = new ForceDamage((LivingEntity) entity, damage, source, false);
                 forceDamage.applyEffect(player);
-                forceDamage.applyEffect(player);
 
                 PotionEffect slowness = new PotionEffect(PotionEffectType.SLOWNESS, 20 * 4, 1, false, false);
                 PotionEffect blindness = new PotionEffect(PotionEffectType.BLINDNESS, 30, 0, false, false);

@@ -185,6 +185,7 @@ public class sctInventory extends absInventory {
                 .getOrDefault(new NamespacedKey(plugin, skill), PersistentDataType.LONG, 0L);
 
         List<Long> requireExpList;
+        long hpBonus = 0;
         switch (skill) {
             case "R":
                 requireExpList = requireExpOfR;
@@ -192,11 +193,11 @@ public class sctInventory extends absInventory {
                 break;
             case "Q":
                 requireExpList = requireExpOfQ;
-                applyAdditionalHealth(player, 1); // Q 업그레이드 시 체력 +1
+                hpBonus = 1; // Q 업그레이드 시 체력 +1
                 break;
             case "F":
                 requireExpList = requireExpOfF;
-                applyAdditionalHealth(player, 2); // F 업그레이드 시 체력 +2
+                hpBonus = 2; // F 업그레이드 시 체력 +2
                 break;
             default: return;
         }
@@ -206,6 +207,7 @@ public class sctInventory extends absInventory {
 
         if (totalExp >= requiredExp) {
             deductExp(player, requiredExp);
+            if (hpBonus > 0) applyAdditionalHealth(player, hpBonus);
 
             player.getPersistentDataContainer().set(
                     new NamespacedKey(plugin, skill),

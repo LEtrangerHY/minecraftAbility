@@ -142,6 +142,7 @@ public class coreConfig {
         cool.updateCooldown(player, "Q", 10000L);
         cool.resumeCooldown(player, "F");
         cool.updateCooldown(player, "F", 10000L);
+
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_player"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_nightel"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_benzene"), PersistentDataType.BYTE, (byte) 0);

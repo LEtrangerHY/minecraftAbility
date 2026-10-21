@@ -144,18 +144,6 @@ public class knightCore extends absCore {
         }
     }
 
-    @EventHandler
-    public void respawnHealthSet(PlayerRespawnEvent event) {
-        Player player = event.getPlayer();
-        AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
-        if (maxHealth == null) return;
-
-        double originalMax = 20.0;
-        maxHealth.setBaseValue(originalMax);
-
-        player.setHealth(originalMax);
-    }
-
     @Override
     protected boolean contains(Player player) {
         return tag.Knight.contains(player);

@@ -253,13 +253,13 @@ public class Q implements SkillBase {
                     .withDamageLocation(player.getLocation())
                     .build();
 
-            Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+            new BukkitRunnable() {
                 int life = 80;
 
                 @Override
                 public void run() {
                     if (item.isDead() || !item.isValid()) {
-                        Bukkit.getScheduler().cancelTask(this.hashCode());
+                        cancel();
                         return;
                     }
 
@@ -282,7 +282,7 @@ public class Q implements SkillBase {
                                     14, 0.3, 0.3, 0.3, blood);
 
                             item.remove();
-                            Bukkit.getScheduler().cancelTask(this.hashCode());
+                            cancel();
                             return;
                         }
                     }
@@ -291,16 +291,16 @@ public class Q implements SkillBase {
                         world.playSound(loc, Sound.ITEM_TRIDENT_HIT_GROUND, 1, 1);
                         world.spawnParticle(Particle.BLOCK, loc, 14, 0.3, 0.3, 0.3, iron);
                         item.remove();
-                        Bukkit.getScheduler().cancelTask(this.hashCode());
+                        cancel();
                         return;
                     }
 
                     if (life-- <= 0) {
                         item.remove();
-                        Bukkit.getScheduler().cancelTask(this.hashCode());
+                        cancel();
                     }
                 }
-            }, 1L, 1L);
+            }.runTaskTimer(plugin, 1L, 1L);
         }
     }
 

@@ -17,6 +17,7 @@ import org.bukkit.util.Vector;
 import org.core.cool.Cool;
 import org.core.effect.crowdControl.ForceDamage;
 import org.core.effect.crowdControl.Invulnerable;
+import org.core.effect.effectPlugin.skillSpectatorGuard;
 import org.core.coreSystem.cores.KEY.Benzene.Passive.chainResonance;
 import org.core.coreSystem.cores.KEY.Benzene.coreSystem.Benzene;
 import org.core.coreSystem.absCoreSystem.SkillBase;
@@ -262,11 +263,20 @@ public class F implements SkillBase {
 
         Location targetLoc = entity.getLocation().clone();
 
+        final GameMode originalMode = skillSpectatorGuard.begin(player, firstLocation);
+
         new BukkitRunnable() {
             int tick = 0;
 
             @Override
             public void run() {
+                if (!player.isOnline()) {
+                    config.damaged_2.remove(player.getUniqueId());
+                    config.fskill_using.remove(player.getUniqueId());
+                    this.cancel();
+                    return;
+                }
+
                 if (tick >= chainNum || player.isDead()) {
                     config.damaged_2.remove(player.getUniqueId());
                     config.fskill_using.remove(player.getUniqueId());
@@ -275,13 +285,13 @@ public class F implements SkillBase {
                         player.teleport(firstLocation);
                     }
 
-                    player.setGameMode(playerGameMode);
+                    skillSpectatorGuard.end(player);
 
                     this.cancel();
                     return;
                 }
 
-                teleportBehind(player, playerGameMode, targetLoc, -5.0);
+                teleportBehind(player, originalMode, targetLoc, -5.0);
 
                 world.playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1, 1);
                 world.spawnParticle(Particle.ENCHANTED_HIT, entity.getLocation().clone().add(0, 1.2, 0), 22, 0.6, 0.6, 0.6, 1);

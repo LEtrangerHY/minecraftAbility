@@ -8,6 +8,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.core.command.*;
 import org.core.cool.Cool;
+import org.core.effect.effectPlugin.skillSpectatorGuard;
 import org.core.coreSystem.cores.KEY.PLAYER.coreSystem.PLAYER;
 import org.core.coreSystem.cores.KEY.PLAYER.coreSystem.playerCore;
 import org.core.coreSystem.cores.KEY.PLAYER.coreSystem.playerInventory;
@@ -217,6 +218,8 @@ public final class Core extends JavaPlugin implements Listener {
         Scout sctConfig = new Scout();
 
         this.cool = new Cool(this);
+
+        Bukkit.getPluginManager().registerEvents(new skillSpectatorGuard(this), this);
 
         this.config = new coreConfig(this, cool);
 
@@ -479,6 +482,8 @@ public final class Core extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
+        skillSpectatorGuard.restoreAll();
+
         Collection<? extends Player> players = Bukkit.getOnlinePlayers();
         int playerCount = players.size();
 

@@ -180,8 +180,9 @@ public class darmesInventory extends absInventory {
                 .getOrDefault(new NamespacedKey(plugin, skill), PersistentDataType.LONG, 0L);
 
         List<Long> requireExpList;
+        long hpBonus = 0;
         switch (skill) {
-            case "R": requireExpList = requireExpOfR; applyAdditionalHealth(player, 3); break;
+            case "R": requireExpList = requireExpOfR; hpBonus = 3; break;
             case "Q": requireExpList = requireExpOfQ; break;
             case "F": requireExpList = requireExpOfF; break;
             default: return;
@@ -192,6 +193,7 @@ public class darmesInventory extends absInventory {
 
         if (totalExp >= requiredExp) {
             deductExp(player, requiredExp);
+            if (hpBonus > 0) applyAdditionalHealth(player, hpBonus);
 
             player.getPersistentDataContainer().set(
                     new NamespacedKey(plugin, skill),

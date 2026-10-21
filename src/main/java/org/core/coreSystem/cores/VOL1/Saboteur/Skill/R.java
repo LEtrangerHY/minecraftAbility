@@ -373,13 +373,13 @@ public class R implements SkillBase {
             config.q_skillCount_Hack.put(player.getUniqueId(), n + 1);
         }
 
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+        new BukkitRunnable() {
             int life = 80;
 
             @Override
             public void run() {
                 if (item.isDead() || !item.isValid()) {
-                    Bukkit.getScheduler().cancelTask(this.hashCode());
+                    cancel();
                     return;
                 }
 
@@ -398,7 +398,7 @@ public class R implements SkillBase {
                                 blood);
 
                         item.remove();
-                        Bukkit.getScheduler().cancelTask(this.hashCode());
+                        cancel();
                         return;
                     }
                 }
@@ -408,16 +408,16 @@ public class R implements SkillBase {
                     world.spawnParticle(Particle.BLOCK,loc.clone(), 14, 0.3, 0.3, 0.3,
                             iron);
                     item.remove();
-                    Bukkit.getScheduler().cancelTask(this.hashCode());
+                    cancel();
                     return;
                 }
 
                 if (life-- <= 0) {
                     item.remove();
-                    Bukkit.getScheduler().cancelTask(this.hashCode());
+                    cancel();
                 }
             }
-        }, 1L, 1L);
+        }.runTaskTimer(plugin, 1L, 1L);
     }
 
     public void hackTypeSpike(Player player){

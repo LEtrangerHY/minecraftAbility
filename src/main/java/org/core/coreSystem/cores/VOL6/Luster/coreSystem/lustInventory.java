@@ -178,10 +178,11 @@ public class lustInventory extends absInventory {
                 .getOrDefault(new NamespacedKey(plugin, skill), PersistentDataType.LONG, 0L);
 
         List<Long> requireExpList;
+        long hpBonus = 0;
         switch (skill) {
             case "R": requireExpList = requireExpOfR; break;
             case "Q": requireExpList = requireExpOfQ; break;
-            case "F": requireExpList = requireExpOfF; applyAdditionalHealth(player, 2); break;
+            case "F": requireExpList = requireExpOfF; hpBonus = 2; break;
             default: return;
         }
 
@@ -190,6 +191,7 @@ public class lustInventory extends absInventory {
 
         if (totalExp >= requiredExp) {
             deductExp(player, requiredExp);
+            if (hpBonus > 0) applyAdditionalHealth(player, hpBonus);
 
             player.getPersistentDataContainer().set(
                     new NamespacedKey(plugin, skill),

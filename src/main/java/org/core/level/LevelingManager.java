@@ -196,24 +196,31 @@ public class LevelingManager implements Listener {
                 case "DARMES" :
                     darmesLeveling darmes = new darmesLeveling(plugin, player, exp);
                     darmes.addExp(player);
+                    break;
                 case "CHARLOTTE":
                     charLeveling charlotte = new charLeveling(plugin, player, exp);
                     charlotte.addExp(player);
+                    break;
                 case "UNDEAD":
                     undeadLeveling undead = new undeadLeveling(plugin, player, exp);
                     undead.addExp(player);
+                    break;
                 case "JESTER":
                     jestLeveling jester = new jestLeveling(plugin, player, exp);
                     jester.addExp(player);
+                    break;
                 case "CHESHIRE":
                     chesLeveling cheshire = new chesLeveling(plugin, player, exp);
                     cheshire.addExp(player);
+                    break;
                 case "STROKE":
                     strLeveling stroke = new strLeveling(plugin, player, exp);
                     stroke.addExp(player);
+                    break;
                 case "SCOUT":
                     sctLeveling scout = new sctLeveling(plugin, player, exp);
                     scout.addExp(player);
+                    break;
                 default :
                     break;
             }

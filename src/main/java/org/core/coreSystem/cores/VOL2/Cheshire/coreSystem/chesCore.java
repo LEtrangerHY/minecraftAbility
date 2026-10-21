@@ -53,7 +53,7 @@ public class chesCore extends absCore {
 
         this.Rskill = new R(config, plugin, cool);
         this.Qskill = new Q(config, plugin, cool);
-        this.Fskill = new F(config, plugin, cool);
+        this.Fskill = new F(config, plugin, cool, this::breakInvisibility);
 
         plugin.getLogger().info("Cheshire downloaded...");
     }

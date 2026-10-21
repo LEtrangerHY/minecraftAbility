@@ -51,7 +51,7 @@ public class Q implements SkillBase {
     public void detect_1(Player player){
         config.f_damaged_2.put(player.getUniqueId(), new HashSet<>());
 
-        double amp = config.q_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L);
+        double amp = config.q_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L);
         double damage = config.q_Skill_Damage * (1 + amp);
 
         DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)

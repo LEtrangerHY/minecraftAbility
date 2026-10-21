@@ -17,20 +17,21 @@ import org.bukkit.util.Vector;
 import org.core.cool.Cool;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.cores.VOL2.Cheshire.coreSystem.Cheshire;
-import org.core.coreSystem.cores.VOL2.Cheshire.coreSystem.chesCore;
-
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public class F implements SkillBase {
 
     private final Cheshire config;
     private final JavaPlugin plugin;
     private final Cool cool;
+    private final Consumer<Player> breakInvisibility;
 
-    public F(Cheshire config, JavaPlugin plugin, Cool cool) {
+    public F(Cheshire config, JavaPlugin plugin, Cool cool, Consumer<Player> breakInvisibility) {
         this.config = config;
         this.plugin = plugin;
         this.cool = cool;
+        this.breakInvisibility = breakInvisibility;
     }
 
     @Override
@@ -75,8 +76,7 @@ public class F implements SkillBase {
             }.runTaskTimer(plugin, 0L, 1L);
 
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                chesCore core = getCheshireCore();
-                if (core != null) core.breakInvisibility(player);
+                breakInvisibility.accept(player);
             }, 40L);
 
             player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 160, 2, false, false));
@@ -114,9 +114,5 @@ public class F implements SkillBase {
                 }
             }, 3L);
         }
-    }
-
-    private chesCore getCheshireCore() {
-        return null;
     }
 }

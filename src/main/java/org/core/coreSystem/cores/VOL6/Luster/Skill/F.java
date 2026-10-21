@@ -243,6 +243,10 @@ public class F implements SkillBase {
                     return;
                 }
 
+                if(offhandItem.getType() == Material.IRON_INGOT && offhandItem.getAmount() >= 18) {
+                    offhandItem.setAmount(offhandItem.getAmount() - 18);
+                }
+
                 long currentDuration = cool.getRemainCooldown(player, "Golem Duration");
                 if (currentDuration > 0) {
                     long newDuration = Math.max(0, currentDuration - 4000L);
@@ -379,10 +383,6 @@ public class F implements SkillBase {
                         }
                     }.runTaskTimer(plugin, 0L, 1L);
                 }
-            }
-
-            if(offhandItem.getType() == Material.IRON_INGOT && offhandItem.getAmount() > 18) {
-                offhandItem.setAmount(offhandItem.getAmount() - 18);
             }
         } else {
             player.playSound(player.getLocation(), Sound.BLOCK_IRON_PLACE, 1, 1);
