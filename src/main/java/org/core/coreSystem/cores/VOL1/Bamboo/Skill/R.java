@@ -1,6 +1,6 @@
 package org.core.coreSystem.cores.VOL1.Bamboo.Skill;
 
-import org.core.models.coreObj.bambSpearModel;
+import org.core.models.coresObj.bambSpearModel;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;

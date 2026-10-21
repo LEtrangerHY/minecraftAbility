@@ -1,6 +1,6 @@
 package org.core.coreSystem.cores.VOL1.Saboteur.coreSystem;
 
-import org.core.models.coreObj.itemShardModel;
+import org.core.models.coresObj.itemShardModel;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;

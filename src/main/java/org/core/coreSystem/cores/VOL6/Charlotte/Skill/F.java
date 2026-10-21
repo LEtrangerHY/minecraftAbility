@@ -1,6 +1,6 @@
 package org.core.coreSystem.cores.VOL6.Charlotte.Skill;
 
-import org.core.models.coreObj.itemShardModel;
+import org.core.models.coresObj.itemShardModel;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;

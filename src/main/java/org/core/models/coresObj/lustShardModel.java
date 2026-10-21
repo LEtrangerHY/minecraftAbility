@@ -1,9 +1,8 @@
-package org.core.models.coreObj;
+package org.core.models.coresObj;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.BlockDisplay;
 import org.bukkit.util.Transformation;
 import org.core.models.absModelSystem.absCoreModel;
@@ -11,21 +10,19 @@ import org.core.models.absModelSystem.absCoreModel;
 import java.util.ArrayList;
 import java.util.List;
 
-public class lustSphereModel extends absCoreModel {
-
-    private static final BlockData IRON = Material.IRON_BLOCK.createBlockData();
+public class lustShardModel extends absCoreModel {
 
     private final List<BlockDisplay> displays = new ArrayList<>();
 
-    public lustSphereModel(World world, Location spawnLoc, int count) {
+    public lustShardModel(World world, Location spawnLoc, int count) {
         for (int i = 0; i < count; i++) {
             displays.add(addPart(world.spawn(spawnLoc, BlockDisplay.class, entity -> {
-                entity.setBlock(IRON);
+                entity.setBlock(Math.random() > 0.5 ? Material.IRON_BLOCK.createBlockData() : Material.NETHERITE_BLOCK.createBlockData());
                 entity.setTeleportDuration(1);
-                Transformation transform = entity.getTransformation();
-                transform.getScale().set(0.35f, 0.35f, 0.35f);
-                transform.getTranslation().set(-0.175f, -0.175f, -0.175f);
-                entity.setTransformation(transform);
+
+                Transformation t = entity.getTransformation();
+                t.getScale().set(0.25f, 0.25f, 0.25f);
+                entity.setTransformation(t);
             })));
         }
     }

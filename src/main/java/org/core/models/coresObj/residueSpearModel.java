@@ -1,4 +1,4 @@
-package org.core.models.coreObj;
+package org.core.models.coresObj;
 
 import org.bukkit.Location;
 import org.bukkit.Material;

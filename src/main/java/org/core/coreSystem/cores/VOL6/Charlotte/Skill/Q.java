@@ -1,9 +1,10 @@
 package org.core.coreSystem.cores.VOL6.Charlotte.Skill;
 
-import org.core.models.coreObj.charWallModel;
+import org.core.models.coresObj.charWallModel;
 import org.core.models.absModelSystem.modelManager;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.TileState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
@@ -365,7 +366,8 @@ public class Q implements SkillBase {
 
                 if (!processedBlocks.add(block)) continue;
 
-                if (block.getType() != Material.BEDROCK && block.getType() != Material.END_PORTAL_FRAME) {
+                if (block.getType() != Material.BEDROCK && block.getType() != Material.END_PORTAL_FRAME
+                        && !(block.getState(false) instanceof TileState)) {
                     session.placedBlocks.add(new PlacedBlock(block, block.getBlockData()));
                     modelManager.trackBlock(block);
                     block.setBlockData(session.paneData, false);

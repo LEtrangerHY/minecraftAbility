@@ -1,6 +1,6 @@
 package org.core.coreSystem.cores.VOL6.Luster.coreSystem;
 
-import org.core.models.coreObj.lustShardModel;
+import org.core.models.coresObj.lustShardModel;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
