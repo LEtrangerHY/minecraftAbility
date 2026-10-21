@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL6.Lavender.Skill;
 
+import org.core.effect.effectPlugin.swingEchoGuard;
 import org.bukkit.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
@@ -43,7 +44,7 @@ public class R implements SkillBase {
         if (activeSwords.containsKey(player.getUniqueId())) {
             SwordData data = activeSwords.get(player.getUniqueId());
             if (!data.isRetracting) {
-                player.swingMainHand();
+                swingEchoGuard.swingMainHand(player);
 
                 int balIndex = config.bladeBallistic.getOrDefault(player.getUniqueId(), 0);
 
@@ -58,7 +59,7 @@ public class R implements SkillBase {
                 Retract(player);
             }
         } else {
-            player.swingMainHand();
+            swingEchoGuard.swingMainHand(player);
             Ballistic(player);
         }
     }

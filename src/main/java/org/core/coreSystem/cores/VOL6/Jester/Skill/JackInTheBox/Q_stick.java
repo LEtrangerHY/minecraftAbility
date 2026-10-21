@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL6.Jester.Skill.JackInTheBox;
 
+import org.core.effect.effectPlugin.swingEchoGuard;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -98,7 +99,7 @@ public class Q_stick implements SkillBase {
 
     private void Slam(Player player) {
         World world = player.getWorld();
-        player.swingMainHand();
+        swingEchoGuard.swingMainHand(player);
 
         world.playSound(player.getLocation(), Sound.ENTITY_WITCH_THROW, 1.2f, 1.5f);
 
@@ -177,7 +178,7 @@ public class Q_stick implements SkillBase {
 
     private void Sweep(Player player) {
         World world = player.getWorld();
-        player.swingMainHand();
+        swingEchoGuard.swingMainHand(player);
 
         world.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1.5f, 1.2f);
         world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.2f, 0.8f);

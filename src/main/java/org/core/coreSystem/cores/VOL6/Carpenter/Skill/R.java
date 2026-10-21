@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL6.Carpenter.Skill;
 
+import org.core.effect.effectPlugin.swingEchoGuard;
 import org.bukkit.*;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
@@ -93,7 +94,7 @@ public class R implements SkillBase {
                 for (Entity entity : nearbyEntities) {
                     if (entity instanceof LivingEntity target && entity != player && !config.r_damaged.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(entity)) {
 
-                        player.swingMainHand();
+                        swingEchoGuard.swingMainHand(player);
 
                         Stun stun = new Stun(entity, (long) (config.r_Stun * velocity));
                         stun.applyEffect(player);

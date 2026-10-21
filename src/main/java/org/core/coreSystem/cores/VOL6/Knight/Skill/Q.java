@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL6.Knight.Skill;
 
+import org.core.effect.effectPlugin.swingEchoGuard;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
@@ -194,7 +195,7 @@ public class Q implements SkillBase {
 
         config.damaged.put(player.getUniqueId(), new HashSet<>());
 
-        player.swingMainHand();
+        swingEchoGuard.swingMainHand(player);
         World world = player.getWorld();
         world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
 

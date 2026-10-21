@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL4.Undead.Skill.DeadlyWeapons;
 
+import org.core.effect.effectPlugin.swingEchoGuard;
 import org.bukkit.*;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
@@ -150,7 +151,7 @@ public class R_shovel implements SkillBase {
                 .build();
 
         World world = player.getWorld();
-        player.swingMainHand();
+        swingEchoGuard.swingMainHand(player);
         world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.5f, 0.7f);
         world.playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_HURT, 0.6f, 0.8f);
 

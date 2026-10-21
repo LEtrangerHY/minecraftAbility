@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL6.Swordsman.Skill;
 
+import org.core.effect.effectPlugin.swingEchoGuard;
 import org.bukkit.*;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
@@ -43,7 +44,7 @@ public class F implements SkillBase {
     @Override
     public void Trigger(Player player) {
         World world = player.getWorld();
-        player.swingMainHand();
+        swingEchoGuard.swingMainHand(player);
 
         if (!config.laidoSlash.getOrDefault(player.getUniqueId(), false)) {
             world.spawnParticle(Particle.SPIT, player.getLocation().add(0, 1.0, 0), 20, 0.2, 0.3, 0.2, 0.5);
@@ -103,7 +104,7 @@ public class F implements SkillBase {
     }
 
     public void Slash(Player player) {
-        player.swingMainHand();
+        swingEchoGuard.swingMainHand(player);
         World world = player.getWorld();
         UUID uuid = player.getUniqueId();
 

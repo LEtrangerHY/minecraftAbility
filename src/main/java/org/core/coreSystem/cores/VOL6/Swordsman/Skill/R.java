@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL6.Swordsman.Skill;
 
+import org.core.effect.effectPlugin.swingEchoGuard;
 import org.bukkit.*;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
@@ -44,7 +45,7 @@ public class R implements SkillBase {
     @Override
     public void Trigger(Player player) {
         World world = player.getWorld();
-        player.swingMainHand();
+        swingEchoGuard.swingMainHand(player);
 
         Location startLocation = player.getLocation();
         Vector direction = startLocation.getDirection().normalize().multiply(config.r_Skill_dash);

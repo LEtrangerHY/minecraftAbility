@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL4.Undead.Skill.DeadlyWeapons;
 
+import org.core.effect.effectPlugin.swingEchoGuard;
 import org.bukkit.*;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.damage.DamageSource;
@@ -148,7 +149,7 @@ public class R_axe implements SkillBase {
     public void Reuse(Player player) {
 
         World world = player.getWorld();
-        player.swingMainHand();
+        swingEchoGuard.swingMainHand(player);
 
         world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.5f, 0.5f);
 

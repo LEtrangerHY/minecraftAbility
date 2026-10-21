@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL6.Darmes.Skill;
 
+import org.core.effect.effectPlugin.swingEchoGuard;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -48,7 +49,7 @@ public class F implements SkillBase {
         World world = player.getWorld();
         UUID uuid = player.getUniqueId();
 
-        player.swingMainHand();
+        swingEchoGuard.swingMainHand(player);
 
         world.playSound(player.getLocation(), Sound.ENTITY_WIND_CHARGE_WIND_BURST, 1.5f, 0.6f);
 

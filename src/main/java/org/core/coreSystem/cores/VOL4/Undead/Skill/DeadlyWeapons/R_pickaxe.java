@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL4.Undead.Skill.DeadlyWeapons;
 
+import org.core.effect.effectPlugin.swingEchoGuard;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
@@ -137,7 +138,7 @@ public class R_pickaxe implements SkillBase {
 
     public void Reuse(Player player) {
         World world = player.getWorld();
-        player.swingMainHand();
+        swingEchoGuard.swingMainHand(player);
 
         LivingEntity target = getTargetedEntity(player, 4.0, 0.4);
 

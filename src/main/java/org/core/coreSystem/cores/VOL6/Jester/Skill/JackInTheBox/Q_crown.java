@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL6.Jester.Skill.JackInTheBox;
 
+import org.core.effect.effectPlugin.swingEchoGuard;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -79,7 +80,7 @@ public class Q_crown implements SkillBase {
         }
 
         player.setVelocity(new Vector(0, 0.6, 0));
-        player.swingMainHand();
+        swingEchoGuard.swingMainHand(player);
         world.playSound(pLoc, Sound.ENTITY_BREEZE_JUMP, 1.2f, 1.2f);
 
         new BukkitRunnable() {

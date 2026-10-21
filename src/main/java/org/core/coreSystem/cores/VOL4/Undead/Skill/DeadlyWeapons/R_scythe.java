@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL4.Undead.Skill.DeadlyWeapons;
 
+import org.core.effect.effectPlugin.swingEchoGuard;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -111,7 +112,7 @@ public class R_scythe implements SkillBase {
         if (initialForward.lengthSquared() == 0) initialForward.setX(1);
 
         World world = player.getWorld();
-        player.swingMainHand();
+        swingEchoGuard.swingMainHand(player);
         world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.2f, 1.0f);
         world.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_FLAP, 0.8f, 1.2f);
 
@@ -220,7 +221,7 @@ public class R_scythe implements SkillBase {
         if (initialForward.lengthSquared() == 0) initialForward.setX(1);
 
         World world = player.getWorld();
-        player.swingMainHand();
+        swingEchoGuard.swingMainHand(player);
         world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.4f, 0.8f);
         world.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_FLAP, 1.0f, 0.9f);
 
