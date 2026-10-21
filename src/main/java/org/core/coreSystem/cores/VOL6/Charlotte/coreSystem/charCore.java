@@ -1,6 +1,6 @@
 package org.core.coreSystem.cores.VOL6.Charlotte.coreSystem;
 
-import org.core.models.skillObj.charShieldModel;
+import org.core.models.coreObj.charShieldModel;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;

@@ -1,4 +1,4 @@
-package org.core.models.skillObj;
+package org.core.models.coreObj;
 
 import org.bukkit.Location;
 import org.bukkit.Material;

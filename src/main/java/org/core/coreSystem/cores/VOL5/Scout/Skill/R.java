@@ -1,6 +1,6 @@
 package org.core.coreSystem.cores.VOL5.Scout.Skill;
 
-import org.core.models.skillObj.sctBombModel;
+import org.core.models.coreObj.sctBombModel;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;

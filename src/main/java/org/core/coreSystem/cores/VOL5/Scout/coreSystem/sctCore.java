@@ -1,6 +1,6 @@
 package org.core.coreSystem.cores.VOL5.Scout.coreSystem;
 
-import org.core.models.skillObj.bulletModel;
+import org.core.models.coreObj.bulletModel;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;

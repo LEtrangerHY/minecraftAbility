@@ -1,6 +1,6 @@
 package org.core.coreSystem.cores.VOL6.Jester.Skill.JackInTheBox;
 
-import org.core.models.skillObj.jestShieldModel;
+import org.core.models.coreObj.jestShieldModel;
 import org.bukkit.Bukkit;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;

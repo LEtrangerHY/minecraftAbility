@@ -1,6 +1,6 @@
 package org.core.coreSystem.cores.VOL6.Knight.Skill;
 
-import org.core.models.skillObj.knightSwordModel;
+import org.core.models.coreObj.knightSwordModel;
 import com.google.common.collect.Multimap;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

@@ -1,6 +1,6 @@
 package org.core.coreSystem.cores.VOL6.Luster.Skill;
 
-import org.core.models.skillObj.lustSphereModel;
+import org.core.models.coreObj.lustSphereModel;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;

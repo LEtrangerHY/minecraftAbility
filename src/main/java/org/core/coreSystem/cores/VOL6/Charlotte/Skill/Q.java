@@ -1,6 +1,6 @@
 package org.core.coreSystem.cores.VOL6.Charlotte.Skill;
 
-import org.core.models.skillObj.charWallModel;
+import org.core.models.coreObj.charWallModel;
 import org.core.models.absModelSystem.modelManager;
 import org.bukkit.*;
 import org.bukkit.block.Block;

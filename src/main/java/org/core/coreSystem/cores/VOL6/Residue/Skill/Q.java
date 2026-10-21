@@ -1,6 +1,6 @@
 package org.core.coreSystem.cores.VOL6.Residue.Skill;
 
-import org.core.models.skillObj.residueSpearModel;
+import org.core.models.coreObj.residueSpearModel;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;

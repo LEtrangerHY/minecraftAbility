@@ -1,6 +1,6 @@
 package org.core.coreSystem.cores.VOL4.Undead.Skill.DeadlyWeapons;
 
-import org.core.models.skillObj.bulletModel;
+import org.core.models.coreObj.bulletModel;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;

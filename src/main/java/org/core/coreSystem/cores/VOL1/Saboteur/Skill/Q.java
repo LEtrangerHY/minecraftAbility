@@ -1,6 +1,6 @@
 package org.core.coreSystem.cores.VOL1.Saboteur.Skill;
 
-import org.core.models.skillObj.itemShardModel;
+import org.core.models.coreObj.itemShardModel;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
