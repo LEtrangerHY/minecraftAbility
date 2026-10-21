@@ -1,5 +1,7 @@
 package org.core.coreSystem.cores.VOL6.Charlotte.Skill;
 
+import org.core.models.skillObj.charWallModel;
+import org.core.models.absModelSystem.modelManager;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
@@ -15,15 +17,12 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.core.cool.Cool;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.cores.VOL6.Charlotte.coreSystem.Charlotte;
 import org.core.effect.crowdControl.ForceDamage;
 import org.core.effect.crowdControl.Grounding;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -112,21 +111,12 @@ public class Q implements SkillBase {
         Vector up = new Vector(0, 1, 0);
         Vector right = forward.clone().crossProduct(up).normalize();
 
-        BlockDisplay[] displays = new BlockDisplay[15];
-        for (int i = 0; i < 15; i++) {
-            BlockDisplay display = (BlockDisplay) world.spawnEntity(startLoc, EntityType.BLOCK_DISPLAY);
-            display.setBlock(WHITE_STAINED_GLASS);
-            display.setTeleportDuration(1);
-            display.setTransformation(new Transformation(
-                    new Vector3f(-0.5f, -0.5f, -0.5f), new Quaternionf(), new Vector3f(1f, 1f, 1f), new Quaternionf()
-            ));
-            displays[i] = display;
-        }
+        charWallModel wall = new charWallModel(world, startLoc, WHITE_STAINED_GLASS);
 
         world.playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.5f, 0.8f);
         world.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1.0f, 1.2f);
 
-        QSession session = new QSession(displays, forward, right, up, WHITE_STAINED_GLASS);
+        QSession session = new QSession(wall, forward, right, up, WHITE_STAINED_GLASS);
         glassSessions.put(uuid, session);
 
         new BukkitRunnable() {
@@ -192,15 +182,7 @@ public class Q implements SkillBase {
 
         revertBlocks(session);
 
-        for (int i = 0; i < 15; i++) {
-            BlockDisplay display = (BlockDisplay) world.spawnEntity(session.centerLoc, EntityType.BLOCK_DISPLAY);
-            display.setBlock(session.paneData);
-            display.setTeleportDuration(1);
-            display.setTransformation(new Transformation(
-                    new Vector3f(-0.5f, -0.5f, -0.5f), new Quaternionf(), new Vector3f(1f, 1f, 1f), new Quaternionf()
-            ));
-            session.displays[i] = display;
-        }
+        session.wall = new charWallModel(world, session.centerLoc, session.paneData);
 
         player.playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.5f, 0.8f);
         Location baseStartLoc = session.centerLoc.clone();
@@ -366,33 +348,11 @@ public class Q implements SkillBase {
     }
 
     private void updateDisplays(QSession session, Location center) {
-        float yaw = center.getYaw();
-        if (yaw == 0) {
-            yaw = (float) Math.toDegrees(Math.atan2(-session.forward.getX(), session.forward.getZ()));
-        }
-
-        int index = 0;
-        for (int row = 0; row < 3; row++) {
-            for (int col = -2; col <= 2; col++) {
-                Vector offset = session.right.clone().multiply(col).add(session.up.clone().multiply(row));
-                Location targetLoc = center.clone().add(offset);
-
-                targetLoc.setYaw(yaw);
-                targetLoc.setPitch(0f);
-
-                BlockDisplay display = session.displays[index];
-                if (display != null && display.isValid()) {
-                    display.teleport(targetLoc);
-                }
-                index++;
-            }
-        }
+        session.wall.update(center, session.forward, session.right, session.up);
     }
 
     private void placeBlocks(QSession session, Location center, World world) {
-        for (BlockDisplay display : session.displays) {
-            if (display != null && display.isValid()) display.remove();
-        }
+        session.wall.remove();
 
         Set<Block> processedBlocks = new HashSet<>();
 
@@ -407,6 +367,7 @@ public class Q implements SkillBase {
 
                 if (block.getType() != Material.BEDROCK && block.getType() != Material.END_PORTAL_FRAME) {
                     session.placedBlocks.add(new PlacedBlock(block, block.getBlockData()));
+                    modelManager.trackBlock(block);
                     block.setBlockData(session.paneData, false);
                 }
             }
@@ -417,6 +378,7 @@ public class Q implements SkillBase {
     private void revertBlocks(QSession session) {
         for (PlacedBlock pb : session.placedBlocks) {
             pb.block.setBlockData(pb.oldData, false);
+            modelManager.untrackBlock(pb.block);
         }
         session.placedBlocks.clear();
     }
@@ -427,9 +389,7 @@ public class Q implements SkillBase {
             if (session.timeoutTask != null) session.timeoutTask.cancel();
             revertBlocks(session);
 
-            for (BlockDisplay display : session.displays) {
-                if (display != null && display.isValid()) display.remove();
-            }
+            session.wall.remove();
 
             Player player = Bukkit.getPlayer(uuid);
             if (player != null && player.isOnline()) {
@@ -451,7 +411,7 @@ public class Q implements SkillBase {
     }
 
     private static class QSession {
-        BlockDisplay[] displays;
+        charWallModel wall;
         List<PlacedBlock> placedBlocks = new ArrayList<>();
         Vector forward, right, up;
         BlockData paneData;
@@ -459,8 +419,8 @@ public class Q implements SkillBase {
         boolean landed = false;
         BukkitTask timeoutTask;
 
-        public QSession(BlockDisplay[] displays, Vector forward, Vector right, Vector up, BlockData paneData) {
-            this.displays = displays;
+        public QSession(charWallModel wall, Vector forward, Vector right, Vector up, BlockData paneData) {
+            this.wall = wall;
             this.forward = forward;
             this.right = right;
             this.up = up;

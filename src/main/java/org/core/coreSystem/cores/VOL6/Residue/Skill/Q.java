@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL6.Residue.Skill;
 
+import org.core.models.skillObj.residueSpearModel;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
@@ -82,19 +83,7 @@ public class Q implements SkillBase {
             setItemToPearl(player);
         }, 1L);
 
-        ArmorStand spearStand = (ArmorStand) world.spawnEntity(eyeLoc.add(0, -1.2, 0), EntityType.ARMOR_STAND);
-        spearStand.setInvisible(true);
-        spearStand.setGravity(false);
-        spearStand.setArms(true);
-        spearStand.setMarker(true);
-        spearStand.setBasePlate(false);
-        spearStand.setSmall(false);
-
-        try {
-            spearStand.getEquipment().setItemInMainHand(new ItemStack(Material.IRON_SPEAR));
-        } catch (NoSuchFieldError e) {
-            spearStand.getEquipment().setItemInMainHand(new ItemStack(Material.TRIDENT));
-        }
+        ArmorStand spearStand = new residueSpearModel(world, eyeLoc.add(0, -1.2, 0)).getStand();
 
         updateSpearRotation(spearStand, velocity);
 

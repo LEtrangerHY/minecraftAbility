@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL5.Scout.Skill;
 
+import org.core.models.skillObj.sctBombModel;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -9,14 +10,12 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.RayTraceResult;
-import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.core.cool.Cool;
 import org.core.coreSystem.absCoreSystem.SkillBase;
@@ -56,14 +55,7 @@ public class R implements SkillBase {
         world.playSound(spawnLoc, Sound.ENTITY_SNOWBALL_THROW, 1.0f, 0.5f);
         world.playSound(spawnLoc, Sound.BLOCK_PISTON_EXTEND, 0.5f, 1.5f);
 
-        ItemDisplay bomb = world.spawn(spawnLoc, ItemDisplay.class, display -> {
-            display.setItemStack(new ItemStack(Material.OBSERVER));
-            display.setTeleportDuration(1);
-
-            Transformation transform = display.getTransformation();
-            transform.getScale().set(0.5f, 0.5f, 0.5f);
-            display.setTransformation(transform);
-        });
+        ItemDisplay bomb = new sctBombModel(world, spawnLoc).getDisplay();
 
         config.activeBombs.put(uuid, bomb);
 

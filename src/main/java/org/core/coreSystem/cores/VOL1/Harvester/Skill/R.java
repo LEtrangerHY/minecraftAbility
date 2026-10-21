@@ -60,7 +60,8 @@ public class R implements SkillBase {
 
         double hitThreshold = Math.cos(maxAngle + 0.1);
 
-        config.damaged.put(player.getUniqueId(), new HashSet<>());
+        HashSet<Entity> hitEntities = new HashSet<>();
+        config.damaged.put(player.getUniqueId(), hitEntities);
 
         double amp = config.r_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L);
         double rawDamage = config.r_Skill_damage * (1 + amp);
@@ -99,9 +100,9 @@ public class R implements SkillBase {
                     player.showTitle(title);
                 }
 
-                if (ticks > maxTicks || player.isDead()) {
+                if (ticks > maxTicks || player.isDead() || !player.isOnline()) {
                     config.rskill_using.remove(player.getUniqueId());
-                    config.damaged.remove(player.getUniqueId());
+                    config.damaged.remove(player.getUniqueId(), hitEntities);
                     this.cancel();
                     return;
                 }
@@ -115,7 +116,7 @@ public class R implements SkillBase {
 
                 for (Entity entity : world.getNearbyEntities(origin, slashLength + 0.5, slashLength + 0.5, slashLength + 0.5)) {
                     if (!(entity instanceof LivingEntity target) || entity == player) continue;
-                    if (config.damaged.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(target)) continue;
+                    if (hitEntities.contains(target)) continue;
 
                     Vector toTarget = target.getLocation().toVector().subtract(origin.toVector());
 
@@ -126,7 +127,7 @@ public class R implements SkillBase {
                     double dotProduct = sweepCenterDir.dot(toTargetPlanar);
 
                     if (dotProduct >= hitThreshold) {
-                        config.damaged.get(player.getUniqueId()).add(target);
+                        hitEntities.add(target);
 
                         if (invisibility) {
                             world.spawnParticle(Particle.CRIT, target.getLocation().clone().add(0, 1.3, 0), 26, 0.4, 0.4, 0.4, 1);

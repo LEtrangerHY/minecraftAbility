@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL5.Scout.coreSystem;
 
+import org.core.models.skillObj.bulletModel;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
@@ -27,7 +28,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.RayTraceResult;
-import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.core.cool.Cool;
 import org.core.coreSystem.absCoreSystem.ConfigWrapper;
@@ -309,15 +309,8 @@ public class sctCore extends absCore {
         Vector spawnOffset = direction.clone().multiply(0.2).add(new Vector(0, -0.3, 0));
         Location spawnLoc = player.getEyeLocation().add(spawnOffset);
 
-        BlockDisplay bulletDisplay = world.spawn(spawnLoc, BlockDisplay.class, entity -> {
-            Material bulletMat = overclocked ? Material.SEA_LANTERN : Material.GOLD_BLOCK;
-            entity.setBlock(bulletMat.createBlockData());
-            entity.setTeleportDuration(1);
-
-            Transformation transform = entity.getTransformation();
-            transform.getScale().set(0.15f, 0.15f, 0.35f);
-            entity.setTransformation(transform);
-        });
+        Material bulletMat = overclocked ? Material.SEA_LANTERN : Material.GOLD_BLOCK;
+        BlockDisplay bulletDisplay = new bulletModel(world, spawnLoc, bulletMat.createBlockData(), 0.15f, 0.15f, 0.35f).getDisplay();
 
         double speed = 4.0;
         Vector velocity = direction.clone().multiply(speed);

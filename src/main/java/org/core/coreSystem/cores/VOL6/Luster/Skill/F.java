@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL6.Luster.Skill;
 
+import org.core.models.absModelSystem.modelManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
@@ -105,6 +106,7 @@ public class F implements SkillBase {
                     world.spawnParticle(Particle.BLOCK, spawnLoc.clone().add(0, 1, 0), 100, 0.7, 1.5, 0.7, iron);
 
                     Entity golemEntity = world.spawnEntity(spawnLoc, EntityType.IRON_GOLEM);
+                    modelManager.track(golemEntity);
 
                     golemEntity.setGlowing(true);
 

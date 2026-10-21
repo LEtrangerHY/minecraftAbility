@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL6.Jester.Skill.JackInTheBox;
 
+import org.core.models.skillObj.jestShieldModel;
 import org.bukkit.Bukkit;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
@@ -13,7 +14,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -73,18 +73,7 @@ public class Q_shield implements SkillBase {
         Location startLoc = player.getEyeLocation().subtract(0, 0.2, 0);
         double shieldScale = 1.8;
 
-        ItemDisplay shieldDisplay = startLoc.getWorld().spawn(startLoc, ItemDisplay.class, display -> {
-            display.setItemStack(new ItemStack(Material.SHIELD));
-            display.setItemDisplayTransform(ItemDisplay.ItemDisplayTransform.FIXED);
-            display.setTeleportDuration(1);
-
-            display.setTransformation(new org.bukkit.util.Transformation(
-                    new org.joml.Vector3f(0f, 0f, 0f),
-                    new org.joml.Quaternionf().rotationX((float) (-Math.PI / 2)),
-                    new org.joml.Vector3f((float) shieldScale, (float) shieldScale, (float) shieldScale),
-                    new org.joml.Quaternionf()
-            ));
-        });
+        ItemDisplay shieldDisplay = new jestShieldModel(startLoc.getWorld(), startLoc, shieldScale).getDisplay();
 
         new BukkitRunnable() {
             Location loc = player.getEyeLocation().subtract(0, 0.2, 0);

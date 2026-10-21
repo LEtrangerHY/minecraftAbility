@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL5.Blue.Skill;
 
+import org.core.models.absModelSystem.modelManager;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.damage.DamageSource;
@@ -147,6 +148,7 @@ public class R implements SkillBase {
                 int perTick = 3;
                 for (int i = 0; i < perTick && index < flower.size(); i++, index++) {
                     Block block = flower.get(index);
+                    modelManager.trackBlock(block);
                     block.setType(Material.WITHER_ROSE, false);
 
                     world.spawnParticle(Particle.SOUL, block.getLocation().clone().add(0.5, 0.5, 0.5), 3, 0.1, 0.1, 0.1, 0.02);
@@ -155,6 +157,7 @@ public class R implements SkillBase {
                         @Override
                         public void run() {
                             cool.setCooldown(player, config.r_Skill_Cool, "R");
+                            modelManager.untrackBlock(block);
                             if (block.getType() == Material.WITHER_ROSE) {
                                 block.setType(Material.AIR, false);
                                 world.spawnParticle(Particle.SMOKE, block.getLocation().add(0.5, 0.2, 0.5), 5, 0.1, 0.1, 0.1, 0.02);

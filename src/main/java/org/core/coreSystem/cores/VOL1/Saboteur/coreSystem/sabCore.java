@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL1.Saboteur.coreSystem;
 
+import org.core.models.skillObj.itemShardModel;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
@@ -210,10 +211,7 @@ public class sabCore extends absCore {
 
         world.playSound(player.getLocation(), Sound.ITEM_TRIDENT_THROW, 1, 1);
 
-        Item item = world.dropItem(playerLocation, new ItemStack(Material.IRON_NUGGET));
-        item.setVelocity(direction);
-        item.setPickupDelay(1000);
-        item.setGravity(true);
+        Item item = new itemShardModel(world, playerLocation, Material.IRON_NUGGET, direction, true).getItem();
 
         DamageSource source = DamageSource.builder(DamageType.MOB_PROJECTILE)
                 .withCausingEntity(player)

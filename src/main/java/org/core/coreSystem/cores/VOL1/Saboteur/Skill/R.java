@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL1.Saboteur.Skill;
 
+import org.core.models.skillObj.itemShardModel;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
@@ -13,7 +14,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
@@ -72,10 +72,7 @@ public class R implements SkillBase {
                 .normalize()
                 .multiply(2.4);
 
-        Item shard = world.dropItem(startLoc, new ItemStack(Material.IRON_NUGGET));
-        shard.setVelocity(direction);
-        shard.setPickupDelay(1000);
-        shard.setGravity(false);
+        Item shard = new itemShardModel(world, startLoc, Material.IRON_NUGGET, direction, false).getItem();
 
         world.playSound(startLoc, Sound.ITEM_TRIDENT_THROW, 1.0f, 1.0f);
 
@@ -356,10 +353,7 @@ public class R implements SkillBase {
 
         world.playSound(player.getLocation(), Sound.ITEM_TRIDENT_THROW, 1, 1);
 
-        Item item = world.dropItem(playerLocation, new ItemStack(Material.IRON_NUGGET));
-        item.setVelocity(direction);
-        item.setPickupDelay(1000);
-        item.setGravity(false);
+        Item item = new itemShardModel(world, playerLocation, Material.IRON_NUGGET, direction, false).getItem();
 
         double amp = config.f_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L);
         double damage = config.r_Skill_Damage_Throw_HACK * (1 + amp);

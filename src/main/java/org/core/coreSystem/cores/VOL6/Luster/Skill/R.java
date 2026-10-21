@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL6.Luster.Skill;
 
+import org.core.models.skillObj.lustSphereModel;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
@@ -17,7 +18,6 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.RayTraceResult;
-import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.core.cool.Cool;
 import org.core.effect.crowdControl.ForceDamage;
@@ -25,7 +25,6 @@ import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.cores.VOL6.Luster.coreSystem.Luster;
 
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 
 public class R implements SkillBase {
@@ -62,27 +61,17 @@ public class R implements SkillBase {
             BlockData iron = Material.IRON_BLOCK.createBlockData();
 
             int blockCount = 12;
-            List<BlockDisplay> sphereBlocks = new ArrayList<>();
             Vector[] startOffsets = new Vector[blockCount];
             float[] yaws = new float[blockCount];
             float[] pitches = new float[blockCount];
 
             Location initialLoc = player.getEyeLocation().add(player.getLocation().getDirection().multiply(1.5));
+            List<BlockDisplay> sphereBlocks = new lustSphereModel(world, initialLoc, blockCount).getDisplays();
 
             for (int i = 0; i < blockCount; i++) {
                 startOffsets[i] = new Vector(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize();
                 yaws[i] = (float) (Math.random() * 360);
                 pitches[i] = (float) (Math.random() * 360);
-
-                BlockDisplay bd = world.spawn(initialLoc, BlockDisplay.class, entity -> {
-                    entity.setBlock(iron);
-                    entity.setTeleportDuration(1);
-                    Transformation transform = entity.getTransformation();
-                    transform.getScale().set(0.35f, 0.35f, 0.35f);
-                    transform.getTranslation().set(-0.175f, -0.175f, -0.175f);
-                    entity.setTransformation(transform);
-                });
-                sphereBlocks.add(bd);
             }
 
             world.playSound(initialLoc, Sound.BLOCK_BEACON_ACTIVATE, 1.0f, 2.0f);

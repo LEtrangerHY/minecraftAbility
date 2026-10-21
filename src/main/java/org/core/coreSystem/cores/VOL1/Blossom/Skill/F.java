@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL1.Blossom.Skill;
 
+import org.core.models.absModelSystem.modelManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
@@ -122,6 +123,12 @@ public class F implements SkillBase {
         Set<Location> afterBlocks = getNearbyNonAirBlocks(baseLoc, 9);
         afterBlocks.removeAll(beforeBlocks);
 
+        modelManager.trackBlock(targetBlock, originalData);
+        BlockData airData = Material.AIR.createBlockData();
+        for (Location loc : afterBlocks) {
+            modelManager.trackBlock(loc.getBlock(), airData);
+        }
+
         for (Location loc : afterBlocks) {
             Block block = loc.getBlock();
             if (block.getBlockData() instanceof Leaves leaves) {
@@ -209,6 +216,7 @@ public class F implements SkillBase {
     private void removeTreeBlocks(Set<Location> blocks, Block targetBlock, BlockData originalData) {
         for (Location loc : blocks) {
             Block block = loc.getBlock();
+            modelManager.untrackBlock(block);
             Material type = block.getType();
 
             if (type.name().contains("CHERRY") ||
@@ -219,8 +227,11 @@ public class F implements SkillBase {
             }
         }
 
-        if (targetBlock != null && targetBlock.getType() == Material.DIRT) {
-            targetBlock.setBlockData(originalData);
+        if (targetBlock != null) {
+            modelManager.untrackBlock(targetBlock);
+            if (targetBlock.getType() == Material.DIRT) {
+                targetBlock.setBlockData(originalData);
+            }
         }
     }
 

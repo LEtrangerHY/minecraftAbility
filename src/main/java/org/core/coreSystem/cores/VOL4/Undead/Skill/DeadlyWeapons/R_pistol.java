@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL4.Undead.Skill.DeadlyWeapons;
 
+import org.core.models.skillObj.bulletModel;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -13,7 +14,6 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.RayTraceResult;
-import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.core.cool.Cool;
 import org.core.coreSystem.absCoreSystem.SkillBase;
@@ -106,15 +106,7 @@ public class R_pistol implements SkillBase {
         Vector spawnOffset = dir.clone().multiply(0.2).add(new Vector(0, -0.3, 0));
         Location spawnLoc = player.getEyeLocation().add(spawnOffset);
 
-        BlockDisplay bulletDisplay = world.spawn(spawnLoc, BlockDisplay.class, entity -> {
-            entity.setBlock(Material.IRON_BLOCK.createBlockData());
-            entity.setTeleportDuration(1);
-
-            Transformation transform = entity.getTransformation();
-            transform.getScale().set(0.3f, 0.2f, 0.3f);
-            transform.getTranslation().set(0f, 0f, 0f);
-            entity.setTransformation(transform);
-        });
+        BlockDisplay bulletDisplay = new bulletModel(world, spawnLoc, Material.IRON_BLOCK.createBlockData(), 0.3f, 0.2f, 0.3f).getDisplay();
 
         double speed = 4.0;
         Vector velocity = dir.clone().multiply(speed);

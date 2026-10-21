@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL6.Knight.Skill;
 
+import org.core.models.skillObj.knightSwordModel;
 import com.google.common.collect.Multimap;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -18,7 +19,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.EulerAngle;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.core.cool.Cool;
@@ -160,21 +160,8 @@ public class R implements SkillBase {
 
             Location swordLoc = new Location(world, x, y, z);
 
-            ArmorStand stand = (ArmorStand) world.spawnEntity(swordLoc, EntityType.ARMOR_STAND);
+            ArmorStand stand = new knightSwordModel(world, swordLoc, player.getInventory().getItemInOffHand()).getStand();
             player.getWorld().spawnParticle(Particle.ENCHANTED_HIT, swordLoc, 21, 0.4, 0.4, 0.4, 0);
-
-            stand.setInvisible(true);
-            stand.setGravity(false);
-            stand.setMarker(true);
-            stand.setArms(false);
-            stand.setBasePlate(false);
-
-            ItemStack off = player.getInventory().getItemInOffHand();
-
-            ItemStack swordItem = new ItemStack(off);
-            stand.getEquipment().setItemInMainHand(swordItem);
-
-            stand.setLeftArmPose(new EulerAngle(0, 0, Math.toRadians(90)));
 
             swords.add(stand);
             prevHiltLocations.add(swordLoc.clone());

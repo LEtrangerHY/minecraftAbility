@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL5.Blaze.Skill;
 
+import org.core.models.absModelSystem.modelManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
@@ -263,6 +264,7 @@ public class R implements SkillBase{
             fb.setVelocity(dir.clone().multiply(METEOR_SPEED));
             fb.getPersistentDataContainer().set(meteorKey, PersistentDataType.BYTE, (byte) 1);
         });
+        modelManager.track(meteor);
 
         world.playSound(apex, Sound.ENTITY_BLAZE_SHOOT, 1.0f, 0.8f + (float) Math.random() * 0.4f);
         world.spawnParticle(Particle.SOUL_FIRE_FLAME, spawnLoc, 12, 0.1, 0.1, 0.1, 0.12);

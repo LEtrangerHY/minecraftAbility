@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL1.Saboteur.Skill;
 
+import org.core.models.skillObj.itemShardModel;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -10,7 +11,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
@@ -242,10 +242,7 @@ public class Q implements SkillBase {
             dir.setZ(z);
             dir.normalize().multiply(2.3);
 
-            Item item = world.dropItem(origin, new ItemStack(Material.IRON_NUGGET));
-            item.setVelocity(dir);
-            item.setPickupDelay(1000);
-            item.setGravity(false);
+            Item item = new itemShardModel(world, origin, Material.IRON_NUGGET, dir, false).getItem();
 
             DamageSource source = DamageSource.builder(DamageType.MOB_PROJECTILE)
                     .withCausingEntity(player)

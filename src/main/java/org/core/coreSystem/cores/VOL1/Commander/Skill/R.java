@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL1.Commander.Skill;
 
+import org.core.models.skillObj.comBlockModel;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
@@ -43,17 +44,7 @@ public class R implements SkillBase, Listener {
         Vector spawnOffset = dir.clone().multiply(0.8).add(new Vector(0, 1.2, 0));
         Location spawnLoc = player.getLocation().add(spawnOffset);
 
-        FallingBlock fb = player.getWorld().spawn(
-                spawnLoc,
-                FallingBlock.class,
-                entity -> {
-                    entity.setBlockData(Material.COMMAND_BLOCK.createBlockData());
-                    entity.setDropItem(false);
-                    entity.setHurtEntities(false);
-                    entity.setGravity(false);
-                    entity.setPersistent(true);
-                }
-        );
+        FallingBlock fb = new comBlockModel(world, spawnLoc).getBlock();
 
         double speed = 1.2;
         fb.setVelocity(dir.multiply(speed));

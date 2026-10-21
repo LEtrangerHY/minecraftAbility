@@ -306,7 +306,8 @@ public class F implements SkillBase {
     }
 
     public void Slash(Player player, double height) {
-        config.damaged_2.put(player.getUniqueId(), new HashSet<>());
+        HashSet<Entity> hitEntities = new HashSet<>();
+        config.damaged_2.put(player.getUniqueId(), hitEntities);
 
         player.swingMainHand();
         World world = player.getWorld();
@@ -350,7 +351,7 @@ public class F implements SkillBase {
                     world.playSound(player.getLocation(), Sound.BLOCK_CHAIN_BREAK, 1.2f, 1.0f);
                 }
 
-                if (ticks >= maxTicks || player.isDead()) {
+                if (ticks >= maxTicks || player.isDead() || !player.isOnline()) {
                     this.cancel();
                     return;
                 }
@@ -359,7 +360,7 @@ public class F implements SkillBase {
 
                     if (!(entity instanceof LivingEntity target) || entity == player) continue;
 
-                    if (config.damaged_2.get(player.getUniqueId()).contains(entity)) continue;
+                    if (hitEntities.contains(entity)) continue;
 
                     Vector toTarget = target.getLocation().toVector().subtract(player.getLocation().toVector());
                     toTarget.setY(0);
@@ -373,7 +374,7 @@ public class F implements SkillBase {
                         ForceDamage forceDamage = new ForceDamage(target, damage, source, true);
                         forceDamage.applyEffect(player);
 
-                        config.damaged_2.get(player.getUniqueId()).add(entity);
+                        hitEntities.add(entity);
                     }
                 }
 

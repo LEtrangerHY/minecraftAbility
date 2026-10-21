@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL6.Luster.coreSystem;
 
+import org.core.models.skillObj.lustShardModel;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -20,7 +21,6 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.core.cool.Cool;
 import org.core.main.Core;
@@ -33,7 +33,6 @@ import org.core.coreSystem.cores.VOL6.Luster.Skill.F;
 import org.core.coreSystem.cores.VOL6.Luster.Skill.Q;
 import org.core.coreSystem.cores.VOL6.Luster.Skill.R;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -210,25 +209,14 @@ public class lustCore extends absCore {
                 .withDirectEntity(player)
                 .build();
 
-        List<BlockDisplay> blockDisplays = new ArrayList<>();
-        Vector[] offsets = new Vector[blockCount];
-
         Location spawnLoc = playerLocation.clone().add(0, 1.4, 0).add(direction.clone().multiply(0.5));
+        List<BlockDisplay> blockDisplays = new lustShardModel(world, spawnLoc, blockCount).getDisplays();
+        Vector[] offsets = new Vector[blockCount];
 
         for (int i = 0; i < blockCount; i++) {
             offsets[i] = new Vector(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5)
                     .normalize()
                     .multiply(isCrit ? 0.35 : 0.15);
-
-            BlockDisplay bd = world.spawn(spawnLoc, BlockDisplay.class, entity -> {
-                entity.setBlock(Math.random() > 0.5 ? Material.IRON_BLOCK.createBlockData() : Material.NETHERITE_BLOCK.createBlockData());
-                entity.setTeleportDuration(1);
-
-                Transformation t = entity.getTransformation();
-                t.getScale().set(0.25f, 0.25f, 0.25f);
-                entity.setTransformation(t);
-            });
-            blockDisplays.add(bd);
         }
 
         new BukkitRunnable() {

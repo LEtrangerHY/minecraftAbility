@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL6.Charlotte.coreSystem;
 
+import org.core.models.skillObj.charShieldModel;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -243,30 +244,13 @@ public class charCore extends absCore {
 
         World world = player.getWorld();
 
-        org.bukkit.entity.BlockDisplay[] shieldBlocks = new org.bukkit.entity.BlockDisplay[6];
-
-        BlockData glassData = Material.WHITE_STAINED_GLASS.createBlockData();
-
         Location spawnLoc = player.getEyeLocation().add(player.getEyeLocation().getDirection().multiply(3));
-        for (int i = 0; i < 6; i++) {
-            shieldBlocks[i] = world.spawn(spawnLoc, org.bukkit.entity.BlockDisplay.class, display -> {
-                display.setBlock(glassData);
-                display.setTeleportDuration(1);
-                display.setPersistent(false);
-                display.setBrightness(new org.bukkit.entity.Display.Brightness(15, 15));
-                display.setTransformation(new org.bukkit.util.Transformation(
-                        new org.joml.Vector3f(-0.5f, -0.5f, -0.0625f),
-                        new org.joml.Quaternionf(),
-                        new org.joml.Vector3f(1f, 1f, 0.125f),
-                        new org.joml.Quaternionf()
-                ));
-            });
-        }
+        charShieldModel shield = new charShieldModel(world, spawnLoc);
 
         BukkitRunnable task = new BukkitRunnable() {
             @Override
             public synchronized void cancel() throws IllegalStateException {
-                removeShield(shieldBlocks);
+                shield.remove();
                 shieldTasks.remove(uuid, this);
                 super.cancel();
             }
@@ -296,26 +280,7 @@ public class charCore extends absCore {
 
                 Location center = eyeLoc.clone().add(forward.clone().multiply(3));
 
-                int index = 0;
-                for (int row = 0; row < 2; row++) {
-                    for (int col = -1; col <= 1; col++) {
-                        double rightOffset = col * 1.0;
-                        double upOffset = (row == 0) ? -0.5 : 0.5;
-
-                        Vector offset = right.clone().multiply(rightOffset).add(actualUp.clone().multiply(upOffset));
-                        Location targetLoc = center.clone().add(offset);
-
-                        Location displayLoc = targetLoc.clone();
-                        displayLoc.setYaw(playerYaw);
-                        displayLoc.setPitch(playerPitch);
-
-                        org.bukkit.entity.BlockDisplay display = shieldBlocks[index];
-                        if (display != null && display.isValid()) {
-                            display.teleport(displayLoc);
-                        }
-                        index++;
-                    }
-                }
+                shield.update(center, right, actualUp, playerYaw, playerPitch);
 
                 double widthLimit = 1.8;
                 double heightLimit = 1.5;
@@ -356,14 +321,6 @@ public class charCore extends absCore {
 
         shieldTasks.put(uuid, task);
         task.runTaskTimer(plugin, 0L, 1L);
-    }
-
-    private void removeShield(org.bukkit.entity.BlockDisplay[] shieldBlocks) {
-        for (org.bukkit.entity.BlockDisplay display : shieldBlocks) {
-            if (display != null && display.isValid()) {
-                display.remove();
-            }
-        }
     }
 
     private boolean isShieldActive(Player player) {

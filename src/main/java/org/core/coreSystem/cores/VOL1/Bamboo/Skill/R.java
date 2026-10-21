@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL1.Bamboo.Skill;
 
+import org.core.models.skillObj.bambSpearModel;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
@@ -15,13 +16,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.RayTraceResult;
-import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.core.cool.Cool;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.cores.VOL1.Bamboo.coreSystem.Bamboo;
 import org.core.effect.crowdControl.ForceDamage;
-import org.joml.AxisAngle4f;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -154,27 +153,9 @@ public class R implements SkillBase {
         setItemToRedstone(player);
 
         Location hitboxLoc = getTailLocation(spawnLoc, velocity);
-        LivingEntity hitbox = (LivingEntity) world.spawnEntity(hitboxLoc, EntityType.CHICKEN);
-        hitbox.setInvisible(true);
-        hitbox.setAI(false);
-        hitbox.setGravity(false);
-        hitbox.setSilent(true);
-        hitbox.setInvulnerable(true);
-        hitbox.setCollidable(false);
-        if (hitbox instanceof Ageable) ((Ageable) hitbox).setAdult();
-
-        hitbox.addScoreboardTag("bamboo_projectile");
-        hitbox.setLeashHolder(player);
-
-        BlockDisplay bambooDisplay = (BlockDisplay) world.spawnEntity(spawnLoc, EntityType.BLOCK_DISPLAY);
-        bambooDisplay.setBlock(Material.BAMBOO.createBlockData());
-        bambooDisplay.setTeleportDuration(1);
-
-        Transformation transform = bambooDisplay.getTransformation();
-        transform.getScale().set(1.0f, 4.0f, 1.0f);
-        transform.getTranslation().set(-0.5f, 0.5f, -1.0f);
-        transform.getLeftRotation().set(new AxisAngle4f((float) Math.toRadians(90), 1, 0, 0));
-        bambooDisplay.setTransformation(transform);
+        bambSpearModel spear = new bambSpearModel(world, player, spawnLoc, hitboxLoc);
+        LivingEntity hitbox = spear.getHitbox();
+        BlockDisplay bambooDisplay = spear.getDisplay();
 
         player.playSound(player.getLocation(), Sound.ENTITY_WIND_CHARGE_THROW, 1.2f, 1.2f);
         player.playSound(player.getLocation(), Sound.ITEM_TRIDENT_THROW, 1.0f, 0.8f);

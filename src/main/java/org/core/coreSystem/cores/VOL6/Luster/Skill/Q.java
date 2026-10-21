@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL6.Luster.Skill;
 
+import org.core.models.skillObj.lustLiftedBlockModel;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
@@ -14,7 +15,6 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.RayTraceResult;
-import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.core.cool.Cool;
 import org.core.effect.crowdControl.ForceDamage;
@@ -154,13 +154,7 @@ public class Q implements SkillBase {
                         spawnLoc.setYaw(randomYaw);
                         spawnLoc.setPitch(randomPitch);
 
-                        BlockDisplay display = world.spawn(spawnLoc, BlockDisplay.class, entity -> {
-                            entity.setBlock(data);
-                            entity.setTeleportDuration(1);
-                            Transformation t = entity.getTransformation();
-                            t.getTranslation().set(-0.5f, -0.5f, -0.5f); // 회전 중심 맞춤
-                            entity.setTransformation(t);
-                        });
+                        BlockDisplay display = new lustLiftedBlockModel(world, spawnLoc, data, null).getDisplay();
 
                         liftedBlocks.add(display);
                         playLiftParticles(spawnLoc);
@@ -201,14 +195,7 @@ public class Q implements SkillBase {
                         spawnLoc.setYaw(randomYaw);
                         spawnLoc.setPitch(randomPitch);
 
-                        BlockDisplay display = world.spawn(spawnLoc, BlockDisplay.class, entity -> {
-                            entity.setBlock(Material.IRON_BLOCK.createBlockData());
-                            entity.setTeleportDuration(1);
-                            Transformation t = entity.getTransformation();
-                            t.getTranslation().set(-0.5f, -0.5f, -0.5f); // 회전 중심 맞춤
-                            entity.setTransformation(t);
-                            entity.getPersistentDataContainer().set(new NamespacedKey(plugin, "summoned_block"), PersistentDataType.BYTE, (byte) 1);
-                        });
+                        BlockDisplay display = new lustLiftedBlockModel(world, spawnLoc, Material.IRON_BLOCK.createBlockData(), new NamespacedKey(plugin, "summoned_block")).getDisplay();
 
                         liftedBlocks.add(display);
                         playLiftParticles(spawnLoc);

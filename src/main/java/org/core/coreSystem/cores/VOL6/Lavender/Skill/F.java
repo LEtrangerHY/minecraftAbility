@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL6.Lavender.Skill;
 
+import org.core.models.absModelSystem.modelManager;
 import org.bukkit.*;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Damageable;
@@ -117,6 +118,7 @@ public class F implements SkillBase {
                 if (distance <= radius + 0.5) {
                     Location floorLoc = center.clone().add(x, -1, z).getBlock().getLocation();
                     if (floorLoc.getBlock().isPassable()) {
+                        modelManager.trackBlock(floorLoc.getBlock());
                         floorLoc.getBlock().setType(Material.AMETHYST_BLOCK);
                         config.activeWalls.put(floorLoc, uuid);
                         createdBlocks.add(floorLoc);
@@ -127,6 +129,7 @@ public class F implements SkillBase {
                     for (int y = 0; y < height; y++) {
                         Location blockLoc = center.clone().add(x, y, z).getBlock().getLocation();
                         if (blockLoc.getBlock().isPassable()) {
+                            modelManager.trackBlock(blockLoc.getBlock());
                             blockLoc.getBlock().setType(Material.AMETHYST_BLOCK);
                             config.activeWalls.put(blockLoc, uuid);
                             createdBlocks.add(blockLoc);
@@ -163,6 +166,7 @@ public class F implements SkillBase {
                 for (Location loc : createdBlocks) {
                     if (uuid.equals(config.activeWalls.get(loc))) {
                         loc.getBlock().setType(Material.AIR);
+                        modelManager.untrackBlock(loc.getBlock());
                         config.activeWalls.remove(loc);
                     }
                 }
