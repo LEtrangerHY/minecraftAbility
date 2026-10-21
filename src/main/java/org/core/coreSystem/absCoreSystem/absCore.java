@@ -18,8 +18,6 @@ import org.core.effect.crowdControl.Stun;
 import org.core.effect.effectPlugin.swingEchoGuard;
 import org.core.main.coreConfig;
 
-import java.util.*;
-
 public abstract class absCore implements Listener {
 
     protected final coreConfig tag;
@@ -42,8 +40,6 @@ public abstract class absCore implements Listener {
     protected abstract boolean isRCondition(Player player);
     protected abstract boolean isQCondition(Player player);
     protected abstract boolean isFCondition(Player player);
-    protected abstract boolean isRAnimated(Player player);
-    protected abstract boolean isFAnimated(Player player);
     protected abstract ConfigWrapper getConfigWrapper();
 
     public void manualReset(Player player) {

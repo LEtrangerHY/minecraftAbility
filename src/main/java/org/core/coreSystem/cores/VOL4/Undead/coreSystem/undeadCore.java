@@ -409,16 +409,6 @@ public class undeadCore extends absCore {
     }
 
     @Override
-    protected boolean isRAnimated(Player player) {
-        return true;
-    }
-
-    @Override
-    protected boolean isFAnimated(Player player) {
-        return false;
-    }
-
-    @Override
     protected ConfigWrapper getConfigWrapper() {
         return new ConfigWrapper() {
             @Override

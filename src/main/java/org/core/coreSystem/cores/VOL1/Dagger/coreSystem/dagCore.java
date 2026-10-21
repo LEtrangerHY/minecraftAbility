@@ -240,16 +240,6 @@ public class dagCore extends absCore {
     }
 
     @Override
-    protected boolean isRAnimated(Player player) {
-        return true;
-    }
-
-    @Override
-    protected boolean isFAnimated(Player player) {
-        return true;
-    }
-
-    @Override
     protected ConfigWrapper getConfigWrapper() {
         return new ConfigWrapper() {
             @Override
