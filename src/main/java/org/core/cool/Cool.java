@@ -242,4 +242,14 @@ public class Cool {
         }
         return 0L;
     }
+
+    public void clearAll(Player player) {
+        HashMap<String, CooldownData> playerCooldowns = cooldowns.remove(player.getUniqueId());
+        if (playerCooldowns != null) {
+            for (CooldownData data : playerCooldowns.values()) {
+                if (data.bossBar != null) data.bossBar.removeAll();
+            }
+        }
+        player.sendActionBar(Component.empty());
+    }
 }

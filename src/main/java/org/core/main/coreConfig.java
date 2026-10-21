@@ -175,6 +175,10 @@ public class coreConfig {
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_scout"), PersistentDataType.BYTE, (byte) 0);
     }
 
+    public void clearCooldowns(Player player) {
+        cool.clearAll(player);
+    }
+
     public void setSetting(Player player, String setting, boolean value) {
         NamespacedKey key = getSettingKey(setting);
         if (key == null) return;
