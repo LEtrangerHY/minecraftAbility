@@ -4,9 +4,7 @@ import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.MultipleFacing;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
@@ -32,6 +30,10 @@ import org.core.effect.crowdControl.ForceDamage;
 import org.core.main.Core;
 import org.core.main.coreConfig;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 public class charCore extends absCore {
     private final Core plugin;
     private final Charlotte config;
@@ -42,6 +44,8 @@ public class charCore extends absCore {
 
     private static final BlockData GLASS = Material.GLASS.createBlockData();
     private static final BlockData CHAIN = Material.IRON_CHAIN.createBlockData();
+
+    private final Map<UUID, BukkitRunnable> shieldTasks = new HashMap<>();
 
     public charCore(Core plugin, coreConfig tag, Charlotte config, Cool cool) {
         super(tag, cool);
@@ -225,19 +229,23 @@ public class charCore extends absCore {
     @EventHandler
     public void sneakPassive(PlayerToggleSneakEvent event) {
         Player player = event.getPlayer();
+        UUID uuid = player.getUniqueId();
 
-        if (!event.isSneaking() || !hasProperItems(player) || !tag.Charlotte.contains(player)) return;
+        if (!event.isSneaking()) {
+            BukkitRunnable running = shieldTasks.remove(uuid);
+            if (running != null) running.cancel();
+            return;
+        }
+        if (!hasProperItems(player) || !tag.Charlotte.contains(player)) return;
+
+        BukkitRunnable previous = shieldTasks.remove(uuid);
+        if (previous != null) previous.cancel();
+
         World world = player.getWorld();
 
         org.bukkit.entity.BlockDisplay[] shieldBlocks = new org.bukkit.entity.BlockDisplay[6];
 
-        BlockData glassData = Material.GLASS_PANE.createBlockData();
-        if (glassData instanceof org.bukkit.block.data.MultipleFacing) {
-            MultipleFacing pane = (org.bukkit.block.data.MultipleFacing) glassData;
-            pane.setFace(BlockFace.EAST, true);
-            pane.setFace(BlockFace.WEST, true);
-            glassData = pane;
-        }
+        BlockData glassData = Material.GLASS_PANE.createBlockData("[east=true,west=true]");
 
         Location spawnLoc = player.getLocation();
         for (int i = 0; i < 6; i++) {
@@ -258,13 +266,15 @@ public class charCore extends absCore {
 
         BukkitRunnable task = new BukkitRunnable() {
             @Override
+            public synchronized void cancel() throws IllegalStateException {
+                removeShield(shieldBlocks);
+                shieldTasks.remove(uuid, this);
+                super.cancel();
+            }
+
+            @Override
             public void run() {
-                if (!player.isOnline() || !player.isSneaking() || player.isDead()) {
-                    for (org.bukkit.entity.BlockDisplay display : shieldBlocks) {
-                        if (display != null && display.isValid()) {
-                            display.remove();
-                        }
-                    }
+                if (!player.isOnline() || player.isDead() || !hasProperItems(player) || shieldTasks.get(uuid) != this) {
                     this.cancel();
                     return;
                 }
@@ -345,14 +355,33 @@ public class charCore extends absCore {
             }
         };
 
+        shieldTasks.put(uuid, task);
         task.runTaskTimer(plugin, 0L, 1L);
+    }
+
+    private void removeShield(org.bukkit.entity.BlockDisplay[] shieldBlocks) {
+        for (org.bukkit.entity.BlockDisplay display : shieldBlocks) {
+            if (display != null && display.isValid()) {
+                display.remove();
+            }
+        }
+    }
+
+    private boolean isShieldActive(Player player) {
+        return shieldTasks.containsKey(player.getUniqueId());
+    }
+
+    @EventHandler
+    public void shieldQuit(PlayerQuitEvent event) {
+        BukkitRunnable running = shieldTasks.remove(event.getPlayer().getUniqueId());
+        if (running != null) running.cancel();
     }
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onShieldBlockDamage(EntityDamageByEntityEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
 
-        if (!player.isSneaking() || !hasProperItems(player) || !tag.Charlotte.contains(player)) return;
+        if (!isShieldActive(player) || !hasProperItems(player) || !tag.Charlotte.contains(player)) return;
 
         Location eyeLoc = player.getEyeLocation();
         Vector forward = eyeLoc.getDirection().normalize();
