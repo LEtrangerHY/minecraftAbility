@@ -391,7 +391,7 @@ public final class Core extends JavaPlugin implements Listener {
 
         this.jester = new jestCore(this, this.config, jestConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.jester, this);
-        this.config.registerCore("jester", this.undead);
+        this.config.registerCore("jester", this.jester);
 
         this.jestInv = new jestInventory(this, this.config);
         Bukkit.getPluginManager().registerEvents(this.jestInv, this);

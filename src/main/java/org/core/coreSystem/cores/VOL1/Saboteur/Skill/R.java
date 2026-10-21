@@ -191,8 +191,9 @@ public class R implements SkillBase {
 
             @Override
             public void run() {
-                if (!player.isOnline() || player.isDead() || !config.trapThrowPos.get(player.getUniqueId()).contains(particleLoc)) {
-                    config.trapThrowPos.get(player.getUniqueId()).remove(particleLoc);
+                List<Location> positions = config.trapThrowPos.get(player.getUniqueId());
+                if (!player.isOnline() || player.isDead() || positions == null || !positions.contains(particleLoc)) {
+                    if (positions != null) positions.remove(particleLoc);
                     cancel();
                     return;
                 }
@@ -204,7 +205,7 @@ public class R implements SkillBase {
                         trapThrowActive(player, particleLoc.clone(), target);
                     }
 
-                    config.trapThrowPos.get(player.getUniqueId()).remove(particleLoc);
+                    positions.remove(particleLoc);
                     cancel();
                     return;
                 }
@@ -278,8 +279,9 @@ public class R implements SkillBase {
 
             @Override
             public void run() {
-                if (!player.isOnline() || player.isDead() || !config.trapSpikePos.get(player.getUniqueId()).contains(particleLoc)) {
-                    config.trapSpikePos.get(player.getUniqueId()).remove(particleLoc);
+                List<Location> positions = config.trapSpikePos.get(player.getUniqueId());
+                if (!player.isOnline() || player.isDead() || positions == null || !positions.contains(particleLoc)) {
+                    if (positions != null) positions.remove(particleLoc);
                     cancel();
                     return;
                 }

@@ -6,24 +6,60 @@ commands:
   core:
     description: "능력 설정"
     usage: "/core [플레이어] [능력] <true|false>"
+    permission: core.admin.set
   coreclear:
     description: "능력 초기화"
     usage: "/coreclear [플레이어]"
+    permission: core.admin.clear
   corecheck:
     description: "소유한 능력 확인"
     usage: "/corecheck [플레이어]"
+    permission: core.check
   corelevelreset:
     description: "레벨 초기화"
     usage: "/corelevelreset [플레이어]"
+    permission: core.admin.level
   corelevelset:
     description: "레벨 설정"
     usage: "/corelevelset [플레이어] [레벨] [경험치]"
+    permission: core.admin.level
   coredbpaste:
     description: "데이터베이스 붙여넣기(데이터 소실 방지)"
     usage: "/coredbpaste"
+    permission: core.admin.db
   coredbupdate:
     description: "데이터베이스 업데이트(저장)"
     usage: "/coredbupdate"
+    permission: core.admin.db
   gc:
     description: "gc"
     usage: "/gc"
+    permission: core.admin.gc
+permissions:
+  core.check:
+    description: "/corecheck 사용"
+    default: true
+  core.admin:
+    description: "Core 관리자 명령어 전체"
+    default: op
+    children:
+      core.admin.set: true
+      core.admin.clear: true
+      core.admin.level: true
+      core.admin.db: true
+      core.admin.gc: true
+  core.admin.set:
+    description: "/core 사용"
+    default: op
+  core.admin.clear:
+    description: "/coreclear 사용"
+    default: op
+  core.admin.level:
+    description: "/corelevelreset, /corelevelset 사용"
+    default: op
+  core.admin.db:
+    description: "/coredbpaste, /coredbupdate 사용"
+    default: op
+  core.admin.gc:
+    description: "/gc 사용"
+    default: op
