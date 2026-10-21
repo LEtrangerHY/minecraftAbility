@@ -245,24 +245,24 @@ public class charCore extends absCore {
 
         org.bukkit.entity.BlockDisplay[] shieldBlocks = new org.bukkit.entity.BlockDisplay[6];
 
-        BlockData glassData = Material.GLASS_PANE.createBlockData("[east=true,west=true]");
+        BlockData glassData = Material.WHITE_STAINED_GLASS.createBlockData();
 
-        Location spawnLoc = player.getLocation();
+        Location spawnLoc = player.getEyeLocation().add(player.getEyeLocation().getDirection().multiply(3));
         for (int i = 0; i < 6; i++) {
-            org.bukkit.entity.BlockDisplay display = world.spawn(spawnLoc, org.bukkit.entity.BlockDisplay.class);
-            display.setBlock(glassData);
-
-            display.setTeleportDuration(1);
-
-            display.setTransformation(new org.bukkit.util.Transformation(
-                    new org.joml.Vector3f(-0.5f, -0.5f, -0.5f),
-                    new org.joml.Quaternionf(),
-                    new org.joml.Vector3f(1f, 1f, 1f),
-                    new org.joml.Quaternionf()
-            ));
-
-            shieldBlocks[i] = display;
+            shieldBlocks[i] = world.spawn(spawnLoc, org.bukkit.entity.BlockDisplay.class, display -> {
+                display.setBlock(glassData);
+                display.setTeleportDuration(1);
+                display.setPersistent(false);
+                display.setBrightness(new org.bukkit.entity.Display.Brightness(15, 15));
+                display.setTransformation(new org.bukkit.util.Transformation(
+                        new org.joml.Vector3f(-0.5f, -0.5f, -0.0625f),
+                        new org.joml.Quaternionf(),
+                        new org.joml.Vector3f(1f, 1f, 0.125f),
+                        new org.joml.Quaternionf()
+                ));
+            });
         }
+        plugin.getLogger().info("[CharlotteShield] spawned " + shieldBlocks.length + " displays for " + player.getName());
 
         BukkitRunnable task = new BukkitRunnable() {
             @Override
