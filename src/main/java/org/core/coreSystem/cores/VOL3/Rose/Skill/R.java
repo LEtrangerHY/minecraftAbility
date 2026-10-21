@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL3.Rose.Skill;
 
+import org.core.effect.effectPlugin.swingEchoGuard;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -31,7 +32,7 @@ public class R implements SkillBase {
 
     @Override
     public void Trigger(Player player) {
-        player.swingOffHand();
+        swingEchoGuard.swingOffHand(player);
 
         Entity target = getTargetEntity(player, 3.0);
 

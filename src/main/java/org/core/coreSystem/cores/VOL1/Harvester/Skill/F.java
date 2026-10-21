@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL1.Harvester.Skill;
 
+import org.core.effect.effectPlugin.swingEchoGuard;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.damage.DamageSource;
@@ -49,7 +50,7 @@ public class F implements SkillBase {
 
     @Override
     public void Trigger(Player player) {
-        player.swingMainHand();
+        swingEchoGuard.swingMainHand(player);
         player.getWorld().playSound(player.getLocation(), Sound.ITEM_TRIDENT_RIPTIDE_3, 1.0f, 1.0f);
         Slash(player, player.getLocation().clone().add(0, 0.8, 0));
 

@@ -15,6 +15,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.core.cool.Cool;
 import org.core.effect.crowdControl.Stun;
+import org.core.effect.effectPlugin.swingEchoGuard;
 import org.core.main.coreConfig;
 
 import java.util.*;
@@ -23,7 +24,6 @@ public abstract class absCore implements Listener {
 
     protected final coreConfig tag;
     protected final Cool cool;
-    private final Map<UUID, Boolean> isSwingAnimate = new HashMap<>();
 
     public absCore(coreConfig tag, Cool cool) {
         this.tag = tag;
@@ -98,10 +98,7 @@ public abstract class absCore implements Listener {
 
         Player player = event.getPlayer();
 
-        if (isSwingAnimate.getOrDefault(player.getUniqueId(), false)) {
-            isSwingAnimate.remove(player.getUniqueId());
-            return;
-        }
+        if (event.getAction() == Action.LEFT_CLICK_AIR && swingEchoGuard.isEchoPending(player)) return;
 
         if (!isCustomAttackUser(player) || !contains(player) || !isItemRequired(player) || Stun.isStunned(player)) return;
 
@@ -133,8 +130,6 @@ public abstract class absCore implements Listener {
 
         if (cool.isReloading(player, "R") || !isRCondition(player)) return;
 
-        if (isRAnimated(player)) isSwingAnimate.put(player.getUniqueId(), true);
-
         cool.setCooldown(player, this.getConfigWrapper().getRcooldown(player), "R");
         getRSkill().Trigger(player);
     }
@@ -146,8 +141,6 @@ public abstract class absCore implements Listener {
         ItemStack dropped = event.getItemDrop().getItemStack();
 
         if (!contains(player) || Stun.isStunned(player) || !isDropRequired(player, dropped)) return;
-
-        isSwingAnimate.put(player.getUniqueId(), true);
 
         event.setCancelled(true);
 
@@ -165,8 +158,6 @@ public abstract class absCore implements Listener {
         event.setCancelled(true);
 
         if (cool.isReloading(player, "F") || !isFCondition(player)) return;
-
-        if (isRAnimated(player)) isSwingAnimate.put(player.getUniqueId(), true);
 
         cool.setCooldown(player, getConfigWrapper().getFcooldown(player), "F");
         getFSkill().Trigger(player);

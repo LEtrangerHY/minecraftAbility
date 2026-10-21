@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL1.Saboteur.Skill;
 
+import org.core.effect.effectPlugin.swingEchoGuard;
 import org.core.models.coresObj.itemShardModel;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -342,7 +343,7 @@ public class R implements SkillBase {
 
         World world = player.getWorld();
 
-        player.swingMainHand();
+        swingEchoGuard.swingMainHand(player);
 
         Particle.DustOptions poisonGreen = new Particle.DustOptions(Color.fromRGB(64, 253, 20), 1.0f);
         BlockData blood = Material.REDSTONE_BLOCK.createBlockData();
@@ -420,7 +421,7 @@ public class R implements SkillBase {
 
         World world = player.getWorld();
 
-        player.swingMainHand();
+        swingEchoGuard.swingMainHand(player);
 
         world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
         world.playSound(player.getLocation(), Sound.ITEM_TRIDENT_THROW, 1, 1);

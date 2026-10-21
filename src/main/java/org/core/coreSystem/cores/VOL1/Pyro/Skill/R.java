@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL1.Pyro.Skill;
 
+import org.core.effect.effectPlugin.swingEchoGuard;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
@@ -52,7 +53,7 @@ public class R implements SkillBase {
             offhandItem.setAmount(offhandItem.getAmount() - 4);
             cool.setCooldown(player, config.r_Skill_Cool, "R");
 
-            player.swingMainHand();
+            swingEchoGuard.swingMainHand(player);
 
             Location startLocation = player.getLocation();
             Vector direction = startLocation.getDirection().normalize().multiply(1.9);

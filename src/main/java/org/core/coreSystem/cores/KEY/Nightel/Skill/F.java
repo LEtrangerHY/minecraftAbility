@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.KEY.Nightel.Skill;
 
+import org.core.effect.effectPlugin.swingEchoGuard;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.damage.DamageSource;
@@ -44,7 +45,7 @@ public class F implements SkillBase {
 
     @Override
     public void Trigger(Player player) {
-        player.swingMainHand();
+        swingEchoGuard.swingMainHand(player);
         World world = player.getWorld();
 
         LivingEntity target = getTargetedEntity(player, 4.8, 0.3);
@@ -138,7 +139,7 @@ public class F implements SkillBase {
     public void Slash(Player player, double height, int slashCount) {
         config.damaged_2.put(player.getUniqueId(), new HashSet<>());
 
-        player.swingMainHand();
+        swingEchoGuard.swingMainHand(player);
         World world = player.getWorld();
         world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
 

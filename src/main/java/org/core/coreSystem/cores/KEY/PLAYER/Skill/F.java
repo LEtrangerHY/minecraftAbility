@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.KEY.PLAYER.Skill;
 
+import org.core.effect.effectPlugin.swingEchoGuard;
 import org.bukkit.*;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
@@ -34,7 +35,7 @@ public class F implements SkillBase {
 
     @Override
     public void Trigger(Player player) {
-        player.swingMainHand();
+        swingEchoGuard.swingMainHand(player);
         World world = player.getWorld();
         world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
 

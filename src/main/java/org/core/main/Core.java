@@ -9,6 +9,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.core.command.*;
 import org.core.cool.Cool;
 import org.core.effect.effectPlugin.skillSpectatorGuard;
+import org.core.effect.effectPlugin.swingEchoGuard;
 import org.core.models.absModelSystem.modelManager;
 import org.core.coreSystem.cores.KEY.PLAYER.coreSystem.PLAYER;
 import org.core.coreSystem.cores.KEY.PLAYER.coreSystem.playerCore;
@@ -221,6 +222,7 @@ public final class Core extends JavaPlugin implements Listener {
         this.cool = new Cool(this);
 
         Bukkit.getPluginManager().registerEvents(new skillSpectatorGuard(this), this);
+        Bukkit.getPluginManager().registerEvents(new swingEchoGuard(), this);
 
         this.config = new coreConfig(this, cool);
 

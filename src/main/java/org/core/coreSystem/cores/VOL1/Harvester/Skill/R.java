@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL1.Harvester.Skill;
 
+import org.core.effect.effectPlugin.swingEchoGuard;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
@@ -46,7 +47,7 @@ public class R implements SkillBase {
     @Override
     public void Trigger(Player player) {
 
-        player.swingMainHand();
+        swingEchoGuard.swingMainHand(player);
         World world = player.getWorld();
 
         world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);

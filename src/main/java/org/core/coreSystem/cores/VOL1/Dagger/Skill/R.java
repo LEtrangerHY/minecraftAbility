@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL1.Dagger.Skill;
 
+import org.core.effect.effectPlugin.swingEchoGuard;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
@@ -40,7 +41,7 @@ public class R implements SkillBase {
     public void Trigger(Player player) {
         World world = player.getWorld();
 
-        player.swingMainHand();
+        swingEchoGuard.swingMainHand(player);
 
         LivingEntity target = getTargetedEntity(player,4.0, 0.4);
 

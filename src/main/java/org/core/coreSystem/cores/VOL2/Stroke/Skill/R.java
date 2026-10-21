@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL2.Stroke.Skill;
 
+import org.core.effect.effectPlugin.swingEchoGuard;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -121,7 +122,7 @@ public class R implements SkillBase {
     }
 
     private void executeSwing(Player player, double chargeRatio) {
-        player.swingMainHand();
+        swingEchoGuard.swingMainHand(player);
         cool.setCooldown(player, config.r_Skill_Cool, "R");
 
         NamespacedKey rKey = new NamespacedKey(plugin, "R");

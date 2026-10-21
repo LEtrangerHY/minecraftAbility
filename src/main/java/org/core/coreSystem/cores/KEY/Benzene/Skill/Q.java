@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.KEY.Benzene.Skill;
 
+import org.core.effect.effectPlugin.swingEchoGuard;
 import org.bukkit.*;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
@@ -37,7 +38,7 @@ public class Q implements SkillBase {
 
     @Override
     public void Trigger(Player player) {
-        player.swingOffHand();
+        swingEchoGuard.swingOffHand(player);
         World world = player.getWorld();
 
         LivingEntity entity = getTargetedEntity(player, 12, 0.6);

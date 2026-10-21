@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.KEY.Benzene.Skill;
 
+import org.core.effect.effectPlugin.swingEchoGuard;
 import org.bukkit.*;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.damage.DamageSource;
@@ -47,7 +48,7 @@ public class R implements SkillBase {
         cool.updateCooldown(player, "R", 6000L);
         cool.pauseCooldown(player, "R");
 
-        player.swingMainHand();
+        swingEchoGuard.swingMainHand(player);
 
         Location startLocation = player.getLocation();
         Vector direction = startLocation.getDirection().normalize().multiply(config.r_Skill_dash);

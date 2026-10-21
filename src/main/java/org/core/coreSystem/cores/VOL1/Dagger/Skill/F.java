@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL1.Dagger.Skill;
 
+import org.core.effect.effectPlugin.swingEchoGuard;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
@@ -126,7 +127,7 @@ public class F implements SkillBase {
     }
 
     public void X_finish(Player player){
-        player.swingMainHand();
+        swingEchoGuard.swingMainHand(player);
 
         Location startLocation = player.getLocation();
 

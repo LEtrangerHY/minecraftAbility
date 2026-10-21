@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL2.Cheshire.Skill;
 
+import org.core.effect.effectPlugin.swingEchoGuard;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
@@ -53,7 +54,7 @@ public class R implements SkillBase {
                 .withDirectEntity(player)
                 .build();
 
-        player.swingMainHand();
+        swingEchoGuard.swingMainHand(player);
 
         if (config.invisState.contains(uuid)) {
             config.invisState.remove(uuid);

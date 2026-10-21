@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.KEY.PLAYER.Skill;
 
+import org.core.effect.effectPlugin.swingEchoGuard;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
@@ -37,7 +38,7 @@ public class Q implements SkillBase {
 
     @Override
     public void Trigger(Player player) {
-        player.swingOffHand();
+        swingEchoGuard.swingOffHand(player);
         World world = player.getWorld();
 
         LivingEntity entity = getTargetedEntity(player, 12, 0.5);

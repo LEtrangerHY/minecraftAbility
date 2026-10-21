@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.KEY.Nightel.Skill;
 
+import org.core.effect.effectPlugin.swingEchoGuard;
 import org.bukkit.*;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
@@ -48,7 +49,7 @@ public class R implements SkillBase {
 
         chain.chainCount(player, config.r_Skill_Cool, "R");
 
-        player.swingMainHand();
+        swingEchoGuard.swingMainHand(player);
 
         Location startLocation = player.getLocation();
         Vector direction = startLocation.getDirection().normalize().multiply(config.r_Skill_dash);
