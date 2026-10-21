@@ -262,7 +262,6 @@ public class charCore extends absCore {
                 ));
             });
         }
-        plugin.getLogger().info("[CharlotteShield] spawned " + shieldBlocks.length + " displays for " + player.getName());
 
         BukkitRunnable task = new BukkitRunnable() {
             @Override

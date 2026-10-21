@@ -385,7 +385,7 @@ public class blazeCore extends absCore {
                     for (Entity entity : world.getNearbyEntities(particleLoc, dist, dist, dist)) {
                         if (entity instanceof LivingEntity target && entity != player) {
 
-                            config.damaged.get(player.getUniqueId()).add(entity);
+                            config.damaged.computeIfAbsent(player.getUniqueId(), k -> new HashSet<>()).add(entity);
 
                             ForceDamage forceDamage = new ForceDamage(target, damage, source, false);
                             forceDamage.applyEffect(player);
