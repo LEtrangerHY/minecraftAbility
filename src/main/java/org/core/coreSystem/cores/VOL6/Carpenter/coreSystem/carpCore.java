@@ -98,7 +98,7 @@ public class carpCore extends absCore {
         if (!(event.getEntity() instanceof LivingEntity target)) return;
 
         if(tag.Carpenter.contains(player) && hasProperItems(player)){
-            if(!config.r_damaging.getOrDefault(player.getUniqueId(), false)) {
+            if(!config.r_damaging.getOrDefault(player.getUniqueId(), false) || !config.q_damaging.getOrDefault(player.getUniqueId(), false)) {
 
                 Vector direction = player.getEyeLocation().add(0, -0.5, 0).getDirection().normalize();
                 Location particleLocation = player.getEyeLocation().clone()
