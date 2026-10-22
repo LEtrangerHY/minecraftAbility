@@ -22,10 +22,10 @@ public class Carpenter {
     public HashMap<UUID, Boolean> r_damaging = new HashMap<>();
     public HashMap<UUID, HashSet<Entity>> r_damaged = new HashMap<>();
     public double r_Skill_amp = 0.12;
-    public double r_Skill_damage = 7;
-    public long r_Stun = 2400;
-    public long r_Skill_Cool = 13000;
-    public double r_Skill_dash = 1.5;
+    public double r_Skill_damage = 3;
+    public long r_Stun = 1200;
+    public long r_Skill_Cool = 12000;
+    public double r_Skill_dash = 1.4;
 
     //Q
     public HashMap<UUID, Boolean> q_damaging = new HashMap<>();

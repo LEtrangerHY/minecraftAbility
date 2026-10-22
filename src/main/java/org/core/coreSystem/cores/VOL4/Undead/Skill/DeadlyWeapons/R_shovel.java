@@ -143,7 +143,7 @@ public class R_shovel implements SkillBase {
     public void Reuse(Player player, String coolKey, String coolKey_re) {
 
         double amp = config.r_Skill_amp * player.getPersistentDataContainer().getOrDefault(keyR, PersistentDataType.LONG, 0L);
-        double damage = 4.5 * (1 + amp) * 1.2;
+        double damage = 4.0 * (1 + amp) * 1.2;
 
         DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
                 .withCausingEntity(player)

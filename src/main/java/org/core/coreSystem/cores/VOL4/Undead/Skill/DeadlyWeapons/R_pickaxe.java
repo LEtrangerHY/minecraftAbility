@@ -144,7 +144,7 @@ public class R_pickaxe implements SkillBase {
 
         if (target != null) {
             double amp = config.r_Skill_amp * player.getPersistentDataContainer().getOrDefault(keyR, PersistentDataType.LONG, 0L);
-            double damage = 4.0 * (1 + amp);
+            double damage = 3.0 * (1 + amp);
 
             DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
                     .withCausingEntity(player)

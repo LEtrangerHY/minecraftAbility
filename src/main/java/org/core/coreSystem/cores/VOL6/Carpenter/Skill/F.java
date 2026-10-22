@@ -57,7 +57,7 @@ public class F implements SkillBase {
             player.showTitle(title);
 
             totem(player);
-            cool.updateCooldown(player, "F", 120000L);
+            cool.updateCooldown(player, "F", 360000L);
         }
     }
 

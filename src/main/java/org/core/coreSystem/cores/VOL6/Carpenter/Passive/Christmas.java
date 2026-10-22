@@ -40,7 +40,7 @@ public class Christmas {
         world.spawnParticle(Particle.END_ROD, player.getLocation().add(0, 1.2, 0), 70, 1.2, 1.2, 1.2, 0.7);
         int duration = 430;
 
-        PotionEffect resistance = new PotionEffect(PotionEffectType.RESISTANCE, duration, 3);
+        PotionEffect resistance = new PotionEffect(PotionEffectType.RESISTANCE, duration, 2);
 
         player.addPotionEffect(resistance);
 

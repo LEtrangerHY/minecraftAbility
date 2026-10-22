@@ -109,7 +109,7 @@ public class carpCore extends absCore {
 
             player.getWorld().playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_IRON, 1, 1);
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_STRONG, 1, 1);
-            event.setDamage(event.getDamage() * 5.7);
+            event.setDamage(event.getDamage() * 4.3);
 
 
         }
