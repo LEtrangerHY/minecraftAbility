@@ -56,6 +56,7 @@ public class coreConfig {
     public Set<Player> Jester;
     public Set<Player> Stroke;
     public Set<Player> Scout;
+    public Set<Player> Apocalypse;
 
     public coreConfig(JavaPlugin plugin, Cool cool) {
         this.plugin = plugin;
@@ -89,6 +90,7 @@ public class coreConfig {
         this.Jester = new persistentPlayerSet(plugin, "setting_jester");
         this.Stroke = new persistentPlayerSet(plugin, "setting_stroke");
         this.Scout = new persistentPlayerSet(plugin, "setting_scout");
+        this.Apocalypse = new persistentPlayerSet(plugin, "setting_apocalypse");
     }
 
     public void registerCore(String name, absCore core) {
@@ -124,6 +126,7 @@ public class coreConfig {
         if (Jester.contains(player)) return "JESTER";
         if (Stroke.contains(player)) return "STROKE";
         if (Scout.contains(player)) return "SCOUT";
+        if (Apocalypse.contains(player)) return "APOCALYPSE";
         return "NONE";
     }
 
@@ -173,6 +176,7 @@ public class coreConfig {
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_jester"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_stroke"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_scout"), PersistentDataType.BYTE, (byte) 0);
+        player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_apocalypse"), PersistentDataType.BYTE, (byte) 0);
     }
 
     public void clearCooldowns(Player player) {
@@ -234,6 +238,7 @@ public class coreConfig {
             case "jester" -> new NamespacedKey(plugin, "setting_jester");
             case "stroke" -> new NamespacedKey(plugin, "setting_stroke");
             case "scout" -> new NamespacedKey(plugin, "setting_scout");
+            case "apocalypse" -> new NamespacedKey(plugin, "setting_apocalypse");
             default -> null;
         };
     }

@@ -98,19 +98,20 @@ public class carpCore extends absCore {
         if (!(event.getEntity() instanceof LivingEntity target)) return;
 
         if(tag.Carpenter.contains(player) && hasProperItems(player)){
-            if(!config.r_damaging.getOrDefault(player.getUniqueId(), false) || !config.q_damaging.getOrDefault(player.getUniqueId(), false)) {
 
-                Vector direction = player.getEyeLocation().add(0, -0.5, 0).getDirection().normalize();
-                Location particleLocation = player.getEyeLocation().clone()
-                        .add(direction.clone().multiply(2.6));
+            if(config.r_damaging.getOrDefault(player.getUniqueId(), false) || config.q_damaging.getOrDefault(player.getUniqueId(), false)) return;
 
-                player.getWorld().spawnParticle(Particle.EXPLOSION, particleLocation, 1, 0, 0, 0, 0);
+            Vector direction = player.getEyeLocation().add(0, -0.5, 0).getDirection().normalize();
+            Location particleLocation = player.getEyeLocation().clone()
+                    .add(direction.clone().multiply(2.6));
 
-                player.getWorld().playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_IRON, 1, 1);
-                player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_STRONG, 1, 1);
-                event.setDamage(event.getDamage() * 5.7);
+            player.getWorld().spawnParticle(Particle.EXPLOSION, particleLocation, 1, 0, 0, 0, 0);
 
-            }
+            player.getWorld().playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_IRON, 1, 1);
+            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_STRONG, 1, 1);
+            event.setDamage(event.getDamage() * 5.7);
+
+
         }
     }
 

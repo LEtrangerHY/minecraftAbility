@@ -8,6 +8,9 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.core.command.*;
 import org.core.cool.Cool;
+import org.core.coreSystem.cores.VOL5.Apocalypse.coreSystem.Apocalypse;
+import org.core.coreSystem.cores.VOL5.Apocalypse.coreSystem.apoCore;
+import org.core.coreSystem.cores.VOL5.Apocalypse.coreSystem.apoInventory;
 import org.core.effect.effectPlugin.skillSpectatorGuard;
 import org.core.effect.effectPlugin.swingEchoGuard;
 import org.core.models.absModelSystem.modelManager;
@@ -145,6 +148,7 @@ public final class Core extends JavaPlugin implements Listener {
     private chesCore cheshire;
     private strCore stroke;
     private sctCore scout;
+    private apoCore apocalypse;
 
     private playerInventory playerInv;
     private nightInventory nightInv;
@@ -174,6 +178,7 @@ public final class Core extends JavaPlugin implements Listener {
     private chesInventory chesInv;
     private strInventory strInv;
     private sctInventory sctInv;
+    private apoInventory apoInv;
 
     private EntityLevelingManager Elevel;
 
@@ -218,6 +223,7 @@ public final class Core extends JavaPlugin implements Listener {
         Cheshire chesConfig = new Cheshire();
         Stroke strConfig = new Stroke();
         Scout sctConfig = new Scout();
+        Apocalypse apoConfig = new Apocalypse();
 
         this.cool = new Cool(this);
 
@@ -419,6 +425,13 @@ public final class Core extends JavaPlugin implements Listener {
 
         this.sctInv = new sctInventory(this, this.config);
         Bukkit.getPluginManager().registerEvents(this.sctInv, this);
+
+        //this.apocalypse = new apoCore(this, this.config, apoConfig, cool);
+        //Bukkit.getPluginManager().registerEvents(this.apocalypse, this);
+        //this.config.registerCore("apocalypse", this.apocalypse);
+
+        //this.apoInv = new apoInventory(this, this.config);
+        //Bukkit.getPluginManager().registerEvents(this.apoInv, this);
 
         this.benz = new benzCore(this, this.config, benzConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.benz, this);
