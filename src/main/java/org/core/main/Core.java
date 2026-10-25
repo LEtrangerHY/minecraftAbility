@@ -426,12 +426,12 @@ public final class Core extends JavaPlugin implements Listener {
         this.sctInv = new sctInventory(this, this.config);
         Bukkit.getPluginManager().registerEvents(this.sctInv, this);
 
-        //this.apocalypse = new apoCore(this, this.config, apoConfig, cool);
-        //Bukkit.getPluginManager().registerEvents(this.apocalypse, this);
-        //this.config.registerCore("apocalypse", this.apocalypse);
+        this.apocalypse = new apoCore(this, this.config, apoConfig, cool);
+        Bukkit.getPluginManager().registerEvents(this.apocalypse, this);
+        this.config.registerCore("apocalypse", this.apocalypse);
 
-        //this.apoInv = new apoInventory(this, this.config);
-        //Bukkit.getPluginManager().registerEvents(this.apoInv, this);
+        this.apoInv = new apoInventory(this, this.config);
+        Bukkit.getPluginManager().registerEvents(this.apoInv, this);
 
         this.benz = new benzCore(this, this.config, benzConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.benz, this);

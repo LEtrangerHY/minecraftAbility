@@ -18,6 +18,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.*;
 import org.core.coreSystem.cores.KEY.PLAYER.coreSystem.playerLeveling;
 import org.core.coreSystem.cores.VOL2.Cheshire.coreSystem.chesLeveling;
+import org.core.coreSystem.cores.VOL5.Apocalypse.coreSystem.apoLeveling;
 import org.core.coreSystem.cores.VOL5.Scout.coreSystem.sctLeveling;
 import org.core.coreSystem.cores.VOL2.Stroke.coreSystem.strLeveling;
 import org.core.coreSystem.cores.VOL4.Undead.coreSystem.undeadLeveling;
@@ -221,6 +222,9 @@ public class LevelingManager implements Listener {
                     sctLeveling scout = new sctLeveling(plugin, player, exp);
                     scout.addExp(player);
                     break;
+                case "APOCALYPSE":
+                    apoLeveling apocalypse = new apoLeveling(plugin, player, exp);
+                    apocalypse.addExp(player);
                 default :
                     break;
             }
