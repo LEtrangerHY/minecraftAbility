@@ -25,7 +25,7 @@ public class apoLeveling implements Levels {
         this.exp = exp;
     }
 
-    public Set<Long> requireExp = Set.of(66L, 202L, 363L, 666L, 1001L, 1111L, 2002L, 3003L, 4004L, 6006L);
+    public Set<Long> requireExp = Set.of(66L, 212L, 333L, 666L, 888L, 1221L, 2442L, 3443L, 4664L, 6664L);
 
     @Override
     public void addLV(Entity entity){
