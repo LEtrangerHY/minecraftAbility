@@ -169,9 +169,9 @@ public class apoInventory extends absInventory {
         return player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, skill), PersistentDataType.LONG, 0L);
     }
 
-    public List<Long> requireExpOfR = List.of(22L, 77L, 170L, 257L, 307L, 617L);
-    public List<Long> requireExpOfQ = List.of(22L, 77L, 170L, 257L, 307L, 617L);
-    public List<Long> requireExpOfF = List.of(22L, 77L, 170L, 257L, 307L, 617L);
+    public List<Long> requireExpOfR = List.of(22L, 66L, 180L, 240L, 360L, 646L);
+    public List<Long> requireExpOfQ = List.of(22L, 66L, 180L, 240L, 360L, 646L);
+    public List<Long> requireExpOfF = List.of(22L, 66L, 180L, 240L, 360L, 646L);
 
     @Override
     protected void reinforceSkill(Player player, String skill, Long skillLevel, Inventory customInv) {
