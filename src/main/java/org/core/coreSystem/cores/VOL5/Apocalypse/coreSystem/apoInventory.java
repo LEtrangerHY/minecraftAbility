@@ -49,9 +49,9 @@ public class apoInventory extends absInventory {
 
         return switch (skill) {
             case "main" -> Component.text("APOCALYPSE");
-            case "R" -> Component.text("R (미정)");
-            case "Q" -> Component.text("Q (미정)");
-            case "F" -> Component.text("F (미정)");
+            case "R" -> Component.text("GaleStrike");
+            case "Q" -> Component.text("Wallop");
+            case "F" -> Component.text("REVELATION");
             default -> Component.text("???");
         };
     }
@@ -140,11 +140,11 @@ public class apoInventory extends absInventory {
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
                 lore.add(Component.text("짧게 발도 자세를 잡은 뒤, 긴 목검으로 전방의 넓은 부채꼴을 위에서 아래로 지그재그로 4번 베어 베기마다 피해를 준다. 참격의 중앙에 가깝고 칼끝(바깥 테두리)에 가깝게 맞을수록 피해가 커진다. (베기당 2.2 ~ 8)").color(NamedTextColor.GREEN));
                 lore.add(Component.text("베는 동안 전방에서 날아오는 투사체를 베어 없앤다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("웅크린 채 사용하면 패리 자세를 취한다. 자세는 웅크리고 있는 동안 유지되며, 웅크리기를 풀면 4연속 베기가 나간다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("웅크린 채 사용하면 패리 자세를 취한다. 자세는 웅크리고 있는 동안 유지되며, 웅크리기를 풀면 묵시록이 나간다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("시전하면 목검을 오른손으로 바꿔 쥐고, 베기가 끝나면 원래대로 돌아온다. 목검을 쥔 동안(패리 자세, 반격 대기 포함)에는 R, Q 를 사용할 수 없다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("패리 성공 : 공격을 한 번 무시하고 공격한 적을 3초간 발광시킨다. 3초 안에 재사용하면 대상을 베기 좋은 거리까지 순식간에 돌진해(앞을 막는 블럭은 부숨) 크게 베어 대상에게 거리와 상관없이 12의 피해를 준다. 베기에 휘말린 주변의 적도 피해를 입는다. (2.2 ~ 12)").color(NamedTextColor.GREEN));
                 lore.add(Component.text("돌진 중에는 무적이며 R, Q 를 사용할 수 없다. 3초 안에 재사용하지 않으면 F 가 바로 준비된다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("4연속 베기 또는 돌진 베기를 사용하면 재사용 대기시간 44초.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("묵시록 또는 돌진 베기를 사용하면 재사용 대기시간 44초.").color(NamedTextColor.GREEN));
                 break;
             default:
                 break;
