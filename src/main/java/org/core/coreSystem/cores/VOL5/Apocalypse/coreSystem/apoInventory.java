@@ -59,9 +59,9 @@ public class apoInventory extends absInventory {
     @Override
     protected Material getTotem(Player player, String skill) {
         return switch (skill) {
-            case "R" -> Material.WOODEN_SWORD;
+            case "R" -> Material.WIND_CHARGE;
             case "Q" -> Material.STICK;
-            case "F" -> Material.OAK_PLANKS;
+            case "F" -> Material.ENDER_EYE;
             default -> Material.BARRIER;
         };
     }
