@@ -170,7 +170,7 @@ public class apoCore extends absCore {
         if (!(event.getDamager() instanceof Player player) || !contains(player)) return;
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
         if (config.skillDamaging.contains(player.getUniqueId())) return;
-        if (!hasEquipment(player) && !Fskill.isDrawn(player)) return;
+        if (!Rskill.isWindowOpen(player) && !hasEquipment(player) && !Fskill.isDrawn(player)) return;
 
         event.setCancelled(true);
     }
@@ -180,7 +180,7 @@ public class apoCore extends absCore {
         if (event.getHand() != EquipmentSlot.HAND) return;
 
         Player player = event.getPlayer();
-        if (!contains(player) || !hasEquipment(player) || Stun.isStunned(player)) return;
+        if (!contains(player) || !hasEquipment(player) || Stun.isStunned(player) || Rskill.isWindowOpen(player)) return;
         if (swingEchoGuard.isEchoPending(player)) return;
 
         combo.onSwing(player);

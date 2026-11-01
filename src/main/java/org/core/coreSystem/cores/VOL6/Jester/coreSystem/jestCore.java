@@ -442,16 +442,16 @@ public class jestCore extends absCore {
         private ItemStack originalItem;
 
         private Material[] sequence = {
-                Material.TRIDENT,
                 Material.FIREWORK_ROCKET,
+                Material.TRIDENT,
                 Material.SHIELD,
                 Material.STICK,
                 Material.CHAINMAIL_HELMET
         };
 
         private String[] stageNames = {
-                "Trick - Trident",
                 "Trick - Rocket",
+                "Trick - Trident",
                 "Trick - Shield",
                 "Trick - Stick",
                 "Trick - Crown"
