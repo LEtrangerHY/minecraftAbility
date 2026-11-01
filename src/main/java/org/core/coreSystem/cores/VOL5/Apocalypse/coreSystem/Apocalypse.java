@@ -90,8 +90,8 @@ public class Apocalypse {
     //F
     public HashMap<UUID, HashSet<Entity>> f_damaged = new HashMap<>();
     public double f_Skill_amp = 0.13;
-    public double f_Skill_damage = 8;
-    public double f_Skill_minDamage = 2.2;
+    public double f_Skill_damage = 9;
+    public double f_Skill_minDamage = 3;
     public double f_Skill_sigma = 20;
     public long f_Skill_Cool = 44000;
     public double f_Skill_reach = 6.6;
