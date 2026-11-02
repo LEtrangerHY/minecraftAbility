@@ -42,9 +42,9 @@ public class BatCombo {
     private final Cool cool;
     private final Map<UUID, String> barKeys = new HashMap<>();
 
-    private static final String BAR_SECOND = "Combo - 2nd Hit";
-    private static final String BAR_CRUSH = "Combo - Crush";
-    private static final String BAR_RUIN = "Combo - Ruin";
+    private static final String BAR_SECOND = "Continue";
+    private static final String BAR_CRUSH = "Break";
+    private static final String BAR_RUIN = "ABORT";
 
     static final Palette WOOD = new Palette(
             new Particle.DustOptions(Color.fromRGB(232, 226, 214), 0.5f),

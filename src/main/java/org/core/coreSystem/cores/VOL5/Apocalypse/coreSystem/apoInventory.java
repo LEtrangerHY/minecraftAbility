@@ -142,12 +142,12 @@ public class apoInventory extends absInventory {
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
                 lore.add(Component.text("종언 : 목검을 뽑아 전방 부채꼴을 위에서 아래로 지그재그로 4번 벤다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("참격의 중앙과 칼끝에 가깝게 맞을수록 피해가 커진다. (베기당 2.2 ~ 8)").color(NamedTextColor.GREEN));
+                lore.add(Component.text("참격의 중앙과 칼끝에 가깝게 맞을수록 피해가 커진다. (베기당 3 ~ 9)").color(NamedTextColor.GREEN));
                 lore.add(Component.text("베는 동안 전방에서 날아오는 투사체를 베어 없앤다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("패리 : 웅크린 채 사용하면 패리 자세를 취하고, 웅크리기를 풀면 종언이 나간다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("패리 성공 : 공격을 한 번 무시하고, 공격한 적을 3초간 발광시킨다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("반격 : 3초 안에 재사용하면 대상에게 돌진해 12의 피해를 가한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("돌진은 앞을 막는 블럭을 부수며, 베기에 휘말린 적도 피해를 입는다. (2.2 ~ 12)").color(NamedTextColor.GREEN));
+                lore.add(Component.text("돌진은 앞을 막는 블럭을 부수며, 베기에 휘말린 적도 피해를 입는다. (3 ~ 12)").color(NamedTextColor.GREEN));
                 lore.add(Component.text("목검을 쥔 동안 R, Q를 사용할 수 없으며, 돌진 중에는 무적이다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("3초 안에 재사용하지 않으면 F가 바로 준비된다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("종언 또는 반격을 사용하면 재사용 대기시간 44초.").color(NamedTextColor.GREEN));
