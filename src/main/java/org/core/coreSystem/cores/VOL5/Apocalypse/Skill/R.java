@@ -80,6 +80,9 @@ public class R implements SkillBase {
         Location to = player.getLocation();
         world.spawnParticle(Particle.SMOKE, to.clone().add(0, 1, 0), 10, 0.2, 0.4, 0.2, 0.01);
 
+        if (Invulnerable.isInvulnerable(player)) {
+            new Invulnerable(player, 0L).removeEffect(player);
+        }
         new Stiff(player, config.r_Skill_duration).applyEffect(player);
         new Invulnerable(player, config.r_Skill_duration).applyEffect(player);
         hide(player);
