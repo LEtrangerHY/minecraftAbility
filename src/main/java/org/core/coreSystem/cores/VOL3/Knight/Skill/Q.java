@@ -1,335 +1,272 @@
 package org.core.coreSystem.cores.VOL3.Knight.Skill;
 
-import org.core.effect.effectPlugin.swingEchoGuard;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.title.Title;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
-import org.bukkit.entity.Damageable;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.core.cool.Cool;
-import org.core.effect.crowdControl.ForceDamage;
 import org.core.coreSystem.absCoreSystem.SkillBase;
+import org.core.coreSystem.cores.VOL3.Knight.Passive.bladeBond;
 import org.core.coreSystem.cores.VOL3.Knight.coreSystem.Knight;
+import org.core.effect.crowdControl.ForceDamage;
+import org.core.effect.effectPlugin.swingEchoGuard;
+import org.core.models.coresObj.knightSwordModel;
 
-import java.time.Duration;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class Q implements SkillBase {
     private final Knight config;
     private final JavaPlugin plugin;
     private final Cool cool;
+    private final bladeBond blades;
+    private final NamespacedKey keyQ;
+    private final NamespacedKey slowKey;
 
-    public Q(Knight config, JavaPlugin plugin, Cool cool) {
+    private final Map<UUID, BukkitTask> parrying = new HashMap<>();
+
+    public Q(Knight config, JavaPlugin plugin, Cool cool, bladeBond blades) {
         this.config = config;
         this.plugin = plugin;
         this.cool = cool;
+        this.blades = blades;
+        this.keyQ = new NamespacedKey(plugin, "Q");
+        this.slowKey = new NamespacedKey(plugin, "knight_parry_slow");
     }
 
     @Override
-    public void Trigger(Player player){
-
-        if(!config.isFocusing.getOrDefault(player.getUniqueId(), false)) {
-
-            LivingEntity target = getTargetedEntity(player, 7, 0.3);
-
-            if(target != null && !target.isDead()) {
-
-                config.isFocusing.put(player.getUniqueId(), true);
-
-                AttributeInstance maxHealth = target.getAttribute(Attribute.MAX_HEALTH);
-                if (maxHealth == null) return;
-                config.targetMaxHealth.put(player.getUniqueId(), maxHealth.getBaseValue());
-
-
-                player.playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1, 1);
-                cool.setCooldown(player, 2000L, "Focus");
-                Focus(player, target);
-
-            }else{
-                Title title = Title.title(
-                        Component.empty(),
-                        Component.text("not designated").color(NamedTextColor.BLACK),
-                        Title.Times.times(Duration.ZERO, Duration.ofMillis(300), Duration.ofMillis(200))
-                );
-                player.showTitle(title);
-
-                player.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_LEATHER, 1, 1);
-                long cools = 500L;
-                cool.updateCooldown(player, "Q", cools);
-            }
-
-        }else if(config.isFocusing.getOrDefault(player.getUniqueId(), false)){
-            config.isFocusCancel.put(player.getUniqueId(), true);
+    public void Trigger(Player player) {
+        if (isParrying(player)) {
+            fan(player);
+        } else {
+            parry(player);
         }
     }
 
-    public void Focus(Player player, LivingEntity target) {
+    public boolean isParrying(Player player) {
+        return parrying.containsKey(player.getUniqueId());
+    }
 
+    public void cleanup(Player player) {
+        end(player.getUniqueId());
+    }
+
+    private double amplify(Player player) {
+        long level = player.getPersistentDataContainer().getOrDefault(keyQ, PersistentDataType.LONG, 0L);
+        return 1 + config.q_Skill_amp * level;
+    }
+
+    private DamageSource source(Player player) {
+        return DamageSource.builder(DamageType.MAGIC)
+                .withCausingEntity(player)
+                .withDirectEntity(player)
+                .build();
+    }
+
+    private Material mainSword(Player player) {
+        ItemStack main = player.getInventory().getItemInMainHand();
+        if (bladeBond.isSword(main)) return main.getType();
+        ItemStack off = player.getInventory().getItemInOffHand();
+        if (bladeBond.isSword(off)) return off.getType();
+        return Material.IRON_SWORD;
+    }
+
+    private void parry(Player player) {
+        UUID uuid = player.getUniqueId();
         World world = player.getWorld();
 
-        config.isFocusCancel.remove(player.getUniqueId());
+        cool.updateCooldown(player, "Q", config.q_Reuse_Delay);
+        slow(player, true);
 
-        AttributeInstance maxHealth = target.getAttribute(Attribute.MAX_HEALTH);
-        if (maxHealth == null) return;
-        double originalMax = config.targetMaxHealth.getOrDefault(player.getUniqueId(), maxHealth.getBaseValue());
+        world.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_NETHERITE, 1f, 1.2f);
+        world.playSound(player.getLocation(), Sound.BLOCK_GRINDSTONE_USE, 0.6f, 1.6f);
 
-        new BukkitRunnable() {
-            int ticks = 0;
+        long duration = Math.max(1L, config.q_Parry_Duration / 50L);
+
+        BukkitTask task = new BukkitRunnable() {
+            long ticks = 0;
 
             @Override
             public void run() {
-                boolean isCancelled = config.isFocusCancel.getOrDefault(player.getUniqueId(), false);
+                Player owner = Bukkit.getPlayer(uuid);
+                if (owner == null || owner.isDead()) {
+                    end(uuid);
+                    return;
+                }
 
-                if (ticks >= 40 || player.isDead() || isCancelled) {
-                    if (!isCancelled) {
-                        Slice(player, target, originalMax);
-                    } else {
-                        world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
-                        world.playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_REPAIR, 1, 1);
-                        world.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_LEATHER, 1, 1);
+                if (ticks >= duration) {
+                    end(uuid);
+                    cool.updateCooldown(owner, "Q", 0L);
+                    owner.playSound(owner.getLocation(), Sound.ITEM_ARMOR_EQUIP_LEATHER, 0.8f, 1f);
+                    return;
+                }
 
-                        Title title = Title.title(
-                                Component.empty(),
-                                Component.text("Focus Cancelled").color(NamedTextColor.BLACK),
-                                Title.Times.times(Duration.ZERO, Duration.ofMillis(300), Duration.ofMillis(200))
-                        );
-                        player.showTitle(title);
+                if (ticks % 4 == 0) stance(owner);
+                ticks++;
+            }
+        }.runTaskTimer(plugin, 0L, 1L);
 
-                        ItemStack mainHand = player.getInventory().getItemInMainHand();
-                        ItemMeta meta = mainHand.getItemMeta();
-                        if (meta instanceof org.bukkit.inventory.meta.Damageable && mainHand.getType().getMaxDurability() > 0) {
-                            org.bukkit.inventory.meta.Damageable damageable = (org.bukkit.inventory.meta.Damageable) meta;
-                            int newDamage = damageable.getDamage() + 1;
-                            damageable.setDamage(newDamage);
-                            mainHand.setItemMeta(meta);
+        parrying.put(uuid, task);
+    }
 
-                            if (newDamage >= mainHand.getType().getMaxDurability()) {
-                                player.getInventory().setItemInMainHand(null);
-                            }
-                        }
+    private void end(UUID uuid) {
+        BukkitTask task = parrying.remove(uuid);
+        if (task != null) task.cancel();
 
-                        resetTargetMaxHealth(target, originalMax);
+        Player player = Bukkit.getPlayer(uuid);
+        if (player != null) slow(player, false);
+    }
 
-                        cool.updateCooldown(player, "Focus", 0L);
-                        cool.updateCooldown(player, "Q", 3000L);
-                    }
+    private void slow(Player player, boolean apply) {
+        AttributeInstance speed = player.getAttribute(Attribute.MOVEMENT_SPEED);
+        if (speed == null) return;
 
-                    config.isFocusing.remove(player.getUniqueId());
-                    config.isFocusCancel.remove(player.getUniqueId());
+        if (speed.getModifier(slowKey) != null) speed.removeModifier(slowKey);
+        if (apply) {
+            speed.addTransientModifier(new AttributeModifier(slowKey, -config.q_Parry_Slow,
+                    AttributeModifier.Operation.MULTIPLY_SCALAR_1, EquipmentSlotGroup.ANY));
+        }
+    }
+
+    private void stance(Player player) {
+        World world = player.getWorld();
+        Location base = player.getLocation().add(0, 1.0, 0);
+        Vector forward = player.getLocation().getDirection().setY(0);
+        if (forward.lengthSquared() < 1.0E-4) forward = new Vector(0, 0, 1);
+        forward.normalize();
+
+        for (int i = -3; i <= 3; i++) {
+            Vector arc = forward.clone().rotateAroundY(Math.toRadians(i * 15));
+            Location point = base.clone().add(arc.multiply(0.9));
+            world.spawnParticle(Particle.DUST, point, 1, 0, 0.05, 0, 0, i == 0 ? bladeBond.WHITE : bladeBond.GRAY);
+        }
+    }
+
+    private void fan(Player player) {
+        end(player.getUniqueId());
+        cool.updateCooldown(player, "Q", config.q_Fan_Cool);
+
+        boolean full = blades.count(player) >= config.blade_Max;
+        int count = full ? config.q_Fan_Full_Count : config.q_Fan_Count;
+        if (full) blades.recallOldest(player, count);
+
+        World world = player.getWorld();
+        Material material = mainSword(player);
+        double damage = bladeBond.swordDamage(material) * amplify(player);
+        DamageSource source = source(player);
+        Location eye = player.getEyeLocation();
+        Vector look = eye.getDirection();
+        double half = config.q_Fan_Angle / 2.0;
+
+        swingEchoGuard.swingMainHand(player);
+        world.playSound(player.getLocation(), Sound.ITEM_TRIDENT_THROW, 1f, 0.9f);
+        world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1.1f);
+
+        for (int i = 0; i < count; i++) {
+            double offset = count == 1 ? 0 : -half + config.q_Fan_Angle * i / (count - 1);
+            Vector direction = look.clone().rotateAroundY(Math.toRadians(offset));
+            blades.launch(player, material, eye, direction, config.q_Fan_Speed, config.q_Fan_Range,
+                    damage, source, true, null, null);
+        }
+
+        bladeBond.wear(player, EquipmentSlot.HAND, 1);
+    }
+
+    public void onParry(Player player, LivingEntity attacker) {
+        end(player.getUniqueId());
+        cool.updateCooldown(player, "Q", config.q_Parry_Cool);
+
+        World world = player.getWorld();
+        Location chest = player.getLocation().add(0, 1.1, 0);
+        world.playSound(chest, Sound.ITEM_SHIELD_BLOCK, 1f, 0.8f);
+        world.playSound(chest, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1.4f);
+        world.playSound(chest, Sound.BLOCK_ANVIL_LAND, 0.4f, 1.8f);
+        world.spawnParticle(Particle.SWEEP_ATTACK, chest, 1, 0, 0, 0, 0);
+        world.spawnParticle(Particle.ENCHANTED_HIT, chest, 16, 0.4, 0.4, 0.4, 0.3);
+
+        Material material = mainSword(player);
+        double damage = bladeBond.swordDamage(material) * amplify(player);
+
+        swingEchoGuard.swingMainHand(player);
+        homing(player, attacker, material, damage);
+        bladeBond.wear(player, EquipmentSlot.HAND, 1);
+    }
+
+    private void homing(Player player, LivingEntity target, Material material, double damage) {
+        World world = player.getWorld();
+        int epoch = blades.epoch(player);
+        Location start = player.getEyeLocation();
+
+        Vector toward = target.getBoundingBox().getCenter().subtract(start.toVector());
+        final Vector initial = toward.lengthSquared() < 1.0E-4 ? start.getDirection().normalize() : toward.normalize();
+
+        Location spawn = start.clone().add(initial.clone().multiply(0.6));
+        spawn.setDirection(initial);
+        knightSwordModel model = new knightSwordModel(world, spawn, material, bladeBond.SCALE, false, false);
+        DamageSource source = source(player);
+        long duration = Math.max(1L, config.q_Homing_Duration / 50L);
+
+        world.playSound(start, Sound.ITEM_TRIDENT_THROW, 1f, 1.5f);
+
+        new BukkitRunnable() {
+            long ticks = 0;
+            final Location cursor = spawn.clone();
+
+            @Override
+            public void run() {
+                if (!blades.isCurrent(player, epoch) || !player.isOnline() || !model.isValid()
+                        || target.isDead() || !target.isValid() || !target.getWorld().equals(world) || ticks++ >= duration) {
+                    model.remove();
                     cancel();
                     return;
                 }
 
-                if (ticks % 10 == 0) {
-                    PotionEffect slowness = new PotionEffect(PotionEffectType.SLOWNESS, 10, 2, false, false);
-                    player.addPotionEffect(slowness);
+                Vector aim = target.getBoundingBox().getCenter();
+                Vector to = aim.clone().subtract(cursor.toVector());
+                double distance = to.length();
+                Vector facing = distance > 1.0E-4 ? to.clone().normalize() : initial.clone();
 
-                    world.spawnParticle(Particle.ENCHANTED_HIT,
-                            player.getLocation().clone().add(0, 1.3, 0), 14, 0.4, 0.4, 0.4, 1);
-                    world.spawnParticle(Particle.DAMAGE_INDICATOR,
-                            target.getLocation().clone().add(0, 1.3, 0), 2, 0.2, 0.2, 0.2, 1);
+                if (distance <= config.q_Homing_Speed + 0.4) {
+                    cancel();
+                    RayTraceResult surface = target.getBoundingBox().rayTrace(cursor.toVector(), facing, distance + 1.0);
+                    Vector point = surface != null ? surface.getHitPosition() : aim;
+                    Location at = point.toLocation(world);
 
-                    AttributeInstance maxHealth = target.getAttribute(Attribute.MAX_HEALTH);
-                    if (maxHealth != null && !target.isDead()) {
-                        double currentMax = maxHealth.getBaseValue();
-                        double newMax = Math.max(1.0, currentMax - 1);
-                        maxHealth.setBaseValue(newMax);
+                    new ForceDamage(target, damage, source, false).applyEffect(player);
+                    world.spawnParticle(Particle.ENCHANTED_HIT, at, 14, 0.2, 0.2, 0.2, 0.2);
+                    world.playSound(at, Sound.ITEM_TRIDENT_HIT, 1f, 0.9f);
 
-                        if (target.getHealth() > newMax) {
-                            target.setHealth(newMax);
-                        }
-                    }
-                }
-
-                ticks++;
-            }
-        }.runTaskTimer(plugin, 0, 1);
-    }
-
-
-    public void Slice(Player player,LivingEntity target, double originalMax) {
-
-        World world = player.getWorld();
-
-        config.q_Skill_Using.put(player.getUniqueId(), true);
-
-        new BukkitRunnable() {
-            int tick = 0;
-
-            @Override
-            public void run() {
-                if (tick >= 2 || player.isDead()) {
-                    config.damaged.remove(player.getUniqueId());
-                    resetTargetMaxHealth(target, originalMax);
-                    config.q_Skill_Using.remove(player.getUniqueId());
-                    this.cancel();
+                    blades.embed(player, material, false, target, point, facing, model);
                     return;
                 }
 
-                world.playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1, 1);
-
-                Slash(player, tick);
-
-                tick++;
+                Location previous = cursor.clone();
+                cursor.add(facing.clone().multiply(config.q_Homing_Speed));
+                Location tip = cursor.clone();
+                tip.setDirection(facing);
+                model.getDisplay().teleport(tip);
+                bladeBond.streak(world, previous, facing, config.q_Homing_Speed);
             }
-        }.runTaskTimer(plugin, 0L, 3L);
-    }
-
-    public void Slash(Player player, int atkType) {
-
-        config.damaged.put(player.getUniqueId(), new HashSet<>());
-
-        swingEchoGuard.swingMainHand(player);
-        World world = player.getWorld();
-        world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
-
-        double slashLength = 4.7;
-        double maxAngle = Math.toRadians(49);
-        long tickDelay = 0L;
-        int maxTicks = 3;
-        double innerRadius = 2.7;
-
-        double hitThreshold = Math.cos(maxAngle + 0.1);
-
-        double amp = config.q_Skill_amp * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L);
-        double damage = config.q_Skill_Damage * (1 + amp);
-
-        DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
-                .withCausingEntity(player)
-                .withDirectEntity(player)
-                .build();
-
-        Location origin = player.getEyeLocation().add(0, 0, 0);
-        Vector direction = player.getLocation().getDirection().clone();
-        Vector rightAxis = direction.clone().crossProduct(new Vector(0, 1, 0)).normalize();
-
-        new BukkitRunnable() {
-            int ticks = 0;
-
-            @Override
-            public void run() {
-
-                if (ticks >= maxTicks || player.isDead()) {
-                    ItemStack mainHand = player.getInventory().getItemInMainHand();
-                    ItemMeta meta = mainHand.getItemMeta();
-                    if (meta instanceof org.bukkit.inventory.meta.Damageable damageable && mainHand.getType().getMaxDurability() > 0) {
-                        int newDamage = damageable.getDamage() + 1;
-                        damageable.setDamage(newDamage);
-                        mainHand.setItemMeta(meta);
-
-                        if (newDamage >= mainHand.getType().getMaxDurability()) {
-                            player.getInventory().setItemInMainHand(null);
-                        }
-                    }
-                    this.cancel();
-                    return;
-                }
-
-                double progress = (ticks + 1) * (maxAngle * 2 / maxTicks) - maxAngle;
-                Vector centerDir;
-
-                if (atkType == 0) {
-                    centerDir = direction.clone().setY(0).normalize().rotateAroundY(progress);
-                } else {
-                    centerDir = direction.clone().rotateAroundAxis(rightAxis, progress);
-                }
-
-                for (Entity entity : world.getNearbyEntities(origin, slashLength, slashLength, slashLength)) {
-                    if (!(entity instanceof LivingEntity target) || entity == player) continue;
-                    if (config.damaged.get(player.getUniqueId()).contains(entity)) continue;
-
-                    Vector toTarget = target.getLocation().toVector().subtract(origin.toVector());
-
-                    if (toTarget.lengthSquared() > slashLength * slashLength) continue;
-
-                    Vector targetDir = toTarget.normalize();
-                    double dotProduct;
-
-                    if (atkType == 0) {
-                        Vector flatToTarget = toTarget.clone().setY(0).normalize();
-                        dotProduct = centerDir.dot(flatToTarget);
-                    } else {
-                        dotProduct = centerDir.dot(targetDir);
-                    }
-
-                    if (dotProduct >= hitThreshold) {
-                        config.damaged.get(player.getUniqueId()).add(entity);
-
-                        ForceDamage forceDamage = new ForceDamage(target, damage, source, true);
-                        forceDamage.applyEffect(player);
-                    }
-                }
-
-                for (double length = innerRadius; length <= slashLength; length += 0.1) {
-                    for (double angle = -maxAngle; angle <= maxAngle; angle += Math.toRadians(1)) {
-                        Vector angleDir;
-                        if (atkType == 0) {
-                            angleDir = centerDir.clone().rotateAroundY(angle);
-                        } else {
-                            angleDir = centerDir.clone().rotateAroundAxis(rightAxis, angle);
-                        }
-
-                        Vector particleOffset = angleDir.clone().multiply(length);
-                        Location particleLocation = origin.clone().add(particleOffset);
-
-                        Particle.DustOptions dustOptions = new Particle.DustOptions(
-                                Math.random() < 0.17 ? Color.fromRGB(255, 255, 255) : Color.fromRGB(0, 0, 0),
-                                0.7f
-                        );
-                        world.spawnParticle(Particle.DUST, particleLocation, 1, 0, 0, 0, 0, dustOptions);
-
-                    }
-                }
-                ticks++;
-            }
-        }.runTaskTimer(plugin, tickDelay, 1L);
-    }
-
-    private void resetTargetMaxHealth(LivingEntity target, double originalMax) {
-        AttributeInstance maxHealth = target.getAttribute(Attribute.MAX_HEALTH);
-
-        if (maxHealth != null && !target.isDead()) {
-            if(originalMax >= maxHealth.getBaseValue()) maxHealth.setBaseValue(originalMax);
-        }
-    }
-
-    public static LivingEntity getTargetedEntity(Player player, double range, double raySize) {
-        World world = player.getWorld();
-        Location eyeLocation = player.getEyeLocation();
-        Vector direction = eyeLocation.getDirection();
-
-        List<LivingEntity> candidates = new ArrayList<>();
-
-        for (Entity entity : world.getNearbyEntities(eyeLocation, range, range, range)) {
-            if (!(entity instanceof LivingEntity) || entity.equals(player)) continue;
-
-            RayTraceResult result = world.rayTraceEntities(
-                    eyeLocation, direction, range, raySize, e -> e.equals(entity)
-            );
-
-            if (result != null) {
-                candidates.add((LivingEntity) entity);
-            }
-        }
-
-        return candidates.stream()
-                .min(Comparator.comparingDouble(Damageable::getHealth))
-                .orElse(null);
+        }.runTaskTimer(plugin, 0L, 1L);
     }
 }

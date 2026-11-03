@@ -55,9 +55,9 @@ public class knightInventory extends absInventory {
 
         return switch (skill) {
             case "main" -> Component.text("KNIGHT");
-            case "R" -> Component.text("BlingSwords");
+            case "R" -> Component.text("TetherBlades");
             case "Q" -> Component.text("FlashSevering");
-            case "F" -> Component.text("BURST SEVERING");
+            case "F" -> Component.text("MACHAIRA");
             default -> Component.text("???");
         };
     }
@@ -79,9 +79,15 @@ public class knightInventory extends absInventory {
 
         if (skill.equals("main")) {
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-            lore.add(Component.text("타입 : 브루저").color(NamedTextColor.LIGHT_PURPLE));
+            lore.add(Component.text("타입 : 중거리 견제형").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("장착 : 메인핸드와 오프핸드 모두 검 종류 아이템 장착.").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+            lore.add(Component.text("검기 : 좌클릭 시 전방으로 검기를 날려 처음 닿는 적에게 3의 피해를 가한다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("꽂힌 검 : 적이나 블럭에 꽂힌 검은 12초간 남으며, 최대 12자루까지 유지된다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("12자루를 넘기면 가장 먼저 꽂힌 검을 회수한다. 검을 회수할 때마다 체력을 2.33 회복한다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("검이 꽂힌 적이 죽으면 꽂혀 있던 검들이 튕겨 나가 주변 바닥에 각각 꽂힌다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("결합선 : 검기가 꽂힌 검에 닿으면, 그 검에서 12블럭 안의 다른 꽂힌 검을 향해 검기가 뻗어 나간다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("뻗어 나간 검기가 지나는 적은 검기 피해의 60%를 받는다. (검기 한 번에 대상마다 한 번)").color(NamedTextColor.GREEN));
             lore.add(Component.text(""));
             lore.add(Component.text("메뉴북 아이템 없어도 인벤토리 화면에서 철검을 우클릭해서 메뉴 화면 진입 가능").color(NamedTextColor.AQUA));
             return lore;
@@ -108,24 +114,32 @@ public class knightInventory extends absInventory {
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
                 lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : 연계").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("대상 : 적 오브젝트/블럭").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("대상 중심으로 회전하는 어검 3개를 대상에게 적용한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("7초 후 회전하던 어검을 대상에게 투사한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("투척 : 던진 검이 꽂혀 있지 않으면, 오프핸드 검을 전방으로 던진다. 던진 검은 처음 닿는 적이나 블럭에 꽂힌다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("적에게 꽂히면 오프핸드 검 재질의 공격력만큼 피해를 가한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("어검 : 던진 검(FlashSevering으로 던진 검 포함)이 꽂혀 있으면, 그 검들이 사라지고 각 자리 주위 세 방향에 검 3자루가 나타난다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("검 3자루는 살짝 돌아 자세를 잡은 뒤, 적에게 꽂혀 있었다면 직선으로, 블럭에 꽂혀 있었다면 소용돌이치며 중심을 지나 날아간다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("날아가는 검은 블럭을 통과하며, 처음 닿는 적에게 꽂혀 재질 공격력의 1/3만큼 피해를 가한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("재사용 대기시간 0.4초.").color(NamedTextColor.GREEN));
                 break;
             case "Q":
                 requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfQ.get((int) level)) : Component.text("Require EXP : MAX");
                 lore.add(requireXp.color(NamedTextColor.AQUA));
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("시스템 : 선딜레이").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("타입 : 방어 / 공격").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : 패링 / 재사용").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("선딜레이 : 시전 시 3초간 선딜레이가 발생한다. 피격당할시 선딜레이가 해제된다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("선딜레이 이후 : 전방을 중심으로 십자 참격을 가한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("선딜레이 이전 : 피격한 대상을 밀쳐낸다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("기본 : 3초간 패링 상태가 된다. 패링 상태에서는 이동속도가 70% 감소한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("패링 성공 : 근접 공격이나 투사체를 막고, 공격한 적에게 반드시 꽂히는 검을 날린다. (재사용 대기시간 3초)").color(NamedTextColor.GREEN));
+                lore.add(Component.text("날린 검은 블럭을 통과하며, 메인핸드 검 재질의 공격력만큼 피해를 가한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("재사용 : 패링 상태에서 다시 사용하면 전방 40도 부채꼴로 검 3자루를 던진다. (재사용 대기시간 12초)").color(NamedTextColor.GREEN));
+                lore.add(Component.text("던진 검은 처음 닿는 적이나 블럭에 꽂히며, 메인핸드 검 재질의 공격력만큼 피해를 가한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("꽂힌 검이 12자루일 때 사용하면 가장 먼저 꽂힌 4자루를 회수하고 4자루를 던진다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("패링 상태가 그냥 끝나면 재사용 대기시간이 없다.").color(NamedTextColor.GREEN));
                 break;
             case "F":
                 requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfF.get((int) level)) : Component.text("Require EXP : MAX");
@@ -133,11 +147,18 @@ public class knightInventory extends absInventory {
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
                 lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : 선딜레이").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("대상 : 적 오브젝트/블럭").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("전방으로 강한 참격을 가한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("피격-강한 참격 : 피격된 블럭들을 모두 파괴한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("조건 : 꽂힌 검이 1자루 이상 있어야 사용할 수 있다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("선딜레이 : 0.6초간 경직되며, 양손의 검과 꽂힌 검을 모두 거둬 대검으로 합친다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("거둬지는 검은 손으로 날아오며, 뽑히는 적과 경로 위의 적에게 재질 공격력의 1/6만큼 마법 피해를 가한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("거둔 검마다 체력을 2.33 회복한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("내려치기 : 대검을 내리찍어 전방 직선에 피해를 가하고 1.2초간 기절시킨다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("거둔 검이 많을수록 대검과 범위, 피해가 커진다. (1자루 : 길이 6, 폭 2, 피해 4 ~ 12자루 : 길이 12, 폭 3, 피해 13)").color(NamedTextColor.GREEN));
+                lore.add(Component.text("거둔 검마다 (재질 공격력 - 1)의 절반만큼 마법 피해가 추가된다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("피격-내려치기 : 피격된 블럭들을 모두 파괴한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("재사용 대기시간 : 거둔 검 1자루당 5초 (최대 60초).").color(NamedTextColor.GREEN));
                 break;
             default:
                 break;

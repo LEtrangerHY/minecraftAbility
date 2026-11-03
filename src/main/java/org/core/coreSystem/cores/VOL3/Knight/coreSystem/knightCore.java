@@ -12,6 +12,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -19,8 +20,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.core.cool.Cool;
@@ -30,14 +29,20 @@ import org.core.main.coreConfig;
 import org.core.coreSystem.absCoreSystem.ConfigWrapper;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.absCoreSystem.absCore;
+import org.core.coreSystem.cores.VOL3.Knight.Passive.bladeBond;
 import org.core.coreSystem.cores.VOL3.Knight.Skill.F;
 import org.core.coreSystem.cores.VOL3.Knight.Skill.Q;
 import org.core.coreSystem.cores.VOL3.Knight.Skill.R;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 public class knightCore extends absCore {
     private final Core plugin;
     private final Knight config;
 
+    private final bladeBond blades;
     private final R Rskill;
     private final Q Qskill;
     private final F Fskill;
@@ -48,9 +53,10 @@ public class knightCore extends absCore {
         this.plugin = plugin;
         this.config = config;
 
-        this.Rskill = new R(config, plugin, cool);
-        this.Qskill = new Q(config, plugin, cool);
-        this.Fskill = new F(config, plugin, cool);
+        this.blades = new bladeBond(config, plugin);
+        this.Rskill = new R(config, plugin, cool, blades);
+        this.Qskill = new Q(config, plugin, cool, blades);
+        this.Fskill = new F(config, plugin, cool, blades);
 
         plugin.getLogger().info("Knight downloaded...");
     }
@@ -94,54 +100,29 @@ public class knightCore extends absCore {
         }
     }
 
-    @EventHandler
-    public void focusCancel(EntityDamageByEntityEvent event) {
-        if (!(event.getEntity() instanceof Player player)) return;
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void parry(EntityDamageByEntityEvent event) {
+        if (!(event.getEntity() instanceof Player player) || !contains(player)) return;
+        if (!Qskill.isParrying(player)) return;
+
+        EntityDamageEvent.DamageCause cause = event.getCause();
+        if (cause != EntityDamageEvent.DamageCause.ENTITY_ATTACK
+                && cause != EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK
+                && cause != EntityDamageEvent.DamageCause.PROJECTILE) return;
 
         LivingEntity attacker = null;
         Entity damager = event.getDamager();
 
-        if (damager instanceof LivingEntity) {
-            attacker = (LivingEntity) damager;
-        } else if (damager instanceof Projectile projectile) {
-            if (projectile.getShooter() instanceof LivingEntity shooter) {
-                attacker = shooter;
-            }
+        if (damager instanceof LivingEntity living) {
+            attacker = living;
+        } else if (damager instanceof Projectile projectile && projectile.getShooter() instanceof LivingEntity shooter) {
+            attacker = shooter;
         }
 
-        if (attacker == null) return;
+        if (attacker == null || attacker.equals(player)) return;
 
-        if (tag.Knight.contains(player)) {
-            World world = player.getWorld();
-
-            if (config.isFocusing.getOrDefault(player.getUniqueId(), false)) {
-                event.setCancelled(true);
-
-                if (!config.isFocusCancel.getOrDefault(player.getUniqueId(), false)) {
-
-                    Location playerLoc = player.getLocation();
-                    Vector dirToAttacker = attacker.getLocation().toVector()
-                            .subtract(player.getLocation().toVector())
-                            .normalize();
-                    playerLoc.setDirection(dirToAttacker);
-                    player.teleport(playerLoc);
-
-                    Vector knockback = dirToAttacker.multiply(1.4);
-                    damager.setVelocity(knockback);
-
-                    PotionEffect glowing = new PotionEffect(PotionEffectType.GLOWING, 20 * 3, 1, false, true);
-                    ((LivingEntity) attacker).addPotionEffect(glowing);
-
-                    world.spawnParticle(Particle.ENCHANTED_HIT, damager.getLocation().clone().add(0, 1, 0), 21, 0.4, 0.4, 0.4, 1);
-                    world.spawnParticle(Particle.SWEEP_ATTACK, damager.getLocation().clone().add(0, 1, 0), 1, 0.0, 0, 0, 0);
-
-                    world.playSound(playerLoc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
-                    world.playSound(playerLoc, Sound.ENTITY_IRON_GOLEM_REPAIR, 1, 1);
-
-                    config.isFocusCancel.put(player.getUniqueId(), true);
-                }
-            }
-        }
+        event.setCancelled(true);
+        Qskill.onParry(player, attacker);
     }
 
     @Override
@@ -151,7 +132,7 @@ public class knightCore extends absCore {
 
     @Override
     protected boolean isCustomAttackUser(Player player) {
-        return !config.q_Skill_Using.getOrDefault(player.getUniqueId(), false);
+        return !Fskill.isCasting(player);
     }
 
     @Override
@@ -176,6 +157,10 @@ public class knightCore extends absCore {
                 .withDirectEntity(player)
                 .build();
 
+        double share = config.l_Skill_Damage * config.bond_Share;
+        Set<UUID> struck = new HashSet<>();
+        Set<bladeBond.Blade> touched = new HashSet<>();
+
         new BukkitRunnable() {
             int ticks = 0;
 
@@ -197,12 +182,22 @@ public class knightCore extends absCore {
                 for (Entity entity : world.getNearbyEntities(particleLocation, 0.7, 0.3, 0.7)) {
                     if (entity instanceof LivingEntity target && entity != player) {
 
-                        ForceDamage forceDamage = new ForceDamage(target, 3.0, source, false);
-                        forceDamage.applyEffect(player);
+                        if (struck.add(target.getUniqueId())) {
+                            ForceDamage forceDamage = new ForceDamage(target, config.l_Skill_Damage, source, false);
+                            forceDamage.applyEffect(player);
+                        }
+
+                        for (bladeBond.Blade blade : blades.hostedBy(player, target)) {
+                            if (touched.add(blade)) blades.bond(player, blade, share, source, struck);
+                        }
 
                         config.collision.put(player.getUniqueId(), true);
                         break;
                     }
+                }
+
+                for (bladeBond.Blade blade : blades.near(player, particleLocation, config.l_Touch_Radius)) {
+                    if (touched.add(blade)) blades.bond(player, blade, share, source, struck);
                 }
 
                 ticks++;
@@ -256,7 +251,11 @@ public class knightCore extends absCore {
 
     private boolean canUseQSkill(Player player) { return true; }
 
-    private boolean canUseFSkill(Player player) { return true; }
+    private boolean canUseFSkill(Player player) {
+        if (blades.count(player) > 0) return true;
+        player.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_LEATHER, 1, 0.8f);
+        return false;
+    }
 
     @Override
     protected boolean isItemRequired(Player player){
@@ -290,6 +289,9 @@ public class knightCore extends absCore {
             @Override
             public void variableReset(Player player) {
                 config.variableReset(player);
+                Qskill.cleanup(player);
+                Fskill.cleanup(player);
+                blades.clear(player);
             }
 
             @Override
@@ -305,7 +307,7 @@ public class knightCore extends absCore {
 
             @Override
             public long getLcooldown(Player player) {
-                return 625L;
+                return config.l_Skill_Cool;
             }
 
             @Override
@@ -320,7 +322,8 @@ public class knightCore extends absCore {
 
             @Override
             public long getFcooldown(Player player) {
-                return config.F_COOLDOWN.getOrDefault(player.getUniqueId(), config.f_Skill_Cool);
+                long scaled = Math.min(config.f_Cool_Max, config.f_Cool_Per_Blade * blades.count(player));
+                return config.F_COOLDOWN.getOrDefault(player.getUniqueId(), scaled);
             }
         };
     }

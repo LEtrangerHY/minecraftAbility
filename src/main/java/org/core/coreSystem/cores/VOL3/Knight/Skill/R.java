@@ -1,394 +1,224 @@
 package org.core.coreSystem.cores.VOL3.Knight.Skill;
 
-import org.core.models.coresObj.knightSwordModel;
-import com.google.common.collect.Multimap;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.title.Title;
-import org.bukkit.*;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
-import org.bukkit.entity.*;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.core.cool.Cool;
 import org.core.coreSystem.absCoreSystem.SkillBase;
+import org.core.coreSystem.cores.VOL3.Knight.Passive.bladeBond;
 import org.core.coreSystem.cores.VOL3.Knight.coreSystem.Knight;
 import org.core.effect.crowdControl.ForceDamage;
+import org.core.effect.effectPlugin.swingEchoGuard;
+import org.core.models.coresObj.knightSwordModel;
 
-import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 
 public class R implements SkillBase {
     private final Knight config;
     private final JavaPlugin plugin;
     private final Cool cool;
+    private final bladeBond blades;
+    private final NamespacedKey keyR;
 
-    public R(Knight config, JavaPlugin plugin, Cool cool) {
+    public R(Knight config, JavaPlugin plugin, Cool cool, bladeBond blades) {
         this.config = config;
         this.plugin = plugin;
         this.cool = cool;
+        this.blades = blades;
+        this.keyR = new NamespacedKey(plugin, "R");
     }
 
     @Override
     public void Trigger(Player player) {
-        World world = player.getWorld();
+        List<bladeBond.Blade> origins = new ArrayList<>();
+        for (bladeBond.Blade blade : blades.list(player)) {
+            if (blade.isOrigin()) origins.add(blade);
+        }
 
-        if (config.swordCount.getOrDefault(player.getUniqueId(), 0) < 3) {
-
-            Entity target = getTargetedEntity(player, 17, 0.3);
-
-            if (target == null || target.isDead() || (target instanceof LivingEntity && ((LivingEntity) target).getHealth() <= 0)) {
-                return;
-            }
-
-            player.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_LEATHER, 1, 1);
-
-            int currentCount = config.swordCount.getOrDefault(player.getUniqueId(), 0) + 1;
-            config.swordCount.put(player.getUniqueId(), currentCount);
-
-            world.spawnParticle(Particle.ENCHANTED_HIT, target.getLocation().clone().add(0, 1, 0), 49, 0.4, 0.4, 0.4, 1);
-
-            Title title = Title.title(
-                    Component.empty(),
-                    Component.text(currentCount).color(NamedTextColor.BLACK),
-                    Title.Times.times(Duration.ZERO, Duration.ofMillis(100), Duration.ofMillis(200))
-            );
-            player.showTitle(title);
-
-            TripleSword(player, target);
-
-            player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
-            ItemStack offHand = player.getInventory().getItemInOffHand();
-            ItemMeta meta = offHand.getItemMeta();
-            if (meta instanceof org.bukkit.inventory.meta.Damageable && offHand.getType().getMaxDurability() > 0) {
-                org.bukkit.inventory.meta.Damageable damageable = (org.bukkit.inventory.meta.Damageable) meta;
-                int newDamage = damageable.getDamage() + 1;
-                damageable.setDamage(newDamage);
-                offHand.setItemMeta(meta);
-
-                if (newDamage >= offHand.getType().getMaxDurability()) {
-                    player.getInventory().setItemInOffHand(null);
-                }
-            }
-
+        if (origins.isEmpty()) {
+            throwBlade(player);
         } else {
-            Title title = Title.title(
-                    Component.empty(),
-                    Component.text("Can use 3 times").color(NamedTextColor.RED),
-                    Title.Times.times(Duration.ZERO, Duration.ofMillis(100), Duration.ofMillis(200))
-            );
-            player.showTitle(title);
-
-            world.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_LEATHER, 1, 1);
-            long cools = 300L;
-            cool.updateCooldown(player, "R", cools);
+            volley(player, origins);
         }
     }
 
-    public void TripleSword(Player player, Entity target) {
-        if (target == null || target.isDead()) return;
-
-        final World world = target.getWorld();
-        final int swordCount = 3;
-        final double radius = 7;
-        final double yOffset = 0.3;
-        final double projectileSpeed = 1.0;
-
-        double baseDamage = 1.0;
-
-        ItemStack offHandItem = player.getInventory().getItemInOffHand();
-
-        if (offHandItem != null && offHandItem.getType() != Material.AIR) {
-            boolean foundCustom = false;
-            ItemMeta meta = offHandItem.getItemMeta();
-
-            if (meta != null && meta.hasAttributeModifiers()) {
-                Collection<AttributeModifier> modifiers = meta.getAttributeModifiers(Attribute.ATTACK_DAMAGE);
-
-                if (modifiers != null) {
-                    for (AttributeModifier modifier : modifiers) {
-                        baseDamage += modifier.getAmount();
-                    }
-                    foundCustom = true;
-                }
-            }
-
-            if (!foundCustom) {
-                Multimap<Attribute, AttributeModifier> defaults = offHandItem.getType().getDefaultAttributeModifiers(EquipmentSlot.HAND);
-
-                if (defaults.containsKey(Attribute.ATTACK_DAMAGE)) {
-                    for (AttributeModifier modifier : defaults.get(Attribute.ATTACK_DAMAGE)) {
-                        baseDamage += modifier.getAmount();
-                    }
-                }
-            }
-        }
-
-        final double damage = baseDamage / 3.0;
-
-        final List<ArmorStand> swords = new ArrayList<>();
-        final List<Double> baseAngles = new ArrayList<>();
-        final List<Location> prevHiltLocations = new ArrayList<>();
-        Particle.DustOptions dustOption = new Particle.DustOptions(Color.fromRGB(0, 0, 0), 0.7f);
-        Particle.DustOptions dustOption_gra = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 0.7f);
-
-        Location center = target.getLocation();
-
-        world.playSound(center, Sound.ENTITY_WITHER_SHOOT, 1, 1);
-
-        for (int i = 0; i < swordCount; i++) {
-            double angle = 2 * Math.PI / swordCount * i;
-            baseAngles.add(angle);
-
-            double x = center.getX() + radius * Math.cos(angle);
-            double y = center.getY() + yOffset;
-            double z = center.getZ() + radius * Math.sin(angle);
-
-            Location swordLoc = new Location(world, x, y, z);
-
-            ArmorStand stand = new knightSwordModel(world, swordLoc, player.getInventory().getItemInOffHand()).getStand();
-            player.getWorld().spawnParticle(Particle.ENCHANTED_HIT, swordLoc, 21, 0.4, 0.4, 0.4, 0);
-
-            swords.add(stand);
-            prevHiltLocations.add(swordLoc.clone());
-        }
-
-        new BukkitRunnable() {
-            double orbitAngle = 0;
-            int ticks = 0;
-
-            @Override
-            public void run() {
-                if (target.isDead() || (target instanceof LivingEntity && ((LivingEntity) target).getHealth() <= 0)) {
-                    swords.forEach(ArmorStand::remove);
-                    if (config.swordCount.getOrDefault(player.getUniqueId(), 0) > 0) {
-                        player.heal(damage * 3);
-                        int newCount = config.swordCount.getOrDefault(player.getUniqueId(), 0) - 1;
-                        config.swordCount.put(player.getUniqueId(), newCount);
-
-                        Title title = Title.title(
-                                Component.empty(),
-                                Component.text((3 - newCount) + " set").color(NamedTextColor.GRAY),
-                                Title.Times.times(Duration.ZERO, Duration.ofMillis(100), Duration.ofMillis(200))
-                        );
-                        player.showTitle(title);
-
-                        if (newCount == 0) {
-                            config.swordCount.remove(player.getUniqueId());
-                        }
-                    }
-                    cancel();
-                    return;
-                }
-
-                Location center = target.getLocation();
-                orbitAngle += Math.toRadians(1);
-
-                for (int i = 0; i < swords.size(); i++) {
-                    double angle = baseAngles.get(i) + orbitAngle;
-                    double x = center.getX() + radius * Math.cos(angle);
-                    double y = center.getY() + yOffset;
-                    double z = center.getZ() + radius * Math.sin(angle);
-
-                    Location newLoc = new Location(world, x, y, z);
-
-                    double dx = center.getX() - x;
-                    double dy = (center.getY() + yOffset) - y;
-                    double dz = center.getZ() - z;
-                    double distXZ = Math.sqrt(dx * dx + dz * dz);
-
-                    float yaw = (float) Math.toDegrees(Math.atan2(-dx, dz));
-                    float pitch = (float) -Math.toDegrees(Math.atan2(dy, distXZ));
-                    newLoc.setYaw(yaw);
-                    newLoc.setPitch(pitch);
-
-                    Location prevHilt = prevHiltLocations.get(i);
-                    if (Math.random() < 0.17) {
-                        spawnParticleTrail(world, prevHilt, newLoc, Particle.DUST, dustOption_gra);
-                    } else {
-                        spawnParticleTrail(world, prevHilt, newLoc, Particle.DUST, dustOption);
-                    }
-
-                    swords.get(i).teleport(newLoc);
-                    prevHiltLocations.set(i, newLoc.clone());
-                }
-
-                ticks++;
-
-                if (ticks >= 20 * 7) {
-                    if (target.isDead() || (target instanceof LivingEntity && ((LivingEntity) target).getHealth() <= 0)) {
-                        swords.forEach(ArmorStand::remove);
-                        if (config.swordCount.getOrDefault(player.getUniqueId(), 0) > 0) {
-                            player.heal(damage);
-                            int newCount = config.swordCount.getOrDefault(player.getUniqueId(), 0) - 1;
-                            config.swordCount.put(player.getUniqueId(), newCount);
-
-                            Title title = Title.title(
-                                    Component.empty(),
-                                    Component.text((3 - newCount) + " set").color(NamedTextColor.GRAY),
-                                    Title.Times.times(Duration.ZERO, Duration.ofMillis(100), Duration.ofMillis(200))
-                            );
-                            player.showTitle(title);
-
-                            if (newCount == 0) {
-                                config.swordCount.remove(player.getUniqueId());
-                            }
-                        }
-                        this.cancel();
-                        return;
-                    }
-
-                    if (config.swordCount.getOrDefault(player.getUniqueId(), 0) > 0) {
-                        player.heal(damage);
-                        int newCount = config.swordCount.getOrDefault(player.getUniqueId(), 0) - 1;
-                        config.swordCount.put(player.getUniqueId(), newCount);
-
-                        Title title = Title.title(
-                                Component.empty(),
-                                Component.text((3 - newCount) + " set").color(NamedTextColor.GRAY),
-                                Title.Times.times(Duration.ZERO, Duration.ofMillis(100), Duration.ofMillis(200))
-                        );
-                        player.showTitle(title);
-
-                        if (newCount == 0) {
-                            config.swordCount.remove(player.getUniqueId());
-                        }
-                    }
-                    for (ArmorStand sword : swords) {
-                        launchSwordProjectile(player, sword, target, projectileSpeed, damage, plugin);
-                        player.playSound(target.getLocation(), Sound.ITEM_TRIDENT_THROW, 1, 1);
-                    }
-                    this.cancel();
-                    return;
-                }
-            }
-        }.runTaskTimer(plugin, 0L, 1L);
+    private double amplify(Player player) {
+        long level = player.getPersistentDataContainer().getOrDefault(keyR, PersistentDataType.LONG, 0L);
+        return 1 + config.r_Skill_amp * level;
     }
 
-    private void spawnParticleTrail(World world, Location from, Location to, Particle particle, Particle.DustOptions dust) {
-        int points = 7;
-        for (int i = 0; i <= points; i++) {
-            double t = (double) i / points;
-            double x = from.getX() + (to.getX() - from.getX()) * t;
-            double y = from.getY() + (to.getY() - from.getY()) * t + 1;
-            double z = from.getZ() + (to.getZ() - from.getZ()) * t;
-            world.spawnParticle(particle, x, y, z, 1, 0, 0, 0, 0, dust);
-        }
-    }
-
-    private void launchSwordProjectile(Player player, ArmorStand sword, Entity target, double speed, double damage, JavaPlugin plugin) {
-
-        Particle.DustOptions dustOption = new Particle.DustOptions(Color.fromRGB(0, 0, 0), 1.0f);
-        Particle.DustOptions dustOption_gra = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.0f);
-
-        final Location fixedTargetPos = target.getLocation().clone().add(0, 0.3, 0);
-
-        double amp = config.r_Skill_amplify * player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L);
-        damage = damage * (1 + amp);
-
-        DamageSource source = DamageSource.builder(DamageType.MAGIC)
+    private DamageSource source(Player player) {
+        return DamageSource.builder(DamageType.MAGIC)
                 .withCausingEntity(player)
                 .withDirectEntity(player)
                 .build();
+    }
 
-        double finalDamage = damage;
+    private void throwBlade(Player player) {
+        World world = player.getWorld();
+        Material material = player.getInventory().getItemInOffHand().getType();
+        double damage = bladeBond.swordDamage(material) * amplify(player);
+
+        swingEchoGuard.swingOffHand(player);
+        world.playSound(player.getLocation(), Sound.ITEM_TRIDENT_THROW, 1f, 1.2f);
+        world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.6f, 1.5f);
+
+        Location eye = player.getEyeLocation();
+        blades.launch(player, material, eye, eye.getDirection(), config.r_Throw_Speed, config.r_Throw_Range,
+                damage, source(player), true, null, null);
+
+        bladeBond.wear(player, EquipmentSlot.OFF_HAND, 1);
+    }
+
+    private void volley(Player player, List<bladeBond.Blade> origins) {
+        swingEchoGuard.swingMainHand(player);
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, 0.6f, 1.4f);
+
+        double amp = amplify(player);
+        int epoch = blades.epoch(player);
+        long stagger = Math.max(0L, config.r_Reuse_Stagger / 50L);
+
+        for (int i = 0; i < origins.size(); i++) {
+            bladeBond.Blade origin = origins.get(i);
+            Location center = origin.getCenter();
+            boolean spiral = origin.getHost() == null;
+            Material material = origin.getMaterial();
+            double damage = bladeBond.swordDamage(material) / config.r_Reuse_Divide * amp;
+
+            Location vanish = origin.getExposed();
+            vanish.getWorld().spawnParticle(Particle.DUST, vanish, 12, 0.2, 0.2, 0.2, 0, bladeBond.WHITE);
+            blades.discard(player, origin);
+
+            Bukkit.getScheduler().runTaskLater(plugin, () -> summon(player, epoch, center, spiral, material, damage), stagger * i);
+        }
+    }
+
+    private void summon(Player player, int epoch, Location center, boolean spiral, Material material, double damage) {
+        if (!blades.isCurrent(player, epoch) || !player.isOnline()) return;
+
+        World world = center.getWorld();
+        world.playSound(center, Sound.ITEM_TRIDENT_RIPTIDE_1, 0.8f, 1.3f);
+
+        for (int i = 0; i < 3; i++) {
+            double angle = 2 * Math.PI / 3 * i;
+            Location start = center.clone().add(config.r_Reuse_Radius * Math.cos(angle), 0, config.r_Reuse_Radius * Math.sin(angle));
+            world.spawnParticle(Particle.ENCHANTED_HIT, start, 14, 0.3, 0.3, 0.3, 0);
+            fly(player, epoch, center, start, angle, spiral, material, damage);
+        }
+    }
+
+    private void fly(Player player, int epoch, Location center, Location start, double angle, boolean spiral,
+                     Material material, double damage) {
+        World world = center.getWorld();
+        Vector tangent = new Vector(-Math.sin(angle), 0, Math.cos(angle));
+
+        Location spawn = start.clone();
+        spawn.setDirection(tangent);
+        knightSwordModel model = new knightSwordModel(world, spawn, material, bladeBond.SCALE, false, false);
+        DamageSource source = source(player);
+
+        double radius = config.r_Reuse_Radius;
+        long windup = Math.max(1L, config.r_Windup_Time / 50L);
+        double turn = Math.toRadians(config.r_Windup_Turn);
+        long dashTicks = (long) Math.ceil(config.r_Straight_Distance / config.r_Straight_Speed);
+        long spiralTicks = Math.max(1L, config.r_Spiral_Ticks);
+        double spiralTurn = Math.toRadians(config.r_Spiral_Turn);
+        double exit = config.r_Spiral_Exit;
+
         new BukkitRunnable() {
-            Vector dir = null;
+            long ticks = 0;
+            Location previous = start.clone();
+            Vector facing = tangent.clone();
+            Location dashFrom = null;
+            Vector dash = null;
 
             @Override
             public void run() {
-                if (!sword.isValid()) {
-                    sword.remove();
+                if (!blades.isCurrent(player, epoch) || !player.isOnline() || !model.isValid()) {
+                    model.remove();
                     cancel();
                     return;
                 }
+                ticks++;
 
-                if (dir == null) {
-                    Vector diff = fixedTargetPos.toVector().subtract(sword.getLocation().toVector());
-                    if (diff.lengthSquared() < 0.0001) {
-                        sword.remove();
+                if (ticks <= windup) {
+                    double progress = (double) ticks / windup;
+                    double theta = angle + turn * progress * progress;
+                    Location next = center.clone().add(radius * Math.cos(theta), 0, radius * Math.sin(theta));
+                    facing = new Vector(-Math.sin(theta), 0, Math.cos(theta));
+                    next.setDirection(facing);
+                    model.getDisplay().teleport(next);
+                    previous = next;
+                    return;
+                }
+
+                long t = ticks - windup;
+                Location next;
+                if (spiral) {
+                    if (t > spiralTicks) {
+                        model.remove();
                         cancel();
                         return;
                     }
-                    dir = diff.normalize();
-                }
-
-                sword.teleport(sword.getLocation().add(dir.clone().multiply(speed)));
-
-                Location swordLoc = sword.getLocation().clone();
-                Location hiltLoc = swordLoc.clone().add(0, 0.7, 0);
-                if (Math.random() < 0.17) {
-                    sword.getWorld().spawnParticle(Particle.DUST, hiltLoc, 1, 0, 0, 0, 0, dustOption_gra);
+                    double u = (double) t / spiralTicks;
+                    double current = radius * (1 - (1 + exit) * u);
+                    double theta = angle + turn + spiralTurn * u;
+                    next = center.clone().add(current * Math.cos(theta), 0, current * Math.sin(theta));
                 } else {
-                    sword.getWorld().spawnParticle(Particle.DUST, hiltLoc, 1, 0, 0, 0, 0, dustOption);
+                    if (t > dashTicks) {
+                        model.remove();
+                        cancel();
+                        return;
+                    }
+                    if (dash == null) {
+                        dashFrom = previous.clone();
+                        dash = center.toVector().subtract(dashFrom.toVector());
+                        if (dash.lengthSquared() < 1.0E-4) dash = facing.clone();
+                        dash.normalize();
+                    }
+                    next = dashFrom.clone().add(dash.clone().multiply(config.r_Straight_Speed * t));
                 }
 
-                for (Entity e : sword.getNearbyEntities(0.7, 0.7, 0.7)) {
-                    if (e != player && e instanceof LivingEntity le) {
-                        if (le.isDead() || le.getHealth() <= 0) continue;
+                Vector move = next.toVector().subtract(previous.toVector());
+                double distance = move.length();
 
-                        player.getWorld().spawnParticle(Particle.ENCHANTED_HIT, e.getLocation().clone().add(0, 1, 0), 21, 0.4, 0.4, 0.4, 1);
-                        player.playSound(e.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1);
+                if (distance > 1.0E-4) {
+                    facing = move.clone().normalize();
 
-                        ForceDamage forceDamage = new ForceDamage(le, finalDamage, source, false);
-                        forceDamage.applyEffect(player);
-                        PotionEffect darkness = new PotionEffect(PotionEffectType.DARKNESS, 20 * 3, 1, false, false);
-                        le.addPotionEffect(darkness);
-                        sword.remove();
+                    RayTraceResult hit = world.rayTraceEntities(previous, move, distance, 0.3, e -> bladeBond.isTarget(player, e));
+                    if (hit != null && hit.getHitEntity() instanceof LivingEntity target) {
                         cancel();
-                        break;
+                        Location point = hit.getHitPosition().toLocation(world);
+
+                        new ForceDamage(target, damage, source, false).applyEffect(player);
+                        world.spawnParticle(Particle.ENCHANTED_HIT, point, 12, 0.2, 0.2, 0.2, 0.2);
+                        world.playSound(point, Sound.ITEM_TRIDENT_HIT, 1f, 1.2f);
+
+                        blades.embed(player, material, false, target, hit.getHitPosition(), facing, model);
+                        return;
                     }
                 }
 
-                if (sword.getLocation().distanceSquared(fixedTargetPos) > 777) {
-                    sword.remove();
-                    cancel();
-                }
+                next.setDirection(facing);
+                model.getDisplay().teleport(next);
+                bladeBond.streak(world, previous, facing, distance);
+                previous = next;
             }
         }.runTaskTimer(plugin, 0L, 1L);
-    }
-
-    public static LivingEntity getTargetedEntity(Player player, double range, double raySize) {
-        World world = player.getWorld();
-        Location eyeLocation = player.getEyeLocation();
-        Vector direction = eyeLocation.getDirection();
-
-        List<LivingEntity> candidates = new ArrayList<>();
-
-        for (Entity entity : world.getNearbyEntities(eyeLocation, range, range, range)) {
-            if (entity instanceof ArmorStand) continue;
-
-            if (!(entity instanceof LivingEntity) || entity.equals(player) || entity.isInvulnerable()) continue;
-
-            LivingEntity livingEntity = (LivingEntity) entity;
-
-            if (livingEntity.isDead() || livingEntity.getHealth() <= 0) continue;
-
-            RayTraceResult result = world.rayTraceEntities(
-                    eyeLocation, direction, range, raySize, e -> e.equals(entity)
-            );
-
-            if (result != null) {
-                candidates.add(livingEntity);
-            }
-        }
-
-        return candidates.stream()
-                .min(Comparator.comparingDouble(Damageable::getHealth))
-                .orElse(null);
     }
 }
