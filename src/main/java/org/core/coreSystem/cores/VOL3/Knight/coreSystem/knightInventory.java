@@ -136,6 +136,7 @@ public class knightInventory extends absInventory {
                 lore.add(Component.text("기본 : 3초간 패링 상태가 된다. 패링 상태에서는 이동속도가 70% 감소한다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("패링 성공 : 근접 공격이나 투사체를 막고, 공격한 적에게 반드시 꽂히는 검을 날린다. (재사용 대기시간 3초)").color(NamedTextColor.GREEN));
                 lore.add(Component.text("날린 검은 블럭을 통과하며, 메인핸드 검 재질의 공격력만큼 피해를 가한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("패링한 적이 6블럭 안에 있으면 살짝 밀쳐낸 뒤 2초간 기절시킨다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("재사용 : 패링 상태에서 다시 사용하면 전방 40도 부채꼴로 검 3자루를 던진다. (재사용 대기시간 12초)").color(NamedTextColor.GREEN));
                 lore.add(Component.text("던진 검은 처음 닿는 적이나 블럭에 꽂히며, 메인핸드 검 재질의 공격력만큼 피해를 가한다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("꽂힌 검이 12자루일 때 사용하면 가장 먼저 꽂힌 4자루를 회수하고 4자루를 던진다.").color(NamedTextColor.GREEN));
@@ -154,10 +155,10 @@ public class knightInventory extends absInventory {
                 lore.add(Component.text("선딜레이 : 0.6초간 경직되며, 양손의 검과 꽂힌 검을 모두 거둬 대검으로 합친다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("거둬지는 검은 손으로 날아오며, 뽑히는 적과 경로 위의 적에게 재질 공격력의 1/6만큼 마법 피해를 가한다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("거둔 검마다 체력을 2.33 회복한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("내려치기 : 대검을 내리찍어 전방 직선에 피해를 가하고 1.2초간 기절시킨다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("거둔 검이 많을수록 대검과 범위, 피해가 커진다. (1자루 : 길이 6, 폭 2, 피해 4 ~ 12자루 : 길이 12, 폭 3, 피해 13)").color(NamedTextColor.GREEN));
-                lore.add(Component.text("거둔 검마다 (재질 공격력 - 1)의 절반만큼 마법 피해가 추가된다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("피격-내려치기 : 피격된 블럭들을 모두 파괴한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("내려치기 : 대검을 내리찍어 전방 직선에 거둔 검들의 재질 공격력 합의 1/3만큼 마법 피해를 가한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("거둔 검이 많을수록 대검과 범위가 커진다. (1자루 : 길이 6, 폭 2 ~ 12자루 : 길이 12, 폭 3)").color(NamedTextColor.GREEN));
+                lore.add(Component.text("6자루 이상 : 적을 기절시킨다. 거둔 검 1자루당 0.25초 (최대 3초).").color(NamedTextColor.GREEN));
+                lore.add(Component.text("9자루 이상 : 대검이 휘두른 궤적과 전방 직선의 블럭을 모두 파괴한다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("재사용 대기시간 : 거둔 검 1자루당 5초 (최대 60초).").color(NamedTextColor.GREEN));
                 break;
             default:

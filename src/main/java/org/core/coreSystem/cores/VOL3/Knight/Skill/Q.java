@@ -28,6 +28,7 @@ import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.cores.VOL3.Knight.Passive.bladeBond;
 import org.core.coreSystem.cores.VOL3.Knight.coreSystem.Knight;
 import org.core.effect.crowdControl.ForceDamage;
+import org.core.effect.crowdControl.Stun;
 import org.core.effect.effectPlugin.swingEchoGuard;
 import org.core.models.coresObj.knightSwordModel;
 
@@ -210,6 +211,26 @@ public class Q implements SkillBase {
         swingEchoGuard.swingMainHand(player);
         homing(player, attacker, material, damage);
         bladeBond.wear(player, EquipmentSlot.HAND, 1);
+
+        if (attacker.getWorld().equals(world)
+                && attacker.getLocation().distanceSquared(player.getLocation()) <= config.q_Parry_Push_Range * config.q_Parry_Push_Range) {
+            repel(player, attacker);
+        }
+    }
+
+    private void repel(Player player, LivingEntity target) {
+        Vector push = target.getLocation().toVector().subtract(player.getLocation().toVector()).setY(0);
+        if (push.lengthSquared() < 1.0E-4) push = player.getLocation().getDirection().setY(0);
+        if (push.lengthSquared() < 1.0E-4) push = new Vector(0, 0, 1);
+        push.normalize().multiply(config.q_Parry_Push).setY(config.q_Parry_Push_Lift);
+        target.setVelocity(push);
+
+        int epoch = blades.epoch(player);
+        long delay = Math.max(1L, config.q_Parry_Stun_Delay / 50L);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if (!blades.isCurrent(player, epoch) || !player.isOnline() || target.isDead() || !target.isValid()) return;
+            new Stun(target, config.q_Parry_Stun).applyEffect(player);
+        }, delay);
     }
 
     private void homing(Player player, LivingEntity target, Material material, double damage) {

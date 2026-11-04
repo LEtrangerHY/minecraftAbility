@@ -64,6 +64,11 @@ public class Knight {
     public double q_Homing_Speed = 2.2;
     public long q_Homing_Duration = 5000;
     public long q_Parry_Cool = 3000;
+    public double q_Parry_Push_Range = 6.0;
+    public double q_Parry_Push = 0.8;
+    public double q_Parry_Push_Lift = 0.3;
+    public long q_Parry_Stun_Delay = 300;
+    public long q_Parry_Stun = 2000;
     public long q_Skill_Cool = 3000;
 
     //F
