@@ -444,7 +444,7 @@ public final class Core extends JavaPlugin implements Listener {
         this.config.registerCore("adam", this.adam);
 
         this.adamInv = new adamInventory(this, this.config);
-        Bukkit.getPluginManager().registerEvents(this.adam, this);
+        Bukkit.getPluginManager().registerEvents(this.adamInv, this);
 
         this.benz = new benzCore(this, this.config, benzConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.benz, this);
