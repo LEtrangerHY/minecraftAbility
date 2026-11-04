@@ -11,6 +11,9 @@ import org.core.cool.Cool;
 import org.core.coreSystem.cores.VOL5.Apocalypse.coreSystem.Apocalypse;
 import org.core.coreSystem.cores.VOL5.Apocalypse.coreSystem.apoCore;
 import org.core.coreSystem.cores.VOL5.Apocalypse.coreSystem.apoInventory;
+import org.core.coreSystem.cores.VOL6.Adam.coreSystem.Adam;
+import org.core.coreSystem.cores.VOL6.Adam.coreSystem.adamCore;
+import org.core.coreSystem.cores.VOL6.Adam.coreSystem.adamInventory;
 import org.core.effect.effectPlugin.skillSpectatorGuard;
 import org.core.effect.effectPlugin.swingEchoGuard;
 import org.core.models.absModelSystem.modelManager;
@@ -149,6 +152,7 @@ public final class Core extends JavaPlugin implements Listener {
     private strCore stroke;
     private sctCore scout;
     private apoCore apocalypse;
+    private adamCore adam;
 
     private playerInventory playerInv;
     private nightInventory nightInv;
@@ -179,6 +183,7 @@ public final class Core extends JavaPlugin implements Listener {
     private strInventory strInv;
     private sctInventory sctInv;
     private apoInventory apoInv;
+    private adamInventory adamInv;
 
     private EntityLevelingManager Elevel;
 
@@ -224,6 +229,7 @@ public final class Core extends JavaPlugin implements Listener {
         Stroke strConfig = new Stroke();
         Scout sctConfig = new Scout();
         Apocalypse apoConfig = new Apocalypse();
+        Adam adamConfig = new Adam();
 
         this.cool = new Cool(this);
 
@@ -432,6 +438,13 @@ public final class Core extends JavaPlugin implements Listener {
 
         this.apoInv = new apoInventory(this, this.config);
         Bukkit.getPluginManager().registerEvents(this.apoInv, this);
+
+        this.adam = new adamCore(this, this.config, adamConfig, cool);
+        Bukkit.getPluginManager().registerEvents(this.adam, this);
+        this.config.registerCore("adam", this.adam);
+
+        this.adamInv = new adamInventory(this, this.config);
+        Bukkit.getPluginManager().registerEvents(this.adam, this);
 
         this.benz = new benzCore(this, this.config, benzConfig, cool);
         Bukkit.getPluginManager().registerEvents(this.benz, this);

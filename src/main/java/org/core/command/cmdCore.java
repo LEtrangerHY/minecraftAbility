@@ -25,7 +25,7 @@ public class cmdCore implements CommandExecutor, TabCompleter {
             "bamboo", "luster", "blaze", "commander", "harvester", "blossom", "blue",
             "swordsman", "saboteur", "burst", "lavender", "rose", "residue", "darmes",
             "charlotte", "undead", "cheshire", "jester", "stroke", "scout", "apocalypse",
-            "benzene"
+            "adam", "benzene"
     );
 
     public cmdCore(coreConfig config, LevelingManager level) {

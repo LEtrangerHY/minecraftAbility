@@ -51,6 +51,7 @@ public class coreConfig {
     public Set<Player> Residue;
     public Set<Player> Darmes;
     public Set<Player> Charlotte;
+    public Set<Player> Adam;
     public Set<Player> Undead;
     public Set<Player> Cheshire;
     public Set<Player> Jester;
@@ -85,6 +86,7 @@ public class coreConfig {
         this.Residue = new persistentPlayerSet(plugin, "setting_residue");
         this.Darmes = new persistentPlayerSet(plugin, "setting_darmes");
         this.Charlotte = new persistentPlayerSet(plugin, "setting_charlotte");
+        this.Adam = new persistentPlayerSet(plugin, "setting_adam");
         this.Undead = new persistentPlayerSet(plugin, "setting_undead");
         this.Cheshire = new persistentPlayerSet(plugin, "setting_cheshire");
         this.Jester = new persistentPlayerSet(plugin, "setting_jester");
@@ -121,6 +123,7 @@ public class coreConfig {
         if (Residue.contains(player)) return "RESIDUE";
         if (Darmes.contains(player)) return "DARMES";
         if (Charlotte.contains(player)) return "CHARLOTTE";
+        if (Adam.contains(player)) return "ADAM";
         if (Undead.contains(player)) return "UNDEAD";
         if (Cheshire.contains(player)) return "CHESHIRE";
         if (Jester.contains(player)) return "JESTER";
@@ -171,6 +174,7 @@ public class coreConfig {
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_residue"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_darmes"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_charlotte"), PersistentDataType.BYTE, (byte) 0);
+        player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_adam"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_undead"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_cheshire"), PersistentDataType.BYTE, (byte) 0);
         player.getPersistentDataContainer().set(new NamespacedKey(plugin, "setting_jester"), PersistentDataType.BYTE, (byte) 0);
@@ -233,6 +237,7 @@ public class coreConfig {
             case "residue" -> new NamespacedKey(plugin, "setting_residue");
             case "darmes" -> new NamespacedKey(plugin, "setting_darmes");
             case "charlotte" -> new NamespacedKey(plugin, "setting_charlotte");
+            case "adam" -> new NamespacedKey(plugin, "setting_adam");
             case "undead" -> new NamespacedKey(plugin, "setting_undead");
             case "cheshire" -> new NamespacedKey(plugin, "setting_cheshire");
             case "jester" -> new NamespacedKey(plugin, "setting_jester");

@@ -22,6 +22,7 @@ import org.core.coreSystem.cores.VOL5.Apocalypse.coreSystem.apoLeveling;
 import org.core.coreSystem.cores.VOL5.Scout.coreSystem.sctLeveling;
 import org.core.coreSystem.cores.VOL2.Stroke.coreSystem.strLeveling;
 import org.core.coreSystem.cores.VOL4.Undead.coreSystem.undeadLeveling;
+import org.core.coreSystem.cores.VOL6.Adam.coreSystem.adamLeveling;
 import org.core.coreSystem.cores.VOL6.Charlotte.coreSystem.charLeveling;
 import org.core.coreSystem.cores.VOL6.Darmes.coreSystem.darmesLeveling;
 import org.core.coreSystem.cores.VOL6.Jester.coreSystem.jestLeveling;
@@ -201,6 +202,10 @@ public class LevelingManager implements Listener {
                 case "CHARLOTTE":
                     charLeveling charlotte = new charLeveling(plugin, player, exp);
                     charlotte.addExp(player);
+                    break;
+                case "ADAM":
+                    adamLeveling adam = new adamLeveling(plugin, player, exp);
+                    adam.addExp(player);
                     break;
                 case "UNDEAD":
                     undeadLeveling undead = new undeadLeveling(plugin, player, exp);
