@@ -43,9 +43,12 @@ public class Knight {
     public long r_Reuse_Stagger = 100;
     public long r_Windup_Time = 400;
     public double r_Windup_Turn = 60.0;
-    public double r_Straight_Speed = 2.2;
+    public double r_Windup_Turn_Straight = 50.0;
+    public double r_Windup_Pull = 1.5;
+    public double r_Line_Width = 0.07;
+    public double r_Straight_Speed = 4.0;
     public double r_Straight_Distance = 21.0;
-    public long r_Spiral_Ticks = 12;
+    public long r_Spiral_Ticks = 8;
     public double r_Spiral_Turn = 90.0;
     public double r_Spiral_Exit = 2.0;
     public long r_Skill_Cool = 400;

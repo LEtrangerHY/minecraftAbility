@@ -45,6 +45,7 @@ public class stackCharge {
         private double base;
         private double granted;
         private boolean ready;
+        private double progress;
         private long started;
     }
 
@@ -112,6 +113,11 @@ public class stackCharge {
         }
     }
 
+    public double progress(Player player) {
+        Charge charge = charges.get(player.getUniqueId());
+        return charge == null ? 0.0 : charge.progress;
+    }
+
     public boolean isReady(Player player) {
         Charge charge = charges.get(player.getUniqueId());
         return charge != null && charge.ready;
@@ -123,9 +129,8 @@ public class stackCharge {
                 ? 1.0
                 : Math.max(0.0, 1.0 - config.charge_Level_Cut * (level - config.charge_Free_Level));
 
-        int last = Math.max(1, config.f_Auto_Stack - 1);
-        int amount = Math.max(1, Math.min(last, count(player)));
-        double ratio = last <= 1 ? 1.0 : (amount - 1) / (double) (last - 1);
+        int amount = Math.max(1, Math.min(config.stack_Max, count(player)));
+        double ratio = config.stack_Max <= 1 ? 1.0 : (amount - 1) / (double) (config.stack_Max - 1);
         double millis = (config.charge_Min + (config.charge_Max - config.charge_Min) * ratio) * scale;
 
         return Math.max(50L, Math.round(millis));
@@ -133,7 +138,7 @@ public class stackCharge {
 
     public void start(Player player, Predicate<Player> equipped) {
         stop(player);
-        if (count(player) <= 0 || count(player) >= config.f_Auto_Stack || cool.isReloading(player, "F")) return;
+        if (count(player) <= 0 || cool.isReloading(player, "F")) return;
 
         UUID uuid = player.getUniqueId();
         Charge charge = new Charge();
@@ -154,13 +159,14 @@ public class stackCharge {
                 }
 
                 if (!player.isOnline() || player.isDead() || !player.isSneaking() || !equipped.test(player)
-                        || cool.isReloading(player, "F") || count(player) <= 0 || count(player) >= config.f_Auto_Stack) {
+                        || cool.isReloading(player, "F") || count(player) <= 0) {
                     stop(player);
                     return;
                 }
 
                 double elapsed = System.currentTimeMillis() - charge.started;
                 double progress = Math.min(1.0, elapsed / requiredMillis(player));
+                charge.progress = progress;
                 charge.bar.setProgress(progress);
                 grant(player, charge, progress);
 

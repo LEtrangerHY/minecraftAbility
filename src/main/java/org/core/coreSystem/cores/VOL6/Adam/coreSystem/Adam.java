@@ -22,7 +22,7 @@ public class Adam {
     public float stack_Melee_Strength = 0.9f;
     public double charge_Absorption = 0.5;
     public long charge_Min = 300;
-    public long charge_Max = 700;
+    public long charge_Max = 800;
     public long charge_Free_Level = 3;
     public double charge_Level_Cut = 0.2;
 
@@ -55,6 +55,7 @@ public class Adam {
     public double f_Strong_Ring_Max = 4.0;
     public int f_Auto_Stack = 6;
     public long f_Strong_Stun = 2000;
+    public double f_Charge_Bonus = 0.66;
     public int f_Strong_Windup = 4;
     public int f_Strong_Ticks = 5;
     public int f_Strong_Linger = 6;

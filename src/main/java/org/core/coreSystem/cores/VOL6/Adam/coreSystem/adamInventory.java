@@ -106,12 +106,10 @@ public class adamInventory extends absInventory {
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
                 lore.add(Component.text("타입 : 효과").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("시스템 : 패시브").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("대상 : 플레이어").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("패시브 : F 스킬 스택 1개당 이동속도가 3% 증가한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("차징 : F 스킬을 차징하는 동안 차징 진행도에 비례해 최대 체력의 50%까지 흡수 효과를 점차 부여받는다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("차징 해제 : 차징을 해제하거나 강화 베기를 시전하면 차징으로 얻은 흡수 효과가 사라진다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("-").color(NamedTextColor.GREEN));
                 break;
             case "Q":
                 requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfQ.get((int) level)) : Component.text("Require EXP : MAX");
@@ -139,8 +137,8 @@ public class adamInventory extends absInventory {
                 lore.add(Component.text("베기 피격 : 피격된 적의 숫자만큼 스택을 획득한다. (1회 최대 3개, 최대 6개)").color(NamedTextColor.GREEN));
                 lore.add(Component.text("일반 공격 : 충전된 일반 공격을 적중시키면 스택을 1개 획득한다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("흡혈 : 검격으로 가한 피해의 30%만큼 체력을 회복한다. (1회 시전당 최대 체력의 25%까지)").color(NamedTextColor.GREEN));
-                lore.add(Component.text("차징 : 스택이 6개 미만이면, 쉬프트를 누르고 있는 동안 보유한 스택 수에 비례한 짧은 시간 동안 차징된다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("강화 베기 : 스택이 6개 이상이거나 차징 완료 후 시전 시, 스택을 모두 소모해 검을 소환하여 소모한 스택 수에 비례한 크기의 내려베기를 가하고, 피격된 적을 2초간 기절시킨다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("차징 : 쉬프트를 누르고 있으면 보유한 스택 수에 비례한 시간 동안 차징되며, 차징량에 비례해 강화 베기의 피해량이 최대 66% 증가한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("강화 베기 : 스택이 6개이거나 차징 완료 후 시전 시, 스택을 모두 소모해 검을 소환하여 소모한 스택 수에 비례한 크기의 내려베기를 가하고, 피격된 적을 2초간 기절시킨다.").color(NamedTextColor.GREEN));
                 break;
             default:
                 break;

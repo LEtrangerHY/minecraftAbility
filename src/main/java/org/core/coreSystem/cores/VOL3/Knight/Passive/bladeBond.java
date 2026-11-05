@@ -421,7 +421,7 @@ public class bladeBond {
 
     public static void streak(World world, Location from, Vector heading, double distance) {
         Vector unit = heading.clone().normalize();
-        for (double d = 0; d < distance; d += 0.5) {
+        for (double d = 0; d < distance; d += 0.25) {
             Location point = from.clone().add(unit.clone().multiply(d));
             world.spawnParticle(Particle.DUST, point, 1, 0, 0, 0, 0, Math.random() < 0.17 ? WHITE : BLACK);
         }

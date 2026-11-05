@@ -218,6 +218,7 @@ public class F implements SkillBase {
 
     private void strike(Player player) {
         UUID uuid = player.getUniqueId();
+        double bonus = 1 + config.f_Charge_Bonus * charge.progress(player);
         int stacks = charge.consume(player);
         charge.stop(player);
         if (stacks <= 0) {
@@ -234,7 +235,7 @@ public class F implements SkillBase {
         double ring = lerp(config.f_Strong_Ring_Min, config.f_Strong_Ring_Max, t);
         float size = (float) lerp(0.6, 1.0, t);
         float scale = (float) (radius / adamSwordModel.length(1.0f));
-        double damage = config.f_Strong_Damage_Per_Stack * stacks * amplify(player);
+        double damage = config.f_Strong_Damage_Per_Stack * stacks * amplify(player) * bonus;
         DamageSource source = source(player);
 
         int windup = Math.max(1, config.f_Strong_Windup);
