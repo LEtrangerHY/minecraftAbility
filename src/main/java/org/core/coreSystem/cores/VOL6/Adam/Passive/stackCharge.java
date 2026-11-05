@@ -1,5 +1,8 @@
 package org.core.coreSystem.cores.VOL6.Adam.Passive;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
@@ -18,6 +21,7 @@ import org.bukkit.scheduler.BukkitTask;
 import org.core.cool.Cool;
 import org.core.coreSystem.cores.VOL6.Adam.coreSystem.Adam;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -65,6 +69,8 @@ public class stackCharge {
 
         stacks.put(player.getUniqueId(), after);
         speed(player);
+        show(player);
+        if (before < config.stack_Max && after >= config.stack_Max) cool.updateCooldown(player, "F", 0L);
         player.playSound(player.getLocation(), Sound.BLOCK_CHAIN_HIT, 0.6f, 0.7f + after * 0.08f);
     }
 
@@ -72,6 +78,19 @@ public class stackCharge {
         Integer amount = stacks.remove(player.getUniqueId());
         speed(player);
         return amount == null ? 0 : amount;
+    }
+
+    private void show(Player player) {
+        int amount = count(player);
+        Component bar = amount >= config.stack_Max
+                ? Component.text("⬤").color(NamedTextColor.GRAY)
+                : Component.text("○ ".repeat(amount).trim()).color(NamedTextColor.GRAY);
+
+        player.showTitle(Title.title(
+                Component.empty(),
+                bar,
+                Title.Times.times(Duration.ZERO, Duration.ofMillis(1200), Duration.ofMillis(200))
+        ));
     }
 
     public void clear(Player player) {

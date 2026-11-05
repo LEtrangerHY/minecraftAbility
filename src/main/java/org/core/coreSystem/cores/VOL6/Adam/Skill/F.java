@@ -7,6 +7,8 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.damage.DamageSource;
@@ -42,7 +44,7 @@ public class F implements SkillBase {
     private static final double GRIP_HEIGHT = 1.3;
     private static final double GRIP_FORWARD = 0.9;
     private static final double GRIP_SIDE = 0.4;
-    private static final float SWORD_BREADTH = 0.6f;
+    private static final float SWORD_BREADTH = 1.0f;
     private static final float SWORD_THICKNESS = 0.4f;
     private static final double WAKE = Math.toRadians(50);
 
@@ -93,6 +95,25 @@ public class F implements SkillBase {
         return from + (to - from) * t;
     }
 
+    private double deal(Player player, LivingEntity target, double damage, DamageSource source, boolean noKnock) {
+        double before = target.getHealth() + target.getAbsorptionAmount();
+        new ForceDamage(target, damage, source, noKnock).applyEffect(player);
+        double after = target.isDead() ? 0.0 : target.getHealth() + target.getAbsorptionAmount();
+        return Math.max(0.0, before - after);
+    }
+
+    private double heal(Player player, double dealt, double healed) {
+        if (dealt <= 0 || player.isDead()) return healed;
+
+        AttributeInstance attribute = player.getAttribute(Attribute.MAX_HEALTH);
+        double max = attribute != null ? attribute.getValue() : 20.0;
+        double amount = Math.min(dealt * config.f_Heal_Ratio, max * config.f_Heal_Cap - healed);
+        if (amount <= 0) return healed;
+
+        player.setHealth(Math.min(max, player.getHealth() + amount));
+        return healed + amount;
+    }
+
     private static Particle.DustOptions shade(double depth, float size) {
         double clamped = Math.max(0.0, Math.min(1.0, depth));
         int value = (int) Math.round(135 * (1.0 - clamped));
@@ -124,6 +145,7 @@ public class F implements SkillBase {
         new BukkitRunnable() {
             int ticks = 0;
             int gained = 0;
+            double healed = 0;
 
             @Override
             public void run() {
@@ -145,7 +167,7 @@ public class F implements SkillBase {
 
                     if (current.dot(toEntity.normalize()) > hitThreshold) {
                         hitEntities.add(entity);
-                        new ForceDamage(target, damage, source, true).applyEffect(player);
+                        healed = heal(player, deal(player, target, damage, source, true), healed);
 
                         if (gained < config.f_Stack_Per_Swing) {
                             gained++;
@@ -212,7 +234,7 @@ public class F implements SkillBase {
         double ring = lerp(config.f_Strong_Ring_Min, config.f_Strong_Ring_Max, t);
         float size = (float) lerp(0.6, 1.0, t);
         float scale = (float) (radius / adamSwordModel.length(1.0f));
-        double damage = (config.f_Skill_Damage + config.f_Strong_Damage_Per_Stack * stacks) * amplify(player);
+        double damage = config.f_Strong_Damage_Per_Stack * stacks * amplify(player);
         DamageSource source = source(player);
 
         int windup = Math.max(1, config.f_Strong_Windup);
@@ -221,6 +243,7 @@ public class F implements SkillBase {
         double end = -Math.asin(Math.min(1.0, GRIP_HEIGHT / radius));
         float finalPitch = (float) -Math.toDegrees(end);
         Set<UUID> struck = new HashSet<>();
+        double[] healed = {0.0};
 
         float startYaw = player.getLocation().getYaw();
         adamSwordModel sword = new adamSwordModel(world, grip(player, startYaw, -90f), swordOf(player), scale * 0.35f, SWORD_BREADTH, SWORD_THICKNESS);
@@ -263,12 +286,12 @@ public class F implements SkillBase {
                     sword.getDisplay().teleport(grip);
 
                     wake(world, grip, forward, next, inner, radius, size);
-                    strikeSlice(player, world, grip, forward, angle, next, radius, width, damage, source, struck);
+                    strikeSlice(player, world, grip, forward, angle, next, radius, width, damage, source, struck, healed);
                     angle = next;
                 } else if (ticks == windup + swing) {
                     if (forward == null) forward = horizontal(yaw);
                     Location grip = grip(player, yaw, finalPitch);
-                    impact(player, world, grip, forward, radius, end, ring, damage, source, struck, size);
+                    impact(player, world, grip, forward, radius, end, ring, damage, source, struck, healed, size);
                 } else if (ticks >= windup + swing + linger) {
                     finish(uuid);
                     return;
@@ -316,7 +339,7 @@ public class F implements SkillBase {
     }
 
     private void strikeSlice(Player player, World world, Location grip, Vector forward, double from, double to,
-                             double radius, double width, double damage, DamageSource source, Set<UUID> struck) {
+                             double radius, double width, double damage, DamageSource source, Set<UUID> struck, double[] healed) {
         Vector side = new Vector(-forward.getZ(), 0, forward.getX());
         double low = Math.min(from, to) - 0.12;
         double high = Math.max(from, to) + 0.12;
@@ -346,14 +369,14 @@ public class F implements SkillBase {
             if (!hit) continue;
 
             struck.add(entity.getUniqueId());
-            new ForceDamage(target, damage, source, false).applyEffect(player);
+            healed[0] = heal(player, deal(player, target, damage, source, false), healed[0]);
             new Stun(target, config.f_Strong_Stun).applyEffect(player);
             world.spawnParticle(Particle.ENCHANTED_HIT, target.getLocation().add(0, height * 0.6, 0), 12, 0.3, 0.3, 0.3, 0.2);
         }
     }
 
     private void impact(Player player, World world, Location grip, Vector forward, double radius, double end, double ring,
-                        double damage, DamageSource source, Set<UUID> struck, float size) {
+                        double damage, DamageSource source, Set<UUID> struck, double[] healed, float size) {
         Location point = grip.clone()
                 .add(forward.clone().multiply(Math.cos(end) * radius))
                 .add(0, Math.sin(end) * radius, 0);
@@ -390,7 +413,7 @@ public class F implements SkillBase {
             if (dx * dx + dz * dz > limit * limit || Math.abs(at.getY() - point.getY()) > 2.5) continue;
 
             struck.add(entity.getUniqueId());
-            new ForceDamage(target, damage, source, false).applyEffect(player);
+            healed[0] = heal(player, deal(player, target, damage, source, false), healed[0]);
             new Stun(target, config.f_Strong_Stun).applyEffect(player);
         }
     }

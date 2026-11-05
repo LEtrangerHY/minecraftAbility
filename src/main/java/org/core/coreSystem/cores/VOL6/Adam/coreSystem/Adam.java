@@ -17,8 +17,9 @@ public class Adam {
     public double r_Skill_amp = 0;
     public long r_Skill_Cool = 6000;
 
-    public int stack_Max = 12;
+    public int stack_Max = 6;
     public double stack_Speed = 0.03;
+    public float stack_Melee_Strength = 0.9f;
     public double charge_Absorption = 0.5;
     public long charge_Min = 300;
     public long charge_Max = 700;
@@ -42,7 +43,9 @@ public class Adam {
     public double f_Skill_amp = 0.2;
     public double f_Skill_Damage = 2.0;
     public int f_Stack_Per_Swing = 3;
-    public double f_Strong_Damage_Per_Stack = 1.0;
+    public double f_Heal_Ratio = 0.3;
+    public double f_Heal_Cap = 0.25;
+    public double f_Strong_Damage_Per_Stack = 2.0;
     public double f_Strong_Radius_Min = 3.5;
     public double f_Strong_Radius_Max = 8.0;
     public double f_Strong_Inner = 0.4;

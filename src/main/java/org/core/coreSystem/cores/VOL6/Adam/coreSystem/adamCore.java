@@ -1,10 +1,12 @@
 package org.core.coreSystem.cores.VOL6.Adam.coreSystem;
 
+import io.papermc.paper.event.player.PrePlayerAttackEntityEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -69,6 +71,16 @@ public class adamCore extends absCore {
         if (!event.isSneaking() || !contains(player) || !hasProperItems(player)) return;
 
         charge.start(player, this::hasProperItems);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void meleeStack(PrePlayerAttackEntityEvent event) {
+        Player player = event.getPlayer();
+        if (!event.willAttack() || !contains(player) || !hasProperItems(player)) return;
+        if (!(event.getAttacked() instanceof LivingEntity target) || target.isDead()) return;
+        if (player.getAttackCooldown() < config.stack_Melee_Strength) return;
+
+        charge.add(player, 1);
     }
 
     private void applyAdditionalHealth(Player player, boolean healFull) {

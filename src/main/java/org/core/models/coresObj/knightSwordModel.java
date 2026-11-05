@@ -18,13 +18,19 @@ public class knightSwordModel extends absCoreModel {
     private final ItemDisplay display;
     private final Quaternionf rotation;
     private final boolean hilt;
+    private final float thickness;
 
     public knightSwordModel(World world, Location location, Material material, float scale, boolean flat, boolean hilt) {
+        this(world, location, material, scale, flat, hilt, 1.0f);
+    }
+
+    public knightSwordModel(World world, Location location, Material material, float scale, boolean flat, boolean hilt, float thickness) {
         Quaternionf base = new Quaternionf().rotationTo(new Vector3f(1f, 1f, 0f).normalize(), new Vector3f(0f, 0f, 1f));
         this.rotation = new Quaternionf().rotationZ((float) (flat ? Math.PI / 4 : -Math.PI / 4)).mul(base);
         this.hilt = hilt;
+        this.thickness = thickness;
 
-        Transformation initial = transformation(rotation, hilt, scale);
+        Transformation initial = transformation(rotation, hilt, scale, thickness);
         this.display = addPart(world.spawn(location, ItemDisplay.class, d -> {
             d.setItemStack(new ItemStack(material));
             d.setItemDisplayTransform(ItemDisplay.ItemDisplayTransform.FIXED);
@@ -33,11 +39,11 @@ public class knightSwordModel extends absCoreModel {
         }));
     }
 
-    private static Transformation transformation(Quaternionf rotation, boolean hilt, float scale) {
+    private static Transformation transformation(Quaternionf rotation, boolean hilt, float scale, float thickness) {
         return new Transformation(
                 new Vector3f(0f, 0f, (hilt ? TIP : -TIP) * scale),
                 new Quaternionf(rotation),
-                new Vector3f(scale, scale, scale),
+                new Vector3f(scale, scale, scale * thickness),
                 new Quaternionf()
         );
     }
@@ -45,7 +51,7 @@ public class knightSwordModel extends absCoreModel {
     public void resize(float scale, int ticks) {
         display.setInterpolationDelay(0);
         display.setInterpolationDuration(ticks);
-        display.setTransformation(transformation(rotation, hilt, scale));
+        display.setTransformation(transformation(rotation, hilt, scale, thickness));
     }
 
     public void darken() {

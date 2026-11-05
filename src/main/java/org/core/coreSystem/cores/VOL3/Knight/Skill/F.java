@@ -46,6 +46,7 @@ public class F implements SkillBase {
     private final NamespacedKey keyF;
 
     private static final double GRIP_HEIGHT = 1.2;
+    private static final float GREATSWORD_THICKNESS = 0.4f;
     private static final Particle.DustOptions TRAIL = new Particle.DustOptions(Color.fromRGB(0, 0, 0), 1.3f);
     private static final Particle.DustOptions TRAIL_SHADE = new Particle.DustOptions(Color.fromRGB(40, 40, 40), 1.1f);
     private static final Particle.DustOptions TRAIL_EDGE = new Particle.DustOptions(Color.fromRGB(235, 235, 235), 0.9f);
@@ -124,7 +125,7 @@ public class F implements SkillBase {
 
         float startYaw = player.getLocation().getYaw();
         knightSwordModel greatsword = new knightSwordModel(world, grip(player, startYaw, -90f),
-                Material.NETHERITE_SWORD, 1.0f, false, true);
+                Material.NETHERITE_SWORD, 1.0f, false, true, GREATSWORD_THICKNESS);
         greatsword.darken();
         greatswords.put(uuid, greatsword);
 
@@ -219,11 +220,11 @@ public class F implements SkillBase {
         double reach = knightSwordModel.length(scale);
         double from = Math.toRadians(fromPitch);
         double to = Math.toRadians(toPitch);
-        double step = Math.toRadians(2.5);
+        double step = Math.min(Math.toRadians(2.5), 0.25 / Math.max(1.0, reach));
 
         for (double angle = from; angle <= to + 1.0E-6; angle += step) {
             Vector direction = forward.clone().multiply(Math.cos(angle)).add(new Vector(0, -Math.sin(angle), 0));
-            for (double radius = 1.0; radius <= reach; radius += 0.4) {
+            for (double radius = 1.0; radius <= reach; radius += 0.2) {
                 Location point = pivot.clone().add(direction.clone().multiply(radius));
                 Particle.DustOptions dust;
                 if (radius > reach - 0.6) dust = TRAIL_EDGE;
