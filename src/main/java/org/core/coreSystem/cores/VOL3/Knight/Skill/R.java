@@ -77,7 +77,7 @@ public class R implements SkillBase {
     private void throwBlade(Player player) {
         World world = player.getWorld();
         Material material = player.getInventory().getItemInOffHand().getType();
-        double damage = bladeBond.swordDamage(material) * amplify(player);
+        double damage = bladeBond.swordDamage(material) * config.blade_Throw_Ratio * amplify(player);
 
         swingEchoGuard.swingOffHand(player);
         world.playSound(player.getLocation(), Sound.ITEM_TRIDENT_THROW, 1f, 1.2f);

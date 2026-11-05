@@ -33,6 +33,7 @@ public class Knight {
     public double bond_Share = 0.6;
     public double bond_Width = 0.4;
     public double bond_Speed = 1.82;
+    public double blade_Throw_Ratio = 2.0 / 3;
 
     //R
     public double r_Skill_amp = 0.2;

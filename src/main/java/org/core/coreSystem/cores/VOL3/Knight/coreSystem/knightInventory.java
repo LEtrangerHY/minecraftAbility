@@ -118,7 +118,7 @@ public class knightInventory extends absInventory {
                 lore.add(Component.text("대상 : 적 오브젝트/블럭").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
                 lore.add(Component.text("투척 : 던진 검이 꽂혀 있지 않으면, 오프핸드 검을 전방으로 던진다. 던진 검은 처음 닿는 적이나 블럭에 꽂힌다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("적에게 꽂히면 오프핸드 검 재질의 공격력만큼 피해를 가한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("적에게 꽂히면 오프핸드 검 재질 공격력의 2/3만큼 피해를 가한다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("어검 : 던진 검(FlashSevering으로 던진 검 포함)이 꽂혀 있으면, 그 검들이 사라지고 각 자리 주위 세 방향에 검 3자루가 나타난다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("검 3자루는 살짝 돌아 자세를 잡은 뒤, 적에게 꽂혀 있었다면 직선으로, 블럭에 꽂혀 있었다면 소용돌이치며 중심을 지나 날아간다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("날아가는 검은 블럭을 통과하며, 처음 닿는 적에게 꽂혀 재질 공격력의 1/3만큼 피해를 가한다.").color(NamedTextColor.GREEN));
@@ -135,10 +135,10 @@ public class knightInventory extends absInventory {
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
                 lore.add(Component.text("기본 : 3초간 패링 상태가 된다. 패링 상태에서는 이동속도가 70% 감소한다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("패링 성공 : 근접 공격이나 투사체를 막고, 공격한 적에게 반드시 꽂히는 검을 날린다. (재사용 대기시간 3초)").color(NamedTextColor.GREEN));
-                lore.add(Component.text("날린 검은 블럭을 통과하며, 메인핸드 검 재질의 공격력만큼 피해를 가한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("날린 검은 블럭을 통과하며, 메인핸드 검 재질 공격력의 2/3만큼 피해를 가한다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("패링한 적이 6블럭 안에 있으면 살짝 밀쳐낸 뒤 2초간 기절시킨다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("재사용 : 패링 상태에서 다시 사용하면 전방 40도 부채꼴로 검 3자루를 던진다. (재사용 대기시간 12초)").color(NamedTextColor.GREEN));
-                lore.add(Component.text("던진 검은 처음 닿는 적이나 블럭에 꽂히며, 메인핸드 검 재질의 공격력만큼 피해를 가한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("던진 검은 처음 닿는 적이나 블럭에 꽂히며, 메인핸드 검 재질 공격력의 2/3만큼 피해를 가한다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("꽂힌 검이 12자루일 때 사용하면 가장 먼저 꽂힌 4자루를 회수하고 4자루를 던진다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("패링 상태가 그냥 끝나면 재사용 대기시간이 없다.").color(NamedTextColor.GREEN));
                 break;

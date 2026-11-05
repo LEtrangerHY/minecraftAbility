@@ -173,7 +173,7 @@ public class Q implements SkillBase {
 
         World world = player.getWorld();
         Material material = mainSword(player);
-        double damage = bladeBond.swordDamage(material) * amplify(player);
+        double damage = bladeBond.swordDamage(material) * config.blade_Throw_Ratio * amplify(player);
         DamageSource source = source(player);
         Location eye = player.getEyeLocation();
         Vector look = eye.getDirection();
@@ -206,7 +206,7 @@ public class Q implements SkillBase {
         world.spawnParticle(Particle.ENCHANTED_HIT, chest, 16, 0.4, 0.4, 0.4, 0.3);
 
         Material material = mainSword(player);
-        double damage = bladeBond.swordDamage(material) * amplify(player);
+        double damage = bladeBond.swordDamage(material) * config.blade_Throw_Ratio * amplify(player);
 
         swingEchoGuard.swingMainHand(player);
         homing(player, attacker, material, damage);
