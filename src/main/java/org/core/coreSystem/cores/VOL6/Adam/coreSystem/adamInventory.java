@@ -55,7 +55,7 @@ public class adamInventory extends absInventory {
         return switch (skill) {
             case "main" -> Component.text("ADAM");
             case "R" -> Component.text("-");
-            case "Q" -> Component.text("BrokenSword");
+            case "Q" -> Component.text("Castling");
             case "F" -> Component.text("THIELE");
             default -> Component.text("???");
         };
@@ -139,6 +139,7 @@ public class adamInventory extends absInventory {
                 lore.add(Component.text("흡혈 : 검격으로 가한 피해의 30%만큼 체력을 회복한다. (1회 시전당 최대 체력의 25%까지)").color(NamedTextColor.GREEN));
                 lore.add(Component.text("차징 : 쉬프트를 누르고 있으면 보유한 스택 수에 비례한 시간 동안 차징되며, 차징량에 비례해 강화 베기의 피해량이 최대 66% 증가한다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("강화 베기 : 스택이 6개이거나 차징 완료 후 시전 시, 스택을 모두 소모해 검을 소환하여 소모한 스택 수에 비례한 크기의 내려베기를 가하고, 피격된 적을 2초간 기절시킨다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("강화 베기의 준비 동작부터 내려벨 때까지 받는 피해가 90% 감소한다.").color(NamedTextColor.GREEN));
                 break;
             default:
                 break;

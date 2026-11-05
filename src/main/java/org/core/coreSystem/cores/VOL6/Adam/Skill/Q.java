@@ -23,6 +23,8 @@ import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.cores.VOL6.Adam.Passive.stackCharge;
 import org.core.coreSystem.cores.VOL6.Adam.coreSystem.Adam;
 import org.core.effect.crowdControl.Grounding;
+import org.core.effect.crowdControl.Invulnerable;
+import org.core.effect.crowdControl.Stun;
 import org.core.effect.effectPlugin.swingEchoGuard;
 
 import java.util.HashMap;
@@ -159,6 +161,9 @@ public class Q implements SkillBase {
         player.teleport(playerDest);
         player.setFallDistance(0);
         target.setFallDistance(0);
+
+        new Invulnerable(player, config.q_Swap_Invulnerable).applyEffect(player);
+        new Stun(target, config.q_Swap_Stun).applyEffect(player);
 
         world.spawnParticle(Particle.BLOCK, playerDest.clone().add(0, 1.0, 0), 10, 0.3, 0.5, 0.3, 0, CHAIN_BLOCK_DATA);
         world.spawnParticle(Particle.BLOCK, targetDest.clone().add(0, 1.0, 0), 10, 0.3, 0.5, 0.3, 0, CHAIN_BLOCK_DATA);

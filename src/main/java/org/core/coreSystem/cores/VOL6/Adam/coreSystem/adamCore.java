@@ -10,6 +10,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -81,6 +82,16 @@ public class adamCore extends absCore {
         if (player.getAttackCooldown() < config.stack_Melee_Strength) return;
 
         charge.add(player, 1);
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void brace(EntityDamageEvent event) {
+        if (!(event.getEntity() instanceof Player player) || !contains(player) || !Fskill.isBracing(player)) return;
+
+        EntityDamageEvent.DamageCause cause = event.getCause();
+        if (cause == EntityDamageEvent.DamageCause.VOID || cause == EntityDamageEvent.DamageCause.KILL) return;
+
+        event.setDamage(event.getDamage() * (1 - config.f_Strong_Guard));
     }
 
     private void applyAdditionalHealth(Player player, boolean healFull) {

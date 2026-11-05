@@ -27,6 +27,7 @@ import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.cores.VOL6.Adam.Passive.stackCharge;
 import org.core.coreSystem.cores.VOL6.Adam.coreSystem.Adam;
 import org.core.effect.crowdControl.ForceDamage;
+import org.core.effect.crowdControl.Stiff;
 import org.core.effect.crowdControl.Stun;
 import org.core.effect.effectPlugin.swingEchoGuard;
 import org.core.models.coresObj.adamSwordModel;
@@ -41,6 +42,8 @@ import java.util.concurrent.ThreadLocalRandom;
 public class F implements SkillBase {
 
     private static final BlockData CHAIN_BLOCK = Material.IRON_CHAIN.createBlockData();
+    private static final Particle.DustOptions AURA_BLACK = new Particle.DustOptions(Color.fromRGB(0, 0, 0), 0.7f);
+    private static final Particle.DustOptions AURA_WHITE = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 0.7f);
     private static final double GRIP_HEIGHT = 1.3;
     private static final double GRIP_FORWARD = 0.9;
     private static final double GRIP_SIDE = 0.4;
@@ -56,6 +59,7 @@ public class F implements SkillBase {
 
     private final Map<UUID, BukkitTask> casting = new HashMap<>();
     private final Map<UUID, adamSwordModel> swords = new HashMap<>();
+    private final Set<UUID> bracing = new HashSet<>();
 
     public F(Adam config, JavaPlugin plugin, Cool cool, stackCharge charge) {
         this.config = config;
@@ -77,6 +81,10 @@ public class F implements SkillBase {
 
     public void cleanup(Player player) {
         finish(player.getUniqueId());
+    }
+
+    public boolean isBracing(Player player) {
+        return bracing.contains(player.getUniqueId());
     }
 
     private double amplify(Player player) {
@@ -238,9 +246,10 @@ public class F implements SkillBase {
         double damage = config.f_Strong_Damage_Per_Stack * stacks * amplify(player) * bonus;
         DamageSource source = source(player);
 
-        int windup = Math.max(1, config.f_Strong_Windup);
-        int swing = Math.max(1, config.f_Strong_Ticks);
-        int linger = Math.max(0, config.f_Strong_Linger);
+        int windup = Math.max(1, (int) Math.round(lerp(config.f_Strong_Windup, config.f_Strong_Windup_Max, t)));
+        int swing = Math.max(1, (int) Math.round(lerp(config.f_Strong_Ticks, config.f_Strong_Ticks_Min, t)));
+        int linger = Math.max(0, (int) Math.round(lerp(config.f_Strong_Linger, config.f_Strong_Linger_Max, t)));
+        float weight = (float) t;
         double end = -Math.asin(Math.min(1.0, GRIP_HEIGHT / radius));
         float finalPitch = (float) -Math.toDegrees(end);
         Set<UUID> struck = new HashSet<>();
@@ -249,9 +258,15 @@ public class F implements SkillBase {
         float startYaw = player.getLocation().getYaw();
         adamSwordModel sword = new adamSwordModel(world, grip(player, startYaw, -90f), swordOf(player), scale * 0.35f, SWORD_BREADTH, SWORD_THICKNESS);
         swords.put(uuid, sword);
+        bracing.add(uuid);
+
+        long rooted = Math.round((windup + swing) * 50L * t);
+        if (rooted > 0) new Stiff(player, rooted).applyEffect(player);
 
         world.playSound(player.getLocation(), Sound.BLOCK_CHAIN_PLACE, 1.4f, 0.6f);
-        world.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_NETHERITE, 1.0f, 0.8f);
+        world.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_NETHERITE, 1.0f, (float) lerp(0.8, 0.7, t));
+        world.playSound(player.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE, 0.3f + 0.7f * weight, 0.6f);
+        world.playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, 0.5f * weight, 0.6f);
 
         BukkitTask task = new BukkitRunnable() {
             int ticks = 0;
@@ -273,11 +288,12 @@ public class F implements SkillBase {
                     sword.getDisplay().teleport(grip);
                     world.spawnParticle(Particle.BLOCK, grip.clone().add(0, adamSwordModel.length(scale) * (ticks + 1) / windup * 0.5, 0),
                             3, 0.25, 0.4, 0.25, 0, CHAIN_BLOCK);
+                    aura(player, ticks, windup, scale, weight);
                 } else if (ticks < windup + swing) {
                     if (forward == null) {
                         forward = horizontal(yaw);
                         swingEchoGuard.swingMainHand(player);
-                        world.playSound(player.getLocation(), Sound.ITEM_MACE_SMASH_AIR, 1f, 0.7f);
+                        world.playSound(player.getLocation(), Sound.ITEM_MACE_SMASH_AIR, 0.6f + 0.4f * weight, (float) lerp(0.8, 0.6, t));
                         world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.2f, 0.6f);
                     }
 
@@ -287,12 +303,13 @@ public class F implements SkillBase {
                     sword.getDisplay().teleport(grip);
 
                     wake(world, grip, forward, next, inner, radius, size);
-                    strikeSlice(player, world, grip, forward, angle, next, radius, width, damage, source, struck, healed);
+                    strikeSlice(player, world, grip, forward, angle, next, radius, width, damage, source, struck, healed, weight);
                     angle = next;
                 } else if (ticks == windup + swing) {
+                    bracing.remove(uuid);
                     if (forward == null) forward = horizontal(yaw);
                     Location grip = grip(player, yaw, finalPitch);
-                    impact(player, world, grip, forward, radius, end, ring, damage, source, struck, healed, size);
+                    impact(player, world, grip, forward, radius, end, ring, damage, source, struck, healed, size, weight);
                 } else if (ticks >= windup + swing + linger) {
                     finish(uuid);
                     return;
@@ -305,7 +322,25 @@ public class F implements SkillBase {
         casting.put(uuid, task);
     }
 
+    private void aura(Player player, int ticks, int windup, float scale, float weight) {
+        World world = player.getWorld();
+        Location base = player.getLocation().add(0, GRIP_HEIGHT, 0);
+        double height = adamSwordModel.length(scale) * Math.min(1.0, (ticks + 1) / (double) windup);
+        int strands = 1 + Math.round(2 * weight);
+
+        for (int i = 0; i < strands; i++) {
+            double angle = ticks * 0.6 + i * 2 * Math.PI / strands;
+            double y = (ticks * 0.45 + i * height / strands) % Math.max(0.5, height);
+            Location point = base.clone().add(0.9 * Math.cos(angle), y, 0.9 * Math.sin(angle));
+            world.spawnParticle(Particle.DUST, point, 1, 0, 0, 0, 0, Math.random() < 0.17 ? AURA_WHITE : AURA_BLACK);
+        }
+        if (weight >= 0.4f && ticks % 3 == 0) {
+            world.spawnParticle(Particle.SQUID_INK, base.clone().add(0, height, 0), 2, 0.2, 0.2, 0.2, 0.02);
+        }
+    }
+
     private void finish(UUID uuid) {
+        bracing.remove(uuid);
         BukkitTask task = casting.remove(uuid);
         if (task != null) task.cancel();
 
@@ -340,7 +375,7 @@ public class F implements SkillBase {
     }
 
     private void strikeSlice(Player player, World world, Location grip, Vector forward, double from, double to,
-                             double radius, double width, double damage, DamageSource source, Set<UUID> struck, double[] healed) {
+                             double radius, double width, double damage, DamageSource source, Set<UUID> struck, double[] healed, float weight) {
         Vector side = new Vector(-forward.getZ(), 0, forward.getX());
         double low = Math.min(from, to) - 0.12;
         double high = Math.max(from, to) + 0.12;
@@ -373,11 +408,13 @@ public class F implements SkillBase {
             healed[0] = heal(player, deal(player, target, damage, source, false), healed[0]);
             new Stun(target, config.f_Strong_Stun).applyEffect(player);
             world.spawnParticle(Particle.ENCHANTED_HIT, target.getLocation().add(0, height * 0.6, 0), 12, 0.3, 0.3, 0.3, 0.2);
+            world.spawnParticle(Particle.DAMAGE_INDICATOR, target.getLocation().add(0, height * 0.65, 0), 6 + Math.round(14 * weight), 0.4, 0.4, 0.4, 1);
+            world.playSound(target.getLocation(), Sound.ENTITY_PLAYER_ATTACK_STRONG, 0.5f + 0.5f * weight, 0.8f);
         }
     }
 
     private void impact(Player player, World world, Location grip, Vector forward, double radius, double end, double ring,
-                        double damage, DamageSource source, Set<UUID> struck, double[] healed, float size) {
+                        double damage, DamageSource source, Set<UUID> struck, double[] healed, float size, float weight) {
         Location point = grip.clone()
                 .add(forward.clone().multiply(Math.cos(end) * radius))
                 .add(0, Math.sin(end) * radius, 0);
@@ -385,10 +422,16 @@ public class F implements SkillBase {
         Block ground = point.clone().add(0, -0.2, 0).getBlock();
         BlockData data = ground.getType().isSolid() ? ground.getBlockData() : Material.DIRT.createBlockData();
 
-        world.playSound(point, Sound.ENTITY_GENERIC_EXPLODE, 0.8f, 1.3f);
-        world.playSound(point, Sound.BLOCK_ANVIL_LAND, 0.6f, 0.6f);
+        world.playSound(point, Sound.ITEM_MACE_SMASH_GROUND_HEAVY, 0.4f + 0.6f * weight, 0.7f);
+        world.playSound(point, Sound.ENTITY_GENERIC_EXPLODE, 0.4f + 0.3f * weight, (float) lerp(1.2, 0.6, weight));
         world.playSound(point, Sound.BLOCK_CHAIN_BREAK, 1.6f, 0.8f);
-        world.spawnParticle(Particle.EXPLOSION, point.clone().add(0, 0.3, 0), 1, 0, 0, 0, 0);
+        if (weight > 0) world.playSound(point, Sound.ENTITY_WITHER_BREAK_BLOCK, 0.5f * weight, 0.7f);
+        world.spawnParticle(Particle.EXPLOSION, point.clone().add(0, 0.3, 0), 1 + Math.round(weight), ring * 0.15, 0.1, ring * 0.15, 0);
+        world.spawnParticle(Particle.LARGE_SMOKE, point.clone().add(0, 0.3, 0), 6 + Math.round(14 * weight), ring * 0.3, 0.3, ring * 0.3, 0.02);
+        world.spawnParticle(Particle.SQUID_INK, point.clone().add(0, 0.3, 0), 2 + Math.round(6 * weight), ring * 0.3, 0.1, ring * 0.3, 0.05);
+        if (ground.getType().isSolid()) {
+            world.spawnParticle(Particle.DUST_PILLAR, point, 10 + Math.round(30 * weight), ring * 0.35, 0.2, ring * 0.35, 0.2, data);
+        }
 
         int points = Math.max(24, (int) (ring * 28));
         double[] scales = {0.55, 0.8, 1.0};
@@ -416,6 +459,8 @@ public class F implements SkillBase {
             struck.add(entity.getUniqueId());
             healed[0] = heal(player, deal(player, target, damage, source, false), healed[0]);
             new Stun(target, config.f_Strong_Stun).applyEffect(player);
+            world.spawnParticle(Particle.DAMAGE_INDICATOR, at.clone().add(0, 1.3, 0), 6 + Math.round(14 * weight), 0.4, 0.4, 0.4, 1);
+            world.playSound(at, Sound.ENTITY_PLAYER_ATTACK_STRONG, 0.5f + 0.5f * weight, 0.8f);
         }
     }
 }

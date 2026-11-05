@@ -37,6 +37,8 @@ public class Adam {
     public long q_Reuse_Delay = 150;
     public long q_Miss_Cool = 300;
     public double q_Face_Range = 6.0;
+    public long q_Swap_Invulnerable = 600;
+    public long q_Swap_Stun = 600;
 
     // F
     public long f_Skill_Cool = 1000;
@@ -55,10 +57,14 @@ public class Adam {
     public double f_Strong_Ring_Max = 4.0;
     public int f_Auto_Stack = 6;
     public long f_Strong_Stun = 2000;
+    public double f_Strong_Guard = 2.0 / 3;
     public double f_Charge_Bonus = 0.66;
     public int f_Strong_Windup = 4;
+    public int f_Strong_Windup_Max = 12;
     public int f_Strong_Ticks = 5;
+    public int f_Strong_Ticks_Min = 3;
     public int f_Strong_Linger = 6;
+    public int f_Strong_Linger_Max = 12;
 
     public void variableReset(Player player) {
         R_COOLDOWN.remove(player.getUniqueId());
