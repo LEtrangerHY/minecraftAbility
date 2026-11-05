@@ -261,7 +261,7 @@ public class F implements SkillBase {
         bracing.add(uuid);
 
         long rooted = Math.round((windup + swing) * 50L * t);
-        if (rooted > 0) new Stiff(player, rooted).applyEffect(player);
+        if (rooted > 0) new Stiff(player, rooted, true).applyEffect(player);
 
         world.playSound(player.getLocation(), Sound.BLOCK_CHAIN_PLACE, 1.4f, 0.6f);
         world.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_NETHERITE, 1.0f, (float) lerp(0.8, 0.7, t));

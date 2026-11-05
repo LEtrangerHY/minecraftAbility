@@ -23,16 +23,22 @@ public class Stiff implements Effects, Listener {
 
     private final Entity target;
     private final long duration;
+    private final boolean force;
 
     public Stiff(Entity target, long duration) {
+        this(target, duration, false);
+    }
+
+    public Stiff(Entity target, long duration, boolean force) {
         this.target = target;
         this.duration = duration;
+        this.force = force;
     }
 
     @Override
     public void applyEffect(Entity entity) {
         if (!(entity instanceof LivingEntity)) return;
-        if (target.isInvulnerable()) return;
+        if (!force && target.isInvulnerable()) return;
 
         UUID targetId = target.getUniqueId();
         long currentTime = System.currentTimeMillis();
