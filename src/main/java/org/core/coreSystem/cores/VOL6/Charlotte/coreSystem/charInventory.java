@@ -55,7 +55,7 @@ public class charInventory extends absInventory {
         return switch (skill) {
             case "main" -> Component.text("CHARLOTTE");
             case "R" -> Component.text("-");
-            case "Q" -> Component.text("PRISM");
+            case "Q" -> Component.text("Prism");
             case "F" -> Component.text("PRISMANE");
             default -> Component.text("???");
         };
