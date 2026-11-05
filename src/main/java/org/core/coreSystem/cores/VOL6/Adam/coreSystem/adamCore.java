@@ -11,12 +11,14 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.core.cool.Cool;
 import org.core.coreSystem.absCoreSystem.ConfigWrapper;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.absCoreSystem.absCore;
+import org.core.coreSystem.cores.VOL6.Adam.Passive.stackCharge;
 import org.core.coreSystem.cores.VOL6.Adam.Skill.F;
 import org.core.coreSystem.cores.VOL6.Adam.Skill.Q;
 import org.core.coreSystem.cores.VOL6.Adam.Skill.R;
@@ -27,6 +29,7 @@ public class adamCore extends absCore {
     private final Core plugin;
     private final Adam config;
 
+    private final stackCharge charge;
     private final R Rskill;
     private final Q Qskill;
     private final F Fskill;
@@ -37,9 +40,10 @@ public class adamCore extends absCore {
         this.plugin = plugin;
         this.config = config;
 
+        this.charge = new stackCharge(config, plugin, cool);
         this.Rskill = new R(config, plugin, cool);
-        this.Qskill = new Q(config, plugin, cool);
-        this.Fskill = new F(config, plugin, cool);
+        this.Qskill = new Q(config, plugin, cool, charge);
+        this.Fskill = new F(config, plugin, cool, charge);
 
         plugin.getLogger().info("Adam downloaded...");
     }
@@ -57,6 +61,14 @@ public class adamCore extends absCore {
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             applyAdditionalHealth(player, true);
         }, 1L);
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void sneakCharge(PlayerToggleSneakEvent event) {
+        Player player = event.getPlayer();
+        if (!event.isSneaking() || !contains(player) || !hasProperItems(player)) return;
+
+        charge.start(player, this::hasProperItems);
     }
 
     private void applyAdditionalHealth(Player player, boolean healFull) {
@@ -140,6 +152,9 @@ public class adamCore extends absCore {
             @Override
             public void variableReset(Player player) {
                 config.variableReset(player);
+                Qskill.cleanup(player);
+                Fskill.cleanup(player);
+                charge.clear(player);
             }
             @Override
             public void cooldownReset(Player player) {

@@ -105,33 +105,40 @@ public class adamInventory extends absInventory {
                 lore.add(requireXp.color(NamedTextColor.AQUA));
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("타입 : -").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("대상 : -").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("타입 : 효과").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : 패시브").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("대상 : 플레이어").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("-").color(NamedTextColor.GREEN));
+                lore.add(Component.text("패시브 : F 스킬 스택 1개당 이동속도가 3% 증가한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("차징 : F 스킬을 차징하는 동안 차징 진행도에 비례해 최대 체력의 50%까지 흡수 효과를 점차 부여받는다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("차징 해제 : 차징을 해제하거나 강화 베기를 시전하면 차징으로 얻은 흡수 효과가 사라진다.").color(NamedTextColor.GREEN));
                 break;
             case "Q":
                 requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfQ.get((int) level)) : Component.text("Require EXP : MAX");
                 lore.add(requireXp.color(NamedTextColor.AQUA));
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("타입 : -").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("대상 : -").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("타입 : 효과").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : 지정형/재시전").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("-").color(NamedTextColor.GREEN));
+                lore.add(Component.text("지정 : 대상을 2초간 고정시키고, F 스킬 스택을 3개 획득한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("재시전 : 1초 내에 재시전 시, 지정한 대상과 위치를 맞바꾼다. 대상이 6칸 이내였다면 대상을 바라본다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("비지정 : 아무 효과 없이 0.3초의 쿨타임이 적용된다.").color(NamedTextColor.GREEN));
                 break;
             case "F":
                 requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfF.get((int) level)) : Component.text("Require EXP : MAX");
                 lore.add(requireXp.color(NamedTextColor.AQUA));
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("타입 : -").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("대상 : -").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : 피격형/차징").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("-").color(NamedTextColor.GREEN));
+                lore.add(Component.text("기본 : 전방으로 부채꼴 베기를 가한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("베기 피격 : 피격된 적의 숫자만큼 스택을 획득한다. (1회 최대 3개, 최대 12개)").color(NamedTextColor.GREEN));
+                lore.add(Component.text("차징 : 스택이 6개 미만이면, 쉬프트를 누르고 있는 동안 보유한 스택 수에 비례한 짧은 시간 동안 차징된다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("강화 베기 : 스택이 6개 이상이거나 차징 완료 후 시전 시, 스택을 모두 소모해 검을 소환하여 소모한 스택 수에 비례한 크기의 내려베기를 가하고, 피격된 적을 2초간 기절시킨다.").color(NamedTextColor.GREEN));
                 break;
             default:
                 break;
