@@ -121,7 +121,7 @@ public class adamInventory extends absInventory {
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
                 lore.add(Component.text("지정 : 대상을 2초간 고정시키고, F 스킬 스택을 3개 획득한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("재시전 : 1초 내에 재시전 시, 지정한 대상과 위치를 맞바꾼다. 대상이 6칸 이내였다면 대상을 바라본다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("재시전 : 1초 내에 재시전 시, 지정한 대상과 위치를 맞바꾸고 자신은 0.6초간 무적, 대상은 0.6초간 기절한다. 대상이 6칸 이내였다면 대상을 바라본다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("비지정 : 아무 효과 없이 0.3초의 쿨타임이 적용된다.").color(NamedTextColor.GREEN));
                 break;
             case "F":
@@ -139,7 +139,7 @@ public class adamInventory extends absInventory {
                 lore.add(Component.text("흡혈 : 검격으로 가한 피해의 30%만큼 체력을 회복한다. (1회 시전당 최대 체력의 25%까지)").color(NamedTextColor.GREEN));
                 lore.add(Component.text("차징 : 쉬프트를 누르고 있으면 보유한 스택 수에 비례한 시간 동안 차징되며, 차징량에 비례해 강화 베기의 피해량이 최대 66% 증가한다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("강화 베기 : 스택이 6개이거나 차징 완료 후 시전 시, 스택을 모두 소모해 검을 소환하여 소모한 스택 수에 비례한 크기의 내려베기를 가하고, 피격된 적을 2초간 기절시킨다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("강화 베기의 준비 동작부터 내려벨 때까지 받는 피해가 90% 감소한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("강화 베기의 준비 동작부터 내려벨 때까지 받는 피해가 66% 감소한다.").color(NamedTextColor.GREEN));
                 break;
             default:
                 break;
