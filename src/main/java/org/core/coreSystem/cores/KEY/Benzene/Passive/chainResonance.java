@@ -4,6 +4,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
 import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -30,6 +32,7 @@ public class chainResonance {
     private static final Particle.DustOptions DUST_FAR = new Particle.DustOptions(Color.fromRGB(0, 0, 0), 0.5f);
     private static final Component ICON_FULL = Component.text("⌬").color(NamedTextColor.GRAY);
     private static final String[] BENZENE_ICONS = new String[7];
+    private static final double REMOVE_HEAL_RATIO = 0.06;
 
     static {
         for (int i = 0; i <= 6; i++) {
@@ -82,12 +85,15 @@ public class chainResonance {
 
     public void decrease(UUID targetUUID) {
         config.chainRes.forEach((uuid, entityMap) -> {
+            int beforeSize = entityMap.size();
             boolean isRemoved = entityMap.values().removeIf(uuidValue -> uuidValue.equals(targetUUID));
 
             if (isRemoved) {
+                int removedCount = beforeSize - entityMap.size();
                 Player player = Bukkit.getPlayer(uuid);
                 if (player != null && player.isOnline()) {
                     sendBar(player, entityMap.size());
+                    healByRatio(player, REMOVE_HEAL_RATIO * removedCount);
                 }
             }
         });
@@ -122,6 +128,7 @@ public class chainResonance {
 
             if (firstKeyEntity == null || !firstKeyEntity.isValid() || firstKeyEntity.isDead()) {
                 chainMap.remove(firstKey);
+                healByRatio(player, REMOVE_HEAL_RATIO);
                 updateChainResList(player);
                 return;
             }
@@ -141,8 +148,19 @@ public class chainResonance {
             }
 
             chainMap.remove(firstKey);
+            healByRatio(player, REMOVE_HEAL_RATIO);
             updateChainResList(player);
         }
+    }
+
+    private void healByRatio(Player player, double ratio) {
+        if (player.isDead() || !player.isOnline()) return;
+
+        AttributeInstance maxHealthAttr = player.getAttribute(Attribute.MAX_HEALTH);
+        if (maxHealthAttr == null) return;
+
+        double maxHealth = maxHealthAttr.getValue();
+        player.setHealth(Math.min(maxHealth, player.getHealth() + maxHealth * ratio));
     }
 
     private double distanceSquared(Location l1, Location l2, double h1, double h2) {

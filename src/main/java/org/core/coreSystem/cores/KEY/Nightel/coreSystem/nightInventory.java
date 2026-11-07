@@ -71,6 +71,15 @@ public class nightInventory extends absInventory {
             lore.add(Component.text("타입 : 기동형 암살자").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("장착 : 메인핸드에 철검 장착, 오프핸드는 장착 금지.").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+            lore.add(Component.text("패시브 : R, Q 스킬을 사용할 때마다 체인이 1개 쌓인다. (최대 6개)").color(NamedTextColor.GREEN));
+            lore.add(Component.text("Q 다음에 이어서 R 또는 Q를 사용하면 체인이 2개 쌓인다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("쌓인 체인 1개마다 사용한 스킬의 쿨타임이 3.3배 늘어난다. (최대 6초)").color(NamedTextColor.GREEN));
+            lore.add(Component.text("체인은 3초마다 1개씩 사라지며, 1개 사라질 때마다 최대 체력의 6%를 회복한다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("공명 : 체인이 6개가 되면 3초간 이동속도가 33% 증가하고 받는 피해가 66% 감소한다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("공명 중 체인이 하나씩 풀리며 16% / 14% / 12% / 10% / 8% / 6%씩, 총 66%를 회복한다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("공명이 끝나면 R, Q 스킬의 쿨타임이 초기화된다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("F 스킬로 체인을 소모할 때는 회복하지 않는다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text(""));
             lore.add(Component.text("메뉴북 아이템 없어도 인벤토리 화면에서 철검을 우클릭해서 메뉴 화면 진입 가능").color(NamedTextColor.AQUA));
             return lore;

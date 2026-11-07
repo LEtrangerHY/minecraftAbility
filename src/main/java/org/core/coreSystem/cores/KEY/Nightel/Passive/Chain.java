@@ -4,6 +4,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
 import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -29,6 +31,8 @@ public class Chain implements Listener {
 
     private static final String[] HEX_ICONS = new String[7];
     private static final String[] BENZENE_ICONS = new String[7];
+    private static final double DECAY_HEAL_RATIO = 0.06;
+    private static final double[] HEXA_HEAL_RATIOS = {0.16, 0.14, 0.12, 0.10, 0.08, 0.06};
 
     static {
         for (int i = 0; i <= 6; i++) {
@@ -146,6 +150,7 @@ public class Chain implements Listener {
                         player.showTitle(title);
 
                         config.chainCount.put(playerUUID, nextCount);
+                        healByRatio(player, DECAY_HEAL_RATIO);
 
                         Location particleLoc = player.getLocation().add(0, 1.2, 0);
                         player.getWorld().spawnParticle(Particle.ENCHANTED_HIT, particleLoc, 12, 0.6, 0.6, 0.6, 1);
@@ -193,9 +198,24 @@ public class Chain implements Listener {
                     Location pLoc = player.getLocation().add(0, 1.2, 0);
                     world.spawnParticle(Particle.ENCHANTED_HIT, pLoc, 22, 0.6, 0.6, 0.6, 1);
                     world.playSound(pLoc, Sound.BLOCK_CHAIN_BREAK, 1.2f, 1.0f);
+
+                    int healIndex = tick / 10 - 1;
+                    if (healIndex >= 0 && healIndex < HEXA_HEAL_RATIOS.length) {
+                        healByRatio(player, HEXA_HEAL_RATIOS[healIndex]);
+                    }
                 }
             }
         }.runTaskTimer(plugin, 0L, 1L);
+    }
+
+    private void healByRatio(Player player, double ratio) {
+        if (player.isDead() || !player.isOnline()) return;
+
+        AttributeInstance maxHealthAttr = player.getAttribute(Attribute.MAX_HEALTH);
+        if (maxHealthAttr == null) return;
+
+        double maxHealth = maxHealthAttr.getValue();
+        player.setHealth(Math.min(maxHealth, player.getHealth() + maxHealth * ratio));
     }
 
     public void removePoint(Player player) {

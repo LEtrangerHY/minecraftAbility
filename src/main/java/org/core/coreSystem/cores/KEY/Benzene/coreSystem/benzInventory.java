@@ -76,6 +76,14 @@ public class benzInventory extends absInventory {
             lore.add(Component.text("타입 : 브루저").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("장착 : 메인핸드에 철검 장착, 오프핸드에 철 사슬 장착.").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+            lore.add(Component.text("패시브 : R, F 스킬로 적중한 대상에게 연쇄반향을 중첩한다. (전체 최대 6개)").color(NamedTextColor.GREEN));
+            lore.add(Component.text("6개가 찬 상태에서 새로 중첩하면 가장 오래된 연쇄반향이 사라지고, 그 대상을 중첩 수 x 0.1초간 기절시킨다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("연쇄반향이 중첩된 대상을 공격하면 대상의 중첩 1개당 피해량이 10% 증가한다. (최대 60%)").color(NamedTextColor.GREEN));
+            lore.add(Component.text("이 피해는 연쇄반향이 중첩된 다른 대상들에게 전체 중첩 1개당 10%씩 전파된다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("연쇄반향 효과는 22블록 이내의 대상에게만 적용된다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("환경 피해를 66% 감소시키며, 중첩된 연쇄반향 1개당 감소율이 11%씩 줄어든다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("연쇄반향이 1개 사라질 때마다 최대 체력의 6%를 회복한다. (대상 처치 시 중첩 수만큼 회복)").color(NamedTextColor.GREEN));
+            lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text(""));
             lore.add(Component.text("메뉴북 아이템 없어도 인벤토리 화면에서 철 사슬을 우클릭해서 메뉴 화면 진입 가능").color(NamedTextColor.AQUA));
             return lore;
