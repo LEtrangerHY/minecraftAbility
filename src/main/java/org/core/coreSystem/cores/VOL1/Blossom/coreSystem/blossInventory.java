@@ -77,8 +77,8 @@ public class blossInventory extends absInventory {
             lore.add(Component.text("타입 : 서포터").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("장착 : 메인핸드에 분홍 꽃잎 장착, 오프핸드는 장착 금지.").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-            lore.add(Component.text("패시브 : 일반 공격 시 전방으로 꽃잎 돌풍을 날려 경로 위의 대상들에게 피해를 가한다. (공격 간격 2.7초)").color(NamedTextColor.GREEN));
-            lore.add(Component.text("일반 공격 시 자신의 체력을 회복하며, 회복량은 코어 레벨이 오를수록 증가한다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("패시브 : 일반 공격 시 2.7초 동안 조준하는 방향을 따라 앞으로 뻗어 나가는 꽃잎 물결을 일으켜, 닿은 대상들에게 여러 번 피해를 가한다. (공격 간격 2.7초)").color(NamedTextColor.GREEN));
+            lore.add(Component.text("일반 공격 시 자신의 체력을 2.7 회복하며, 회복량은 코어 레벨이 오를수록 증가한다.").color(NamedTextColor.GREEN));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text(""));
             lore.add(Component.text("메뉴북 아이템 없어도 인벤토리 화면에서 분홍 꽃잎을 우클릭해서 메뉴 화면 진입 가능").color(NamedTextColor.AQUA));

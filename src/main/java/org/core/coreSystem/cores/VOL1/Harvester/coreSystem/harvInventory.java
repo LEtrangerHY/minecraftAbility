@@ -77,7 +77,7 @@ public class harvInventory extends absInventory {
             lore.add(Component.text("장착 : 메인핸드에 철 괭이 장착, 오프핸드는 장착 금지.").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text("패시브 : 일반 공격 피해량이 4로 고정된다. (R, F 사용 중에는 적용되지 않음)").color(NamedTextColor.GREEN));
-            lore.add(Component.text("키 큰 풀 위에 있거나, 주위에 풀 또는 다 자란 작물이 6개 이상 있으면 은신한다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("키 큰 풀 속에 서 있거나, 주위에 풀 또는 다 자란 작물이 6개 이상 있으면 은신한다.").color(NamedTextColor.GREEN));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text(""));
             lore.add(Component.text("메뉴북 아이템 없어도 인벤토리 화면에서 철 괭이를 우클릭해서 메뉴 화면 진입 가능").color(NamedTextColor.AQUA));

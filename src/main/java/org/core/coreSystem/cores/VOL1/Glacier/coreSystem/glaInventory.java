@@ -78,7 +78,7 @@ public class glaInventory extends absInventory {
             lore.add(Component.text("장착 : 메인핸드에 브리즈 막대 장착, 오프핸드는 푸른 얼음 장전.").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text("패시브 : 일반 공격 시 전방으로 얼음 파동을 날려 경로 위의 대상들에게 피해를 가한다. (공격 간격 0.8초)").color(NamedTextColor.GREEN));
-            lore.add(Component.text("얼음 파동에 피격된 대상은 60% 확률로 10초간 냉각된다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("얼음 파동에 피격된 대상은 60% 확률로 10초간 동상에 걸린다. (가루눈에 빠진 것처럼 지속 피해를 입고 느려짐)").color(NamedTextColor.GREEN));
             lore.add(Component.text("냉기 피해를 받지 않으며, 얼어붙지 않는다.").color(NamedTextColor.GREEN));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text(""));

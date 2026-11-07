@@ -73,11 +73,11 @@ public class nightInventory extends absInventory {
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text("패시브 : R, Q 스킬을 사용할 때마다 체인이 1개 쌓인다. (최대 6개)").color(NamedTextColor.GREEN));
             lore.add(Component.text("Q 다음에 이어서 R 또는 Q를 사용하면 체인이 2개 쌓인다.").color(NamedTextColor.GREEN));
-            lore.add(Component.text("쌓인 체인 1개마다 사용한 스킬의 쿨타임이 3.3배 늘어난다. (최대 6초)").color(NamedTextColor.GREEN));
-            lore.add(Component.text("체인은 3초마다 1개씩 사라지며, 1개 사라질 때마다 최대 체력의 6%를 회복한다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("R, Q의 기본 쿨타임은 0.3초이며, 사용할 때 쌓여 있던 체인 1개마다 3.3배가 된다. (체인 0개 0.3초, 1개 약 1초, 2개 약 3.3초, 3개 이상 6초)").color(NamedTextColor.GREEN));
+            lore.add(Component.text("R, Q를 사용하지 않는 동안 3초마다 체인이 1개씩 사라지며, 1개 사라질 때마다 최대 체력의 6%를 회복한다.").color(NamedTextColor.GREEN));
             lore.add(Component.text("공명 : 체인이 6개가 되면 3초간 이동속도가 33% 증가하고 받는 피해가 66% 감소한다.").color(NamedTextColor.GREEN));
             lore.add(Component.text("공명 중 체인이 하나씩 풀리며 16% / 14% / 12% / 10% / 8% / 6%씩, 총 66%를 회복한다.").color(NamedTextColor.GREEN));
-            lore.add(Component.text("공명이 끝나면 R, Q 스킬의 쿨타임이 초기화된다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("공명이 끝나면 R, Q 스킬의 쿨타임이 초기화되고, F 스킬의 쿨타임은 6초가 된다.").color(NamedTextColor.GREEN));
             lore.add(Component.text("F 스킬로 체인을 소모할 때는 회복하지 않는다.").color(NamedTextColor.GREEN));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text(""));

@@ -76,7 +76,7 @@ public class sctInventory extends absInventory {
             lore.add(Component.text("패시브 : 일반 공격 시 탄환을 1발 소모해 전방으로 사격한다. (탄창 10발, 사격 간격 0.7초)").color(NamedTextColor.GREEN));
             lore.add(Component.text("탄환은 처음 맞은 대상에게 피해를 가하고 3초간 발광시키며, 머리에 맞으면 피해량이 2배가 된다.").color(NamedTextColor.GREEN));
             lore.add(Component.text("사격할 때마다 반동으로 조준이 살짝 튀고 몸이 뒤로 밀린다.").color(NamedTextColor.GREEN));
-            lore.add(Component.text("탄창이 비었을 때 웅크리기를 2초간 유지하면 재장전한다. 웅크리기를 풀거나 사격하면 재장전이 취소된다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("탄창이 비었을 때 웅크리기를 2초간 유지하면 재장전한다. 웅크리기를 풀거나, 장비가 바뀌거나, 좌클릭하면 재장전이 취소된다.").color(NamedTextColor.GREEN));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text(""));
             lore.add(Component.text("Shift로 재장전을 수행할 수 있다.").color(NamedTextColor.AQUA));

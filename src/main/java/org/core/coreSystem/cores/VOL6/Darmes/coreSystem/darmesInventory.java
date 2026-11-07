@@ -81,6 +81,9 @@ public class darmesInventory extends absInventory {
             lore.add(Component.text("타입 : 브루저").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("장착 : 메인핸드에 철퇴 장착, 오프핸드에 사슬 장착.").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+            lore.add(Component.text("패시브 : F로 쌓은 강타 수치가 있으면 다음 점프가 강타 수치에 비례해 더 높아지며, 쌓인 강타 수치를 모두 사용한다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("강타 점프 후 착지하면 주위 대상들에게 피해를 가하며, 이 점프의 낙하 피해는 받지 않는다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text(""));
             lore.add(Component.text("메뉴북 아이템 없어도 인벤토리 화면에서 철퇴를 우클릭해서 메뉴 화면 진입 가능").color(NamedTextColor.AQUA));
             return lore;

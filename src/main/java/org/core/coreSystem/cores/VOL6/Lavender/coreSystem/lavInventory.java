@@ -78,6 +78,7 @@ public class lavInventory extends absInventory {
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text("패시브 : 일반 공격의 사거리가 늘어난다. 3.5블록보다 먼 대상도 공격 게이지가 가득 차 있으면 9블록, 아니면 6.6블록까지 맞힐 수 있다.").color(NamedTextColor.GREEN));
             lore.add(Component.text("늘어난 사거리로 맞힌 공격은 공격 게이지가 가득 차 있으면 4, 아니면 2의 피해를 가하며, 메인핸드 무기의 내구도를 1 소모한다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("R의 칼날이 펼쳐져 있는 동안에는 사거리가 늘어나지 않는다.").color(NamedTextColor.GREEN));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text(""));
             lore.add(Component.text("메뉴북 아이템 없어도 인벤토리 화면에서 철검을 우클릭해서 메뉴 화면 진입 가능").color(NamedTextColor.AQUA));

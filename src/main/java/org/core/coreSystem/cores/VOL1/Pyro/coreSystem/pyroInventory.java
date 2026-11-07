@@ -78,7 +78,8 @@ public class pyroInventory extends absInventory {
             lore.add(Component.text("장착 : 메인핸드에 블레이즈 막대 장착, 오프핸드는 블레이즈 가루 장전.").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text("패시브 : 일반 공격 시 전방으로 화염구를 발사한다. (공격 간격 1.4초)").color(NamedTextColor.GREEN));
-            lore.add(Component.text("화염구는 대상이나 벽에 닿으면 폭발해 주위 대상들에게 피해를 가하고, 30% 확률로 7초간 화상을 입힌다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("화염구는 처음 맞은 대상에게 피해를 가한 뒤 폭발하며, 벽에 닿아도 폭발한다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("폭발은 주위 대상들에게 피해를 가하고, 30% 확률로 7초간 화상을 입힌다.").color(NamedTextColor.GREEN));
             lore.add(Component.text("화염구가 지나간 자리의 탈 수 있는 블록과 얼음, 눈에 불이 붙는다.").color(NamedTextColor.GREEN));
             lore.add(Component.text("불, 용암 피해를 받지 않는다.").color(NamedTextColor.GREEN));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));

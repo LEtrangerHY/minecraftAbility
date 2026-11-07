@@ -78,7 +78,7 @@ public class blazeInventory extends absInventory {
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text("패시브 : 일반 공격 시 전방 60° 부채꼴로 9블록까지 푸른 불꽃을 방사해 피해를 가한다. (공격 간격 2.6초)").color(NamedTextColor.GREEN));
             lore.add(Component.text("불꽃에 피격된 대상은 40% 확률로 4초간 화상과 시듦에 걸린다.").color(NamedTextColor.GREEN));
-            lore.add(Component.text("화염구에 맞은 대상은 60% 확률로 4초간 화상과 시듦에 걸린다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("자신이 쏜 투사체(R의 화염구, 화살 등)에 맞은 대상은 60% 확률로 4초간 화상과 시듦에 걸린다.").color(NamedTextColor.GREEN));
             lore.add(Component.text("불, 용암 피해를 받지 않는다.").color(NamedTextColor.GREEN));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text(""));
