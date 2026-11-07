@@ -81,6 +81,10 @@ public class charInventory extends absInventory {
             lore.add(Component.text("타입 : 메이지").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("장착 : 메인핸드에 프리즈머린 크리스탈 장착, 오프핸드에 사슬 장착.").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+            lore.add(Component.text("패시브 : 일반 공격 시 전방으로 프리즘 탄을 발사한다. 탄은 대상이나 벽에 닿으면 폭발해 주위 대상들에게 피해를 가한다. (공격 간격 3초)").color(NamedTextColor.GREEN));
+            lore.add(Component.text("웅크리는 동안 전방 3블록 앞에 방패를 펼친다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("방패는 닿은 투사체를 없애고 닿은 대상을 밀쳐내며, 방패 쪽에서 들어오는 공격을 막는다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text(""));
             lore.add(Component.text("메뉴북 아이템 없어도 인벤토리 화면에서 프리즈머린 크리스탈을 우클릭해서 메뉴 화면 진입 가능").color(NamedTextColor.AQUA));
             return lore;

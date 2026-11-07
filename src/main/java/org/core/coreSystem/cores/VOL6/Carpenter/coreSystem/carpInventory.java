@@ -76,6 +76,9 @@ public class carpInventory extends absInventory {
             lore.add(Component.text("타입 : 서포터").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("장착 : 메인핸드에 철사 덫 갈고리 장착, 오프핸드는 장착 금지.").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+            lore.add(Component.text("패시브 : 일반 공격 피해량이 4.3배가 된다. (R, Q 피해에는 적용되지 않음)").color(NamedTextColor.GREEN));
+            lore.add(Component.text("불사의 토템이 발동하면 21.5초간 저항 III를 얻고, 체력을 12 회복하며, 주위 5블록 안의 대상들을 밀쳐낸다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text(""));
             lore.add(Component.text("메뉴북 아이템 없어도 인벤토리 화면에서 철사 덫 갈고리를 우클릭해서 메뉴 화면 진입 가능").color(NamedTextColor.AQUA));
             return lore;

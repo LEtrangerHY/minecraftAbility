@@ -76,6 +76,11 @@ public class swordInventory extends absInventory {
             lore.add(Component.text("타입 : 브루저").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("장착 : 메인핸드에 철검 장착, 오프핸드에 꾸러미 장착.").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+            lore.add(Component.text("패시브 : 발도 상태(메인핸드 철검, 오프핸드 빈 꾸러미)에서 웅크리기를 1초간 유지하면 검을 꾸러미에 넣어 납도 상태가 된다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("웅크리기를 풀거나 장비가 바뀌거나 스킬을 사용하면 납도 게이지가 취소된다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("납도 상태에서는 R, Q, F가 각각 다른 발도 기술로 바뀌며, 발도 기술을 사용하면 검을 다시 뽑는다. (F의 발도 기술은 끝난 뒤 다시 납도한다)").color(NamedTextColor.GREEN));
+            lore.add(Component.text("납도 상태에서 스킬 없이 꾸러미로 적을 직접 공격하면 꾸러미의 피해(1)가 10배가 되고, 검을 다시 뽑아 발도 상태로 돌아온다. (완충 공격 시 10, 치명타 시 15)").color(NamedTextColor.GREEN));
+            lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text(""));
             lore.add(Component.text("메뉴북 아이템 없어도 인벤토리 화면에서 철검을 우클릭해서 메뉴 화면 진입 가능").color(NamedTextColor.AQUA));
             return lore;

@@ -76,6 +76,9 @@ public class jestInventory extends absInventory {
             lore.add(Component.text("타입 : 브루저").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("장착 : ???").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+            lore.add(Component.text("패시브 : 다른 플레이어가 던진 달걀이 무언가에 맞으면, 0.66% 확률로 가장 가까운 Jester가 그 자리로 순간이동하며 트릭쇼를 시작한다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("트릭쇼 상태이거나 트릭쇼 재사용 대기시간 중에는 발동하지 않는다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text(""));
             lore.add(Component.text("메뉴북 아이템 없어도 인벤토리 화면에서 egg을 우클릭해서 메뉴 화면 진입 가능").color(NamedTextColor.AQUA));
             return lore;

@@ -76,6 +76,11 @@ public class sabInventory extends absInventory {
             lore.add(Component.text("타입 : 디버프 암살자").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("장착 : 메인핸드에 가위 장착, 오프핸드는 장착 금지.").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+            lore.add(Component.text("패시브 : 웅크리기를 0.5초간 유지하면 트랩 타입(스파이크/투사)이 바뀐다. (마지막 수단 중에는 0.2초)").color(NamedTextColor.GREEN));
+            lore.add(Component.text("스파이크 : 일반 공격 피해량이 3블록 이내의 대상에게는 5배, 그 밖의 대상에게는 3배가 된다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("투사 : 일반 공격 시 전방으로 표창을 던져 처음 맞은 대상에게 피해를 가한다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("마지막 수단 중에는 공격으로 피해를 가할 때마다 체력을 1 회복한다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text(""));
             lore.add(Component.text("메뉴북 아이템 없어도 인벤토리 화면에서 가위를 우클릭해서 메뉴 화면 진입 가능").color(NamedTextColor.AQUA));
             return lore;

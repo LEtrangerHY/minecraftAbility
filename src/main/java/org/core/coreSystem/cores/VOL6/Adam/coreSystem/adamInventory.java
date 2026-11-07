@@ -81,6 +81,11 @@ public class adamInventory extends absInventory {
             lore.add(Component.text("타입 : -").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("장착 : 메인핸드에 검 종류 아이템 장착, 오프핸드에 사슬 장착.").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+            lore.add(Component.text("패시브 : 충전된 일반 공격(공격 게이지 90% 이상)을 적중시키면 스택을 1개 얻는다. (최대 6개)").color(NamedTextColor.GREEN));
+            lore.add(Component.text("스택 1개당 이동속도가 3% 증가한다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("스택이 6개가 되는 순간 F 스킬의 재사용 대기시간이 초기화된다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("스택이 있을 때 웅크리기를 유지하면 차징하며, 차징하는 동안 차징량에 비례해 최대 체력의 50%까지 흡수 체력을 얻는다. 차징이 끝나면 흡수 체력은 사라진다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text(""));
             lore.add(Component.text("메뉴북 아이템 없어도 인벤토리 화면에서 철 검을 우클릭해서 메뉴 화면 진입 가능").color(NamedTextColor.AQUA));
             return lore;

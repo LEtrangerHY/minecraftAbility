@@ -76,6 +76,9 @@ public class burstInventory extends absInventory {
             lore.add(Component.text("타입 : 브루저").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("장착 : 메인핸드에 레드스톤 가루 장착, 오프핸드는 장착 금지.").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+            lore.add(Component.text("패시브 : 일반 공격 시 자신에게 1.4의 피해를 입고, 그 자리에서 폭발을 일으킨다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("폭발은 주위 6블록 안의 대상들에게 피해를 가하고 밀쳐내며, 3블록 안의 대상들에게는 추가 피해를 가하고 더 멀리 밀쳐낸다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text(""));
             lore.add(Component.text("메뉴북 아이템 없어도 인벤토리 화면에서 레드스톤 가루를 우클릭해서 메뉴 화면 진입 가능").color(NamedTextColor.AQUA));
             return lore;

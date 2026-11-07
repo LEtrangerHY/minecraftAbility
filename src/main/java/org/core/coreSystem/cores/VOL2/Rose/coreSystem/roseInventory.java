@@ -76,6 +76,11 @@ public class roseInventory extends absInventory {
             lore.add(Component.text("타입 : 브루저").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("장착 : 메인핸드와 오프핸드에 구리 검 장착.").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+            lore.add(Component.text("패시브 : 오른손과 왼손(R)으로 번갈아 적을 공격하면, 가한 피해의 44%가 저장된 선혈 꽃잎이 적에게서 떨어진다. (R 레벨이 오를수록 저장량 증가)").color(NamedTextColor.GREEN));
+            lore.add(Component.text("선혈 꽃잎을 주우면 전방으로 참격을 가해 저장된 수치만큼 피해를 주고, 같은 수치만큼 체력을 회복하며 배고픔을 1 회복한다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("선혈 꽃잎을 주울 때 양손 검의 내구도가 1씩 회복되고, Q와 F의 재사용 대기시간이 2초 줄어든다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("오른손 또는 왼손(R) 공격으로 적을 맞힐 때마다 F의 재사용 대기시간이 2초 줄어든다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text(""));
             lore.add(Component.text("메뉴북 아이템 없어도 인벤토리 화면에서 구리 검을 우클릭해서 메뉴 화면 진입 가능").color(NamedTextColor.AQUA));
             return lore;

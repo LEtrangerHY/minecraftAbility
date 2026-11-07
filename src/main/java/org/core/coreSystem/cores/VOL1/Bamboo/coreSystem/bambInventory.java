@@ -77,6 +77,8 @@ public class bambInventory extends absInventory {
             lore.add(Component.text("타입 : 기동형 암살자").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("장착 : 메인핸드에 대나무 장착, 오프핸드에 철 조각 장전.").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+            lore.add(Component.text("패시브 : 일반 공격 피해량이 3으로 고정되며, 죽창에 표창이 장착되어 있으면 6이 된다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text(""));
             lore.add(Component.text("메뉴북 아이템 없어도 인벤토리 화면에서 대나무를 우클릭해서 메뉴 화면 진입 가능").color(NamedTextColor.AQUA));
             return lore;

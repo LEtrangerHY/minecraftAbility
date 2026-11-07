@@ -76,6 +76,9 @@ public class comInventory extends absInventory {
             lore.add(Component.text("타입 : 컨트롤러").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("장착 : 메인핸드에 시계 장착, 오프핸드는 장착 금지.").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+            lore.add(Component.text("패시브 : 일반 공격 시 전방으로 탄환을 발사해 처음 맞은 대상에게 피해를 가한다. (공격 간격 1초)").color(NamedTextColor.GREEN));
+            lore.add(Component.text("탄환이 적중하면 설치된 모든 리시버가 주위 5블록 안의 적들에게 추가 피해를 가한다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text(""));
             lore.add(Component.text("메뉴북 아이템 없어도 인벤토리 화면에서 시계를 우클릭해서 메뉴 화면 진입 가능").color(NamedTextColor.AQUA));
             return lore;

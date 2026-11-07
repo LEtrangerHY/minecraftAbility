@@ -77,6 +77,9 @@ public class dagInventory extends absInventory {
             lore.add(Component.text("타입 : 암살자").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("장착 : 메인핸드에 메아리 조각 장착, 오프핸드는 장착 금지.").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+            lore.add(Component.text("패시브 : 일반 공격 피해량이 4로 고정된다. (F 사용 중에는 적용되지 않음)").color(NamedTextColor.GREEN));
+            lore.add(Component.text("R, Q, F 스킬로 피해를 가할 때 대상 현재 체력의 6%만큼 추가 피해를 가한다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text(""));
             lore.add(Component.text("메뉴북 아이템 없어도 인벤토리 화면에서 메아리 조각을 우클릭해서 메뉴 화면 진입 가능").color(NamedTextColor.AQUA));
             return lore;

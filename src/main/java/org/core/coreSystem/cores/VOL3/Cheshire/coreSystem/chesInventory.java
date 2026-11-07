@@ -76,6 +76,11 @@ public class chesInventory extends absInventory {
             lore.add(Component.text("타입 : 기동형 암살자").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("장착 : 메인핸드에 네더라이트 괭이 장착, 오프핸드는 장착 금지.").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+            lore.add(Component.text("패시브 : 웅크리기를 1초간 유지하면 패시브가 충전된다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("충전된 상태에서 적의 공격을 받으면 그 피해를 무효화하고 뒤로 물러나며, 그 자리에 6초간 미소를 남긴다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("발동 후 1.2초간 모든 피해를 무효화하며 다른 플레이어에게 보이지 않는다. 이 동안에는 공격할 수 없다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("발동 후 6초간 투명화되며, 적을 공격하면 투명화가 풀린다. (재사용 대기시간 30초)").color(NamedTextColor.GREEN));
+            lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text(""));
             lore.add(Component.text("메뉴북 아이템 없어도 인벤토리 화면에서 무기 우클릭해서 메뉴 화면 진입 가능").color(NamedTextColor.AQUA));
             return lore;

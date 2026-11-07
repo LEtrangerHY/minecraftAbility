@@ -76,6 +76,9 @@ public class lustInventory extends absInventory {
             lore.add(Component.text("타입 : 원거리 메이지").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("장착 : 메인핸드에 무거운 코어 장착, 오프핸드에 철 주괴/자석석 장전 및 장착.").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
+            lore.add(Component.text("패시브 : 일반 공격 시 전방으로 철 파편을 발사해 처음 맞은 대상에게 피해를 가한다. (공격 간격 1.3초)").color(NamedTextColor.GREEN));
+            lore.add(Component.text("26% 확률로 치명타가 발생해 2배의 피해를 가한다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text(""));
             lore.add(Component.text("메뉴북 아이템 없어도 인벤토리 화면에서 무거운 코어를 우클릭해서 메뉴 화면 진입 가능").color(NamedTextColor.AQUA));
             return lore;
