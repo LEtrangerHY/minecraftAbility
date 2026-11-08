@@ -108,7 +108,7 @@ public class bambInventory extends absInventory {
                 lore.add(Component.text("대상 : 플레이어/블럭/적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
                 lore.add(Component.text("코스트 : 철 조각 1개").color(NamedTextColor.GREEN));
-                lore.add(Component.text("패시브 : 죽창에 표창이 장착되어 있을 시 일반 공격 피해량이 33% 증가한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("패시브 : 죽창에 표창이 장착되어 있을 시 일반 공격 피해량이 3에서 6으로 증가한다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("비장착 : 철 조각을 1개 소모해 죽창에 장착한다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("장착 : 전방으로 죽창을 던진다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("명중 : 죽창이 명중된 위치를 기폭시킨다.").color(NamedTextColor.GREEN));

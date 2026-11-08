@@ -111,7 +111,7 @@ public class roseInventory extends absInventory {
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
                 lore.add(Component.text("왼손의 무기로도 일반 공격 시전이 가능하다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("오른손, 왼손 번갈아 적 피격 시, 가한 피해의 44%의 수치가 저장된 선혈 꽃잎을 적으로부터 드랍한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("드랍된 선혈 꽃잎을 주울 시 전방으로 참격을 가하며 저장된 수치만큼 체력과 배고픔을 회복한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("드랍된 선혈 꽃잎을 주울 시 전방으로 참격을 가하며 저장된 수치만큼 체력을 회복하고, 배고픔을 1 회복한다.").color(NamedTextColor.GREEN));
                 break;
             case "Q":
                 requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfQ.get((int) level)) : Component.text("Require EXP : MAX");

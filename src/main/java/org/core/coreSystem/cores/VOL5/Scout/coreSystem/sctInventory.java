@@ -79,7 +79,6 @@ public class sctInventory extends absInventory {
             lore.add(Component.text("탄창이 비었을 때 웅크리기를 2초간 유지하면 재장전한다. 웅크리기를 풀거나, 장비가 바뀌거나, 좌클릭하면 재장전이 취소된다.").color(NamedTextColor.GREEN));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text(""));
-            lore.add(Component.text("Shift로 재장전을 수행할 수 있다.").color(NamedTextColor.AQUA));
             lore.add(Component.text("메뉴북 아이템 없어도 인벤토리 화면에서 무기 우클릭해서 메뉴 화면 진입 가능").color(NamedTextColor.AQUA));
             return lore;
         }

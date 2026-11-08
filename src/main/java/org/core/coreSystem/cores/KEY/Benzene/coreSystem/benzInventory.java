@@ -116,7 +116,7 @@ public class benzInventory extends absInventory {
                 lore.add(Component.text("패시브 : 비활성화 시 이동속도가 33% 증가한다").color(NamedTextColor.GREEN));
                 lore.add(Component.text("활성화 : 3회 이상 피해 가하기").color(NamedTextColor.GREEN));
                 lore.add(Component.text("전방으로 돌진하며 경로 내 대상들을 베어낸다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("피격-돌진 : ⏣을 1개 소모해 대상들에게 연쇄방향을 1회 중첩한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("피격-돌진 : ⏣을 1개 소모해 대상들에게 연쇄반향을 1회 중첩한다.").color(NamedTextColor.GREEN));
 
                 break;
             case "Q":
