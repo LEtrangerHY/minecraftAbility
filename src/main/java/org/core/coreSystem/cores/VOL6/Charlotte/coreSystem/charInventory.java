@@ -137,10 +137,11 @@ public class charInventory extends absInventory {
                 lore.add(Component.text("시스템 : 피격형").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("전방으로 축척된 프리즘 수치만큼의 유리파편을 연속으로 투사한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("유리벽 피격 : 스킬 시전 시 투사되는 유리파편이 유리벽에 피격될 때마다 프리즘 수치가 1씩 증가한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("유리벽 피격 : 프리즘 수치는 최대 12개까지 증가한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("유리벽 피격 : 평타 시전 시 평타 투사체 피해량을 축척된 프리즘 수치 배수만큼 상승시키고 프리즘 수치를 초기화시킨다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("전방으로 축적된 프리즘 수치만큼의 유리파편을 1초에 걸쳐 연속으로 투사한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("유리 피격 : 유리파편이 유리 종류 블록(유리벽 포함)에 맞을 때마다 프리즘 수치가 1씩 증가한다. (기본 1, 최대 6)").color(NamedTextColor.GREEN));
+                lore.add(Component.text("유리파편이 대상이나 유리에 맞을 때마다 Q의 재사용 대기시간이 1초 줄어든다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("3초 동안 유리파편을 대상이나 유리에 다시 맞히지 못하면 프리즘 수치가 1로 초기화된다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("평타 : 프리즘 수치가 클수록 평타 폭발의 피해와 범위가 커지며, 폭발하면 프리즘 수치가 1로 초기화된다.").color(NamedTextColor.GREEN));
                 break;
             default:
                 break;

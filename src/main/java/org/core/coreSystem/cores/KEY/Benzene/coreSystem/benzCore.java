@@ -187,8 +187,10 @@ public class benzCore extends absCore {
         Player player = event.getPlayer();
 
         if (tag.Benzene.contains(player)) {
-            if (Math.abs(player.getWalkSpeed() - 0.2f * (4f / 3f)) > 0.0001f) {
-                player.setWalkSpeed(0.2f * (4f / 3f));
+            boolean charged = config.atkCount.getOrDefault(player.getUniqueId(), 0) >= 3;
+            float targetSpeed = charged ? 0.2f : 0.2f * (4f / 3f);
+            if (Math.abs(player.getWalkSpeed() - targetSpeed) > 0.0001f) {
+                player.setWalkSpeed(targetSpeed);
             }
         }
     }

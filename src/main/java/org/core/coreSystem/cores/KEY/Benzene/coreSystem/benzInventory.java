@@ -82,7 +82,7 @@ public class benzInventory extends absInventory {
             lore.add(Component.text("이 피해는 연쇄반향이 중첩된 다른 대상들에게 전체 중첩 1개당 10%씩 전파된다.").color(NamedTextColor.GREEN));
             lore.add(Component.text("연쇄반향 효과는 22블록 이내의 대상에게만 적용된다.").color(NamedTextColor.GREEN));
             lore.add(Component.text("환경 피해를 66% 감소시키며, 중첩된 연쇄반향 1개당 감소율이 11%씩 줄어든다.").color(NamedTextColor.GREEN));
-            lore.add(Component.text("이동속도가 항상 33% 증가한다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("R이 활성화되지 않은 동안(피해를 3회 가하기 전) 이동속도가 33% 증가한다.").color(NamedTextColor.GREEN));
             lore.add(Component.text("연쇄반향이 1개 사라질 때마다 최대 체력의 6%를 회복한다. (대상 처치 시 중첩 수만큼 회복)").color(NamedTextColor.GREEN));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text(""));
