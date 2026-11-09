@@ -193,15 +193,14 @@ public class sctInventory extends absInventory {
         switch (skill) {
             case "R":
                 requireExpList = requireExpOfR;
-                // R은 체력 보너스 없음
                 break;
             case "Q":
                 requireExpList = requireExpOfQ;
-                hpBonus = 1; // Q 업그레이드 시 체력 +1
+                hpBonus = 1;
                 break;
             case "F":
                 requireExpList = requireExpOfF;
-                hpBonus = 2; // F 업그레이드 시 체력 +2
+                hpBonus = 2;
                 break;
             default: return;
         }
