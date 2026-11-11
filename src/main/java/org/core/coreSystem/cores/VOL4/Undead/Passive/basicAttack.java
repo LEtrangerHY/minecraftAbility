@@ -19,8 +19,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
@@ -40,12 +38,14 @@ public class basicAttack {
     private static final Particle.DustOptions EDGE = new Particle.DustOptions(Color.fromRGB(198, 202, 210), 0.85f);
     private static final Particle.DustOptions INNER = new Particle.DustOptions(Color.fromRGB(152, 156, 164), 0.7f);
     private static final Particle.DustOptions HAZE = new Particle.DustOptions(Color.fromRGB(122, 126, 132), 0.5f);
-    private static final Particle.DustOptions TRAIL = new Particle.DustOptions(Color.fromRGB(214, 218, 226), 0.45f);
+    public static final Particle.DustOptions TRAIL = new Particle.DustOptions(Color.fromRGB(214, 218, 226), 0.45f);
     private static final Particle.DustOptions[] CELLS = {CORE, EDGE, INNER};
-    private static final Particle.DustOptions BLADE = new Particle.DustOptions(Color.fromRGB(246, 248, 252), 0.75f);
-    private static final Particle.DustOptions KEEN = new Particle.DustOptions(Color.fromRGB(212, 216, 224), 0.62f);
-    private static final Particle.DustOptions BODY = new Particle.DustOptions(Color.fromRGB(158, 163, 172), 0.52f);
-    private static final Particle.DustOptions MIST = new Particle.DustOptions(Color.fromRGB(118, 122, 130), 0.42f);
+    private static final Particle.DustOptions RED_CORE = new Particle.DustOptions(Color.fromRGB(255, 228, 228), 1.0f);
+    private static final Particle.DustOptions RED_EDGE = new Particle.DustOptions(Color.fromRGB(226, 38, 48), 0.9f);
+    private static final Particle.DustOptions RED_INNER = new Particle.DustOptions(Color.fromRGB(140, 14, 24), 0.75f);
+    private static final Particle.DustOptions RED_HAZE = new Particle.DustOptions(Color.fromRGB(96, 12, 18), 0.55f);
+    private static final Particle.DustOptions RED_TRAIL = new Particle.DustOptions(Color.fromRGB(200, 30, 40), 0.6f);
+    private static final Particle.DustOptions[] RED_CELLS = {RED_CORE, RED_EDGE, RED_INNER};
 
     private static final double[][] SECTION = {
             {0.0, 0.0, 0},
@@ -58,8 +58,6 @@ public class basicAttack {
     private static final double[] QUICK_KEYS = {0.0, 0.14, 0.52, 0.9, 1.04, 1.0};
     private static final double[] HEAVY_KEYS = {0.0, 0.04, 0.14, 0.4, 0.78, 1.0, 1.04, 1.0};
     private static final double[] STRIKE_KEYS = {0.0, 0.05, 0.2, 0.56, 1.0, 1.05, 1.0};
-    private static final double[] FLURRY_KEYS = {0.0, 0.42, 0.9, 1.0};
-    private static final double[] FLURRY_TILT = {-18, -50, 50, 18};
 
     private static final Vector WORLD_UP = new Vector(0, 1, 0);
 
@@ -77,11 +75,28 @@ public class basicAttack {
         this.wound = wound;
     }
 
-    private record Basis(Location eye, Vector forward, Vector flat, Vector right, Vector up) {
+    public record Basis(Location eye, Vector forward, Vector flat, Vector right, Vector up) {
     }
 
-    private record Flurry(double reach, double sweep, double thick, double tolerance, Sound sound, float pitch,
-                          boolean push, double knockback, double lift) {
+    private record Power(double rate, double scale, boolean empowered) {
+    }
+
+    private static final Power NORMAL = new Power(1.0, 1.0, false);
+
+    private record Anchor(Location center, Vector axis, Vector side, Vector top) {
+        Vector slant(double tilt) {
+            return side.clone().multiply(Math.cos(tilt)).add(top.clone().multiply(Math.sin(tilt))).normalize();
+        }
+
+        Location pivot(double rim) {
+            return center.clone().subtract(axis.clone().multiply(rim));
+        }
+
+        Location feet() {
+            Location at = center.clone();
+            at.setY(center.getY() - 0.8);
+            return at;
+        }
     }
 
     public long cooldown(Player player) {
@@ -97,274 +112,28 @@ public class basicAttack {
     }
 
     public long attack(Player player) {
+        Double charge = config.f_Empower.remove(player.getUniqueId());
+        Power p = charge == null ? NORMAL : new Power(config.f_Skill_Rate + config.f_Skill_Rate_Step * charge,
+                config.f_Skill_Scale + config.f_Skill_Scale_Step * charge, true);
+
         if (swap.isFirearm(player)) {
-            return shoot(player) ? config.gun_Attack_Cool : config.gun_Attack_Empty_Cool;
+            return shoot(player, p) ? config.gun_Attack_Cool : config.gun_Attack_Empty_Cool;
         }
 
         long cooldown = cooldown(player);
 
         switch (player.getInventory().getItemInMainHand().getType()) {
-            case IRON_AXE -> chop(player);
-            case IRON_PICKAXE -> strike(player);
-            case IRON_SHOVEL -> scoop(player);
-            case IRON_HOE -> reap(player);
-            default -> slash(player);
+            case IRON_AXE -> chop(player, p);
+            case IRON_PICKAXE -> strike(player, p);
+            case IRON_SHOVEL -> scoop(player, p);
+            case IRON_HOE -> reap(player, p);
+            default -> slash(player, p);
         }
 
         return cooldown;
     }
 
-    public void combo(Player player) {
-        UUID uuid = player.getUniqueId();
-        Material tool = player.getInventory().getItemInMainHand().getType();
-        Flurry shape = flurry(tool);
-        double amount = damage(tool) * config.melee_r_Skill_Rate;
-
-        int[] starts = new int[FLURRY_TILT.length];
-        do {
-            int at = config.melee_r_Skill_Delay;
-            for (int i = 0; i < starts.length; i++) {
-                at += (int) (Math.random() * 3);
-                starts[i] = at;
-            }
-        } while (starts[starts.length - 1] - config.melee_r_Skill_Delay != 6);
-
-        LivingEntity[] focus = new LivingEntity[1];
-
-        config.is_acting.add(uuid);
-        player.getWorld().playSound(player, Sound.ITEM_ARMOR_EQUIP_IRON, 1.0f, 0.7f);
-        player.getWorld().playSound(player, Sound.ITEM_ARMOR_EQUIP_NETHERITE, 1.0f, 0.6f);
-        player.getWorld().playSound(player, Sound.ENTITY_PLAYER_ATTACK_NODAMAGE, 0.8f, 0.5f);
-        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, config.melee_r_Skill_Delay, 4, false, false, false));
-
-        new BukkitRunnable() {
-            int ticks = 0;
-            int next = 0;
-
-            @Override
-            public void run() {
-                ticks++;
-
-                if (!player.isOnline() || player.isDead() || !config.is_acting.contains(uuid)) {
-                    config.is_acting.remove(uuid);
-                    cancel();
-                    return;
-                }
-
-                while (next < starts.length && ticks >= starts[next]) {
-                    if (next == 0) focus[0] = aim(player, shape.reach() + 1.0);
-                    comboSlash(player, shape, amount, next++, focus[0]);
-                }
-
-                if (ticks >= starts[starts.length - 1] + FLURRY_KEYS.length + 1) {
-                    config.is_acting.remove(uuid);
-                    cancel();
-                }
-            }
-        }.runTaskTimer(plugin, 0L, 1L);
-    }
-
-    private Flurry flurry(Material tool) {
-        return switch (tool) {
-            case IRON_AXE -> new Flurry(config.axe_Attack_Reach + 2.2, 58, 0.6, 1.0,
-                    Sound.ENTITY_PLAYER_ATTACK_STRONG, 0.6f, true, config.axe_Attack_Knockback, config.axe_Attack_Lift);
-            case IRON_PICKAXE -> new Flurry(config.pickaxe_Attack_Reach + 1.2, 52, 0.35, 0.9,
-                    Sound.ENTITY_PLAYER_ATTACK_STRONG, 1.0f, true, config.pickaxe_Attack_Knockback, config.pickaxe_Attack_Lift);
-            case IRON_SHOVEL -> new Flurry(config.shovel_Attack_Reach + 1.2, 62, 0.5, 0.9,
-                    Sound.ITEM_SHOVEL_FLATTEN, 0.8f, true, config.shovel_Attack_Knockback, config.shovel_Attack_Lift);
-            case IRON_HOE -> new Flurry(config.hoe_Attack_Reach + 1.2, 80, 0.32, 0.9,
-                    Sound.ITEM_HOE_TILL, 1.1f, true, config.hoe_Attack_Knockback, config.hoe_Attack_Lift);
-            default -> new Flurry(config.sword_Attack_Reach + 1.2, 65, 0.45, 1.0,
-                    Sound.ENTITY_PLAYER_ATTACK_NODAMAGE, 0.75f, false, 0, 0);
-        };
-    }
-
-    private double damage(Material tool) {
-        return switch (tool) {
-            case IRON_AXE -> config.axe_Attack_Damage;
-            case IRON_PICKAXE -> config.pickaxe_Attack_Damage;
-            case IRON_SHOVEL -> config.shovel_Attack_Damage;
-            case IRON_HOE -> config.hoe_Attack_Damage;
-            default -> config.sword_Attack_Damage;
-        };
-    }
-
-    private LivingEntity aim(Player player, double range) {
-        Location eye = player.getEyeLocation();
-        RayTraceResult hit = player.getWorld().rayTraceEntities(eye, eye.getDirection(), range, 0.4,
-                entity -> isTarget(player, entity));
-
-        if (hit == null || !(hit.getHitEntity() instanceof LivingEntity target)) return null;
-        return player.hasLineOfSight(target) ? target : null;
-    }
-
-    private void comboSlash(Player player, Flurry shape, double amount, int index, LivingEntity focus) {
-        Basis b = basis(player);
-        World world = player.getWorld();
-        boolean last = index == FLURRY_TILT.length - 1;
-
-        double tilt = Math.toRadians(FLURRY_TILT[index] + (Math.random() * 2 - 1) * 8);
-        Vector slant = b.right().clone().multiply(Math.cos(tilt)).add(b.up().clone().multiply(Math.sin(tilt))).normalize();
-
-        double sweep = Math.toRadians(shape.sweep() + (Math.random() * 2 - 1) * 6);
-        double reach = shape.reach();
-        double rim = reach - 0.6;
-
-        Location origin = b.eye().clone().subtract(0, 0.5, 0);
-        Location pivot = origin.clone().add(b.forward().clone().multiply(0.6));
-
-        Vector toFocus = focus != null && focus.isValid() && !focus.isDead() && focus.getWorld().equals(world)
-                ? focus.getBoundingBox().getCenter().subtract(origin.toVector()) : null;
-        boolean locked = toFocus != null && toFocus.length() > 0.5 && toFocus.length() <= reach + 1.0;
-
-        Vector axis;
-        Vector lean;
-        Location center;
-
-        if (locked) {
-            axis = toFocus.clone().normalize();
-            Vector side = b.right().clone().subtract(axis.clone().multiply(b.right().dot(axis))).normalize();
-            Vector top = side.clone().crossProduct(axis).normalize();
-            lean = side.clone().multiply(Math.cos(tilt)).add(top.multiply(Math.sin(tilt))).normalize();
-            center = origin.clone().add(toFocus).subtract(axis.clone().multiply(rim));
-        } else {
-            axis = b.forward();
-            lean = slant;
-            center = pivot;
-        }
-
-        Vector normal = axis.clone().crossProduct(lean).normalize();
-        if (normal.getY() < 0) normal.multiply(-1);
-
-        world.playSound(player, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.4f, 0.55f + 0.05f * index);
-        world.playSound(player, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.9f, 1.25f + 0.1f * index);
-        world.playSound(player, Sound.ITEM_TRIDENT_THROW, 1.3f, 0.65f + 0.05f * index);
-        world.playSound(player, Sound.ITEM_TRIDENT_HIT, 1.3f, 0.6f + 0.05f * index);
-        world.playSound(player, Sound.ENTITY_PLAYER_ATTACK_STRONG, 1.2f, 0.6f + 0.05f * index);
-        world.playSound(player, Sound.ENTITY_PLAYER_ATTACK_CRIT, 0.9f, 0.75f + 0.05f * index);
-        world.playSound(player, Sound.ENTITY_SHEEP_SHEAR, 1.0f, 0.6f + 0.08f * index);
-        world.playSound(player, shape.sound(), 1.0f, shape.pitch() + 0.08f * index);
-        if (last) world.playSound(player, Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1.2f, 0.6f);
-
-        new BukkitRunnable() {
-            int ticks = 0;
-
-            @Override
-            public void run() {
-                if (!player.isOnline() || player.isDead()) {
-                    cancel();
-                    return;
-                }
-
-                if (ticks < FLURRY_KEYS.length - 1) {
-                    double a0 = -sweep + 2 * sweep * FLURRY_KEYS[ticks];
-                    double a1 = -sweep + 2 * sweep * FLURRY_KEYS[ticks + 1];
-
-                    crescent(world, center, axis, lean, normal, a0, a1, sweep, rim, shape.thick());
-
-                    Vector tangent = axis.clone().multiply(-Math.sin(a1)).add(lean.clone().multiply(Math.cos(a1)));
-                    tipSparks(world, point(center, axis, lean, a1, rim), tangent, 4);
-
-                    if (ticks == 1) {
-                        arcHit(player, origin, b.flat(), b.forward(), slant, reach, -sweep - Math.toRadians(8), sweep + Math.toRadians(8),
-                                shape.tolerance(), amount,
-                                !last || shape.push(), last ? shape.knockback() : 0, last ? shape.lift() : 0);
-                    }
-                } else if (ticks < FLURRY_KEYS.length + 1) {
-                    double step = (ticks == FLURRY_KEYS.length - 1 ? 0.14 : 0.24) / rim;
-                    for (double a = -sweep + Math.random() * step; a <= sweep; a += step) {
-                        world.spawnParticle(Particle.DUST, point(center, axis, lean, a, rim), 1, 0, 0, 0, 0, TRAIL);
-                    }
-                } else {
-                    cancel();
-                    return;
-                }
-
-                ticks++;
-            }
-        }.runTaskTimer(plugin, 0L, 1L);
-    }
-
-    private void crescent(World world, Location pivot, Vector axis, Vector slant, Vector normal, double a0, double a1,
-                          double sweep, double rim, double thick) {
-        double step = 0.08 / rim;
-
-        for (double a = a0; a <= a1; a += step) {
-            double u = Math.max(0.0, Math.min(1.0, (a + sweep) / (2 * sweep)));
-            double width = Math.pow(Math.sin(Math.PI * u), 0.75) * thick;
-
-            world.spawnParticle(Particle.DUST, point(pivot, axis, slant, a, rim), 1, 0.005, 0.005, 0.005, 0, BLADE);
-
-            for (double depth = 0.07; depth < width; depth += 0.075) {
-                double ratio = depth / width;
-                Particle.DustOptions tone = ratio < 0.3 ? KEEN : ratio < 0.65 ? BODY : MIST;
-                if (tone == MIST && Math.random() < 0.4) continue;
-
-                Location at = point(pivot, axis, slant, a, rim - depth * 0.6).subtract(normal.clone().multiply(depth));
-                world.spawnParticle(Particle.DUST, at, 1, 0.012, 0.012, 0.012, 0, tone);
-            }
-        }
-    }
-
-    public void burst(Player player) {
-        UUID uuid = player.getUniqueId();
-        boolean[] landed = new boolean[2];
-        boolean[] ended = new boolean[2];
-
-        if (!pay(player, config.gun_r_Skill_Cost_Ratio)) return;
-
-        config.is_acting.add(uuid);
-        fire(player, config.gun_r_Skill_Rate, 0, config.gun_Attack_Recoil, false, hit -> {
-            landed[0] = hit;
-            ended[0] = true;
-        });
-
-        new BukkitRunnable() {
-            int ticks = 0;
-
-            @Override
-            public void run() {
-                ticks++;
-
-                if (!player.isOnline() || player.isDead() || !config.is_acting.contains(uuid)) {
-                    config.is_acting.remove(uuid);
-                    cancel();
-                    return;
-                }
-
-                if (ticks == config.gun_r_Skill_Interval) {
-                    if (!pay(player, config.gun_r_Skill_Cost_Ratio)) {
-                        config.is_acting.remove(uuid);
-                        cancel();
-                        return;
-                    }
-
-                    fire(player, config.gun_r_Skill_Rate, 0, config.gun_Attack_Recoil, false, hit -> {
-                        landed[1] = hit;
-                        ended[1] = true;
-                    });
-                    return;
-                }
-
-                if (ticks < config.gun_r_Skill_Interval + config.gun_r_Skill_Finish_Delay || !ended[0] || !ended[1]) return;
-
-                if (landed[0] && landed[1] && pay(player, config.gun_r_Skill_Finish_Cost_Ratio)) {
-                    fire(player, config.gun_r_Skill_Finish_Rate, config.gun_r_Skill_Knockback, config.gun_r_Skill_Recoil, true, null);
-
-                    Vector back = player.getEyeLocation().getDirection().normalize().multiply(-config.gun_r_Skill_Push);
-                    back.setY(Math.max(back.getY(), 0.15));
-                    player.setVelocity(back);
-
-                    player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.4f, 0.8f);
-                }
-
-                config.is_acting.remove(uuid);
-                cancel();
-            }
-        }.runTaskTimer(plugin, 0L, 1L);
-    }
-
-    private Basis basis(Player player) {
+    public Basis basis(Player player) {
         Location eye = player.getEyeLocation();
         Vector forward = eye.getDirection().normalize();
         double yaw = Math.toRadians(eye.getYaw());
@@ -454,11 +223,11 @@ public class basicAttack {
         player.setHealth(Math.min(maxHealth, player.getHealth() + maxHealth * ratio));
     }
 
-    private boolean isTarget(Player player, Entity entity) {
+    public boolean isTarget(Player player, Entity entity) {
         return entity instanceof LivingEntity && entity != player && !(entity instanceof ArmorStand) && !entity.isDead();
     }
 
-    private void slash(Player player) {
+    private void slash(Player player, Power p) {
         Basis b = basis(player);
         World world = player.getWorld();
 
@@ -477,12 +246,28 @@ public class basicAttack {
         world.playSound(b.eye(), Sound.ENTITY_PLAYER_ATTACK_NODAMAGE, 1.2f, 0.7f);
         world.playSound(b.eye(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.7f, 1.1f);
 
-        playStroke(player, pivot, b.forward(), slant, from, -from, reach - 0.6, 1.0, SWING_KEYS, 0.5,
-                () -> arcHit(player, origin, b.flat(), b.forward(), slant, reach, -sweep - Math.toRadians(8), sweep + Math.toRadians(8),
-                        0.9, config.sword_Attack_Damage, false, 0, 0));
+        Runnable hit = () -> arcHit(player, origin, b.flat(), b.forward(), slant, reach, -sweep - Math.toRadians(8), sweep + Math.toRadians(8),
+                0.9, config.sword_Attack_Damage * p.rate(), false, 0, 0);
+
+        if (!p.empowered()) {
+            playStroke(player, pivot, b.forward(), slant, from, -from, reach - 0.6, 1.0, SWING_KEYS, 0.5, p, hit);
+            return;
+        }
+
+        empoweredSound(world, b.eye(), p);
+        Anchor a = anchor(player, b, origin, reach, false);
+        double rim = (reach - 0.6) * (a != null ? p.scale() : 1.0);
+        double crossRim = (reach - 0.8) * (a != null ? p.scale() : 1.0);
+        Vector axis = a != null ? a.axis() : b.forward();
+        Vector edge = a != null ? a.slant(tilt) : slant;
+        Vector cross = a != null ? a.slant(-tilt * 1.6)
+                : b.right().clone().multiply(Math.cos(-tilt * 1.6)).add(b.up().clone().multiply(Math.sin(-tilt * 1.6))).normalize();
+
+        playStroke(player, a != null ? a.pivot(rim) : pivot, axis, edge, from, -from, rim, 1.0 * p.scale(), SWING_KEYS, 0.5, p, hit);
+        playStroke(player, a != null ? a.pivot(crossRim) : pivot, axis, cross, -from, from, crossRim, 0.55 * p.scale(), SWING_KEYS, 0.5, p, null);
     }
 
-    private void reap(Player player) {
+    private void reap(Player player, Power p) {
         Basis b = basis(player);
         World world = player.getWorld();
 
@@ -501,12 +286,28 @@ public class basicAttack {
         world.playSound(b.eye(), Sound.ITEM_HOE_TILL, 1.0f, 1.1f);
         world.playSound(b.eye(), Sound.ENTITY_PLAYER_ATTACK_NODAMAGE, 0.9f, 1.0f);
 
-        playStroke(player, pivot, b.forward(), slant, from, -from, reach - 0.5, 0.75, QUICK_KEYS, 0.5,
-                () -> arcHit(player, origin, b.flat(), b.forward(), slant, reach, -sweep - Math.toRadians(6), sweep + Math.toRadians(6),
-                        0.8, config.hoe_Attack_Damage, true, config.hoe_Attack_Knockback, config.hoe_Attack_Lift));
+        Runnable hit = () -> arcHit(player, origin, b.flat(), b.forward(), slant, reach, -sweep - Math.toRadians(6), sweep + Math.toRadians(6),
+                0.8, config.hoe_Attack_Damage * p.rate(), true, config.hoe_Attack_Knockback, config.hoe_Attack_Lift);
+
+        if (!p.empowered()) {
+            playStroke(player, pivot, b.forward(), slant, from, -from, reach - 0.5, 0.75, QUICK_KEYS, 0.5, p, hit);
+            return;
+        }
+
+        empoweredSound(world, b.eye(), p);
+        Anchor a = anchor(player, b, origin, reach, false);
+        double rim = (reach - 0.5) * (a != null ? p.scale() : 1.0);
+        Vector axis = a != null ? a.axis() : b.forward();
+        Vector edge = a != null ? a.slant(tilt) : slant;
+        Location center = a != null ? a.pivot(rim) : pivot;
+
+        playStroke(player, center, axis, edge, from, -from, rim, 0.75 * p.scale(), QUICK_KEYS, 0.5, p, () -> {
+            hit.run();
+            afterImage(player, center, axis, edge, -sweep, sweep, rim + 0.3, p);
+        });
     }
 
-    private void scoop(Player player) {
+    private void scoop(Player player, Power p) {
         Basis b = basis(player);
         World world = player.getWorld();
 
@@ -527,12 +328,29 @@ public class basicAttack {
             world.spawnParticle(Particle.BLOCK, ground.clone().add(0, 0.3, 0), 14, 0.3, 0.2, 0.3, soil.createBlockData());
         }
 
-        playStroke(player, pivot, b.flat(), WORLD_UP, from, to, reach - 0.3, 1.1, SWING_KEYS, 0.5,
-                () -> arcHit(player, origin, b.flat(), b.flat(), WORLD_UP, reach, Math.toRadians(-55), Math.toRadians(70),
-                        0.7, config.shovel_Attack_Damage, true, config.shovel_Attack_Knockback, config.shovel_Attack_Lift));
+        Runnable hit = () -> arcHit(player, origin, b.flat(), b.flat(), WORLD_UP, reach, Math.toRadians(-55), Math.toRadians(70),
+                0.7, config.shovel_Attack_Damage * p.rate(), true, config.shovel_Attack_Knockback, config.shovel_Attack_Lift);
+
+        if (!p.empowered()) {
+            playStroke(player, pivot, b.flat(), WORLD_UP, from, to, reach - 0.3, 1.1, SWING_KEYS, 0.5, p, hit);
+            return;
+        }
+
+        empoweredSound(world, b.eye(), p);
+        Anchor a = anchor(player, b, origin, reach, true);
+        double rim = (reach - 0.3) * (a != null ? p.scale() : 1.0);
+        Location quake = a != null ? a.feet() : ground;
+
+        playStroke(player, a != null ? a.pivot(rim) : pivot, a != null ? a.axis() : b.flat(), WORLD_UP, from, to, rim,
+                1.1 * p.scale(), SWING_KEYS, 0.5, p, () -> {
+                    hit.run();
+                    Material dirt = quake.clone().subtract(0, 0.1, 0).getBlock().getType();
+                    if (dirt.isSolid()) world.spawnParticle(Particle.BLOCK, quake.clone().add(0, 0.3, 0), (int) (30 * p.scale()), 0.5, 0.3, 0.5, dirt.createBlockData());
+                    shockRing(world, quake.clone().add(0, 0.15, 0), 1.6 * p.scale());
+                });
     }
 
-    private void chop(Player player) {
+    private void chop(Player player, Power p) {
         Basis b = basis(player);
         World world = player.getWorld();
 
@@ -546,11 +364,21 @@ public class basicAttack {
         world.playSound(b.eye(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.2f, 0.45f);
         world.playSound(b.eye(), Sound.ENTITY_PLAYER_ATTACK_NODAMAGE, 1.0f, 0.5f);
 
-        playStroke(player, pivot, b.flat(), WORLD_UP, from, to, reach + 0.4, 1.3, HEAVY_KEYS, 1.0,
-                () -> chopHit(player, b.flat(), reach));
+        if (!p.empowered()) {
+            playStroke(player, pivot, b.flat(), WORLD_UP, from, to, reach + 0.4, 1.3, HEAVY_KEYS, 1.0, p,
+                    () -> chopHit(player, b.flat(), reach, p, null));
+            return;
+        }
+
+        empoweredSound(world, b.eye(), p);
+        Anchor a = anchor(player, b, b.eye().clone().subtract(0, 0.5, 0), reach + 1.0, true);
+        double rim = (reach + 0.4) * (a != null ? p.scale() : 1.0);
+
+        playStroke(player, a != null ? a.pivot(rim) : pivot, a != null ? a.axis() : b.flat(), WORLD_UP, from, to, rim,
+                1.3 * p.scale(), HEAVY_KEYS, 1.0, p, () -> chopHit(player, b.flat(), reach, p, a != null ? a.feet() : null));
     }
 
-    private void strike(Player player) {
+    private void strike(Player player, Power p) {
         Basis b = basis(player);
         World world = player.getWorld();
 
@@ -566,8 +394,20 @@ public class basicAttack {
         world.playSound(b.eye(), Sound.ENTITY_PLAYER_ATTACK_NODAMAGE, 1.1f, 0.55f);
         world.playSound(b.eye(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.8f, 0.6f);
 
-        playStroke(player, pivot, b.forward(), slant, from, 0, reach - 0.6, 0.7, STRIKE_KEYS, 1.0,
-                () -> strikeHit(player, b.eye(), b.forward(), reach));
+        Runnable hit = () -> strikeHit(player, b.eye(), b.forward(), reach, p);
+
+        if (!p.empowered()) {
+            playStroke(player, pivot, b.forward(), slant, from, 0, reach - 0.6, 0.7, STRIKE_KEYS, 1.0, p, hit);
+            return;
+        }
+
+        empoweredSound(world, b.eye(), p);
+        Anchor a = anchor(player, b, b.eye().clone().subtract(0, 0.3, 0), reach, false);
+        double rim = (reach - 0.6) * (a != null ? p.scale() : 1.0);
+        Vector edge = a != null ? a.top().clone().multiply(Math.cos(lean)).add(a.side().clone().multiply(Math.sin(lean))).normalize() : slant;
+
+        playStroke(player, a != null ? a.pivot(rim) : pivot, a != null ? a.axis() : b.forward(), edge, from, 0, rim,
+                0.7 * p.scale(), STRIKE_KEYS, 1.0, p, hit);
     }
 
     private static int impactTick(double[] keys, double threshold) {
@@ -577,13 +417,15 @@ public class basicAttack {
         return keys.length - 2;
     }
 
-    private static Location point(Location pivot, Vector axis, Vector slant, double angle, double radius) {
+    public static Location point(Location pivot, Vector axis, Vector slant, double angle, double radius) {
         return pivot.clone().add(axis.clone().multiply(Math.cos(angle) * radius)
                 .add(slant.clone().multiply(Math.sin(angle) * radius)));
     }
 
     private void playStroke(Player player, Location pivot, Vector axis, Vector slant, double from, double to,
-                            double length, double thick, double[] keys, double impactAt, Runnable onImpact) {
+                            double length, double thick, double[] keys, double impactAt, Power p, Runnable onImpact) {
+        Particle.DustOptions[] cells = p.empowered() ? RED_CELLS : CELLS;
+        Particle.DustOptions haze = p.empowered() ? RED_HAZE : HAZE;
         World world = player.getWorld();
         int impactTick = impactTick(keys, impactAt);
         Vector normal = axis.clone().crossProduct(slant).normalize();
@@ -605,14 +447,14 @@ public class basicAttack {
                 double a1 = from + (to - from) * k1;
 
                 if (k1 < k0) {
-                    drawStroke(world, pivot, axis, slant, normal, a0, a1, length * 0.97, thick * 0.5, 0, 1.6);
+                    drawStroke(world, pivot, axis, slant, normal, a0, a1, length * 0.97, thick * 0.5, 0, 1.6, cells, haze);
                 } else {
                     double progress = Math.max(0.0, Math.min(1.0, (k0 + k1) / 2.0));
                     drawStroke(world, pivot, axis, slant, normal, a0, a1, length, thick * (0.55 + 0.45 * progress),
-                            length * 0.35, 1.0);
+                            length * 0.35, p.empowered() ? 0.8 : 1.0, cells, haze);
 
                     Vector tangent = axis.clone().multiply(-Math.sin(a1)).add(slant.clone().multiply(Math.cos(a1))).multiply(sign);
-                    tipSparks(world, point(pivot, axis, slant, a1, length), tangent, 3);
+                    tipSparks(world, point(pivot, axis, slant, a1, length), tangent, p.empowered() ? 6 : 3);
                 }
 
                 if (ticks == impactTick && onImpact != null) onImpact.run();
@@ -623,7 +465,8 @@ public class basicAttack {
     }
 
     private void drawStroke(World world, Location pivot, Vector axis, Vector slant, Vector normal, double a0, double a1,
-                            double rim, double thick, double hazeFrom, double density) {
+                            double rim, double thick, double hazeFrom, double density,
+                            Particle.DustOptions[] cells, Particle.DustOptions haze) {
         double lo = Math.min(a0, a1);
         double hi = Math.max(a0, a1);
 
@@ -633,7 +476,7 @@ public class basicAttack {
                 double step = 0.34 * density / r;
                 for (double a = lo + Math.random() * step; a <= hi; a += step) {
                     if (Math.random() < 0.4) continue;
-                    world.spawnParticle(Particle.DUST, point(pivot, axis, slant, a, r), 1, 0.06, 0.06, 0.06, 0, HAZE);
+                    world.spawnParticle(Particle.DUST, point(pivot, axis, slant, a, r), 1, 0.06, 0.06, 0.06, 0, haze);
                 }
             }
         }
@@ -644,12 +487,114 @@ public class basicAttack {
             for (double[] cell : SECTION) {
                 Location p = pivot.clone().add(dir.clone().multiply(rim - cell[0] * thick))
                         .add(normal.clone().multiply(cell[1] * thick));
-                world.spawnParticle(Particle.DUST, p, 1, 0.02, 0.02, 0.02, 0, CELLS[(int) cell[2]]);
+                world.spawnParticle(Particle.DUST, p, 1, 0.02, 0.02, 0.02, 0, cells[(int) cell[2]]);
             }
         }
     }
 
-    private void tipSparks(World world, Location tip, Vector tangent, int count) {
+    private Anchor anchor(Player player, Basis b, Location origin, double range, boolean level) {
+        Location eye = player.getEyeLocation();
+        RayTraceResult hit = player.getWorld().rayTraceEntities(eye, eye.getDirection(), range + 0.5, 0.4,
+                entity -> isTarget(player, entity));
+        if (hit == null || !(hit.getHitEntity() instanceof LivingEntity target) || !player.hasLineOfSight(target)) return null;
+
+        Vector center = target.getBoundingBox().getCenter();
+        Vector toTarget = center.clone().subtract(origin.toVector());
+        if (level) toTarget.setY(0);
+        if (toTarget.length() < 0.5) return null;
+
+        Vector axis = toTarget.normalize();
+        Vector side = b.right().clone().subtract(axis.clone().multiply(b.right().dot(axis)));
+        if (side.lengthSquared() < 1.0E-6) side = b.right().clone();
+        side.normalize();
+        Vector top = side.clone().crossProduct(axis).normalize();
+        if (top.getY() < 0) top.multiply(-1);
+
+        return new Anchor(center.toLocation(player.getWorld()), axis, side, top);
+    }
+
+    private void empoweredSound(World world, Location at, Power p) {
+        float low = (float) Math.max(0.5, 1.0 - 0.15 * (p.scale() - 1.0) * 5);
+        world.playSound(at, Sound.ENTITY_WARDEN_ATTACK_IMPACT, 0.8f, 0.9f * low);
+        world.playSound(at, Sound.ITEM_TRIDENT_RIPTIDE_1, 0.9f, 1.3f * low);
+        world.playSound(at, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.2f, 0.6f * low);
+        world.playSound(at, Sound.ITEM_MACE_SMASH_AIR, 0.9f, 1.0f * low);
+    }
+
+    private void afterImage(Player player, Location pivot, Vector axis, Vector slant, double from, double to, double rim, Power p) {
+        World world = player.getWorld();
+        Vector normal = axis.clone().crossProduct(slant).normalize();
+
+        new BukkitRunnable() {
+            int ticks = 0;
+
+            @Override
+            public void run() {
+                if (ticks >= 3) {
+                    cancel();
+                    return;
+                }
+                drawStroke(world, pivot, axis, slant, normal, from, to, rim + 0.25 * ticks, 0.35 * p.scale(), 0, 1.4,
+                        RED_CELLS, RED_HAZE);
+                ticks++;
+            }
+        }.runTaskTimer(plugin, 1L, 1L);
+    }
+
+    private void shockRing(World world, Location center, double radius) {
+        new BukkitRunnable() {
+            int ticks = 0;
+
+            @Override
+            public void run() {
+                if (ticks >= 5) {
+                    cancel();
+                    return;
+                }
+
+                double r = radius * (ticks + 1) / 5.0;
+                int points = (int) (14 + r * 12);
+                for (int i = 0; i < points; i++) {
+                    double angle = Math.PI * 2 * i / points;
+                    world.spawnParticle(Particle.DUST, center.clone().add(Math.cos(angle) * r, 0, Math.sin(angle) * r),
+                            1, 0, 0, 0, 0, ticks < 2 ? RED_EDGE : RED_INNER);
+                }
+                ticks++;
+            }
+        }.runTaskTimer(plugin, 0L, 1L);
+    }
+
+    private void spikes(World world, Location impact, Power p) {
+        for (int i = 0; i < 3; i++) {
+            double angle = Math.PI * 2 * i / 3 + Math.random();
+            Location base = impact.clone().add(Math.cos(angle) * 0.7, 0, Math.sin(angle) * 0.7);
+            double height = 0.9 * p.scale();
+            for (double h = 0; h <= height; h += 0.12) {
+                world.spawnParticle(Particle.DUST, base.clone().add(0, h, 0), 1, 0, 0, 0, 0, h < height * 0.6 ? RED_EDGE : RED_CORE);
+            }
+        }
+    }
+
+    private void spear(World world, Location tip, Vector forward, Power p) {
+        double extra = 1.5 * p.scale();
+        for (double d = 0; d <= extra; d += 0.1) {
+            double fade = 1.0 - d / extra;
+            world.spawnParticle(Particle.DUST, tip.clone().add(forward.clone().multiply(d)), 1, 0, 0, 0, 0, fade > 0.5 ? RED_CORE : RED_EDGE);
+        }
+
+        Vector side = forward.clone().crossProduct(WORLD_UP);
+        if (side.lengthSquared() < 1e-6) side = new Vector(1, 0, 0);
+        side.normalize();
+        Vector up = side.clone().crossProduct(forward).normalize();
+        double radius = 0.35 * p.scale();
+        for (int i = 0; i < 16; i++) {
+            double angle = Math.PI * 2 * i / 16;
+            Location at = tip.clone().add(side.clone().multiply(Math.cos(angle) * radius)).add(up.clone().multiply(Math.sin(angle) * radius));
+            world.spawnParticle(Particle.DUST, at, 1, 0, 0, 0, 0, RED_EDGE);
+        }
+    }
+
+    public void tipSparks(World world, Location tip, Vector tangent, int count) {
         if (tangent.lengthSquared() < 1e-6) return;
         Vector dir = tangent.clone().normalize();
         for (int i = 0; i < count; i++) {
@@ -665,8 +610,8 @@ public class basicAttack {
         if (weight >= 0.6) world.playSound(body, Sound.ENTITY_PLAYER_ATTACK_STRONG, 0.7f, 0.9f);
     }
 
-    private void arcHit(Player player, Location origin, Vector flat, Vector axis, Vector slant, double reach,
-                        double lo, double hi, double planeTol, double amount, boolean push, double knockback, double lift) {
+    public void arcHit(Player player, Location origin, Vector flat, Vector axis, Vector slant, double reach,
+                       double lo, double hi, double planeTol, double amount, boolean push, double knockback, double lift) {
         World world = player.getWorld();
         DamageSource source = meleeSource(player);
         Vector normal = axis.clone().crossProduct(slant).normalize();
@@ -696,7 +641,7 @@ public class basicAttack {
         heal(player, hits);
     }
 
-    private void chopHit(Player player, Vector flat, double reach) {
+    private void chopHit(Player player, Vector flat, double reach, Power p, Location quake) {
         World world = player.getWorld();
         DamageSource source = meleeSource(player);
         Location impact = player.getLocation().add(flat.clone().multiply(reach));
@@ -712,18 +657,24 @@ public class basicAttack {
 
         int hits = 0;
 
-        for (Entity entity : world.getNearbyEntities(impact, 1.3, 1.8, 1.3)) {
+        if (p.empowered()) {
+            Location at = quake != null ? quake : impact;
+            shockRing(world, at.clone().add(0, 0.15, 0), 2.0 * p.scale());
+            spikes(world, at, p);
+        }
+
+        for (Entity entity : world.getNearbyEntities(impact, 1.3 * p.scale(), 1.8, 1.3 * p.scale())) {
             if (!isTarget(player, entity)) continue;
             LivingEntity target = (LivingEntity) entity;
             if (!player.hasLineOfSight(target)) continue;
 
-            if (meleeHit(player, target, config.axe_Attack_Damage, true, config.axe_Attack_Knockback, config.axe_Attack_Lift, centerWeight(player, flat, target), source)) hits++;
+            if (meleeHit(player, target, config.axe_Attack_Damage * p.rate(), true, config.axe_Attack_Knockback, config.axe_Attack_Lift, centerWeight(player, flat, target), source)) hits++;
         }
 
         heal(player, hits);
     }
 
-    private void strikeHit(Player player, Location eye, Vector forward, double reach) {
+    private void strikeHit(Player player, Location eye, Vector forward, double reach, Power p) {
         World world = player.getWorld();
 
         Predicate<Entity> filter = entity -> isTarget(player, entity);
@@ -738,10 +689,12 @@ public class basicAttack {
                     back < 0.3 ? CORE : EDGE);
         }
 
+        if (p.empowered()) spear(world, tip, forward, p);
+
         if (hit == null) return;
 
         if (hit.getHitEntity() instanceof LivingEntity target) {
-            if (meleeHit(player, target, config.pickaxe_Attack_Damage, true, config.pickaxe_Attack_Knockback, config.pickaxe_Attack_Lift, 1.0, meleeSource(player))) heal(player, 1);
+            if (meleeHit(player, target, config.pickaxe_Attack_Damage * p.rate(), true, config.pickaxe_Attack_Knockback, config.pickaxe_Attack_Lift, 1.0, meleeSource(player))) heal(player, 1);
             world.playSound(tip, Sound.ITEM_TRIDENT_HIT, 1.2f, 0.7f);
         } else if (hit.getHitBlock() != null) {
             world.spawnParticle(Particle.BLOCK, tip, 12, 0.15, 0.15, 0.15, hit.getHitBlock().getBlockData());
@@ -759,15 +712,15 @@ public class basicAttack {
         return 1.0 + 0.005 * level * level + 0.055 * level;
     }
 
-    private boolean shoot(Player player) {
-        if (!pay(player, config.gun_Attack_Cost_Ratio)) return false;
+    private boolean shoot(Player player, Power p) {
+        if (!p.empowered() && !pay(player, config.gun_Attack_Cost_Ratio)) return false;
 
-        fire(player, 1.0, config.gun_Attack_Knockback, config.gun_Attack_Recoil, false, null);
+        fire(player, p.rate(), config.gun_Attack_Knockback, config.gun_Attack_Recoil * (p.empowered() ? 1.6f : 1.0f), false, p.empowered(), null);
 
         return true;
     }
 
-    private boolean pay(Player player, double ratio) {
+    public boolean pay(Player player, double ratio) {
         AttributeInstance maxHealthAttr = player.getAttribute(Attribute.MAX_HEALTH);
         double maxHealth = maxHealthAttr != null ? maxHealthAttr.getValue() : 20.0;
         double cost = maxHealth * ratio;
@@ -781,7 +734,11 @@ public class basicAttack {
         return true;
     }
 
-    private void fire(Player player, double rate, double knockback, float kick, boolean instant, Consumer<Boolean> done) {
+    public void fire(Player player, double rate, double knockback, float kick, boolean instant, Consumer<Boolean> done) {
+        fire(player, rate, knockback, kick, instant, false, done);
+    }
+
+    private void fire(Player player, double rate, double knockback, float kick, boolean instant, boolean empowered, Consumer<Boolean> done) {
         World world = player.getWorld();
 
         AttributeInstance maxHealthAttr = player.getAttribute(Attribute.MAX_HEALTH);
@@ -791,7 +748,11 @@ public class basicAttack {
         Vector dir = player.getEyeLocation().getDirection().normalize();
 
         Location spawn = player.getEyeLocation().add(dir.clone().multiply(0.2)).add(0, -0.3, 0);
-        BlockDisplay bullet = new bulletModel(world, spawn, Material.IRON_BLOCK.createBlockData(), 0.15f, 0.15f, 0.35f).getDisplay();
+        BlockDisplay bullet = empowered
+                ? new bulletModel(world, spawn, Material.REDSTONE_BLOCK.createBlockData(), 0.22f, 0.22f, 0.5f).getDisplay()
+                : new bulletModel(world, spawn, Material.IRON_BLOCK.createBlockData(), 0.15f, 0.15f, 0.35f).getDisplay();
+        int pierceLimit = empowered ? Integer.MAX_VALUE : config.gun_Attack_Pierce;
+        Particle.DustOptions trail = empowered ? RED_TRAIL : TRAIL;
 
         double speed = config.gun_Attack_Speed;
         Vector velocity = dir.clone().multiply(speed);
@@ -803,6 +764,23 @@ public class basicAttack {
         world.playSound(spawn, Sound.BLOCK_IRON_TRAPDOOR_CLOSE, 1.0f, 1.2f);
         world.spawnParticle(Particle.SMOKE, spawn, 8, 0.06, 0.06, 0.06, 0.04);
         world.spawnParticle(Particle.CRIT, spawn, 6, 0.05, 0.05, 0.05, 0.25);
+
+        if (empowered) {
+            world.playSound(spawn, Sound.ENTITY_WARDEN_ATTACK_IMPACT, 1.0f, 0.8f);
+            world.playSound(spawn, Sound.ITEM_MACE_SMASH_GROUND_HEAVY, 0.9f, 1.4f);
+            world.playSound(spawn, Sound.ENTITY_GENERIC_EXPLODE, 1.2f, 0.6f);
+
+            Vector side = dir.clone().crossProduct(WORLD_UP);
+            if (side.lengthSquared() < 1e-6) side = new Vector(1, 0, 0);
+            side.normalize();
+            Vector up = side.clone().crossProduct(dir).normalize();
+            for (int i = 0; i < 18; i++) {
+                double angle = Math.PI * 2 * i / 18;
+                Location at = spawn.clone().add(dir.clone().multiply(0.4))
+                        .add(side.clone().multiply(Math.cos(angle) * 0.45)).add(up.clone().multiply(Math.sin(angle) * 0.45));
+                world.spawnParticle(Particle.DUST, at, 1, 0, 0, 0, 0, RED_EDGE);
+            }
+        }
 
         recoil(player, kick);
 
@@ -824,7 +802,7 @@ public class basicAttack {
 
         double scale = levelMultiplier(player);
         double reached = instant
-                ? pierce(player, world, spawn, dir, speed * config.gun_Attack_Life, rate, knockback, lost, scale, source, push, pierced, filter)
+                ? pierce(player, world, spawn, dir, speed * config.gun_Attack_Life, rate, knockback, lost, scale, source, push, pierced, filter, pierceLimit)
                 : -1;
         double limit = reached >= 0 ? reached : speed * config.gun_Attack_Life;
 
@@ -862,7 +840,7 @@ public class basicAttack {
                         stopped = true;
                     }
                 } else {
-                    double hit = pierce(player, world, current, dir, speed, rate, knockback, lost, scale, source, push, pierced, filter);
+                    double hit = pierce(player, world, current, dir, speed, rate, knockback, lost, scale, source, push, pierced, filter, pierceLimit);
                     if (!pierced.isEmpty()) report();
                     if (hit >= 0) {
                         travelled = hit;
@@ -870,8 +848,8 @@ public class basicAttack {
                     }
                 }
 
-                for (double d = 0; d < travelled; d += 0.8) {
-                    world.spawnParticle(Particle.DUST, current.clone().add(dir.clone().multiply(d)), 1, 0, 0, 0, 0, TRAIL);
+                for (double d = 0; d < travelled; d += empowered ? 0.35 : 0.8) {
+                    world.spawnParticle(Particle.DUST, current.clone().add(dir.clone().multiply(d)), 1, 0, 0, 0, 0, trail);
                 }
 
                 if (stopped) {
@@ -887,7 +865,7 @@ public class basicAttack {
     }
 
     private double pierce(Player player, World world, Location from, Vector dir, double range, double rate, double knockback,
-                          double lost, double scale, DamageSource source, Vector push, Set<UUID> pierced, Predicate<Entity> filter) {
+                          double lost, double scale, DamageSource source, Vector push, Set<UUID> pierced, Predicate<Entity> filter, int limit) {
         while (true) {
             RayTraceResult hit = world.rayTrace(from, dir, range, FluidCollisionMode.NEVER, true, 0.2, filter);
             if (hit == null) return -1;
@@ -914,7 +892,7 @@ public class basicAttack {
                 world.playSound(at, Sound.ITEM_TRIDENT_HIT, 1.2f, 0.7f);
                 world.playSound(at, Sound.BLOCK_ANVIL_LAND, 0.5f, 1.7f);
 
-                if (pierced.size() < config.gun_Attack_Pierce) continue;
+                if (pierced.size() < limit) continue;
             } else if (hit.getHitBlock() != null) {
                 world.spawnParticle(Particle.BLOCK, at, 10, 0.1, 0.1, 0.1, hit.getHitBlock().getBlockData());
                 world.playSound(at, Sound.BLOCK_STONE_HIT, 1.1f, 1.2f);

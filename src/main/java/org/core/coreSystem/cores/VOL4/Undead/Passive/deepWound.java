@@ -29,6 +29,7 @@ public class deepWound {
 
     private static final BlockData BLOOD = Material.REDSTONE_BLOCK.createBlockData();
     private static final Particle.DustOptions WOUND = new Particle.DustOptions(Color.fromRGB(120, 8, 12), 0.9f);
+    private static final Particle.DustOptions GASH = new Particle.DustOptions(Color.fromRGB(196, 22, 26), 0.8f);
 
     private final Undead config;
     private final JavaPlugin plugin;
@@ -60,12 +61,16 @@ public class deepWound {
         World world = target.getWorld();
         Location center = target.getBoundingBox().getCenter().toLocation(world);
 
-        world.spawnParticle(Particle.SWEEP_ATTACK, center, 1, 0, 0, 0, 0);
-        world.spawnParticle(Particle.BLOCK, center, 18, 0.25, 0.35, 0.25, 0, BLOOD);
-        world.spawnParticle(Particle.CRIT, center, 12, 0.3, 0.4, 0.3, 0.4);
-        world.playSound(center, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.2f, 0.7f);
-        world.playSound(center, Sound.ITEM_TRIDENT_HIT, 1.1f, 0.8f);
-        world.playSound(center, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.0f, 0.7f);
+        slash(world, center, player.getLocation().getDirection(), target.getWidth() + 0.6);
+        world.spawnParticle(Particle.BLOCK, center, 26, 0.25, 0.35, 0.25, 0.1, BLOOD);
+        world.spawnParticle(Particle.CRIT, center, 16, 0.3, 0.4, 0.3, 0.5);
+        world.spawnParticle(Particle.DAMAGE_INDICATOR, center, 4, 0.2, 0.3, 0.2, 0.1);
+
+        world.playSound(center, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.3f, 0.6f);
+        world.playSound(center, Sound.ITEM_TRIDENT_HIT, 1.3f, 0.7f);
+        world.playSound(center, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.2f, 0.6f);
+        world.playSound(center, Sound.ENTITY_PLAYER_HURT_SWEET_BERRY_BUSH, 1.0f, 0.6f);
+        player.playSound(player, Sound.ITEM_TRIDENT_HIT, 0.8f, 0.7f);
 
         slow(target);
         track(target);
@@ -81,12 +86,16 @@ public class deepWound {
         World world = target.getWorld();
         Location center = target.getBoundingBox().getCenter().toLocation(world);
 
-        world.spawnParticle(Particle.BLOCK, center, 40, 0.3, 0.45, 0.3, 0, BLOOD);
-        world.spawnParticle(Particle.DUST, center, 20, 0.3, 0.45, 0.3, 0, WOUND);
-        world.spawnParticle(Particle.CRIT, center, 20, 0.3, 0.4, 0.3, 0.6);
-        world.playSound(center, Sound.ITEM_TRIDENT_HIT, 1.4f, 0.55f);
-        world.playSound(center, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.3f, 0.6f);
-        world.playSound(center, Sound.ENTITY_PLAYER_ATTACK_STRONG, 1.2f, 0.5f);
+        burst(world, center);
+
+        world.playSound(center, Sound.ENTITY_WARDEN_ATTACK_IMPACT, 1.4f, 0.8f);
+        world.playSound(center, Sound.ITEM_MACE_SMASH_GROUND_HEAVY, 1.0f, 1.3f);
+        world.playSound(center, Sound.BLOCK_BONE_BLOCK_BREAK, 1.4f, 0.6f);
+        world.playSound(center, Sound.ITEM_TRIDENT_HIT, 1.5f, 0.5f);
+        world.playSound(center, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.4f, 0.5f);
+        world.playSound(center, Sound.ENTITY_PLAYER_HURT_SWEET_BERRY_BUSH, 1.3f, 0.5f);
+        attacker.playSound(attacker, Sound.ENTITY_WARDEN_ATTACK_IMPACT, 0.9f, 0.8f);
+        attacker.playSound(attacker, Sound.BLOCK_BONE_BLOCK_BREAK, 0.9f, 0.6f);
 
         for (Wound wound : marks.values()) {
             Player owner = plugin.getServer().getPlayer(wound.owner);
@@ -156,15 +165,53 @@ public class deepWound {
 
                 slow(target);
 
-                if (age % 4 == 0) {
+                if (age % 3 == 0) {
                     Location center = target.getBoundingBox().getCenter().toLocation(target.getWorld());
-                    target.getWorld().spawnParticle(Particle.DUST, center, 2, 0.2, 0.35, 0.2, 0, WOUND);
-                    target.getWorld().spawnParticle(Particle.BLOCK, center.add(0, -0.2, 0), 1, 0.15, 0.1, 0.15, 0, BLOOD);
+                    target.getWorld().spawnParticle(Particle.DUST, center, 3, 0.22, 0.35, 0.22, 0, WOUND);
+                    target.getWorld().spawnParticle(Particle.FALLING_DUST, center, 2, 0.2, 0.3, 0.2, 0, BLOOD);
+                }
+
+                if (tick) {
+                    Location center = target.getBoundingBox().getCenter().toLocation(target.getWorld());
+                    target.getWorld().spawnParticle(Particle.BLOCK, center, 8, 0.2, 0.3, 0.2, 0.05, BLOOD);
+                    target.getWorld().playSound(center, Sound.ENTITY_PLAYER_HURT_SWEET_BERRY_BUSH, 0.6f, 0.8f);
                 }
             }
         };
         task.runTaskTimer(plugin, 1L, 1L);
         tasks.put(id, task);
+    }
+
+    private void slash(World world, Location center, Vector facing, double length) {
+        Vector forward = facing.clone().setY(0);
+        if (forward.lengthSquared() < 1.0E-6) forward = new Vector(0, 0, 1);
+        forward.normalize();
+
+        Vector side = new Vector(-forward.getZ(), 0, forward.getX());
+        Vector edge = side.clone().multiply(Math.cos(Math.toRadians(35))).add(new Vector(0, Math.sin(Math.toRadians(35)), 0));
+        Location front = center.clone().subtract(forward.clone().multiply(0.35));
+
+        for (double d = -length / 2; d <= length / 2; d += 0.06) {
+            double fade = 1.0 - Math.abs(d) / (length / 2);
+            Location at = front.clone().add(edge.clone().multiply(d));
+            world.spawnParticle(Particle.DUST, at, 1, 0, 0, 0, 0, fade > 0.35 ? GASH : WOUND);
+            if (fade > 0.5) world.spawnParticle(Particle.DUST, at.clone().add(0, -0.05, 0), 1, 0, 0, 0, 0, WOUND);
+        }
+    }
+
+    private void burst(World world, Location center) {
+        world.spawnParticle(Particle.BLOCK, center, 70, 0.3, 0.45, 0.3, 0.25, BLOOD);
+        world.spawnParticle(Particle.DUST, center, 30, 0.35, 0.5, 0.35, 0, WOUND);
+        world.spawnParticle(Particle.CRIT, center, 30, 0.3, 0.4, 0.3, 0.8);
+        world.spawnParticle(Particle.DAMAGE_INDICATOR, center, 8, 0.25, 0.35, 0.25, 0.15);
+
+        for (int i = 0; i < 14; i++) {
+            double angle = Math.PI * 2 * i / 14;
+            Vector out = new Vector(Math.cos(angle), 0.25, Math.sin(angle));
+            for (double d = 0.3; d <= 1.1; d += 0.2) {
+                world.spawnParticle(Particle.DUST, center.clone().add(out.clone().multiply(d)), 1, 0, 0, 0, 0, d < 0.7 ? GASH : WOUND);
+            }
+        }
     }
 
     private void stop(LivingEntity target) {

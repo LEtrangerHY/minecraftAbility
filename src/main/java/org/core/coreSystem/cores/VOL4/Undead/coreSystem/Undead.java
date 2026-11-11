@@ -24,6 +24,7 @@ public class Undead {
     public HashMap<UUID, Boolean> slash_Flip = new HashMap<>();
 
     public HashMap<UUID, Double> restore_buff_rate = new HashMap<>();
+    public HashMap<UUID, Double> f_Empower = new HashMap<>();
     public HashMap<UUID, Integer> restore_buff_ticks = new HashMap<>();
     public HashMap<UUID, Double> restore_debuff_rate = new HashMap<>();
     public HashMap<UUID, Double> restore_charge_defend = new HashMap<>();
@@ -121,8 +122,15 @@ public class Undead {
 
     //F
     public double f_Skill_amp = 0.2;
-    public long melee_f_Skill_Cool = 6000;
-    public long gun_f_Skill_Cool = 6000;
+    public long melee_f_Skill_Cool = 9000;
+    public long gun_f_Skill_Cool = 9000;
+    public double f_Skill_Cost_Ratio = 0.10;
+    public double f_Skill_Cost_Max = 0.40;
+    public int f_Skill_Window = 80;
+    public double f_Skill_Rate = 1.5;
+    public double f_Skill_Rate_Step = 0.25;
+    public double f_Skill_Scale = 1.1;
+    public double f_Skill_Scale_Step = 0.08;
 
     public boolean isTool(Material material) {
         return material == Material.IRON_SWORD ||
@@ -150,6 +158,7 @@ public class Undead {
         slash_Flip.remove(uuid);
 
         restore_buff_rate.remove(uuid);
+        f_Empower.remove(uuid);
         restore_buff_ticks.remove(uuid);
         restore_debuff_rate.remove(uuid);
         restore_charge_defend.remove(uuid);
