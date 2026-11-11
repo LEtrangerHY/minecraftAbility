@@ -63,14 +63,14 @@ public class Boost {
                     objective.setDisplaySlot(DisplaySlot.SIDEBAR);
                 }
 
-                double buffRate = config.f_buff_rate.getOrDefault(playerUUID, 0.0);
-                int buffTicks = config.f_buff_ticks.getOrDefault(playerUUID, 0);
+                double buffRate = config.restore_buff_rate.getOrDefault(playerUUID, 0.0);
+                int buffTicks = config.restore_buff_ticks.getOrDefault(playerUUID, 0);
                 if (buffRate > 0) {
                     String buffText = String.format("§aBoost: %.0f%% (%.1fs)", buffRate * 100, buffTicks / 20.0);
                     objective.getScore(buffText).setScore(7);
                 }
 
-                double debuffRate = config.f_debuff_rate.getOrDefault(playerUUID, 0.0);
+                double debuffRate = config.restore_debuff_rate.getOrDefault(playerUUID, 0.0);
                 if (debuffRate > 0) {
                     String debuffText = String.format("§cDamage: %.0f%%", debuffRate * 100);
                     objective.getScore(debuffText).setScore(6);

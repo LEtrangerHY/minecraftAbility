@@ -10,8 +10,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -19,6 +21,12 @@ public class Cool {
 
     private final JavaPlugin plugin;
     private final HashMap<UUID, HashMap<String, CooldownData>> cooldowns = new HashMap<>();
+    private final List<ActionBarEditor> actionBarEditors = new ArrayList<>();
+
+    @FunctionalInterface
+    public interface ActionBarEditor {
+        Component edit(Player player, String skill, long remaining, Component label, Component status);
+    }
 
     public Cool(JavaPlugin plugin) {
         this.plugin = plugin;
@@ -39,6 +47,10 @@ public class Cool {
             this.remainingOnPause = 0;
             this.bossBar = bossBar;
         }
+    }
+
+    public void addActionBarEditor(ActionBarEditor editor) {
+        actionBarEditors.add(editor);
     }
 
     private void startGlobalTickerTask() {
@@ -119,6 +131,11 @@ public class Cool {
             status = Component.text(timeText).color(NamedTextColor.YELLOW);
         } else {
             status = Component.text("Ready").color(NamedTextColor.GREEN);
+        }
+
+        for (ActionBarEditor editor : actionBarEditors) {
+            Component edited = editor.edit(player, skillName, remaining, label, status);
+            if (edited != null) return edited;
         }
 
         return label.append(status);

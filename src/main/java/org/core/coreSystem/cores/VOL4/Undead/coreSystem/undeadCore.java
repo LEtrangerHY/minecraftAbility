@@ -1,29 +1,44 @@
 package org.core.coreSystem.cores.VOL4.Undead.coreSystem;
 
-import org.bukkit.*;
+import io.papermc.paper.event.player.PlayerArmSwingEvent;
+import io.papermc.paper.event.player.PrePlayerAttackEntityEvent;
+import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
-import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.entity.*;
-import org.bukkit.event.player.*;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.entity.EntityPotionEffectEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.player.PlayerInputEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.core.cool.Cool;
 import org.core.coreSystem.absCoreSystem.ConfigWrapper;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.absCoreSystem.absCore;
 import org.core.coreSystem.cores.VOL4.Undead.Passive.Boost;
+import org.core.coreSystem.cores.VOL4.Undead.Passive.Restoration;
+import org.core.coreSystem.cores.VOL4.Undead.Passive.basicAttack;
+import org.core.coreSystem.cores.VOL4.Undead.Passive.handSwap;
+import org.core.coreSystem.cores.VOL4.Undead.Passive.stickyBomb;
 import org.core.coreSystem.cores.VOL4.Undead.Skill.F;
 import org.core.coreSystem.cores.VOL4.Undead.Skill.Q;
-import org.core.coreSystem.cores.VOL4.Undead.Skill.DeadlyWeapons.R;
+import org.core.coreSystem.cores.VOL4.Undead.Skill.R;
+import org.core.effect.crowdControl.Stun;
+import org.core.effect.effectPlugin.swingEchoGuard;
 import org.core.main.Core;
 import org.core.main.coreConfig;
 
@@ -35,13 +50,18 @@ public class undeadCore extends absCore {
     private final Core plugin;
     private final Undead config;
 
+    private final handSwap swap;
+    private final basicAttack attack;
+    private final Restoration restore;
+    private final stickyBomb bomb;
     private final Boost boost;
-    private final R Rskill;
-    private final Q Qskill;
-    private final F Fskill;
 
-    private final Map<UUID, BossBar> activeChargeBars = new HashMap<>();
-    private final Map<UUID, BukkitRunnable> activeChargeTasks = new HashMap<>();
+    private final SkillBase Rskill;
+    private final SkillBase Qskill;
+    private final SkillBase Fskill;
+
+    private final Map<UUID, Integer> lastUseTick = new HashMap<>();
+    private final Map<UUID, Boolean> sprintInput = new HashMap<>();
 
     public undeadCore(Core plugin, coreConfig tag, Undead config, Cool cool) {
         super(tag, cool);
@@ -49,13 +69,24 @@ public class undeadCore extends absCore {
         this.plugin = plugin;
         this.config = config;
 
+        this.swap = new handSwap(config, plugin, cool);
+        this.bomb = new stickyBomb(config, plugin);
+        this.attack = new basicAttack(config, plugin, swap, bomb);
+        this.restore = new Restoration(config, plugin, swap);
         this.boost = new Boost(config, tag, plugin);
 
-        this.Rskill = new R(config, plugin, cool);
-        this.Qskill = new Q(config, plugin, cool);
-        this.Fskill = new F(config, plugin, cool);
+        this.Rskill = slot("R", new R(config, plugin, cool, swap, attack));
+        this.Qskill = slot("Q", new Q(config, plugin, cool, swap, bomb));
+        this.Fskill = slot("F", new F(config, plugin, cool, swap));
+
+        cool.addActionBarEditor((player, skill, remaining, label, status) ->
+                contains(player) && swap.isEquipped(player) ? swap.actionBar(player, skill, remaining, label, status) : null);
 
         plugin.getLogger().info("Undead downloaded...");
+    }
+
+    private SkillBase slot(String key, SkillBase skill) {
+        return player -> swap.use(player, key, skill);
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
@@ -84,90 +115,6 @@ public class undeadCore extends absCore {
         }, 1L);
 
         boost.updateUndeadBoard(player);
-    }
-
-    @EventHandler
-    public void sneakCharge(PlayerToggleSneakEvent event) {
-        Player player = event.getPlayer();
-
-        if (!contains(player)) return;
-
-        if (!event.isSneaking()) {
-            cleanupCharge(player);
-            return;
-        }
-
-        if (!hasProperItems(player)) return;
-
-        config.f_charge_consumed.remove(player.getUniqueId());
-        config.f_charge_progress.put(player.getUniqueId(), 0.0);
-
-        config.f_charge_hit_count.put(player.getUniqueId(), 0);
-
-        BossBar bossBar = Bukkit.createBossBar("F skill Charge", BarColor.RED, BarStyle.SEGMENTED_10);
-        bossBar.setProgress(0.0);
-        bossBar.addPlayer(player);
-        activeChargeBars.put(player.getUniqueId(), bossBar);
-
-        BukkitRunnable task = new BukkitRunnable() {
-            long ticks = 0;
-            final long maxTicks = 80L;
-
-            @Override
-            public void run() {
-                if (!player.isSneaking() || !hasProperItems(player) || !player.isValid() || config.f_charge_consumed.getOrDefault(player.getUniqueId(), false)) {
-                    cleanupCharge(player);
-                    return;
-                }
-
-                if (ticks < maxTicks) {
-                    ticks++;
-                }
-
-                double progress = (double) ticks / maxTicks;
-                bossBar.setProgress(progress);
-                config.f_charge_progress.put(player.getUniqueId(), progress);
-
-                double baseReduction;
-                if (progress <= 0.5) {
-                    baseReduction = 0.16 + (0.48 * (progress / 0.5));
-                } else {
-                    baseReduction = 0.64;
-                }
-
-                int hitCount = config.f_charge_hit_count.getOrDefault(player.getUniqueId(), 0);
-                double penalty = hitCount * 0.04;
-
-                double currentReduction = Math.max(0.0, baseReduction - penalty);
-
-                double multiplier = 1.0 - currentReduction;
-                config.f_charge_defend.put(player.getUniqueId(), multiplier);
-
-                if (progress >= 1.0) {
-                    bossBar.setTitle("F skill Charge - MAX");
-                    bossBar.setColor(BarColor.RED);
-                }
-            }
-        };
-
-        task.runTaskTimer(plugin, 0L, 1L);
-        activeChargeTasks.put(player.getUniqueId(), task);
-    }
-
-    private void cleanupCharge(Player player) {
-        UUID uuid = player.getUniqueId();
-        if (activeChargeBars.containsKey(uuid)) {
-            activeChargeBars.get(uuid).removeAll();
-            activeChargeBars.remove(uuid);
-        }
-        if (activeChargeTasks.containsKey(uuid)) {
-            activeChargeTasks.get(uuid).cancel();
-            activeChargeTasks.remove(uuid);
-        }
-        config.f_charge_progress.put(uuid, 0.0);
-
-        config.f_charge_defend.remove(uuid);
-        config.f_charge_hit_count.remove(uuid);
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -208,7 +155,7 @@ public class undeadCore extends absCore {
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void onEntityDamageTaken(EntityDamageEvent event) {
+    public void onDamageTaken(EntityDamageEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
         if (!contains(player)) return;
 
@@ -229,34 +176,38 @@ public class undeadCore extends absCore {
         if (event.isCancelled()) return;
 
         double finalDamage = event.getDamage();
-
         if (finalDamage >= 1000000.0) return;
 
-        double debuffRate = config.f_debuff_rate.getOrDefault(player.getUniqueId(), 0.0);
-        if (debuffRate > 0) {
-            finalDamage *= (1.0 + debuffRate);
-        }
+        double debuff = config.restore_debuff_rate.getOrDefault(player.getUniqueId(), 0.0);
+        if (debuff > 0) finalDamage *= (1.0 + debuff);
 
-        if (activeChargeTasks.containsKey(player.getUniqueId())) {
-            double multiplier = config.f_charge_defend.getOrDefault(player.getUniqueId(), 0.84);
-            finalDamage *= multiplier;
-
-            int currentHits = config.f_charge_hit_count.getOrDefault(player.getUniqueId(), 0);
-            config.f_charge_hit_count.put(player.getUniqueId(), currentHits + 1);
+        if (restore.isCharging(player)) {
+            finalDamage *= config.restore_charge_defend.getOrDefault(player.getUniqueId(), 0.84);
+            config.restore_charge_hit_count.merge(player.getUniqueId(), 1, Integer::sum);
         }
 
         event.setDamage(finalDamage);
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void onEntityDamageGiven(EntityDamageByEntityEvent event) {
+    public void onDamageGiven(EntityDamageByEntityEvent event) {
         if (!(event.getDamager() instanceof Player player)) return;
-        if (!contains(player)) return;
+        if (!contains(player) || event.isCancelled() || config.is_damaging.contains(player.getUniqueId())) return;
 
-        double buffRate = config.f_buff_rate.getOrDefault(player.getUniqueId(), 0.0);
-        if (buffRate > 0 && !event.isCancelled()) {
-            event.setDamage(event.getDamage() * (1.0 + buffRate));
-        }
+        double buff = config.restore_buff_rate.getOrDefault(player.getUniqueId(), 0.0);
+        if (buff > 0) event.setDamage(event.getDamage() * (1.0 + buff));
+    }
+
+    @EventHandler
+    public void onSprintInput(PlayerInputEvent event) {
+        Player player = event.getPlayer();
+        boolean sprint = event.getInput().isSprint();
+        Boolean previous = sprintInput.put(player.getUniqueId(), sprint);
+
+        if (!sprint || Boolean.TRUE.equals(previous)) return;
+        if (!contains(player) || Stun.isStunned(player)) return;
+
+        restore.startCharge(player);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -266,6 +217,40 @@ public class undeadCore extends absCore {
         if (config.is_swapping.contains(player.getUniqueId())) {
             event.setCancelled(true);
         }
+    }
+
+    @EventHandler(priority = EventPriority.LOW)
+    public void onVanillaAttack(PrePlayerAttackEntityEvent event) {
+        Player player = event.getPlayer();
+        if (!contains(player) || !swap.isEquipped(player)) return;
+
+        event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onUseInput(PlayerInteractEvent event) {
+        if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+
+        Player player = event.getPlayer();
+        if (!contains(player)) return;
+
+        lastUseTick.put(player.getUniqueId(), Bukkit.getCurrentTick());
+    }
+
+    @EventHandler(priority = EventPriority.LOW)
+    public void onAttackSwing(PlayerArmSwingEvent event) {
+        if (event.getHand() != EquipmentSlot.HAND) return;
+
+        Player player = event.getPlayer();
+        if (!contains(player) || !swap.isEquipped(player) || swap.isBusy(player) || Stun.isStunned(player)) return;
+        if (swingEchoGuard.isEchoPending(player)) return;
+
+        Integer used = lastUseTick.get(player.getUniqueId());
+        if (used != null && Bukkit.getCurrentTick() - used <= 1) return;
+
+        if (cool.isReloading(player, "L")) return;
+
+        cool.setCooldown(player, attack.attack(player), "L");
     }
 
     private void applyAdditionalHealth(Player player, boolean healFull) {
@@ -284,34 +269,6 @@ public class undeadCore extends absCore {
             } else if (player.getHealth() > newMax) {
                 player.setHealth(newMax);
             }
-        }
-    }
-
-    public void syncCooldowns(Player player) {
-        if (!contains(player)) return;
-
-        Material handMat = player.getInventory().getItemInMainHand().getType();
-
-        String rKey = config.getWeaponCoolKey(handMat);
-        if (rKey != null) {
-            cool.updateCooldown(player, "R", cool.getRemainCooldown(player, rKey));
-        } else {
-            cool.updateCooldown(player, "R", 0L);
-        }
-
-        String qKey = config.getWeaponQCoolKey(handMat);
-        if (qKey != null) {
-            cool.updateCooldown(player, "Q", cool.getRemainCooldown(player, qKey));
-        } else {
-            cool.updateCooldown(player, "Q", 0L);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onItemSwap(org.bukkit.event.player.PlayerItemHeldEvent event) {
-        Player player = event.getPlayer();
-        if (contains(player)) {
-            Bukkit.getScheduler().runTask(plugin, () -> syncCooldowns(player));
         }
     }
 
@@ -348,49 +305,26 @@ public class undeadCore extends absCore {
         return Fskill;
     }
 
-    private boolean isUndeadWeapon(Material material) {
-        return material == Material.IRON_SHOVEL ||
-                material == Material.IRON_PICKAXE ||
-                material == Material.IRON_AXE ||
-                material == Material.IRON_HOE ||
-                material == Material.IRON_HORSE_ARMOR;
-    }
+    private boolean canUseRSkill(Player player) { return !swap.isBusy(player); }
 
-    private boolean isUndeadOrAir(Material material) {
-        return isUndeadWeapon(material) || material == Material.AIR;
-    }
+    private boolean canUseQSkill(Player player) { return !swap.isBusy(player); }
 
-    private boolean hasProperItems(Player player) {
-        Material mainHand = player.getInventory().getItemInMainHand().getType();
-        Material offHand = player.getInventory().getItemInOffHand().getType();
-
-        if (!isUndeadOrAir(mainHand) || !isUndeadOrAir(offHand)) {
-            return false;
-        }
-
-        return isUndeadWeapon(mainHand) || isUndeadWeapon(offHand);
-    }
-
-    private boolean canUseRSkill(Player player) { return true; }
-
-    private boolean canUseQSkill(Player player) { return true; }
-
-    private boolean canUseFSkill(Player player) { return true; }
+    private boolean canUseFSkill(Player player) { return !swap.isBusy(player); }
 
     @Override
     protected boolean isItemRequired(Player player) {
-        if (hasProperItems(player)) {
-            return true;
-        } else {
-            AttributeInstance attackSpeed = player.getAttribute(Attribute.ATTACK_SPEED);
-            if (attackSpeed != null) attackSpeed.setBaseValue(4.0);
-            return false;
-        }
+        return swap.isEquipped(player);
     }
 
     @Override
     protected boolean isDropRequired(Player player, ItemStack droppedItem) {
-        return isUndeadWeapon(droppedItem.getType());
+        ItemStack off = player.getInventory().getItemInOffHand();
+        boolean melee = config.isTool(droppedItem.getType()) && config.isGun(off.getType());
+        boolean firearm = config.isGun(droppedItem.getType()) && config.isTool(off.getType());
+        if (!melee && !firearm) return false;
+
+        swap.markDrop(player, firearm);
+        return true;
     }
 
     @Override
@@ -414,6 +348,9 @@ public class undeadCore extends absCore {
             @Override
             public void variableReset(Player player) {
                 config.variableReset(player);
+                lastUseTick.remove(player.getUniqueId());
+                restore.clear(player);
+                bomb.clear(player);
             }
 
             @Override
@@ -431,22 +368,25 @@ public class undeadCore extends absCore {
 
             @Override
             public long getLcooldown(Player player) {
-                return 0L;
+                return attack.cooldown(player);
             }
 
             @Override
             public long getRcooldown(Player player) {
-                return 0L;
+                return config.R_COOLDOWN.getOrDefault(player.getUniqueId(),
+                        swap.isFirearm(player) ? config.gun_r_Skill_Cool : config.melee_r_Skill_Cool);
             }
 
             @Override
             public long getQcooldown(Player player) {
-                return 0L;
+                return config.Q_COOLDOWN.getOrDefault(player.getUniqueId(),
+                        swap.isFirearm(player) ? config.gun_q_Skill_Cool : config.melee_q_Skill_Cool);
             }
 
             @Override
             public long getFcooldown(Player player) {
-                return config.F_COOLDOWN.getOrDefault(player.getUniqueId(), config.f_Skill_Cool);
+                return config.F_COOLDOWN.getOrDefault(player.getUniqueId(),
+                        swap.isFirearm(player) ? config.gun_f_Skill_Cool : config.melee_f_Skill_Cool);
             }
         };
     }

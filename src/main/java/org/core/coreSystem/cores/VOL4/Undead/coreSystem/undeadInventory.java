@@ -49,9 +49,9 @@ public class undeadInventory extends absInventory {
 
         return switch (skill) {
             case "main" -> Component.text("UNDEAD");
-            case "R" -> Component.text("DeadlyWeapons");
-            case "Q" -> Component.text("LethalAssure");
-            case "F" -> Component.text("RESTORATION");
+            case "R" -> Component.text("-");
+            case "Q" -> Component.text("-");
+            case "F" -> Component.text("-");
             default -> Component.text("???");
         };
     }
@@ -74,12 +74,18 @@ public class undeadInventory extends absInventory {
         if (skill.equals("main")) {
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text("타입 : 브루저").color(NamedTextColor.LIGHT_PURPLE));
-            lore.add(Component.text("장착 : 검을 제외한 모든 철제 도구류 아이템, 메인핸드, 오프핸드 제한 없음").color(NamedTextColor.LIGHT_PURPLE));
+            lore.add(Component.text("장착 : 메인핸드에 철제 도구류(검, 도끼, 곡괭이, 삽, 괭이) 중 1개 장착, 오프핸드에 철 말갑옷 장착.").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text("패시브 : 배고픔이 항상 0으로 유지되고 허기 효과가 사라지지 않지만, 굶주림 피해를 받지 않는다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("핸드 스왑 : R, Q, F 중 하나가 핸드 스왑 커맨드로 지정되며, 액션바에 붉은색으로 표시된다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("핸드 스왑 커맨드를 사용하면 해당 스킬이 발동하면서 양손의 아이템이 교체되어 냉병기 모드와 화기 모드가 전환된다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("나머지 두 스킬이 모두 쿨타임일 때 핸드 스왑 커맨드를 사용하면 그 두 스킬의 쿨타임이 초기화된다. (조건 충족 시 굵게 표시)").color(NamedTextColor.GREEN));
+            lore.add(Component.text("쿨타임이 초기화되었을 때에만 직전과 다른 스킬이 새 핸드 스왑 커맨드로 무작위 지정된다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("스킬 쿨타임은 냉병기 모드와 화기 모드가 공유한다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("일반 공격 : 냉병기 모드에서는 도구 종류에 따른 근접 공격을 가하고, 화기 모드에서는 전방으로 탄환을 발사한다.").color(NamedTextColor.GREEN));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text(""));
-            lore.add(Component.text("메뉴북 아이템 없어도 인벤토리 화면에서 철제 도구류 아이템을 우클릭해서 메뉴 화면 진입 가능").color(NamedTextColor.AQUA));
+            lore.add(Component.text("메뉴북 아이템 없어도 인벤토리 화면에서 철 도끼를 우클릭해서 메뉴 화면 진입 가능").color(NamedTextColor.AQUA));
             return lore;
         }
 
@@ -102,58 +108,36 @@ public class undeadInventory extends absInventory {
                 lore.add(requireXp.color(NamedTextColor.AQUA));
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("시스템 : 복합적").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("타입 : -").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : 모드 전환").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("시전하기 전 메인핸드에 장착된 아이템을 기준으로 개별적으로 쿨타임이 작동한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("1. 삽").color(NamedTextColor.GREEN));
-                lore.add(Component.text("전방으로 돌진하며 적들을 밀쳐내며 피해를 가한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("재사용 : 전방으로 삽을 휘두른다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("피격 : 피격당한 적의 메인 핸드의 아이템을 무장해제 시킨다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("2. 곡괭이").color(NamedTextColor.GREEN));
-                lore.add(Component.text("전방으로 돌진한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("재사용 : 전방을 곡괭이로 내리찍어 피격당한 대상에게 피해를 가한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("피격 : 대상의 방어구중 무작위 1개를 무장해재 시킨다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("3. 도끼").color(NamedTextColor.GREEN));
-                lore.add(Component.text("전방으로 돌진하며 처음 충돌한 적의 이동속도를 90% 감소시키고 피해를 가한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("재사용 : 전방을 도끼로 내리찍어 피격당한 대상에게 피해를 가하고 2초간 기절시킨다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("4. 낫").color(NamedTextColor.GREEN));
-                lore.add(Component.text("회전베기를 시전하며 후방으로 돌진한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("재사용 : 회전베기를 시전하며 전방으로 돌진한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("피격 : 피격 당한 적에게 입힌 피해의 40% 만큼 체력을 회복한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("5. 피스톨").color(NamedTextColor.GREEN));
-                lore.add(Component.text("코스트 : 전체 체력의 13%").color(NamedTextColor.GREEN));
-                lore.add(Component.text("전방으로 남은 체력의 25%의 피해를 가하고 2초간 기절시키는 탄환을 발사한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("탄환에 피격된 적의 남은 체력에 비례해 일정 시간동안 이동속도가 증가한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("냉병기 : -").color(NamedTextColor.GREEN));
+                lore.add(Component.text("화기 : -").color(NamedTextColor.GREEN));
                 break;
             case "Q":
                 requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfQ.get((int) level)) : Component.text("Require EXP : MAX");
                 lore.add(requireXp.color(NamedTextColor.AQUA));
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("타입 : -").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : 모드 전환").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("전방으로 양손에 든 무기를 통해 교차 참격을 가한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("양 손에 든 무기를 교체한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("시전하기 전 오프핸드에 장착된 아이템을 기준으로 개별적으로 쿨타임이 작동한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("냉병기 : -").color(NamedTextColor.GREEN));
+                lore.add(Component.text("화기 : -").color(NamedTextColor.GREEN));
                 break;
             case "F":
                 requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfF.get((int) level)) : Component.text("Require EXP : MAX");
                 lore.add(requireXp.color(NamedTextColor.AQUA));
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("타입 : 효과").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("시스템 : 차징").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("타입 : -").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : 모드 전환").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("차징 : 회복할 체력 수치(0~100%)를 결정한다. 차징을 할수록 수치가 상승한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("차징 : 차징하는 동안 입는 피해량이 차징 시간에 따라 16~64% 감소한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("스킬 시전 시 차징된 수치만큼 체력을 회복한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("회복 후 차징된 수치만큼 일정 시간동안 본인이 입는 피해량이 대폭 상승하지만, 이에 따라 공격력과 이동속도 또한 상승한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("입는 피해량 상승 효과는 합법칙으로 중첩된다. 최대 444% 까지 누적될 수 있으며 매초 2% 씩 감소한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("냉병기 : -").color(NamedTextColor.GREEN));
+                lore.add(Component.text("화기 : -").color(NamedTextColor.GREEN));
                 break;
             default:
                 break;
