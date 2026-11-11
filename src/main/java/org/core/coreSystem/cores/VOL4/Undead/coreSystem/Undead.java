@@ -101,6 +101,12 @@ public class Undead {
     public double q_Skill_Dash = 1.6;
     public int q_Skill_Dash_Ticks = 8;
     public long melee_q_Skill_Cool = 12000;
+    public double melee_q_Skill_Range = 4.0;
+    public double melee_q_Skill_Damage = 8.0;
+    public int melee_q_Skill_Duration = 80;
+    public int melee_q_Skill_Interval = 10;
+    public double melee_q_Skill_Burst = 1.3;
+    public int melee_q_Skill_Slow = 1;
     public long gun_q_Skill_Cool = 12000;
     public double gun_q_Skill_Range = 6.0;
     public int gun_q_Skill_Fuse = 80;
@@ -111,6 +117,7 @@ public class Undead {
     public double gun_q_Skill_Knockback = 1.6;
     public double gun_q_Skill_Lift = 0.4;
     public int gun_q_Skill_Trigger_Delay = 2;
+    public long gun_q_Skill_Stun = 1200;
 
     //F
     public double f_Skill_amp = 0.2;

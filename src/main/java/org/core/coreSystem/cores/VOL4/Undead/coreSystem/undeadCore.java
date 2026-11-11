@@ -33,6 +33,7 @@ import org.core.coreSystem.cores.VOL4.Undead.Passive.Boost;
 import org.core.coreSystem.cores.VOL4.Undead.Passive.Restoration;
 import org.core.coreSystem.cores.VOL4.Undead.Passive.basicAttack;
 import org.core.coreSystem.cores.VOL4.Undead.Passive.handSwap;
+import org.core.coreSystem.cores.VOL4.Undead.Passive.deepWound;
 import org.core.coreSystem.cores.VOL4.Undead.Passive.stickyBomb;
 import org.core.coreSystem.cores.VOL4.Undead.Skill.F;
 import org.core.coreSystem.cores.VOL4.Undead.Skill.Q;
@@ -54,6 +55,7 @@ public class undeadCore extends absCore {
     private final basicAttack attack;
     private final Restoration restore;
     private final stickyBomb bomb;
+    private final deepWound wound;
     private final Boost boost;
 
     private final SkillBase Rskill;
@@ -71,12 +73,13 @@ public class undeadCore extends absCore {
 
         this.swap = new handSwap(config, plugin, cool);
         this.bomb = new stickyBomb(config, plugin);
-        this.attack = new basicAttack(config, plugin, swap, bomb);
+        this.wound = new deepWound(config, plugin);
+        this.attack = new basicAttack(config, plugin, swap, bomb, wound);
         this.restore = new Restoration(config, plugin, swap);
         this.boost = new Boost(config, tag, plugin);
 
         this.Rskill = slot("R", new R(config, plugin, cool, swap, attack));
-        this.Qskill = slot("Q", new Q(config, plugin, cool, swap, bomb));
+        this.Qskill = slot("Q", new Q(config, plugin, cool, swap, bomb, wound));
         this.Fskill = slot("F", new F(config, plugin, cool, swap));
 
         cool.addActionBarEditor((player, skill, remaining, label, status) ->
@@ -351,6 +354,7 @@ public class undeadCore extends absCore {
                 lastUseTick.remove(player.getUniqueId());
                 restore.clear(player);
                 bomb.clear(player);
+                wound.clear(player);
             }
 
             @Override

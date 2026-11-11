@@ -67,12 +67,14 @@ public class basicAttack {
     private final JavaPlugin plugin;
     private final handSwap swap;
     private final stickyBomb bomb;
+    private final deepWound wound;
 
-    public basicAttack(Undead config, JavaPlugin plugin, handSwap swap, stickyBomb bomb) {
+    public basicAttack(Undead config, JavaPlugin plugin, handSwap swap, stickyBomb bomb, deepWound wound) {
         this.config = config;
         this.plugin = plugin;
         this.swap = swap;
         this.bomb = bomb;
+        this.wound = wound;
     }
 
     private record Basis(Location eye, Vector forward, Vector flat, Vector right, Vector up) {
@@ -433,6 +435,9 @@ public class basicAttack {
         }
 
         if (!push || knockback > 0 || lift > 0) bomb.trigger(player, target);
+
+        Material held = player.getInventory().getItemInMainHand().getType();
+        if (held == Material.IRON_AXE || held == Material.IRON_PICKAXE) wound.pop(player, target);
 
         hitVisual(player.getWorld(), target, weight);
         return true;
@@ -900,6 +905,8 @@ public class basicAttack {
                 if (knockback > 0) {
                     target.setVelocity(push);
                     bomb.trigger(player, target);
+                } else {
+                    wound.pop(player, target);
                 }
 
                 world.spawnParticle(Particle.CRIT, at, 8, 0.1, 0.1, 0.1, 0.15);

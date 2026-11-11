@@ -16,6 +16,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.core.coreSystem.cores.VOL4.Undead.coreSystem.Undead;
 import org.core.effect.crowdControl.ForceDamage;
+import org.core.effect.crowdControl.Stun;
 import org.core.models.coresObj.undeadBombModel;
 
 import java.util.ArrayList;
@@ -59,7 +60,7 @@ public class stickyBomb {
 
     public void attach(Player player, LivingEntity target) {
         Bomb old = bombs.get(target.getUniqueId());
-        if (old != null) detonate(old);
+        if (old != null) detonate(old, false);
 
         World world = target.getWorld();
         Location base = target.getLocation();
@@ -102,7 +103,7 @@ public class stickyBomb {
                 }
 
                 if (!target.isValid() || target.isDead() || !target.getWorld().equals(world)) {
-                    detonate(bomb);
+                    detonate(bomb, false);
                     return;
                 }
 
@@ -135,12 +136,12 @@ public class stickyBomb {
                     follow(bomb);
                     bomb.model.toggle();
                     world.playSound(bomb.position, Sound.BLOCK_NOTE_BLOCK_BIT, 1.2f, 2.0f);
-                    if (bomb.primed-- <= 0) detonate(bomb);
+                    if (bomb.primed-- <= 0) detonate(bomb, true);
                     return;
                 }
 
                 if (fuse-- <= 0) {
-                    detonate(bomb);
+                    detonate(bomb, false);
                     return;
                 }
 
@@ -191,7 +192,7 @@ public class stickyBomb {
         bomb.model.teleport(at);
     }
 
-    private void detonate(Bomb bomb) {
+    private void detonate(Bomb bomb, boolean triggered) {
         remove(bomb);
 
         Player owner = plugin.getServer().getPlayer(bomb.owner);
@@ -235,17 +236,21 @@ public class stickyBomb {
             } finally {
                 config.is_damaging.remove(owner.getUniqueId());
             }
-            target.setVelocity(push);
+            if (triggered) {
+                new Stun(target, config.gun_q_Skill_Stun).applyEffect(owner);
+            } else {
+                target.setVelocity(push);
+            }
         }
     }
 
     private void blast(World world, Location center, double radius) {
         world.spawnParticle(Particle.FLASH, center, 1, 0, 0, 0, 0, Color.fromRGB(255, 236, 200));
-        world.spawnParticle(Particle.EXPLOSION, center, 6, radius * 0.25, radius * 0.2, radius * 0.25, 0);
-        world.spawnParticle(Particle.FLAME, center, 60, 0.3, 0.3, 0.3, 0.35);
-        world.spawnParticle(Particle.LAVA, center, 14, 0.4, 0.4, 0.4, 0);
-        world.spawnParticle(Particle.CRIT, center, 50, 0.4, 0.4, 0.4, 1.0);
-        world.spawnParticle(Particle.LARGE_SMOKE, center, 40, 0.5, 0.5, 0.5, 0.12);
+        world.spawnParticle(Particle.EXPLOSION, center, 4, radius * 0.25, radius * 0.2, radius * 0.25, 0);
+        world.spawnParticle(Particle.FLAME, center, 36, 0.3, 0.3, 0.3, 0.3);
+        world.spawnParticle(Particle.LAVA, center, 8, 0.4, 0.4, 0.4, 0);
+        world.spawnParticle(Particle.CRIT, center, 30, 0.4, 0.4, 0.4, 0.9);
+        world.spawnParticle(Particle.LARGE_SMOKE, center, 24, 0.5, 0.5, 0.5, 0.1);
 
         new BukkitRunnable() {
             int tick = 0;
@@ -253,13 +258,13 @@ public class stickyBomb {
             @Override
             public void run() {
                 if (tick >= 6) {
-                    world.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, center, 16, radius * 0.4, 0.4, radius * 0.4, 0.03);
+                    world.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, center, 10, radius * 0.4, 0.4, radius * 0.4, 0.03);
                     cancel();
                     return;
                 }
 
                 double r = radius * (tick + 1) / 6.0;
-                int points = (int) (20 + r * 10);
+                int points = (int) (14 + r * 7);
                 for (int i = 0; i < points; i++) {
                     double angle = Math.PI * 2 * i / points;
                     Location at = center.clone().add(Math.cos(angle) * r, -0.3, Math.sin(angle) * r);

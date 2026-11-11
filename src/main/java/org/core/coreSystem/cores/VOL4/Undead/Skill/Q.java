@@ -13,9 +13,12 @@ import org.bukkit.util.Vector;
 import org.core.cool.Cool;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.cores.VOL4.Undead.Passive.handSwap;
+import org.core.coreSystem.cores.VOL4.Undead.Passive.deepWound;
 import org.core.coreSystem.cores.VOL4.Undead.Passive.stickyBomb;
 import org.core.coreSystem.cores.VOL4.Undead.coreSystem.Undead;
 import org.core.effect.crowdControl.Invulnerable;
+
+import java.util.function.Consumer;
 
 public class Q implements SkillBase {
 
@@ -24,13 +27,15 @@ public class Q implements SkillBase {
     private final Cool cool;
     private final handSwap swap;
     private final stickyBomb bomb;
+    private final deepWound wound;
 
-    public Q(Undead config, JavaPlugin plugin, Cool cool, handSwap swap, stickyBomb bomb) {
+    public Q(Undead config, JavaPlugin plugin, Cool cool, handSwap swap, stickyBomb bomb, deepWound wound) {
         this.config = config;
         this.plugin = plugin;
         this.cool = cool;
         this.swap = swap;
         this.bomb = bomb;
+        this.wound = wound;
     }
 
     @Override
@@ -44,11 +49,16 @@ public class Q implements SkillBase {
 
     private void melee(Player player) {
         dash(player);
+        seek(player, config.melee_q_Skill_Range, target -> wound.mark(player, target));
     }
 
     private void firearm(Player player) {
-        World world = player.getWorld();
         dash(player);
+        seek(player, config.gun_q_Skill_Range, target -> bomb.attach(player, target));
+    }
+
+    private void seek(Player player, double range, Consumer<LivingEntity> action) {
+        World world = player.getWorld();
 
         new BukkitRunnable() {
             int ticks = 0;
@@ -63,7 +73,6 @@ public class Q implements SkillBase {
                 LivingEntity nearest = null;
                 double best = Double.MAX_VALUE;
                 Vector center = player.getBoundingBox().getCenter();
-                double range = config.gun_q_Skill_Range;
 
                 for (Entity entity : world.getNearbyEntities(player.getLocation(), range + 1, range + 1, range + 1)) {
                     if (!isTarget(player, entity)) continue;
@@ -76,7 +85,7 @@ public class Q implements SkillBase {
                 }
 
                 if (nearest != null) {
-                    bomb.attach(player, nearest);
+                    action.accept(nearest);
                     cancel();
                 }
             }
