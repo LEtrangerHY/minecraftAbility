@@ -50,7 +50,7 @@ public class undeadInventory extends absInventory {
         return switch (skill) {
             case "main" -> Component.text("UNDEAD");
             case "R" -> Component.text("DeadlyWeapons");
-            case "Q" -> Component.text("Flatline");
+            case "Q" -> Component.text("FlatLine");
             case "F" -> Component.text("REVENANT");
             default -> Component.text("???");
         };

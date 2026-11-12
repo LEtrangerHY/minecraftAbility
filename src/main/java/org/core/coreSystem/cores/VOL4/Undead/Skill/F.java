@@ -18,6 +18,8 @@ import java.util.UUID;
 
 public class F implements SkillBase {
 
+    private static final String BAR = "REVENANT";
+
     private static final Particle.DustOptions BRIGHT = new Particle.DustOptions(Color.fromRGB(255, 226, 226), 0.8f);
     private static final Particle.DustOptions CRIMSON = new Particle.DustOptions(Color.fromRGB(214, 30, 40), 0.9f);
     private static final Particle.DustOptions DEEP = new Particle.DustOptions(Color.fromRGB(110, 10, 18), 0.7f);
@@ -61,6 +63,7 @@ public class F implements SkillBase {
 
         Double charge = Double.valueOf(debuff);
         config.f_Empower.put(uuid, charge);
+        cool.setCooldown(player, config.f_Skill_Window * 50L, BAR, "boss");
 
         double scale = config.f_Skill_Scale + config.f_Skill_Scale_Step * debuff;
         World world = player.getWorld();
@@ -79,13 +82,22 @@ public class F implements SkillBase {
 
             @Override
             public void run() {
-                if (!player.isOnline() || player.isDead() || config.f_Empower.get(uuid) != charge) {
+                if (!player.isOnline() || player.isDead()) {
+                    config.f_Empower.remove(uuid);
+                    cool.updateCooldown(player, BAR, 0L);
+                    cancel();
+                    return;
+                }
+
+                if (config.f_Empower.get(uuid) != charge) {
+                    if (!config.f_Empower.containsKey(uuid)) cool.updateCooldown(player, BAR, 0L);
                     cancel();
                     return;
                 }
 
                 if (ticks >= config.f_Skill_Window) {
                     config.f_Empower.remove(uuid);
+                    cool.updateCooldown(player, BAR, 0L);
                     world.playSound(player, Sound.BLOCK_FIRE_EXTINGUISH, 0.5f, 1.4f);
                     world.spawnParticle(Particle.SMOKE, hand(player), 6, 0.05, 0.05, 0.05, 0.02);
                     cancel();
