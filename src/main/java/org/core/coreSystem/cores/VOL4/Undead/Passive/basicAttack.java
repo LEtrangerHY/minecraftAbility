@@ -457,7 +457,10 @@ public class basicAttack {
                     tipSparks(world, point(pivot, axis, slant, a1, length), tangent, p.empowered() ? 6 : 3);
                 }
 
-                if (ticks == impactTick && onImpact != null) onImpact.run();
+                if (ticks == impactTick && onImpact != null) {
+                    onImpact.run();
+                    if (p.empowered()) empoweredImpact(world, point(pivot, axis, slant, a1, length), p);
+                }
 
                 ticks++;
             }
@@ -513,12 +516,31 @@ public class basicAttack {
         return new Anchor(center.toLocation(player.getWorld()), axis, side, top);
     }
 
+    private float weight(Power p) {
+        return (float) Math.max(0.6, 1.0 - 0.6 * (p.scale() - config.f_Skill_Scale));
+    }
+
     private void empoweredSound(World world, Location at, Power p) {
-        float low = (float) Math.max(0.5, 1.0 - 0.15 * (p.scale() - 1.0) * 5);
-        world.playSound(at, Sound.ENTITY_WARDEN_ATTACK_IMPACT, 0.8f, 0.9f * low);
-        world.playSound(at, Sound.ITEM_TRIDENT_RIPTIDE_1, 0.9f, 1.3f * low);
+        float low = weight(p);
+        float loud = (float) Math.min(1.6, 1.0 + 0.8 * (p.scale() - config.f_Skill_Scale));
+
+        world.playSound(at, Sound.ENTITY_WARDEN_ATTACK_IMPACT, 0.9f * loud, 0.9f * low);
+        world.playSound(at, Sound.ITEM_TRIDENT_RIPTIDE_1, 1.0f * loud, 1.2f * low);
+        world.playSound(at, Sound.ITEM_MACE_SMASH_AIR, 1.0f * loud, 0.9f * low);
+        world.playSound(at, Sound.ITEM_TRIDENT_THROW, 1.1f * loud, 0.6f * low);
+        world.playSound(at, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.2f * loud, 0.5f * low);
         world.playSound(at, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.2f, 0.6f * low);
-        world.playSound(at, Sound.ITEM_MACE_SMASH_AIR, 0.9f, 1.0f * low);
+    }
+
+    private void empoweredImpact(World world, Location at, Power p) {
+        float low = weight(p);
+        float loud = (float) Math.min(1.6, 1.0 + 0.8 * (p.scale() - config.f_Skill_Scale));
+
+        world.playSound(at, Sound.ITEM_MACE_SMASH_GROUND_HEAVY, 1.0f * loud, 1.1f * low);
+        world.playSound(at, Sound.ENTITY_GENERIC_EXPLODE, 0.6f * loud, 1.5f * low);
+        world.playSound(at, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.8f * loud, 0.7f * low);
+        world.playSound(at, Sound.ITEM_TRIDENT_HIT, 1.2f * loud, 0.6f * low);
+        world.playSound(at, Sound.BLOCK_ANVIL_LAND, 0.35f, 0.6f * low);
     }
 
     private void afterImage(Player player, Location pivot, Vector axis, Vector slant, double from, double to, double rim, Power p) {

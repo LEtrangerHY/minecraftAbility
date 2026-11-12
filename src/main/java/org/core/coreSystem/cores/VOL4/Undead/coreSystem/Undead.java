@@ -29,8 +29,8 @@ public class Undead {
     public HashMap<UUID, Double> restore_debuff_rate = new HashMap<>();
     public HashMap<UUID, Double> restore_charge_defend = new HashMap<>();
     public HashMap<UUID, Integer> restore_charge_hit_count = new HashMap<>();
-    public int restore_Charge_Ticks = 80;
-    public int restore_Min_Ticks = 10;
+    public int restore_Charge_Ticks = 60;
+    public int restore_Min_Ticks = 6;
     public double restore_Debuff_Max = 4.0;
     public double restore_Dash_Min = 0.6;
     public double restore_Dash_Max = 1.8;
@@ -126,11 +126,11 @@ public class Undead {
     public long gun_f_Skill_Cool = 9000;
     public double f_Skill_Cost_Ratio = 0.10;
     public double f_Skill_Cost_Max = 0.40;
-    public int f_Skill_Window = 80;
-    public double f_Skill_Rate = 1.5;
-    public double f_Skill_Rate_Step = 0.25;
-    public double f_Skill_Scale = 1.1;
-    public double f_Skill_Scale_Step = 0.08;
+    public int f_Skill_Window = 120;
+    public double f_Skill_Rate = 1.6;
+    public double f_Skill_Rate_Step = 0.2;
+    public double f_Skill_Scale = 1.3;
+    public double f_Skill_Scale_Step = 0.075;
 
     public boolean isTool(Material material) {
         return material == Material.IRON_SWORD ||

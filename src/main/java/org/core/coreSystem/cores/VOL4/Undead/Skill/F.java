@@ -53,13 +53,13 @@ public class F implements SkillBase {
 
     private void empower(Player player) {
         UUID uuid = player.getUniqueId();
-        Double debuff = config.restore_debuff_rate.remove(uuid);
-        if (debuff == null || debuff <= 0) return;
+        Double removed = config.restore_debuff_rate.remove(uuid);
+        double debuff = removed == null ? 0.0 : removed;
 
         double ratio = Math.min(config.f_Skill_Cost_Max, config.f_Skill_Cost_Ratio * debuff);
         player.setHealth(Math.max(0.5, player.getHealth() * (1.0 - ratio)));
 
-        Double charge = debuff;
+        Double charge = Double.valueOf(debuff);
         config.f_Empower.put(uuid, charge);
 
         double scale = config.f_Skill_Scale + config.f_Skill_Scale_Step * debuff;
