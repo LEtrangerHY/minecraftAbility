@@ -49,9 +49,9 @@ public class undeadInventory extends absInventory {
 
         return switch (skill) {
             case "main" -> Component.text("UNDEAD");
-            case "R" -> Component.text("-");
-            case "Q" -> Component.text("-");
-            case "F" -> Component.text("-");
+            case "R" -> Component.text("DeadlyWeapons");
+            case "Q" -> Component.text("Flatline");
+            case "F" -> Component.text("REVENANT");
             default -> Component.text("???");
         };
     }
@@ -74,7 +74,8 @@ public class undeadInventory extends absInventory {
         if (skill.equals("main")) {
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text("타입 : 브루저").color(NamedTextColor.LIGHT_PURPLE));
-            lore.add(Component.text("장착 : 메인핸드에 철제 도구류(검, 도끼, 곡괭이, 삽, 괭이) 중 1개 장착, 오프핸드에 철 말갑옷 장착.").color(NamedTextColor.LIGHT_PURPLE));
+            lore.add(Component.text("장착 : 한 손에 철제 도구류(검, 도끼, 곡괭이, 삽, 괭이) 중 1개, 다른 손에 철 말갑옷 장착.").color(NamedTextColor.LIGHT_PURPLE));
+            lore.add(Component.text("메인핸드가 도구면 냉병기 모드, 철 말갑옷이면 화기 모드.").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text("패시브 : 배고픔이 항상 0으로 유지되고 허기 효과가 사라지지 않지만, 굶주림 피해를 받지 않는다.").color(NamedTextColor.GREEN));
             lore.add(Component.text("핸드 스왑 : R, Q, F 중 하나가 핸드 스왑 커맨드로 지정되며, 액션바에 붉은색으로 표시된다.").color(NamedTextColor.GREEN));
@@ -83,6 +84,11 @@ public class undeadInventory extends absInventory {
             lore.add(Component.text("쿨타임이 초기화되었을 때에만 직전과 다른 스킬이 새 핸드 스왑 커맨드로 무작위 지정된다.").color(NamedTextColor.GREEN));
             lore.add(Component.text("스킬 쿨타임은 냉병기 모드와 화기 모드가 공유한다.").color(NamedTextColor.GREEN));
             lore.add(Component.text("일반 공격 : 냉병기 모드에서는 도구 종류에 따른 근접 공격을 가하고, 화기 모드에서는 전방으로 탄환을 발사한다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("근접 공격은 적중한 적 1명당 최대 체력의 4%를 회복한다. (최대 16%)").color(NamedTextColor.GREEN));
+            lore.add(Component.text("탄환은 최대 체력의 6%를 소모하며, 적을 최대 4명까지 관통한다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("회복 : 달리기 키를 누르고 있으면 최대 3초간 충전되며, 충전 중 받는 피해가 16% ~ 64% 감소한다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("키를 떼면 충전량만큼 최대 체력 비율로 회복하며 바라보는 방향으로 대시하고, 회복하는 동안 무적이 된다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("회복 시 충전량만큼 주는 피해와 이동 속도가 증가하지만, 받는 피해 증가 디버프가 누적된다. (최대 400%)").color(NamedTextColor.GREEN));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text(""));
             lore.add(Component.text("메뉴북 아이템 없어도 인벤토리 화면에서 철 도끼를 우클릭해서 메뉴 화면 진입 가능").color(NamedTextColor.AQUA));
@@ -108,36 +114,49 @@ public class undeadInventory extends absInventory {
                 lore.add(requireXp.color(NamedTextColor.AQUA));
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("타입 : -").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("시스템 : 모드 전환").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : 연계").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("냉병기 : -").color(NamedTextColor.GREEN));
-                lore.add(Component.text("화기 : -").color(NamedTextColor.GREEN));
+                lore.add(Component.text("냉병기 : 잠시 자세를 잡은 뒤 들고 있는 도구로 4번 연속 벤다. 바라보는 적이 있으면 그 적을 향해 벤다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("한 번 벨 때마다 도구 일반 공격 피해의 0.66배를 가하며, 마지막 베기만 도구에 따른 넉백이 있다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("화기 : 최대 체력의 4%씩 소모해 탄환 2발을 연달아 발사한다. 각 탄환은 일반 공격 피해의 0.44배를 가한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("2발이 모두 적에게 적중하면 최대 체력의 12%를 소모해 즉시 꽂히는 3번째 탄환을 발사한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("3번째 탄환은 일반 공격 피해의 2배를 가하고 적을 크게 밀쳐내며, 반동으로 자신은 뒤로 밀려난다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("재사용 대기시간 6초.").color(NamedTextColor.GREEN));
                 break;
             case "Q":
                 requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfQ.get((int) level)) : Component.text("Require EXP : MAX");
                 lore.add(requireXp.color(NamedTextColor.AQUA));
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("타입 : -").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("시스템 : 모드 전환").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("타입 : 효과/공격").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : 표식").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("대상 : 자신 및 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("냉병기 : -").color(NamedTextColor.GREEN));
-                lore.add(Component.text("화기 : -").color(NamedTextColor.GREEN));
+                lore.add(Component.text("기본 : 바라보는 방향으로 대시하며 0.4초간 무적이 된다. 대시 중 가장 가까운 적 1명에게 표식을 남긴다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("냉병기 : 4블럭 안의 적에게 상처를 낸다. 상처는 4초간 총 8의 피해를 나눠 가하고 적을 둔화시킨다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("상처 난 적을 넉백 없는 공격(도끼·곡괭이 공격, 화기 R의 1·2번째 탄환)으로 맞히면, 남은 피해의 1.3배가 한 번에 터진다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("화기 : 6블럭 안의 적에게 점착 폭탄을 던져 붙인다. 폭탄은 4초 뒤 터져 반경 3블럭 안에 6의 피해를 가하고 밀쳐낸다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("폭탄이 붙은 적을 넉백 있는 공격으로 맞히면 즉시 터지며, 이때는 밀쳐내는 대신 1.2초간 기절시킨다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("재사용 대기시간 12초.").color(NamedTextColor.GREEN));
                 break;
             case "F":
                 requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfF.get((int) level)) : Component.text("Require EXP : MAX");
                 lore.add(requireXp.color(NamedTextColor.AQUA));
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("타입 : -").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("시스템 : 모드 전환").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("타입 : 강화").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : 강화").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("대상 : 자신").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("냉병기 : -").color(NamedTextColor.GREEN));
-                lore.add(Component.text("화기 : -").color(NamedTextColor.GREEN));
+                lore.add(Component.text("기본 : 받는 피해 증가 디버프를 모두 소모하고, 디버프 100%당 현재 체력의 10%를 잃는다. (최대 40%)").color(NamedTextColor.GREEN));
+                lore.add(Component.text("6초 안에 가하는 다음 일반 공격 1회가 강화된다. 디버프가 없어도 사용할 수 있다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("강화된 공격은 피해가 1.6배, 크기가 1.3배가 되며, 소모한 디버프가 많을수록 커진다. (400% : 피해 2.4배, 크기 1.6배)").color(NamedTextColor.GREEN));
+                lore.add(Component.text("냉병기 : 바라보는 적을 향해 붉게 커진 궤적으로 공격한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("화기 : 체력을 소모하지 않고, 적을 수에 제한 없이 관통하는 붉은 탄환을 발사한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("강화는 핸드 스왑 후에도 유지되며, 공격하는 순간의 모드로 나간다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("재사용 대기시간 9초.").color(NamedTextColor.GREEN));
                 break;
             default:
                 break;
