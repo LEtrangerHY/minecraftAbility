@@ -119,7 +119,7 @@ public class undeadInventory extends absInventory {
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
                 lore.add(Component.text("냉병기 : 잠시 자세를 잡은 뒤 들고 있는 도구로 4번 연속 벤다. 바라보는 적이 있으면 그 적을 향해 벤다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("한 번 벨 때마다 도구 일반 공격 피해의 0.66배를 가하며, 마지막 베기만 도구에 따른 넉백이 있다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("한 번 벨 때마다 도구 일반 공격 피해의 66%의 피해를 가하며, 마지막 베기만 도구에 따른 넉백이 있다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("화기 : 최대 체력의 4%씩 소모해 탄환 2발을 연달아 발사한다. 각 탄환은 일반 공격 피해의 0.44배를 가한다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("2발이 모두 적에게 적중하면 최대 체력의 12%를 소모해 즉시 꽂히는 3번째 탄환을 발사한다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("3번째 탄환은 일반 공격 피해의 2배를 가하고 적을 크게 밀쳐내며, 반동으로 자신은 뒤로 밀려난다.").color(NamedTextColor.GREEN));
