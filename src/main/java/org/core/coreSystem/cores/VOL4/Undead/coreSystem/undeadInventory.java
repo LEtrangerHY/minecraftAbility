@@ -175,9 +175,9 @@ public class undeadInventory extends absInventory {
         return player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, skill), PersistentDataType.LONG, 0L);
     }
 
-    public List<Long> requireExpOfR = List.of(44L, 66L, 166L, 244L, 366L, 644L);
-    public List<Long> requireExpOfQ = List.of(44L, 66L, 166L, 244L, 366L, 644L);
-    public List<Long> requireExpOfF = List.of(44L, 66L, 166L, 244L, 366L, 644L);
+    public List<Long> requireExpOfR = List.of(44L, 66L, 144L, 244L, 344L, 644L);
+    public List<Long> requireExpOfQ = List.of(44L, 66L, 144L, 244L, 344L, 644L);
+    public List<Long> requireExpOfF = List.of(44L, 66L, 144L, 244L, 344L, 644L);
 
     @Override
     protected void reinforceSkill(Player player, String skill, Long skillLevel, Inventory customInv) {
@@ -281,7 +281,6 @@ public class undeadInventory extends absInventory {
         else if (level >= 16 && level <= 30) return 5 * level - 38;
         else return 9 * level - 158;
     }
-
 
     @Override
     protected InventoryWrapper getInventoryWrapper() {
