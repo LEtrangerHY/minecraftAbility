@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
 
 public class Blossom {
@@ -15,6 +16,7 @@ public class Blossom {
     public HashMap<UUID, Long> F_COOLDOWN = new HashMap<>();
 
     public long frozenCool = 10000;
+    public static final List<Long> REQUIRE_EXP = List.of(77L, 133L, 277L, 511L, 1033L, 2007L, 4377L, 4777L, 5331L, 6077L);
 
     //passive
     public HashMap<UUID, Boolean> collision = new HashMap<>();
@@ -31,7 +33,7 @@ public class Blossom {
     public long q_Skill_Cool = 14000;
     public double q_Skill_damage = 3;
     public double q_Skill_amp = 0.17;
-    
+
     public HashMap<UUID, Location> treeLoc = new HashMap<>();
     public long f_Skill_Cool = 70000;
     public double f_Skill_damage = 0.7;

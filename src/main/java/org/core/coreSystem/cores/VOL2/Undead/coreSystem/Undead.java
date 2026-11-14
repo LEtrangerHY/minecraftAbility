@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
 
 public class Undead {
@@ -15,6 +16,7 @@ public class Undead {
     public HashMap<UUID, Long> F_COOLDOWN = new HashMap<>();
 
     public long frozenCool = 10000;
+    public static final List<Long> REQUIRE_EXP = List.of(66L, 144L, 244L, 444L, 844L, 1044L, 2044L, 3666L, 4466L, 6444L);
 
     //passive
     public HashMap<UUID, String> swap_Command = new HashMap<>();

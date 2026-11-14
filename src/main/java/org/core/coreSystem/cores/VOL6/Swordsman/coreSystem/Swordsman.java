@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
 
 public class Swordsman {
@@ -14,6 +15,7 @@ public class Swordsman {
     public HashMap<UUID, Long> F_COOLDOWN = new HashMap<>();
 
     public long frozenCool = 10000;
+    public static final List<Long> REQUIRE_EXP = List.of(55L, 136L, 262L, 505L, 1045L, 2350L, 3421L, 4501L, 5140L, 6112L);
 
     //passive
     public HashMap<UUID, Boolean> laidoSlash = new HashMap<>();

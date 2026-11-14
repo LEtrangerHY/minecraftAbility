@@ -4,6 +4,7 @@ import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -14,6 +15,7 @@ public class Luster {
     public HashMap<UUID, Long> F_COOLDOWN = new HashMap<>();
 
     public long frozenCool = 10000;
+    public static final List<Long> REQUIRE_EXP = List.of(88L, 140L, 280L, 440L, 770L, 1000L, 1880L, 2660L, 3990L, 4770L);
 
     //passive
     public HashMap<UUID, Boolean> collision = new HashMap<>();

@@ -3,6 +3,7 @@ package org.core.coreSystem.cores.VOL2.Knight.coreSystem;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 public class Knight {
@@ -13,6 +14,7 @@ public class Knight {
     public HashMap<UUID, Long> F_COOLDOWN = new HashMap<>();
 
     public long frozenCool = 10000;
+    public static final List<Long> REQUIRE_EXP = List.of(77L, 177L, 377L, 677L, 999L, 1444L, 2666L, 3444L, 4666L, 5467L);
 
     //passive
     public HashMap<UUID, Boolean> collision = new HashMap<>();

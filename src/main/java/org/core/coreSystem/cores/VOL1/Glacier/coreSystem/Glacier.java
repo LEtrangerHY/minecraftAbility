@@ -3,6 +3,7 @@ package org.core.coreSystem.cores.VOL1.Glacier.coreSystem;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 public class Glacier {
@@ -12,6 +13,7 @@ public class Glacier {
     public HashMap<UUID, Long> F_COOLDOWN = new HashMap<>();
 
     public long frozenCool = 10000;
+    public static final List<Long> REQUIRE_EXP = List.of(77L, 144L, 288L, 488L, 788L, 1288L, 2388L, 3988L, 4844L, 5888L);
 
     //passive
     public HashMap<UUID, Boolean> collision = new HashMap<>();

@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -16,6 +17,7 @@ public class Scout {
     public HashMap<UUID, Long> F_COOLDOWN = new HashMap<>();
 
     public long frozenCool = 10000;
+    public static final List<Long> REQUIRE_EXP = List.of(77L, 177L, 347L, 527L, 777L, 1114L, 1427L, 2104L, 3371L, 4137L);
 
     //passive
     public final int MAX_AMMO = 10;

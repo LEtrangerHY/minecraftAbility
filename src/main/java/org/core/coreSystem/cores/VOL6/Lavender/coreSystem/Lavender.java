@@ -4,6 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 public class Lavender {
@@ -14,6 +15,7 @@ public class Lavender {
     public HashMap<UUID, Long> F_COOLDOWN = new HashMap<>();
 
     public long frozenCool = 10000;
+    public static final List<Long> REQUIRE_EXP = List.of(66L, 144L, 244L, 466L, 944L, 1164L, 2244L, 3364L, 4446L, 6064L);
 
     //R
     public HashMap<UUID, Boolean> r_Skill_using = new HashMap<>();

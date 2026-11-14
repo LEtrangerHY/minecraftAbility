@@ -16,6 +16,7 @@ public class Blue {
     public HashMap<UUID, Long> F_COOLDOWN = new HashMap<>();
 
     public long frozenCool = 10000;
+    public static final List<Long> REQUIRE_EXP = List.of(44L, 133L, 244L, 433L, 644L, 1334L, 3144L, 4666L, 5441L, 6066L);
 
     //passive
     public HashMap<UUID, Boolean> collision = new HashMap<>();

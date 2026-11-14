@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
 
 public class Apocalypse {
@@ -16,6 +17,7 @@ public class Apocalypse {
     public HashMap<UUID, Long> F_COOLDOWN = new HashMap<>();
 
     public long frozenCool = 10000;
+    public static final List<Long> REQUIRE_EXP = List.of(66L, 212L, 333L, 666L, 888L, 1221L, 2442L, 3443L, 4664L, 6664L);
 
     public static final Material SWORD = Material.WOODEN_SWORD;
     public static final Material BAT = Material.STICK;

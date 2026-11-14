@@ -3,6 +3,7 @@ package org.core.coreSystem.cores.VOL3.Burst.coreSystem;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 public class Burst {
@@ -13,6 +14,7 @@ public class Burst {
     public HashMap<UUID, Long> F_COOLDOWN = new HashMap<>();
 
     public long frozenCool = 10000;
+    public static final List<Long> REQUIRE_EXP = List.of(88L, 188L, 288L, 488L, 988L, 1088L, 2048L, 3888L, 4468L, 6088L);
 
     //passive
     public HashMap<UUID, Boolean> collision = new HashMap<>();

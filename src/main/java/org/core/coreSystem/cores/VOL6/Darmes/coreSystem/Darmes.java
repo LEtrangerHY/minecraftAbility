@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
 
 public class Darmes {
@@ -14,6 +15,7 @@ public class Darmes {
     public HashMap<UUID, Long> F_COOLDOWN = new HashMap<>();
 
     public long frozenCool = 10000;
+    public static final List<Long> REQUIRE_EXP = List.of(66L, 202L, 363L, 666L, 1001L, 1111L, 2002L, 3003L, 4004L, 6006L);
 
     public HashMap<UUID, Boolean> collision = new HashMap<>();
 

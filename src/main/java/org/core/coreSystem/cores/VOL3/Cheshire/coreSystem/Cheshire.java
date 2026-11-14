@@ -16,6 +16,7 @@ public class Cheshire {
     public HashMap<UUID, Long> F_COOLDOWN = new HashMap<>();
 
     public long frozenCool = 10000;
+    public static final List<Long> REQUIRE_EXP = List.of(88L, 188L, 288L, 488L, 988L, 1088L, 2048L, 3888L, 4468L, 6088L);
 
     //passive
     public long passive_Cool = 30000;

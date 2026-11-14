@@ -16,42 +16,79 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.*;
-import org.core.coreSystem.cores.KEY.PLAYER.coreSystem.playerLeveling;
-import org.core.coreSystem.cores.VOL3.Cheshire.coreSystem.chesLeveling;
-import org.core.coreSystem.cores.VOL5.Apocalypse.coreSystem.apoLeveling;
-import org.core.coreSystem.cores.VOL5.Scout.coreSystem.sctLeveling;
-import org.core.coreSystem.cores.VOL3.Stroke.coreSystem.strLeveling;
-import org.core.coreSystem.cores.VOL2.Undead.coreSystem.undeadLeveling;
-import org.core.coreSystem.cores.VOL6.Adam.coreSystem.adamLeveling;
-import org.core.coreSystem.cores.VOL6.Charlotte.coreSystem.charLeveling;
-import org.core.coreSystem.cores.VOL6.Darmes.coreSystem.darmesLeveling;
-import org.core.coreSystem.cores.VOL6.Jester.coreSystem.jestLeveling;
-import org.core.coreSystem.cores.VOL6.Lavender.coreSystem.lavLeveling;
-import org.core.coreSystem.cores.VOL2.Rose.coreSystem.roseLeveling;
-import org.core.coreSystem.cores.VOL6.Residue.coreSystem.residueLeveling;
+import org.core.coreSystem.cores.KEY.Benzene.coreSystem.Benzene;
+import org.core.coreSystem.cores.KEY.Nightel.coreSystem.Nightel;
+import org.core.coreSystem.cores.KEY.PLAYER.coreSystem.PLAYER;
+import org.core.coreSystem.cores.VOL1.Bamboo.coreSystem.Bamboo;
+import org.core.coreSystem.cores.VOL1.Blossom.coreSystem.Blossom;
+import org.core.coreSystem.cores.VOL1.Commander.coreSystem.Commander;
+import org.core.coreSystem.cores.VOL1.Dagger.coreSystem.Dagger;
+import org.core.coreSystem.cores.VOL1.Glacier.coreSystem.Glacier;
+import org.core.coreSystem.cores.VOL1.Harvester.coreSystem.Harvester;
+import org.core.coreSystem.cores.VOL1.Pyro.coreSystem.Pyro;
+import org.core.coreSystem.cores.VOL1.Saboteur.coreSystem.Saboteur;
+import org.core.coreSystem.cores.VOL2.Knight.coreSystem.Knight;
+import org.core.coreSystem.cores.VOL2.Rose.coreSystem.Rose;
+import org.core.coreSystem.cores.VOL2.Undead.coreSystem.Undead;
+import org.core.coreSystem.cores.VOL3.Burst.coreSystem.Burst;
+import org.core.coreSystem.cores.VOL3.Cheshire.coreSystem.Cheshire;
+import org.core.coreSystem.cores.VOL3.Stroke.coreSystem.Stroke;
+import org.core.coreSystem.cores.VOL4.Blaze.coreSystem.Blaze;
+import org.core.coreSystem.cores.VOL4.Blue.coreSystem.Blue;
+import org.core.coreSystem.cores.VOL5.Apocalypse.coreSystem.Apocalypse;
+import org.core.coreSystem.cores.VOL5.Scout.coreSystem.Scout;
+import org.core.coreSystem.cores.VOL6.Adam.coreSystem.Adam;
+import org.core.coreSystem.cores.VOL6.Carpenter.coreSystem.Carpenter;
+import org.core.coreSystem.cores.VOL6.Charlotte.coreSystem.Charlotte;
+import org.core.coreSystem.cores.VOL6.Darmes.coreSystem.Darmes;
+import org.core.coreSystem.cores.VOL6.Jester.coreSystem.Jester;
+import org.core.coreSystem.cores.VOL6.Lavender.coreSystem.Lavender;
+import org.core.coreSystem.cores.VOL6.Luster.coreSystem.Luster;
+import org.core.coreSystem.cores.VOL6.Residue.coreSystem.Residue;
+import org.core.coreSystem.cores.VOL6.Swordsman.coreSystem.Swordsman;
 import org.core.main.coreConfig;
-import org.core.coreSystem.cores.VOL1.Bamboo.coreSystem.bambLeveling;
-import org.core.coreSystem.cores.KEY.Benzene.coreSystem.benzLeveling;
-import org.core.coreSystem.cores.VOL4.Blaze.coreSystem.blazeLeveling;
-import org.core.coreSystem.cores.VOL1.Blossom.coreSystem.blossLeveling;
-import org.core.coreSystem.cores.VOL4.Blue.coreSystem.blueLeveling;
-import org.core.coreSystem.cores.VOL6.Carpenter.coreSystem.carpLeveling;
-import org.core.coreSystem.cores.VOL1.Commander.coreSystem.comLeveling;
-import org.core.coreSystem.cores.VOL1.Dagger.coreSystem.dagLeveling;
-import org.core.coreSystem.cores.VOL1.Glacier.coreSystem.glaLeveling;
-import org.core.coreSystem.cores.VOL1.Harvester.coreSystem.harvLeveling;
-import org.core.coreSystem.cores.VOL2.Knight.coreSystem.knightLeveling;
-import org.core.coreSystem.cores.VOL6.Luster.coreSystem.lustLeveling;
-import org.core.coreSystem.cores.KEY.Nightel.coreSystem.nightLeveling;
-import org.core.coreSystem.cores.VOL1.Pyro.coreSystem.pyroLeveling;
-import org.core.coreSystem.cores.VOL1.Saboteur.coreSystem.sabLeveling;
-import org.core.coreSystem.cores.VOL6.Swordsman.coreSystem.swordLeveling;
-import org.core.coreSystem.cores.VOL3.Burst.coreSystem.burstLeveling;
 import org.core.playerSettings.persistentPlayerHashMap;
 
 import java.util.*;
 
 public class LevelingManager implements Listener {
+
+    private static final double BASE_HEALTH = 60.0;
+    private static final double HEALTH_PER_LEVEL = 6.0;
+    private static final List<Double> DAMAGE_RATE = List.of(1.0, 1.05, 1.09, 1.28, 1.66, 2.03, 2.5, 3.06, 3.53, 3.81, 4.0);
+
+    private static final Map<String, List<Long>> REQUIRE_EXP = Map.ofEntries(
+            Map.entry("PLAYER", PLAYER.REQUIRE_EXP),
+            Map.entry("NIGHTEL", Nightel.REQUIRE_EXP),
+            Map.entry("BENZENE", Benzene.REQUIRE_EXP),
+            Map.entry("BAMBOO", Bamboo.REQUIRE_EXP),
+            Map.entry("CARPENTER", Carpenter.REQUIRE_EXP),
+            Map.entry("DAGGER", Dagger.REQUIRE_EXP),
+            Map.entry("PYRO", Pyro.REQUIRE_EXP),
+            Map.entry("GLACIER", Glacier.REQUIRE_EXP),
+            Map.entry("KNIGHT", Knight.REQUIRE_EXP),
+            Map.entry("LUSTER", Luster.REQUIRE_EXP),
+            Map.entry("BLAZE", Blaze.REQUIRE_EXP),
+            Map.entry("COMMANDER", Commander.REQUIRE_EXP),
+            Map.entry("HARVESTER", Harvester.REQUIRE_EXP),
+            Map.entry("BLOSSOM", Blossom.REQUIRE_EXP),
+            Map.entry("BLUE", Blue.REQUIRE_EXP),
+            Map.entry("SWORDSMAN", Swordsman.REQUIRE_EXP),
+            Map.entry("SABOTEUR", Saboteur.REQUIRE_EXP),
+            Map.entry("BURST", Burst.REQUIRE_EXP),
+            Map.entry("LAVENDER", Lavender.REQUIRE_EXP),
+            Map.entry("ROSE", Rose.REQUIRE_EXP),
+            Map.entry("RESIDUE", Residue.REQUIRE_EXP),
+            Map.entry("DARMES", Darmes.REQUIRE_EXP),
+            Map.entry("CHARLOTTE", Charlotte.REQUIRE_EXP),
+            Map.entry("ADAM", Adam.REQUIRE_EXP),
+            Map.entry("UNDEAD", Undead.REQUIRE_EXP),
+            Map.entry("JESTER", Jester.REQUIRE_EXP),
+            Map.entry("CHESHIRE", Cheshire.REQUIRE_EXP),
+            Map.entry("STROKE", Stroke.REQUIRE_EXP),
+            Map.entry("SCOUT", Scout.REQUIRE_EXP),
+            Map.entry("APOCALYPSE", Apocalypse.REQUIRE_EXP)
+    );
 
     private final JavaPlugin plugin;
     private final coreConfig config;
@@ -65,6 +102,13 @@ public class LevelingManager implements Listener {
 
         this.Level = new persistentPlayerHashMap(plugin, "level");
         this.Exp = new persistentPlayerHashMap(plugin, "exp");
+    }
+
+    public static double damageRate(long level) {
+        if (level < 0) level = 0;
+        if (level > DAMAGE_RATE.size() - 1) level = DAMAGE_RATE.size() - 1;
+
+        return DAMAGE_RATE.get((int) level);
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -92,8 +136,7 @@ public class LevelingManager implements Listener {
 
         AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
         if (maxHealth != null) {
-            double base = Attribute.MAX_HEALTH.getDefaultValue();
-            double newMax = base + (4.0 * level);
+            double newMax = BASE_HEALTH + (HEALTH_PER_LEVEL * level);
 
             maxHealth.setBaseValue(newMax);
 
@@ -108,132 +151,60 @@ public class LevelingManager implements Listener {
 
         if(event.getAmount() > 0){
             Player player = event.getPlayer();
-            long exp = event.getAmount();
+            List<Long> requireExp = REQUIRE_EXP.get(config.getPlayerCore(player));
+            if (requireExp == null) return;
 
-            switch (config.getPlayerCore(player)) {
-                case "PLAYER" :
-                    playerLeveling PLAYER = new playerLeveling(plugin, player, exp);
-                    PLAYER.addExp(player);
-                    break;
-                case "NIGHTEL" :
-                    nightLeveling nox = new nightLeveling(plugin, player, exp);
-                    nox.addExp(player);
-                    break;
-                case "BENZENE" :
-                    benzLeveling benzene = new benzLeveling(plugin, player, exp);
-                    benzene.addExp(player);
-                    break;
-                case "BAMBOO" :
-                    bambLeveling bamboo = new bambLeveling(plugin, player, exp);
-                    bamboo.addExp(player);
-                    break;
-                case "CARPENTER" :
-                    carpLeveling carpenter = new carpLeveling(plugin, player, exp);
-                    carpenter.addExp(player);
-                    break;
-                case "DAGGER" :
-                    dagLeveling dagger = new dagLeveling(plugin, player, exp);
-                    dagger.addExp(player);
-                    break;
-                case "PYRO" :
-                    pyroLeveling pyro = new pyroLeveling(plugin, player, exp);
-                    pyro.addExp(player);
-                    break;
-                case "GLACIER" :
-                    glaLeveling glacier = new glaLeveling(plugin, player, exp);
-                    glacier.addExp(player);
-                    break;
-                case "KNIGHT" :
-                    knightLeveling knight = new knightLeveling(plugin, player, exp);
-                    knight.addExp(player);
-                    break;
-                case "LUSTER" :
-                    lustLeveling luster = new lustLeveling(plugin, player, exp);
-                    luster.addExp(player);
-                    break;
-                case "BLAZE" :
-                    blazeLeveling blaze = new blazeLeveling(plugin, player, exp);
-                    blaze.addExp(player);
-                    break;
-                case "COMMANDER" :
-                    comLeveling commander = new comLeveling(plugin, player, exp);
-                    commander.addExp(player);
-                    break;
-                case "HARVESTER" :
-                    harvLeveling harvester = new harvLeveling(plugin, player, exp);
-                    harvester.addExp(player);
-                    break;
-                case "BLOSSOM" :
-                    blossLeveling blossom = new blossLeveling(plugin, player, exp);
-                    blossom.addExp(player);
-                    break;
-                case "BLUE" :
-                    blueLeveling blue = new blueLeveling(plugin, player, exp);
-                    blue.addExp(player);
-                    break;
-                case "SWORDSMAN" :
-                    swordLeveling sword = new swordLeveling(plugin, player, exp);
-                    sword.addExp(player);
-                    break;
-                case "SABOTEUR" :
-                    sabLeveling saboteur = new sabLeveling(plugin, player, exp);
-                    saboteur.addExp(player);
-                    break;
-                case "BURST" :
-                    burstLeveling burst = new burstLeveling(plugin, player, exp);
-                    burst.addExp(player);
-                    break;
-                case "LAVENDER" :
-                    lavLeveling lavender = new lavLeveling(plugin, player, exp);
-                    lavender.addExp(player);
-                    break;
-                case "ROSE" :
-                    roseLeveling rose = new roseLeveling(plugin, player, exp);
-                    rose.addExp(player);
-                    break;
-                case "RESIDUE" :
-                    residueLeveling residue = new residueLeveling(plugin, player, exp);
-                    residue.addExp(player);
-                    break;
-                case "DARMES" :
-                    darmesLeveling darmes = new darmesLeveling(plugin, player, exp);
-                    darmes.addExp(player);
-                    break;
-                case "CHARLOTTE":
-                    charLeveling charlotte = new charLeveling(plugin, player, exp);
-                    charlotte.addExp(player);
-                    break;
-                case "ADAM":
-                    adamLeveling adam = new adamLeveling(plugin, player, exp);
-                    adam.addExp(player);
-                    break;
-                case "UNDEAD":
-                    undeadLeveling undead = new undeadLeveling(plugin, player, exp);
-                    undead.addExp(player);
-                    break;
-                case "JESTER":
-                    jestLeveling jester = new jestLeveling(plugin, player, exp);
-                    jester.addExp(player);
-                    break;
-                case "CHESHIRE":
-                    chesLeveling cheshire = new chesLeveling(plugin, player, exp);
-                    cheshire.addExp(player);
-                    break;
-                case "STROKE":
-                    strLeveling stroke = new strLeveling(plugin, player, exp);
-                    stroke.addExp(player);
-                    break;
-                case "SCOUT":
-                    sctLeveling scout = new sctLeveling(plugin, player, exp);
-                    scout.addExp(player);
-                    break;
-                case "APOCALYPSE":
-                    apoLeveling apocalypse = new apoLeveling(plugin, player, exp);
-                    apocalypse.addExp(player);
-                default :
-                    break;
+            addExp(player, event.getAmount(), requireExp);
+        }
+    }
+
+    private void addExp(Player player, long exp, List<Long> requireExp) {
+        NamespacedKey expKey = new NamespacedKey(plugin, "exp");
+        NamespacedKey levelKey = new NamespacedKey(plugin, "level");
+
+        long currentLevel = player.getPersistentDataContainer().getOrDefault(levelKey, PersistentDataType.LONG, 0L);
+        long currentExp = player.getPersistentDataContainer().getOrDefault(expKey, PersistentDataType.LONG, 0L);
+
+        long maxExp = Collections.max(requireExp);
+
+        if (currentLevel < requireExp.size()) {
+            player.sendMessage("§e" + "exp : " + exp + " 획득");
+        }
+
+        for (int i = 0; i < exp; i++) {
+            if (currentLevel >= requireExp.size()) {
+                break;
+            }
+            if (currentExp >= maxExp) {
+                break;
+            }
+
+            currentExp++;
+
+            player.getPersistentDataContainer().set(expKey, PersistentDataType.LONG, currentExp);
+
+            if (requireExp.contains(currentExp)) {
+                addLV(player);
+                currentLevel++;
             }
         }
+    }
+
+    private void addLV(Player player) {
+        NamespacedKey levelKey = new NamespacedKey(plugin, "level");
+
+        long current = player.getPersistentDataContainer().getOrDefault(levelKey, PersistentDataType.LONG, 0L);
+        player.getPersistentDataContainer().set(levelKey, PersistentDataType.LONG, current + 1);
+
+        AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
+        if (maxHealth != null) {
+            maxHealth.setBaseValue(maxHealth.getBaseValue() + HEALTH_PER_LEVEL);
+
+            player.setHealth(maxHealth.getBaseValue());
+        }
+
+        player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1.5f, 1.0f);
+        player.sendMessage("§a" + "level " + (current + 1) + " 로 상승!");
     }
 
     public HashMap<UUID, BukkitRunnable> runnableHashMap = new HashMap<>();
@@ -302,14 +273,6 @@ public class LevelingManager implements Listener {
                 0L
         );
 
-        if (level < 0) return;
-        if (level > 10) level = 10;
-
-        double p = 0.005 * level * level + 0.055 * level;
-
-        double originalDamage = event.getDamage();
-        double amplifiedDamage = originalDamage * (1 + p);
-
-        event.setDamage(amplifiedDamage);
+        event.setDamage(event.getDamage() * damageRate(level));
     }
 }

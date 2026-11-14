@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
 
 public class Harvester {
@@ -14,6 +15,7 @@ public class Harvester {
     public HashMap<UUID, Long> F_COOLDOWN = new HashMap<>();
 
     public long frozenCool = 10000;
+    public static final List<Long> REQUIRE_EXP = List.of(44L, 108L, 266L, 444L, 666L, 1414L, 2426L, 3444L, 4444L, 6164L);
 
     //R
     public HashMap<UUID, Boolean> rskill_using = new HashMap<>();

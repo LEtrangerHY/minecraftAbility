@@ -2,8 +2,6 @@ package org.core.command;
 
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -46,16 +44,12 @@ public class cmdLevelReset implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        AttributeInstance maxHealth = target.getAttribute(Attribute.MAX_HEALTH);
-        if (maxHealth != null) {
-            maxHealth.setBaseValue(20.0);
-            target.setHealth(20.0);
-        }
         target.getPersistentDataContainer().set(new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L);
         target.getPersistentDataContainer().set(new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L);
         target.getPersistentDataContainer().set(new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L);
         target.getPersistentDataContainer().set(new NamespacedKey(plugin, "exp"), PersistentDataType.LONG, 0L);
         target.getPersistentDataContainer().set(new NamespacedKey(plugin, "level"), PersistentDataType.LONG, 0L);
+        level.applyLevelHealth(target, true);
 
         sender.sendMessage("§a" + target.getName() + " 경험치, 레벨 리셋 : " + level.Exp.getOrDefault(target, 0L) + ", " + level.Level.getOrDefault(target, 0L));
         return true;

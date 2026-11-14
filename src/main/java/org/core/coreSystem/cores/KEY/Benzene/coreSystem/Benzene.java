@@ -13,6 +13,7 @@ public class Benzene {
     public HashMap<UUID, Long> F_COOLDOWN = new HashMap<>();
 
     public long frozenCool = 10000;
+    public static final List<Long> REQUIRE_EXP = List.of(111L, 333L, 666L, 1111L, 1661L, 2222L, 2992L, 3993L, 5115L, 6666L);
 
     // passive
     public HashMap<UUID, Integer> crCount = new HashMap<>();

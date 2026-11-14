@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -16,6 +17,7 @@ public class Bamboo {
     public HashMap<UUID, Long> F_COOLDOWN = new HashMap<>();
 
     public long frozenCool = 10000;
+    public static final List<Long> REQUIRE_EXP = List.of(67L, 130L, 238L, 445L, 940L, 1183L, 2380L, 3208L, 4306L, 5620L);
 
     //R
     public HashMap<UUID, Boolean> reloaded = new HashMap<>();

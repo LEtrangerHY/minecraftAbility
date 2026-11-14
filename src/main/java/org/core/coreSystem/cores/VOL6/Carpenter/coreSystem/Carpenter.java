@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
 
 public class Carpenter {
@@ -15,6 +16,7 @@ public class Carpenter {
     public HashMap<UUID, Long> F_COOLDOWN = new HashMap<>();
 
     public long frozenCool = 10000;
+    public static final List<Long> REQUIRE_EXP = List.of(77L, 120L, 240L, 480L, 960L, 1212L, 1712L, 2412L, 3612L, 4812L);
 
     //passive
 

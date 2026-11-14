@@ -79,7 +79,7 @@ public class knightInventory extends absInventory {
 
         if (skill.equals("main")) {
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-            lore.add(Component.text("타입 : 중거리 견제형").color(NamedTextColor.LIGHT_PURPLE));
+            lore.add(Component.text("타입 : 배틀 메이지").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("장착 : 메인핸드와 오프핸드 모두 검 종류 아이템 장착.").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text("검기 : 좌클릭 시 전방으로 검기를 날려 처음 닿는 적에게 3의 피해를 가한다.").color(NamedTextColor.GREEN));

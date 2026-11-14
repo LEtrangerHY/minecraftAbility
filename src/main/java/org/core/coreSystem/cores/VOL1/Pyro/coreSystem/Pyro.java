@@ -4,6 +4,7 @@ import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.UUID;
 
 public class Pyro {
@@ -14,6 +15,7 @@ public class Pyro {
     public HashMap<UUID, Long> F_COOLDOWN = new HashMap<>();
 
     public long frozenCool = 10000;
+    public static final List<Long> REQUIRE_EXP = List.of(77L, 154L, 277L, 477L, 977L, 1177L, 2277L, 3377L, 4447L, 6007L);
 
     //passive
     public HashMap<UUID, Boolean> collision = new HashMap<>();

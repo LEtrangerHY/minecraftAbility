@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 public class Stroke {
@@ -14,6 +15,7 @@ public class Stroke {
     public HashMap<UUID, Long> F_COOLDOWN = new HashMap<>();
 
     public long frozenCool = 10000;
+    public static final List<Long> REQUIRE_EXP = List.of(88L, 188L, 288L, 488L, 988L, 1088L, 2048L, 3888L, 4468L, 6088L);
 
     public HashMap<UUID, Long> rLastClickTime = new HashMap<>();
     public HashMap<UUID, Boolean> rIsCharging = new HashMap<>();

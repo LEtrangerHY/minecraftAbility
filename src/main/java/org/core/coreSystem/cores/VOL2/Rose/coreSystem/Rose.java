@@ -4,6 +4,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -16,6 +17,7 @@ public class Rose {
 
     //passive
     public long frozenCool = 10000;
+    public static final List<Long> REQUIRE_EXP = List.of(77L, 177L, 277L, 477L, 744L, 1204L, 2344L, 3477L, 4777L, 5777L);
     public HashMap<UUID, String> atk = new HashMap<>();
     public HashMap<UUID, String> atkType = new HashMap<>();
     public HashMap<UUID, Integer> petals = new HashMap<>();

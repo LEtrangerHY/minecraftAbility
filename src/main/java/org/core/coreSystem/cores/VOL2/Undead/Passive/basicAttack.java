@@ -24,6 +24,7 @@ import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.core.coreSystem.cores.VOL2.Undead.coreSystem.Undead;
 import org.core.effect.crowdControl.ForceDamage;
+import org.core.level.LevelingManager;
 import org.core.models.coresObj.bulletModel;
 
 import java.util.HashSet;
@@ -757,10 +758,7 @@ public class basicAttack {
         long level = player.getPersistentDataContainer().getOrDefault(
                 new NamespacedKey(plugin, "level"), PersistentDataType.LONG, 0L);
 
-        if (level < 0) return 1.0;
-        if (level > 10) level = 10;
-
-        return 1.0 + 0.005 * level * level + 0.055 * level;
+        return LevelingManager.damageRate(level);
     }
 
     private boolean shoot(Player player, Power p) {

@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.UUID;
 
 public class PLAYER {
@@ -16,6 +17,7 @@ public class PLAYER {
     public HashMap<UUID, Long> F_COOLDOWN = new HashMap<>();
 
     public long frozenCool = 10000;
+    public static final List<Long> REQUIRE_EXP = List.of(50L, 100L, 300L, 600L, 1000L, 1600L, 2600L, 3900L, 5300L, 6600L);
 
     //passive
 
