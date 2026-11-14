@@ -15,6 +15,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
+import org.core.level.LevelingManager;
 import org.core.models.absModelSystem.modelManager;
 
 import java.util.*;
@@ -35,6 +36,7 @@ public class EntityLevelingManager implements Listener {
     private static final double NAME_TAG_RADIUS = 6.0;
     private static final double TARGET_RANGE = 22.0;
     private static final double TARGET_RAY_SIZE = 0.5;
+    private static final double MOB_DAMAGE_RATE = 1.0;
 
     public EntityLevelingManager(JavaPlugin plugin) {
         this.plugin = plugin;
@@ -124,8 +126,7 @@ public class EntityLevelingManager implements Listener {
                 AttributeInstance healthAttr = entity.getAttribute(Attribute.MAX_HEALTH);
                 if (healthAttr != null) {
                     double baseHealth = healthAttr.getBaseValue();
-                    double p = (0.005 * level * level + 0.055 * level) * 1.44;
-                    double newHealth = baseHealth * (1 + p);
+                    double newHealth = baseHealth * LevelingManager.damageRate(level);
 
                     healthAttr.setBaseValue(newHealth);
                     entity.setHealth(healthAttr.getValue());
@@ -228,15 +229,11 @@ public class EntityLevelingManager implements Listener {
         if (!data.has(levelKey, PersistentDataType.INTEGER)) return;
 
         int level = data.get(levelKey, PersistentDataType.INTEGER);
-        if (level <= 0) return;
 
         if (data.has(allyKey, PersistentDataType.BYTE)) return;
 
-        double p = (0.005 * level * level + 0.055 * level);
-        double originalDamage = event.getDamage();
-
-        double lowDamageBonus = (originalDamage >= 20) ? 1.0 : (1.0 + (0.033 * level));
-        double amplifiedDamage = originalDamage * (1 + p) * lowDamageBonus;
+        double amplifiedDamage = event.getDamage() * LevelingManager.healthAt(level)
+                / Attribute.MAX_HEALTH.getDefaultValue() * MOB_DAMAGE_RATE;
 
         event.setDamage(amplifiedDamage);
     }

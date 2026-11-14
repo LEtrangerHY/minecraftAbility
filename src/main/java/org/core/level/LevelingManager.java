@@ -11,6 +11,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -58,6 +59,12 @@ public class LevelingManager implements Listener {
 
     private static final double BASE_HEALTH = 60.0;
     private static final double HEALTH_PER_LEVEL = 6.0;
+    private static final Set<DamageCause> ENVIRONMENT_CAUSES = EnumSet.of(
+            DamageCause.FALL, DamageCause.FIRE, DamageCause.LAVA,
+            DamageCause.DROWNING, DamageCause.SUFFOCATION, DamageCause.STARVATION, DamageCause.CONTACT,
+            DamageCause.FREEZE, DamageCause.LIGHTNING, DamageCause.FLY_INTO_WALL, DamageCause.FALLING_BLOCK,
+            DamageCause.CRAMMING, DamageCause.WORLD_BORDER
+    );
     private static final List<Double> DAMAGE_RATE = List.of(1.0, 1.19, 1.4, 1.63, 1.88, 2.17, 2.47, 2.81, 3.18, 3.57, 4.0);
 
     private static final Map<String, List<Long>> REQUIRE_EXP = Map.ofEntries(
@@ -114,6 +121,10 @@ public class LevelingManager implements Listener {
         return DAMAGE_RATE.get((int) level);
     }
 
+    public static double healthAt(long level) {
+        return BASE_HEALTH + HEALTH_PER_LEVEL * level;
+    }
+
     public boolean canLevel(Player player) {
         return REQUIRE_EXP.containsKey(config.getPlayerCore(player));
     }
@@ -144,7 +155,7 @@ public class LevelingManager implements Listener {
         AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
         if (maxHealth != null) {
             double newMax = canLevel(player)
-                    ? BASE_HEALTH + (HEALTH_PER_LEVEL * level)
+                    ? healthAt(level)
                     : Attribute.MAX_HEALTH.getDefaultValue();
 
             maxHealth.setBaseValue(newMax);
@@ -297,5 +308,16 @@ public class LevelingManager implements Listener {
         if (damage == null) return;
 
         event.setDamage(ForceDamage.rawDamage(target, damage, event.getDamageSource().getDamageType()));
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void environmentDamage(EntityDamageEvent event) {
+        if (!(event.getEntity() instanceof Player player)) return;
+        if (!ENVIRONMENT_CAUSES.contains(event.getCause())) return;
+
+        AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
+        if (maxHealth == null) return;
+
+        event.setDamage(event.getDamage() * maxHealth.getValue() / Attribute.MAX_HEALTH.getDefaultValue());
     }
 }
