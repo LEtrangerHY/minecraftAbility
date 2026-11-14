@@ -113,7 +113,9 @@ public class knightCore extends absCore {
         LivingEntity attacker = null;
         Entity damager = event.getDamager();
 
-        if (damager instanceof LivingEntity living) {
+        if (event.getDamageSource().getCausingEntity() instanceof LivingEntity causing) {
+            attacker = causing;
+        } else if (damager instanceof LivingEntity living) {
             attacker = living;
         } else if (damager instanceof Projectile projectile && projectile.getShooter() instanceof LivingEntity shooter) {
             attacker = shooter;

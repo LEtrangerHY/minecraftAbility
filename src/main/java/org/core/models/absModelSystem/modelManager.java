@@ -31,6 +31,10 @@ public final class modelManager {
         return entity;
     }
 
+    public static boolean isTracked(Entity entity) {
+        return entities.contains(entity);
+    }
+
     public static void trackBlock(Block block) {
         trackBlock(block, block.getBlockData());
     }

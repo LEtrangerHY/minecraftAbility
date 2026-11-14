@@ -36,12 +36,12 @@ public class bloodStroke {
         player.getWorld().spawnParticle(Particle.BLOCK, entity.getLocation().clone().add(0, 1.2, 0), 13, 0.3, 0.3, 0.3,
                 blood);
 
-        DamageSource source = DamageSource.builder(DamageType.GENERIC)
+        DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
                 .withCausingEntity(player)
                 .withDirectEntity(player)
                 .build();
 
-        ForceDamage forceDamage = new ForceDamage(entity, entity.getHealth() * 0.06, source, true);
+        ForceDamage forceDamage = new ForceDamage(entity, entity.getHealth() * 0.06, source, true, true);
         forceDamage.applyEffect(player);
 
     }

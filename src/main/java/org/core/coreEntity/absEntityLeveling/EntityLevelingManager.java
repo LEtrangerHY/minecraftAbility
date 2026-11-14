@@ -15,6 +15,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
+import org.core.models.absModelSystem.modelManager;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -93,6 +94,7 @@ public class EntityLevelingManager implements Listener {
 
             PersistentDataContainer data = entity.getPersistentDataContainer();
             if (data.has(levelKey, PersistentDataType.INTEGER)) continue;
+            if (modelManager.isTracked(entity)) continue;
 
             double y = entity.getLocation().getY();
             double centerY = 64.0;
@@ -126,7 +128,6 @@ public class EntityLevelingManager implements Listener {
                     double newHealth = baseHealth * (1 + p);
 
                     healthAttr.setBaseValue(newHealth);
-                    // 💡 우두머리 좀비 등의 AttributeModifier(추가 체력 변동 수치)가 모두 합산된 최종 최대 체력(getValue)으로 만피 동기화
                     entity.setHealth(healthAttr.getValue());
                 }
             }
@@ -210,9 +211,10 @@ public class EntityLevelingManager implements Listener {
 
     @EventHandler
     public void onEntityDamage(EntityDamageByEntityEvent event) {
+        if (event.getDamageSource().getCausingEntity() instanceof Player) return;
+
         LivingEntity attacker = null;
 
-        // 근접 공격 및 화살/화염구 등 원거리 투사체 발사자 추적
         if (event.getDamager() instanceof LivingEntity livingDamager) {
             attacker = livingDamager;
         }

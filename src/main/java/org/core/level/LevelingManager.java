@@ -4,11 +4,13 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -46,6 +48,7 @@ import org.core.coreSystem.cores.VOL6.Lavender.coreSystem.Lavender;
 import org.core.coreSystem.cores.VOL6.Luster.coreSystem.Luster;
 import org.core.coreSystem.cores.VOL6.Residue.coreSystem.Residue;
 import org.core.coreSystem.cores.VOL6.Swordsman.coreSystem.Swordsman;
+import org.core.effect.crowdControl.ForceDamage;
 import org.core.main.coreConfig;
 import org.core.playerSettings.persistentPlayerHashMap;
 
@@ -273,7 +276,8 @@ public class LevelingManager implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void lvAtk(EntityDamageByEntityEvent event) {
 
-        if (!(event.getDamager() instanceof Player player)) return;
+        if (!(event.getDamageSource().getCausingEntity() instanceof Player player)) return;
+        if (player == event.getEntity()) return;
         if (!canLevel(player)) return;
 
         long level = player.getPersistentDataContainer().getOrDefault(
@@ -283,5 +287,15 @@ public class LevelingManager implements Listener {
         );
 
         event.setDamage(event.getDamage() * damageRate(level));
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void fixedDamage(EntityDamageEvent event) {
+        if (!(event.getEntity() instanceof LivingEntity target)) return;
+
+        Double damage = ForceDamage.FIXED.get(target.getUniqueId());
+        if (damage == null) return;
+
+        event.setDamage(ForceDamage.rawDamage(target, damage, event.getDamageSource().getDamageType()));
     }
 }

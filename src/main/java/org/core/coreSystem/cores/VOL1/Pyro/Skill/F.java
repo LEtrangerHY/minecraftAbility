@@ -173,6 +173,6 @@ public class F implements SkillBase {
         boolean setFire = true;
         boolean breakBlocks = true;
 
-        world.createExplosion(burstLoction, power, setFire, breakBlocks);
+        world.createExplosion(burstLoction, power, setFire, breakBlocks, player);
     }
 }

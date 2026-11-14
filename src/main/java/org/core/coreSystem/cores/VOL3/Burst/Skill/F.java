@@ -103,6 +103,7 @@ public class F implements SkillBase {
 
                 TNTPrimed tnt = (TNTPrimed) world.spawnEntity(loc, EntityType.TNT);
                 tnt.setFuseTicks(40);
+                tnt.setSource(player);
                 tnt.setYield(4.0f);
                 tnt.setIsIncendiary(true);
             }

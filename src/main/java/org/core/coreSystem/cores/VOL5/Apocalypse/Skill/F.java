@@ -139,7 +139,9 @@ public class F implements SkillBase {
 
         Entity damager = event.getDamager();
         LivingEntity attacker = null;
-        if (damager instanceof Projectile projectile && projectile.getShooter() instanceof LivingEntity shooter) {
+        if (event.getDamageSource().getCausingEntity() instanceof LivingEntity causing) {
+            attacker = causing;
+        } else if (damager instanceof Projectile projectile && projectile.getShooter() instanceof LivingEntity shooter) {
             attacker = shooter;
         } else if (damager instanceof LivingEntity living) {
             attacker = living;

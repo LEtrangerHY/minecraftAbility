@@ -120,7 +120,7 @@ public class Q_crown implements SkillBase {
                     if (target.isDead() || !target.isValid()) continue;
 
                     double damage = target.getHealth() * 0.33;
-                    ForceDamage fd = new ForceDamage(target, damage, source, true);
+                    ForceDamage fd = new ForceDamage(target, damage, source, true, true);
                     fd.applyEffect(player);
 
                     target.setVelocity(new Vector(0, 0, 0));
@@ -132,7 +132,7 @@ public class Q_crown implements SkillBase {
 
                 if (executeTargets.isEmpty()) {
                     double selfDamage = player.getHealth() * 0.33;
-                    ForceDamage fd = new ForceDamage(player, selfDamage, source, true);
+                    ForceDamage fd = new ForceDamage(player, selfDamage, source, true, true);
                     fd.applyEffect(player);
 
                     Stun stun = new Stun(player, 4000L);

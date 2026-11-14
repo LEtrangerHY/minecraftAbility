@@ -22,6 +22,7 @@ import org.core.cool.Cool;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.cores.VOL3.Cheshire.coreSystem.Cheshire;
 import org.core.effect.crowdControl.ForceDamage;
+import org.core.level.LevelingManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +56,7 @@ public class Q implements SkillBase {
         if (playerLevel > 10) playerLevel = 10;
         double levelBonus = 0.005 * playerLevel * playerLevel + 0.055 * playerLevel;
         double levelMult = 1.0 + levelBonus;
+        double damageRate = LevelingManager.damageRate(playerLevel);
 
         final double maxHeal = 6.0 * (1.0 + qAmp) * levelMult;
         final double[] currentHeal = {0.0};
@@ -101,7 +103,7 @@ public class Q implements SkillBase {
 
             new ForceDamage(mainTarget, scaledDamage, source, true).applyEffect(player);
 
-            double expectedDamageDealt = scaledDamage * levelMult;
+            double expectedDamageDealt = scaledDamage * damageRate;
             double actualHeal = Math.min(expectedDamageDealt * 0.5, maxHeal - currentHeal[0]);
             if (actualHeal > 0) {
                 applyLifesteal(player, actualHeal);
@@ -151,10 +153,10 @@ public class Q implements SkillBase {
                         double magicDamage = target.getHealth() * 0.13;
 
                         new ForceDamage(target, scaledDamage * ((double) 2 /3), source, true).applyEffect(player);
-                        new ForceDamage(target, magicDamage, magicSource, true).applyEffect(player);
+                        new ForceDamage(target, magicDamage, magicSource, true, true).applyEffect(player);
 
-                        double expectedAoeScaledDamage = (scaledDamage * ((double) 2 / 3)) * levelMult;
-                        double expectedAoeMagicDamage = magicDamage * levelMult;
+                        double expectedAoeScaledDamage = (scaledDamage * ((double) 2 / 3)) * damageRate;
+                        double expectedAoeMagicDamage = magicDamage;
 
                         double aoeTotalDamage = expectedAoeScaledDamage + expectedAoeMagicDamage;
                         double aoeActualHeal = Math.min(aoeTotalDamage, maxHeal - currentHeal[0]);

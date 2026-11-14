@@ -145,6 +145,7 @@ public class lustCore extends absCore {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onGolemDamage(EntityDamageByEntityEvent event) {
+        if (event.getDamageSource().getCausingEntity() instanceof Player) return;
         if (event.getDamager() instanceof IronGolem attackingGolem) {
             boolean isPlayerOwned = false;
             UUID attackingUUID = attackingGolem.getUniqueId();
