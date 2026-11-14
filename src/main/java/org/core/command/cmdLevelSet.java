@@ -41,6 +41,11 @@ public class cmdLevelSet implements CommandExecutor, TabCompleter {
             return true;
         }
 
+        if (!level.canLevel(target)) {
+            sender.sendMessage("§c코어가 없는 플레이어는 레벨을 설정할 수 없습니다.");
+            return true;
+        }
+
         long xp;
         long lv;
 

@@ -50,6 +50,8 @@ public class cmdLevelReset implements CommandExecutor, TabCompleter {
         target.getPersistentDataContainer().set(new NamespacedKey(plugin, "exp"), PersistentDataType.LONG, 0L);
         target.getPersistentDataContainer().set(new NamespacedKey(plugin, "level"), PersistentDataType.LONG, 0L);
         level.applyLevelHealth(target, true);
+        target.setFoodLevel(20);
+        target.setSaturation(20.0f);
 
         sender.sendMessage("§a" + target.getName() + " 경험치, 레벨 리셋 : " + level.Exp.getOrDefault(target, 0L) + ", " + level.Level.getOrDefault(target, 0L));
         return true;

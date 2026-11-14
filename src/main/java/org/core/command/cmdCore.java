@@ -63,9 +63,17 @@ public class cmdCore implements CommandExecutor, TabCompleter {
             return true;
         }
 
+        String before = this.config.getPlayerCore(target);
         this.config.clearPlayerCore(target);
         this.config.setSetting(target, setting, value);
+        if (!before.equals(this.config.getPlayerCore(target))) {
+            level.Exp.put(target, 0L);
+            level.Level.put(target, 0L);
+        }
         level.levelScoreBoard(target);
+        level.applyLevelHealth(target, true);
+        target.setFoodLevel(20);
+        target.setSaturation(20.0f);
         sender.sendMessage("§a" + target.getName() + "의 " + setting + " 값을 " + value + "로 설정했습니다.");
         sender.sendMessage("§b" + "DataMenu 를 들고 우클릭하여 설정한 data의 상세정보를 확인할 수 있습니다.");
         return true;

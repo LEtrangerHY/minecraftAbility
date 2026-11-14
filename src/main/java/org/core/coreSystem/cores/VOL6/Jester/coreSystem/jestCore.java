@@ -29,6 +29,7 @@ import org.core.coreSystem.absCoreSystem.ConfigWrapper;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.absCoreSystem.absCore;
 import org.core.effect.crowdControl.ForceDamage;
+import org.core.level.LevelingManager;
 import org.core.main.Core;
 import org.core.main.coreConfig;
 import org.core.coreSystem.cores.VOL6.Jester.Skill.R;
@@ -323,8 +324,10 @@ public class jestCore extends absCore {
 
                     if (attacker != null && attacker != player) {
                         AttributeInstance maxHp = player.getAttribute(Attribute.MAX_HEALTH);
-                        double playerMaxHp = maxHp != null ? maxHp.getBaseValue() : 20.0;
-                        double damage = playerMaxHp * 0.16;
+                        double playerMaxHp = maxHp != null ? maxHp.getValue() : 20.0;
+                        long level = player.getPersistentDataContainer().getOrDefault(
+                                new NamespacedKey(plugin, "level"), PersistentDataType.LONG, 0L);
+                        double damage = playerMaxHp * 0.16 / LevelingManager.damageRate(level);
 
                         DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
                                 .withCausingEntity(player)

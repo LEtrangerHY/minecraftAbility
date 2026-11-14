@@ -34,14 +34,24 @@ public class cmdClear implements CommandExecutor, TabCompleter {
             }
             this.config.clearPlayerCore(target);
             this.config.clearCooldowns(target);
+            level.Exp.put(target, 0L);
+            level.Level.put(target, 0L);
             level.levelScoreBoard(target);
+            level.applyLevelHealth(target, true);
+            target.setFoodLevel(20);
+            target.setSaturation(20.0f);
             sender.sendMessage("§c" + target.getName() + " 에게 할당된 data를 모두 제거했습니다");
             return true;
         } else if (args.length == 0) {
             if (!(sender instanceof Player player)) return true;
             this.config.clearPlayerCore(player);
             this.config.clearCooldowns(player);
+            level.Exp.put(player, 0L);
+            level.Level.put(player, 0L);
             level.levelScoreBoard(player);
+            level.applyLevelHealth(player, true);
+            player.setFoodLevel(20);
+            player.setSaturation(20.0f);
             sender.sendMessage("§c본인에게 할당된 data를 모두 제거했습니다.");
             return true;
         } else {

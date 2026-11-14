@@ -55,7 +55,7 @@ public class LevelingManager implements Listener {
 
     private static final double BASE_HEALTH = 60.0;
     private static final double HEALTH_PER_LEVEL = 6.0;
-    private static final List<Double> DAMAGE_RATE = List.of(1.0, 1.05, 1.09, 1.28, 1.66, 2.03, 2.5, 3.06, 3.53, 3.81, 4.0);
+    private static final List<Double> DAMAGE_RATE = List.of(1.0, 1.19, 1.4, 1.63, 1.88, 2.17, 2.47, 2.81, 3.18, 3.57, 4.0);
 
     private static final Map<String, List<Long>> REQUIRE_EXP = Map.ofEntries(
             Map.entry("PLAYER", PLAYER.REQUIRE_EXP),
@@ -111,6 +111,10 @@ public class LevelingManager implements Listener {
         return DAMAGE_RATE.get((int) level);
     }
 
+    public boolean canLevel(Player player) {
+        return REQUIRE_EXP.containsKey(config.getPlayerCore(player));
+    }
+
     @EventHandler(priority = EventPriority.LOW)
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
@@ -136,11 +140,15 @@ public class LevelingManager implements Listener {
 
         AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
         if (maxHealth != null) {
-            double newMax = BASE_HEALTH + (HEALTH_PER_LEVEL * level);
+            double newMax = canLevel(player)
+                    ? BASE_HEALTH + (HEALTH_PER_LEVEL * level)
+                    : Attribute.MAX_HEALTH.getDefaultValue();
 
             maxHealth.setBaseValue(newMax);
 
             if (healFull) {
+                player.setHealth(newMax);
+            } else if (player.getHealth() > newMax) {
                 player.setHealth(newMax);
             }
         }
@@ -266,6 +274,7 @@ public class LevelingManager implements Listener {
     public void lvAtk(EntityDamageByEntityEvent event) {
 
         if (!(event.getDamager() instanceof Player player)) return;
+        if (!canLevel(player)) return;
 
         long level = player.getPersistentDataContainer().getOrDefault(
                 new NamespacedKey(plugin, "level"),
