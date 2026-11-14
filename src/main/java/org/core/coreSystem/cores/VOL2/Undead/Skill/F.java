@@ -1,4 +1,4 @@
-package org.core.coreSystem.cores.VOL4.Undead.Skill;
+package org.core.coreSystem.cores.VOL2.Undead.Skill;
 
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -11,8 +11,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.core.cool.Cool;
 import org.core.coreSystem.absCoreSystem.SkillBase;
-import org.core.coreSystem.cores.VOL4.Undead.Passive.handSwap;
-import org.core.coreSystem.cores.VOL4.Undead.coreSystem.Undead;
+import org.core.coreSystem.cores.VOL2.Undead.Passive.handSwap;
+import org.core.coreSystem.cores.VOL2.Undead.coreSystem.Undead;
 
 import java.util.UUID;
 

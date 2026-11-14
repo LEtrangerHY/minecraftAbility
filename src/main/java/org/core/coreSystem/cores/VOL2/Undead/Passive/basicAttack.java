@@ -1,4 +1,4 @@
-package org.core.coreSystem.cores.VOL4.Undead.Passive;
+package org.core.coreSystem.cores.VOL2.Undead.Passive;
 
 import org.bukkit.Color;
 import org.bukkit.FluidCollisionMode;
@@ -22,7 +22,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
-import org.core.coreSystem.cores.VOL4.Undead.coreSystem.Undead;
+import org.core.coreSystem.cores.VOL2.Undead.coreSystem.Undead;
 import org.core.effect.crowdControl.ForceDamage;
 import org.core.models.coresObj.bulletModel;
 
@@ -263,7 +263,17 @@ public class basicAttack {
         Vector cross = a != null ? a.slant(-tilt * 1.6)
                 : b.right().clone().multiply(Math.cos(-tilt * 1.6)).add(b.up().clone().multiply(Math.sin(-tilt * 1.6))).normalize();
 
-        playStroke(player, a != null ? a.pivot(rim) : pivot, axis, edge, from, -from, rim, 1.0 * p.scale(), SWING_KEYS, 0.5, p, hit);
+        Runnable anchored = () -> {
+            Set<UUID> struck = new HashSet<>();
+            double amount = config.sword_Attack_Damage * p.rate();
+            int hits = arcStrike(player, a.pivot(rim), b.flat(), axis, edge, rim, -sweep - Math.toRadians(8), sweep + Math.toRadians(8),
+                    0.9 * p.scale(), amount, false, 0, 0, struck);
+            hits += arcStrike(player, a.pivot(crossRim), b.flat(), axis, cross, crossRim, -sweep - Math.toRadians(8), sweep + Math.toRadians(8),
+                    0.9 * p.scale(), amount, false, 0, 0, struck);
+            heal(player, hits);
+        };
+
+        playStroke(player, a != null ? a.pivot(rim) : pivot, axis, edge, from, -from, rim, 1.0 * p.scale(), SWING_KEYS, 0.5, p, a != null ? anchored : hit);
         playStroke(player, a != null ? a.pivot(crossRim) : pivot, axis, cross, -from, from, crossRim, 0.55 * p.scale(), SWING_KEYS, 0.5, p, null);
     }
 
@@ -302,7 +312,12 @@ public class basicAttack {
         Location center = a != null ? a.pivot(rim) : pivot;
 
         playStroke(player, center, axis, edge, from, -from, rim, 0.75 * p.scale(), QUICK_KEYS, 0.5, p, () -> {
-            hit.run();
+            if (a != null) {
+                arcHit(player, center, b.flat(), axis, edge, rim + 0.3, -sweep - Math.toRadians(6), sweep + Math.toRadians(6),
+                        0.8 * p.scale(), config.hoe_Attack_Damage * p.rate(), true, config.hoe_Attack_Knockback, config.hoe_Attack_Lift);
+            } else {
+                hit.run();
+            }
             afterImage(player, center, axis, edge, -sweep, sweep, rim + 0.3, p);
         });
     }
@@ -343,7 +358,12 @@ public class basicAttack {
 
         playStroke(player, a != null ? a.pivot(rim) : pivot, a != null ? a.axis() : b.flat(), WORLD_UP, from, to, rim,
                 1.1 * p.scale(), SWING_KEYS, 0.5, p, () -> {
-                    hit.run();
+                    if (a != null) {
+                        arcHit(player, a.pivot(rim), b.flat(), a.axis(), WORLD_UP, rim, Math.toRadians(-55), Math.toRadians(70),
+                                0.7 * p.scale(), config.shovel_Attack_Damage * p.rate(), true, config.shovel_Attack_Knockback, config.shovel_Attack_Lift);
+                    } else {
+                        hit.run();
+                    }
                     Material dirt = quake.clone().subtract(0, 0.1, 0).getBlock().getType();
                     if (dirt.isSolid()) world.spawnParticle(Particle.BLOCK, quake.clone().add(0, 0.3, 0), (int) (30 * p.scale()), 0.5, 0.3, 0.5, dirt.createBlockData());
                     shockRing(world, quake.clone().add(0, 0.15, 0), 1.6 * p.scale());
@@ -406,8 +426,11 @@ public class basicAttack {
         double rim = (reach - 0.6) * (a != null ? p.scale() : 1.0);
         Vector edge = a != null ? a.top().clone().multiply(Math.cos(lean)).add(a.side().clone().multiply(Math.sin(lean))).normalize() : slant;
 
+        Vector toward = a != null ? a.center().toVector().subtract(b.eye().toVector()) : null;
+        Runnable anchored = () -> strikeHit(player, b.eye(), toward.clone().normalize(), toward.length() + 0.5, p);
+
         playStroke(player, a != null ? a.pivot(rim) : pivot, a != null ? a.axis() : b.forward(), edge, from, 0, rim,
-                0.7 * p.scale(), STRIKE_KEYS, 1.0, p, hit);
+                0.7 * p.scale(), STRIKE_KEYS, 1.0, p, a != null ? anchored : hit);
     }
 
     private static int impactTick(double[] keys, double threshold) {
@@ -634,13 +657,18 @@ public class basicAttack {
 
     public void arcHit(Player player, Location origin, Vector flat, Vector axis, Vector slant, double reach,
                        double lo, double hi, double planeTol, double amount, boolean push, double knockback, double lift) {
+        heal(player, arcStrike(player, origin, flat, axis, slant, reach, lo, hi, planeTol, amount, push, knockback, lift, new HashSet<>()));
+    }
+
+    private int arcStrike(Player player, Location origin, Vector flat, Vector axis, Vector slant, double reach,
+                          double lo, double hi, double planeTol, double amount, boolean push, double knockback, double lift, Set<UUID> struck) {
         World world = player.getWorld();
         DamageSource source = meleeSource(player);
         Vector normal = axis.clone().crossProduct(slant).normalize();
         int hits = 0;
 
         for (Entity entity : world.getNearbyEntities(origin, reach + 1.5, reach + 1.5, reach + 1.5)) {
-            if (!isTarget(player, entity)) continue;
+            if (!isTarget(player, entity) || struck.contains(entity.getUniqueId())) continue;
             LivingEntity target = (LivingEntity) entity;
 
             Vector toTarget = target.getBoundingBox().getCenter().subtract(origin.toVector());
@@ -657,16 +685,17 @@ public class basicAttack {
 
             if (!player.hasLineOfSight(target)) continue;
 
+            struck.add(target.getUniqueId());
             if (meleeHit(player, target, amount, push, knockback, lift, centerWeight(player, flat, target), source)) hits++;
         }
 
-        heal(player, hits);
+        return hits;
     }
 
     private void chopHit(Player player, Vector flat, double reach, Power p, Location quake) {
         World world = player.getWorld();
         DamageSource source = meleeSource(player);
-        Location impact = player.getLocation().add(flat.clone().multiply(reach));
+        Location impact = quake != null ? quake.clone() : player.getLocation().add(flat.clone().multiply(reach));
 
         world.playSound(impact, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.9f, 0.8f);
         world.playSound(impact, Sound.BLOCK_ANVIL_PLACE, 0.4f, 1.2f);

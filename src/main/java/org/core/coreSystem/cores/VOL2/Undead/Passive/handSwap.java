@@ -1,4 +1,4 @@
-package org.core.coreSystem.cores.VOL4.Undead.Passive;
+package org.core.coreSystem.cores.VOL2.Undead.Passive;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -16,7 +16,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.core.cool.Cool;
 import org.core.coreSystem.absCoreSystem.SkillBase;
-import org.core.coreSystem.cores.VOL4.Undead.coreSystem.Undead;
+import org.core.coreSystem.cores.VOL2.Undead.coreSystem.Undead;
 
 import java.util.ArrayList;
 import java.util.HashMap;

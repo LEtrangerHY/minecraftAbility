@@ -1,4 +1,4 @@
-package org.core.coreSystem.cores.VOL4.Undead.Passive;
+package org.core.coreSystem.cores.VOL2.Undead.Passive;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -9,7 +9,7 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.core.main.coreConfig;
-import org.core.coreSystem.cores.VOL4.Undead.coreSystem.Undead;
+import org.core.coreSystem.cores.VOL2.Undead.coreSystem.Undead;
 
 import java.util.HashMap;
 import java.util.Map;

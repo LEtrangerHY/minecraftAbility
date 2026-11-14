@@ -1,4 +1,4 @@
-package org.core.coreSystem.cores.VOL4.Undead.Skill;
+package org.core.coreSystem.cores.VOL2.Undead.Skill;
 
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -12,10 +12,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.core.cool.Cool;
 import org.core.coreSystem.absCoreSystem.SkillBase;
-import org.core.coreSystem.cores.VOL4.Undead.Passive.handSwap;
-import org.core.coreSystem.cores.VOL4.Undead.Passive.deepWound;
-import org.core.coreSystem.cores.VOL4.Undead.Passive.stickyBomb;
-import org.core.coreSystem.cores.VOL4.Undead.coreSystem.Undead;
+import org.core.coreSystem.cores.VOL2.Undead.Passive.handSwap;
+import org.core.coreSystem.cores.VOL2.Undead.Passive.deepWound;
+import org.core.coreSystem.cores.VOL2.Undead.Passive.stickyBomb;
+import org.core.coreSystem.cores.VOL2.Undead.coreSystem.Undead;
 import org.core.effect.crowdControl.Invulnerable;
 
 import java.util.function.Consumer;

@@ -1,4 +1,4 @@
-package org.core.coreSystem.cores.VOL4.Undead.Passive;
+package org.core.coreSystem.cores.VOL2.Undead.Passive;
 
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -16,7 +16,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-import org.core.coreSystem.cores.VOL4.Undead.coreSystem.Undead;
+import org.core.coreSystem.cores.VOL2.Undead.coreSystem.Undead;
 import org.core.effect.crowdControl.ForceDamage;
 
 import java.util.ArrayList;

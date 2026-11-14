@@ -21,7 +21,7 @@ import org.core.coreSystem.cores.VOL3.Cheshire.coreSystem.chesLeveling;
 import org.core.coreSystem.cores.VOL5.Apocalypse.coreSystem.apoLeveling;
 import org.core.coreSystem.cores.VOL5.Scout.coreSystem.sctLeveling;
 import org.core.coreSystem.cores.VOL3.Stroke.coreSystem.strLeveling;
-import org.core.coreSystem.cores.VOL4.Undead.coreSystem.undeadLeveling;
+import org.core.coreSystem.cores.VOL2.Undead.coreSystem.undeadLeveling;
 import org.core.coreSystem.cores.VOL6.Adam.coreSystem.adamLeveling;
 import org.core.coreSystem.cores.VOL6.Charlotte.coreSystem.charLeveling;
 import org.core.coreSystem.cores.VOL6.Darmes.coreSystem.darmesLeveling;

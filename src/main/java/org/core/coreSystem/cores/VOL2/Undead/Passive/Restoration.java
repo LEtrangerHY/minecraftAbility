@@ -1,4 +1,4 @@
-package org.core.coreSystem.cores.VOL4.Undead.Passive;
+package org.core.coreSystem.cores.VOL2.Undead.Passive;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -18,7 +18,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
-import org.core.coreSystem.cores.VOL4.Undead.coreSystem.Undead;
+import org.core.coreSystem.cores.VOL2.Undead.coreSystem.Undead;
 import org.core.effect.crowdControl.Invulnerable;
 import org.core.effect.crowdControl.Stun;
 

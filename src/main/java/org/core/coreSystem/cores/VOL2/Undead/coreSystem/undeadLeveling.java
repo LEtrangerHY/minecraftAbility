@@ -1,4 +1,4 @@
-package org.core.coreSystem.cores.VOL4.Undead.coreSystem;
+package org.core.coreSystem.cores.VOL2.Undead.coreSystem;
 
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
@@ -41,6 +41,7 @@ public class undeadLeveling implements Levels {
 
             player.setHealth(maxHealth.getBaseValue());
         }
+
 
         player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1.5f, 1.0f);
         player.sendMessage("§a" + "level " + updatedLevel + " 로 상승!");

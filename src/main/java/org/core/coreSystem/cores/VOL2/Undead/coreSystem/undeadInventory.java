@@ -1,4 +1,4 @@
-package org.core.coreSystem.cores.VOL4.Undead.coreSystem;
+package org.core.coreSystem.cores.VOL2.Undead.coreSystem;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
