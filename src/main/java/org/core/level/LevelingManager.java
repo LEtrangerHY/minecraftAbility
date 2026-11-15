@@ -208,12 +208,15 @@ public class LevelingManager implements Listener {
     public void applyLevelHealth(Player player, boolean healFull) {
         AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
         if (maxHealth != null) {
+            double oldMax = maxHealth.getBaseValue();
             double newMax = maxHealth(player);
 
             maxHealth.setBaseValue(newMax);
 
             if (healFull) {
                 player.setHealth(newMax);
+            } else if (newMax > oldMax) {
+                player.setHealth(Math.min(player.getHealth() + (newMax - oldMax), maxHealth.getValue()));
             } else if (player.getHealth() > newMax) {
                 player.setHealth(newMax);
             }
