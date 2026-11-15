@@ -15,6 +15,7 @@ public class Saboteur {
 
     public long frozenCool = 10000;
     public static final List<Long> REQUIRE_EXP = List.of(44L, 144L, 244L, 544L, 1044L, 2044L, 3044L, 4044L, 5044L, 6444L);
+    public static final List<Long> HEALTH_BONUS = List.of(0L, 0L, 0L);
 
     //passive
     public HashMap<UUID, Integer> trapType = new HashMap<>();

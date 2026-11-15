@@ -4,8 +4,6 @@ import org.core.models.coresObj.itemShardModel;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -66,7 +64,6 @@ public class sabCore extends absCore {
     public void onJoin(PlayerJoinEvent event) {
         if(!contains(event.getPlayer())) return;
         Player player = event.getPlayer();
-        applyAdditionalHealth(player, false);
         if(tag.Saboteur.contains(player)){
             trapType.trapTypeBoard(player);
         }
@@ -76,23 +73,8 @@ public class sabCore extends absCore {
     public void onRespawn(PlayerRespawnEvent event) {
         if(!contains(event.getPlayer())) return;
         Player player = event.getPlayer();
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            applyAdditionalHealth(player, true);
-        }, 1L);
         if(tag.Saboteur.contains(player)){
             trapType.trapTypeBoard(player);
-        }
-    }
-
-    private void applyAdditionalHealth(Player player, boolean healFull) {
-        AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
-        if (maxHealth != null) {
-            double current = maxHealth.getBaseValue();
-            double newMax = current;
-            maxHealth.setBaseValue(newMax);
-            if (healFull || player.getHealth() > newMax) {
-                player.setHealth(newMax);
-            }
         }
     }
 

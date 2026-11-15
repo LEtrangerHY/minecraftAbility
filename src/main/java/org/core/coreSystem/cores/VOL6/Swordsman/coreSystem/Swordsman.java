@@ -16,6 +16,7 @@ public class Swordsman {
 
     public long frozenCool = 10000;
     public static final List<Long> REQUIRE_EXP = List.of(55L, 136L, 262L, 505L, 1045L, 2350L, 3421L, 4501L, 5140L, 6112L);
+    public static final List<Long> HEALTH_BONUS = List.of(0L, 0L, 0L);
 
     //passive
     public HashMap<UUID, Boolean> laidoSlash = new HashMap<>();
