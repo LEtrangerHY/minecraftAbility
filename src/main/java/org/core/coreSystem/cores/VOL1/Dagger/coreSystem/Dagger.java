@@ -14,6 +14,7 @@ public class Dagger {
 
     public long frozenCool = 10000;
     public static final List<Long> REQUIRE_EXP = List.of(44L, 108L, 231L, 444L, 666L, 1313L, 2320L, 3113L, 4444L, 6134L);
+    public static final List<Long> HEALTH_BONUS = List.of(0L, 0L, 0L);
 
     //passive
 

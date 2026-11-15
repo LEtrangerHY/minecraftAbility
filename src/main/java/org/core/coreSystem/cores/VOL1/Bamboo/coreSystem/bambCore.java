@@ -1,11 +1,8 @@
 package org.core.coreSystem.cores.VOL1.Bamboo.coreSystem;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -51,22 +48,6 @@ public class bambCore extends absCore {
         this.Fskill = new F(config, plugin, cool, Rskill);
 
         plugin.getLogger().info("Bamboo downloaded...");
-    }
-
-    @EventHandler(priority = EventPriority.NORMAL)
-    public void onJoin(PlayerJoinEvent event) {
-        if(!contains(event.getPlayer())) return;
-        Player player = event.getPlayer();
-        applyAdditionalHealth(player, false);
-    }
-
-    @EventHandler(priority = EventPriority.NORMAL)
-    public void onRespawn(PlayerRespawnEvent event) {
-        if(!contains(event.getPlayer())) return;
-        Player player = event.getPlayer();
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            applyAdditionalHealth(player, true);
-        }, 1L);
     }
 
     @EventHandler
@@ -160,19 +141,6 @@ public class bambCore extends absCore {
 
         NamespacedKey key = new NamespacedKey(plugin, R.REDSTONE_KEY);
         return item.getItemMeta().getPersistentDataContainer().has(key, PersistentDataType.BYTE);
-    }
-
-    private void applyAdditionalHealth(Player player, boolean healFull) {
-        long addHP = player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L)
-                + player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L);
-        AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
-        if (maxHealth != null) {
-            double current = maxHealth.getBaseValue();
-            double newMax = current + addHP;
-            maxHealth.setBaseValue(newMax);
-            if (healFull) player.setHealth(newMax);
-            else if (player.getHealth() > newMax) player.setHealth(newMax);
-        }
     }
 
     @EventHandler

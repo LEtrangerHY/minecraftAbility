@@ -15,6 +15,7 @@ public class Burst {
 
     public long frozenCool = 10000;
     public static final List<Long> REQUIRE_EXP = List.of(88L, 188L, 288L, 488L, 988L, 1088L, 2048L, 3888L, 4468L, 6088L);
+    public static final List<Long> HEALTH_BONUS = List.of(0L, 0L, 2L);
 
     //passive
     public HashMap<UUID, Boolean> collision = new HashMap<>();

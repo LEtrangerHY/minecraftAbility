@@ -36,6 +36,7 @@ public class cmdClear implements CommandExecutor, TabCompleter {
             this.config.clearCooldowns(target);
             level.Exp.put(target, 0L);
             level.Level.put(target, 0L);
+            level.resetSkills(target);
             level.levelScoreBoard(target);
             level.applyLevelHealth(target, true);
             target.setFoodLevel(20);
@@ -48,6 +49,7 @@ public class cmdClear implements CommandExecutor, TabCompleter {
             this.config.clearCooldowns(player);
             level.Exp.put(player, 0L);
             level.Level.put(player, 0L);
+            level.resetSkills(player);
             level.levelScoreBoard(player);
             level.applyLevelHealth(player, true);
             player.setFoodLevel(20);

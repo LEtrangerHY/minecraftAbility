@@ -60,6 +60,7 @@ public class cmdLevelSet implements CommandExecutor, TabCompleter {
         target.getPersistentDataContainer().set(new NamespacedKey(plugin, "exp"), PersistentDataType.LONG, xp);
         target.getPersistentDataContainer().set(new NamespacedKey(plugin, "level"), PersistentDataType.LONG, lv);
 
+        level.resetSkills(target);
         level.levelScoreBoard(target);
         level.applyLevelHealth(target, true);
         sender.sendMessage("§a" + target.getName() + "의 경험치, 레벨 수정 " + xp + ", " + lv);

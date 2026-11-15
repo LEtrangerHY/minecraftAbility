@@ -14,6 +14,7 @@ public class Glacier {
 
     public long frozenCool = 10000;
     public static final List<Long> REQUIRE_EXP = List.of(77L, 144L, 288L, 488L, 788L, 1288L, 2388L, 3988L, 4844L, 5888L);
+    public static final List<Long> HEALTH_BONUS = List.of(1L, 1L, 2L);
 
     //passive
     public HashMap<UUID, Boolean> collision = new HashMap<>();

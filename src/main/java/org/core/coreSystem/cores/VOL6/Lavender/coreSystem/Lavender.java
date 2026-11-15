@@ -16,6 +16,7 @@ public class Lavender {
 
     public long frozenCool = 10000;
     public static final List<Long> REQUIRE_EXP = List.of(66L, 144L, 244L, 466L, 944L, 1164L, 2244L, 3364L, 4446L, 6064L);
+    public static final List<Long> HEALTH_BONUS = List.of(0L, 0L, 0L);
 
     //R
     public HashMap<UUID, Boolean> r_Skill_using = new HashMap<>();

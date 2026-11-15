@@ -14,6 +14,7 @@ public class Benzene {
 
     public long frozenCool = 10000;
     public static final List<Long> REQUIRE_EXP = List.of(111L, 333L, 666L, 1111L, 1661L, 2222L, 2992L, 3993L, 5115L, 6666L);
+    public static final List<Long> HEALTH_BONUS = List.of(0L, 1L, 0L);
 
     // passive
     public HashMap<UUID, Integer> crCount = new HashMap<>();

@@ -16,6 +16,7 @@ public class Luster {
 
     public long frozenCool = 10000;
     public static final List<Long> REQUIRE_EXP = List.of(88L, 140L, 280L, 440L, 770L, 1000L, 1880L, 2660L, 3990L, 4770L);
+    public static final List<Long> HEALTH_BONUS = List.of(0L, 0L, 2L);
 
     //passive
     public HashMap<UUID, Boolean> collision = new HashMap<>();

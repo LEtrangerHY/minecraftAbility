@@ -16,6 +16,7 @@ public class Stroke {
 
     public long frozenCool = 10000;
     public static final List<Long> REQUIRE_EXP = List.of(88L, 188L, 288L, 488L, 988L, 1088L, 2048L, 3888L, 4468L, 6088L);
+    public static final List<Long> HEALTH_BONUS = List.of(2L, 0L, 2L);
 
     public HashMap<UUID, Long> rLastClickTime = new HashMap<>();
     public HashMap<UUID, Boolean> rIsCharging = new HashMap<>();

@@ -17,6 +17,7 @@ public class Carpenter {
 
     public long frozenCool = 10000;
     public static final List<Long> REQUIRE_EXP = List.of(77L, 120L, 240L, 480L, 960L, 1212L, 1712L, 2412L, 3612L, 4812L);
+    public static final List<Long> HEALTH_BONUS = List.of(0L, 0L, 3L);
 
     //passive
 

@@ -18,6 +18,7 @@ public class PLAYER {
 
     public long frozenCool = 10000;
     public static final List<Long> REQUIRE_EXP = List.of(50L, 100L, 300L, 600L, 1000L, 1600L, 2600L, 3900L, 5300L, 6600L);
+    public static final List<Long> HEALTH_BONUS = List.of(0L, 1L, 0L);
 
     //passive
 

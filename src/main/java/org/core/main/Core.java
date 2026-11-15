@@ -191,6 +191,10 @@ public final class Core extends JavaPlugin implements Listener {
         return instance;
     }
 
+    public LevelingManager getLevelingManager() {
+        return level;
+    }
+
     @Override
     public void onEnable() {
         getLogger().info("CORE downloading...");

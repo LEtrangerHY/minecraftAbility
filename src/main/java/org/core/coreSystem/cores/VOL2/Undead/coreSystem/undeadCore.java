@@ -3,9 +3,6 @@ package org.core.coreSystem.cores.VOL2.Undead.coreSystem;
 import io.papermc.paper.event.player.PlayerArmSwingEvent;
 import io.papermc.paper.event.player.PrePlayerAttackEntityEvent;
 import org.bukkit.Bukkit;
-import org.bukkit.NamespacedKey;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -22,7 +19,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.core.cool.Cool;
@@ -97,7 +93,6 @@ public class undeadCore extends absCore {
         if (!contains(event.getPlayer())) return;
 
         Player player = event.getPlayer();
-        applyAdditionalHealth(player, false);
 
         player.setFoodLevel(0);
         player.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, PotionEffect.INFINITE_DURATION, 0, false, false));
@@ -111,8 +106,6 @@ public class undeadCore extends absCore {
 
         Player player = event.getPlayer();
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            applyAdditionalHealth(player, true);
-
             player.setFoodLevel(0);
             player.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, PotionEffect.INFINITE_DURATION, 0, false, false));
         }, 1L);
@@ -254,25 +247,6 @@ public class undeadCore extends absCore {
         if (cool.isReloading(player, "L")) return;
 
         cool.setCooldown(player, attack.attack(player), "L");
-    }
-
-    private void applyAdditionalHealth(Player player, boolean healFull) {
-        long addHP = player.getPersistentDataContainer().getOrDefault(
-                new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L) * 2;
-
-        AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
-        if (maxHealth != null) {
-            double current = maxHealth.getBaseValue();
-            double newMax = current + addHP;
-
-            maxHealth.setBaseValue(newMax);
-
-            if (healFull) {
-                player.setHealth(newMax);
-            } else if (player.getHealth() > newMax) {
-                player.setHealth(newMax);
-            }
-        }
     }
 
     @Override

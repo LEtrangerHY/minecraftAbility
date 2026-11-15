@@ -18,6 +18,7 @@ public class Rose {
     //passive
     public long frozenCool = 10000;
     public static final List<Long> REQUIRE_EXP = List.of(77L, 177L, 277L, 477L, 744L, 1204L, 2344L, 3477L, 4777L, 5777L);
+    public static final List<Long> HEALTH_BONUS = List.of(0L, 0L, 0L);
     public HashMap<UUID, String> atk = new HashMap<>();
     public HashMap<UUID, String> atkType = new HashMap<>();
     public HashMap<UUID, Integer> petals = new HashMap<>();

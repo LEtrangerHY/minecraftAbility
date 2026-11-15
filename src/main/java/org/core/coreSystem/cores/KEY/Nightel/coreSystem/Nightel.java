@@ -14,6 +14,7 @@ public class Nightel {
     //passive
     public long frozenCool = 10000;
     public static final List<Long> REQUIRE_EXP = List.of(66L, 222L, 333L, 666L, 999L, 1111L, 2222L, 3333L, 4666L, 6664L);
+    public static final List<Long> HEALTH_BONUS = List.of(0L, 0L, 0L);
     public HashMap<UUID, Integer> chainCount = new HashMap<>();
     public HashMap<UUID, String> chainSkill = new HashMap<>();
 

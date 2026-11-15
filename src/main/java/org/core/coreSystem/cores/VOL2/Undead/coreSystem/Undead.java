@@ -17,6 +17,7 @@ public class Undead {
 
     public long frozenCool = 10000;
     public static final List<Long> REQUIRE_EXP = List.of(66L, 144L, 244L, 444L, 844L, 1044L, 2044L, 3666L, 4466L, 6444L);
+    public static final List<Long> HEALTH_BONUS = List.of(0L, 0L, 2L);
 
     //passive
     public HashMap<UUID, String> swap_Command = new HashMap<>();

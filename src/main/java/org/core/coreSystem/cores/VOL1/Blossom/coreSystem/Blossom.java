@@ -17,6 +17,7 @@ public class Blossom {
 
     public long frozenCool = 10000;
     public static final List<Long> REQUIRE_EXP = List.of(77L, 133L, 277L, 511L, 1033L, 2007L, 4377L, 4777L, 5331L, 6077L);
+    public static final List<Long> HEALTH_BONUS = List.of(0L, 0L, 0L);
 
     //passive
     public HashMap<UUID, Boolean> collision = new HashMap<>();

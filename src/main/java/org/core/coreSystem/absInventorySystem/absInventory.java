@@ -16,6 +16,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
+import org.core.main.Core;
 import org.core.main.coreConfig;
 
 import java.util.List;
@@ -67,14 +68,17 @@ abstract public class absInventory implements Listener {
 
                 if (clicked.getType() == getTotem(player, "R")) {
                     reinforceSkill(player, "R", getSkillLevel(player, "R"), event.getView().getTopInventory());
+                    Core.getInstance().getLevelingManager().applyLevelHealth(player, false);
                     return;
                 }
                 if (clicked.getType() == getTotem(player, "Q")) {
                     reinforceSkill(player, "Q", getSkillLevel(player, "Q"), event.getView().getTopInventory());
+                    Core.getInstance().getLevelingManager().applyLevelHealth(player, false);
                     return;
                 }
                 if (clicked.getType() == getTotem(player, "F")) {
                     reinforceSkill(player, "F", getSkillLevel(player, "F"), event.getView().getTopInventory());
+                    Core.getInstance().getLevelingManager().applyLevelHealth(player, false);
                     return;
                 }
             }

@@ -17,7 +17,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.core.cool.Cool;
@@ -59,40 +58,6 @@ public class charCore extends absCore {
         this.Fskill = new F(config, plugin, cool);
 
         plugin.getLogger().info("Charlotte downloaded...");
-    }
-
-    @EventHandler(priority = EventPriority.NORMAL)
-    public void onJoin(PlayerJoinEvent event) {
-        if(!contains(event.getPlayer())) return;
-        applyAdditionalHealth(event.getPlayer(), false);
-    }
-
-    @EventHandler(priority = EventPriority.NORMAL)
-    public void onRespawn(PlayerRespawnEvent event) {
-        if(!contains(event.getPlayer())) return;
-        Player player = event.getPlayer();
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            applyAdditionalHealth(player, true);
-        }, 1L);
-    }
-
-    private void applyAdditionalHealth(Player player, boolean healFull) {
-        long addHP = player.getPersistentDataContainer().getOrDefault(
-                new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L) * 3;
-
-        AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
-        if (maxHealth != null) {
-            double current = maxHealth.getBaseValue();
-            double newMax = current + addHP;
-
-            maxHealth.setBaseValue(newMax);
-
-            if (healFull) {
-                player.setHealth(newMax);
-            } else if (player.getHealth() > newMax) {
-                player.setHealth(newMax);
-            }
-        }
     }
 
     @Override

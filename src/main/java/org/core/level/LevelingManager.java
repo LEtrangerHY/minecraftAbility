@@ -15,6 +15,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -65,6 +66,9 @@ public class LevelingManager implements Listener {
             DamageCause.FREEZE, DamageCause.LIGHTNING, DamageCause.FLY_INTO_WALL, DamageCause.FALLING_BLOCK,
             DamageCause.CRAMMING, DamageCause.WORLD_BORDER
     );
+    private static final double SKILL_HEALTH_FLAT = 1.0;
+    private static final double SKILL_HEALTH_RATE = 0.016;
+    private static final List<String> SKILLS = List.of("R", "Q", "F");
     private static final List<Double> DAMAGE_RATE = List.of(1.0, 1.19, 1.4, 1.63, 1.88, 2.17, 2.47, 2.81, 3.18, 3.57, 4.0);
 
     private static final Map<String, List<Long>> REQUIRE_EXP = Map.ofEntries(
@@ -100,6 +104,39 @@ public class LevelingManager implements Listener {
             Map.entry("APOCALYPSE", Apocalypse.REQUIRE_EXP)
     );
 
+    private static final Map<String, List<Long>> HEALTH_BONUS = Map.ofEntries(
+            Map.entry("PLAYER", PLAYER.HEALTH_BONUS),
+            Map.entry("NIGHTEL", Nightel.HEALTH_BONUS),
+            Map.entry("BENZENE", Benzene.HEALTH_BONUS),
+            Map.entry("BAMBOO", Bamboo.HEALTH_BONUS),
+            Map.entry("CARPENTER", Carpenter.HEALTH_BONUS),
+            Map.entry("DAGGER", Dagger.HEALTH_BONUS),
+            Map.entry("PYRO", Pyro.HEALTH_BONUS),
+            Map.entry("GLACIER", Glacier.HEALTH_BONUS),
+            Map.entry("KNIGHT", Knight.HEALTH_BONUS),
+            Map.entry("LUSTER", Luster.HEALTH_BONUS),
+            Map.entry("BLAZE", Blaze.HEALTH_BONUS),
+            Map.entry("COMMANDER", Commander.HEALTH_BONUS),
+            Map.entry("HARVESTER", Harvester.HEALTH_BONUS),
+            Map.entry("BLOSSOM", Blossom.HEALTH_BONUS),
+            Map.entry("BLUE", Blue.HEALTH_BONUS),
+            Map.entry("SWORDSMAN", Swordsman.HEALTH_BONUS),
+            Map.entry("SABOTEUR", Saboteur.HEALTH_BONUS),
+            Map.entry("BURST", Burst.HEALTH_BONUS),
+            Map.entry("LAVENDER", Lavender.HEALTH_BONUS),
+            Map.entry("ROSE", Rose.HEALTH_BONUS),
+            Map.entry("RESIDUE", Residue.HEALTH_BONUS),
+            Map.entry("DARMES", Darmes.HEALTH_BONUS),
+            Map.entry("CHARLOTTE", Charlotte.HEALTH_BONUS),
+            Map.entry("ADAM", Adam.HEALTH_BONUS),
+            Map.entry("UNDEAD", Undead.HEALTH_BONUS),
+            Map.entry("JESTER", Jester.HEALTH_BONUS),
+            Map.entry("CHESHIRE", Cheshire.HEALTH_BONUS),
+            Map.entry("STROKE", Stroke.HEALTH_BONUS),
+            Map.entry("SCOUT", Scout.HEALTH_BONUS),
+            Map.entry("APOCALYPSE", Apocalypse.HEALTH_BONUS)
+    );
+
     private final JavaPlugin plugin;
     private final coreConfig config;
 
@@ -125,6 +162,27 @@ public class LevelingManager implements Listener {
         return BASE_HEALTH + HEALTH_PER_LEVEL * level;
     }
 
+    public double maxHealth(Player player) {
+        List<Long> bonus = HEALTH_BONUS.get(config.getPlayerCore(player));
+        if (bonus == null) return Attribute.MAX_HEALTH.getDefaultValue();
+
+        PersistentDataContainer data = player.getPersistentDataContainer();
+        long level = data.getOrDefault(new NamespacedKey(plugin, "level"), PersistentDataType.LONG, 0L);
+
+        long skill = 0;
+        for (int i = 0; i < SKILLS.size(); i++) {
+            skill += bonus.get(i) * data.getOrDefault(new NamespacedKey(plugin, SKILLS.get(i)), PersistentDataType.LONG, 0L);
+        }
+
+        return healthAt(level) * (1.0 + skill * SKILL_HEALTH_RATE) + skill * SKILL_HEALTH_FLAT;
+    }
+
+    public void resetSkills(Player player) {
+        for (String skill : SKILLS) {
+            player.getPersistentDataContainer().set(new NamespacedKey(plugin, skill), PersistentDataType.LONG, 0L);
+        }
+    }
+
     public boolean canLevel(Player player) {
         return REQUIRE_EXP.containsKey(config.getPlayerCore(player));
     }
@@ -148,15 +206,9 @@ public class LevelingManager implements Listener {
     }
 
     public void applyLevelHealth(Player player, boolean healFull) {
-        long level = player.getPersistentDataContainer().getOrDefault(
-                new NamespacedKey(plugin, "level"), PersistentDataType.LONG, 0L
-        );
-
         AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
         if (maxHealth != null) {
-            double newMax = canLevel(player)
-                    ? healthAt(level)
-                    : Attribute.MAX_HEALTH.getDefaultValue();
+            double newMax = maxHealth(player);
 
             maxHealth.setBaseValue(newMax);
 
@@ -218,12 +270,7 @@ public class LevelingManager implements Listener {
         long current = player.getPersistentDataContainer().getOrDefault(levelKey, PersistentDataType.LONG, 0L);
         player.getPersistentDataContainer().set(levelKey, PersistentDataType.LONG, current + 1);
 
-        AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
-        if (maxHealth != null) {
-            maxHealth.setBaseValue(maxHealth.getBaseValue() + HEALTH_PER_LEVEL);
-
-            player.setHealth(maxHealth.getBaseValue());
-        }
+        applyLevelHealth(player, true);
 
         player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1.5f, 1.0f);
         player.sendMessage("§a" + "level " + (current + 1) + " 로 상승!");

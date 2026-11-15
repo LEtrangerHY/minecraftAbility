@@ -1,17 +1,12 @@
 package org.core.coreSystem.cores.VOL3.Stroke.coreSystem;
 
 import org.bukkit.*;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Vector;
 import org.core.cool.Cool;
 import org.core.main.Core;
@@ -46,24 +41,6 @@ public class strCore extends absCore {
         plugin.getLogger().info("Stroke downloaded...");
     }
 
-    @EventHandler(priority = EventPriority.NORMAL)
-    public void onJoin(PlayerJoinEvent event) {
-        if(!contains(event.getPlayer())) return;
-
-        Player player = event.getPlayer();
-        applyAdditionalHealth(player, false);
-    }
-
-    @EventHandler(priority = EventPriority.NORMAL)
-    public void onRespawn(PlayerRespawnEvent event) {
-        if(!contains(event.getPlayer())) return;
-
-        Player player = event.getPlayer();
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            applyAdditionalHealth(player, true);
-        }, 1L);
-    }
-
     @EventHandler(priority = EventPriority.HIGH)
     public void onInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
@@ -92,26 +69,6 @@ public class strCore extends absCore {
             if (movement.lengthSquared() > 0.0005) {
                 config.qIsSampling.put(uuid, true);
                 ((Q) Qskill).startMovementSampling(player, event.getFrom());
-            }
-        }
-    }
-
-    private void applyAdditionalHealth(Player player, boolean healFull) {
-        long addHP = player.getPersistentDataContainer().getOrDefault(
-                new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L) * 2
-                + player.getPersistentDataContainer().getOrDefault(
-                new NamespacedKey(plugin, "F"), PersistentDataType.LONG, 0L) * 2;
-
-        AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
-        if (maxHealth != null) {
-            double current = maxHealth.getBaseValue();
-            double newMax = current + addHP;
-            maxHealth.setBaseValue(newMax);
-
-            if (healFull) {
-                player.setHealth(newMax);
-            } else if (player.getHealth() > newMax) {
-                player.setHealth(newMax);
             }
         }
     }

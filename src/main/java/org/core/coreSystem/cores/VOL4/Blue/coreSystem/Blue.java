@@ -17,6 +17,7 @@ public class Blue {
 
     public long frozenCool = 10000;
     public static final List<Long> REQUIRE_EXP = List.of(44L, 133L, 244L, 433L, 644L, 1334L, 3144L, 4666L, 5441L, 6066L);
+    public static final List<Long> HEALTH_BONUS = List.of(0L, 0L, 0L);
 
     //passive
     public HashMap<UUID, Boolean> collision = new HashMap<>();

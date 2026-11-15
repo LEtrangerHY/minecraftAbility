@@ -69,6 +69,7 @@ public class cmdCore implements CommandExecutor, TabCompleter {
         if (!before.equals(this.config.getPlayerCore(target))) {
             level.Exp.put(target, 0L);
             level.Level.put(target, 0L);
+            level.resetSkills(target);
         }
         level.levelScoreBoard(target);
         level.applyLevelHealth(target, true);

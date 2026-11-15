@@ -14,6 +14,7 @@ public class Blaze {
 
     public long frozenCool = 10000;
     public static final List<Long> REQUIRE_EXP = List.of(64L, 128L, 256L, 512L, 1024L, 2048L, 4096L, 4666L, 5446L, 6444L);
+    public static final List<Long> HEALTH_BONUS = List.of(1L, 0L, 0L);
 
     //passive
     public HashMap<UUID, HashSet<Entity>> damaged = new HashMap<>();

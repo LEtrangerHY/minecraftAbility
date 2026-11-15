@@ -1,9 +1,6 @@
 package org.core.coreSystem.cores.KEY.Nightel.coreSystem;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -54,7 +51,6 @@ public class nightCore extends absCore {
         if(!contains(event.getPlayer())) return;
 
         Player player = event.getPlayer();
-        applyAdditionalHealth(player, false);
 
         chain.updateChainList(player);
     }
@@ -64,29 +60,8 @@ public class nightCore extends absCore {
         if(!contains(event.getPlayer())) return;
 
         Player player = event.getPlayer();
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            applyAdditionalHealth(player, true);
-        }, 1L);
 
         chain.updateChainList(player);
-    }
-
-    private void applyAdditionalHealth(Player player, boolean healFull) {
-        long addHP = 0;
-
-        AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
-        if (maxHealth != null) {
-            double current = maxHealth.getBaseValue();
-            double newMax = current + addHP;
-
-            maxHealth.setBaseValue(newMax);
-
-            if (healFull) {
-                player.setHealth(newMax);
-            } else if (player.getHealth() > newMax) {
-                player.setHealth(newMax);
-            }
-        }
     }
 
     @EventHandler

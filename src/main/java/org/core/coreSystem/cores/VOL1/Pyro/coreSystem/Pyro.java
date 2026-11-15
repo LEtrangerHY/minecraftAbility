@@ -16,6 +16,7 @@ public class Pyro {
 
     public long frozenCool = 10000;
     public static final List<Long> REQUIRE_EXP = List.of(77L, 154L, 277L, 477L, 977L, 1177L, 2277L, 3377L, 4447L, 6007L);
+    public static final List<Long> HEALTH_BONUS = List.of(0L, 1L, 1L);
 
     //passive
     public HashMap<UUID, Boolean> collision = new HashMap<>();

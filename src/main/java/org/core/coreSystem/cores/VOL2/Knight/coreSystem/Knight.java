@@ -15,6 +15,7 @@ public class Knight {
 
     public long frozenCool = 10000;
     public static final List<Long> REQUIRE_EXP = List.of(77L, 177L, 377L, 677L, 999L, 1444L, 2666L, 3444L, 4666L, 5467L);
+    public static final List<Long> HEALTH_BONUS = List.of(1L, 2L, 0L);
 
     //passive
     public HashMap<UUID, Boolean> collision = new HashMap<>();

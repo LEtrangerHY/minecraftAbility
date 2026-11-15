@@ -16,6 +16,7 @@ public class Harvester {
 
     public long frozenCool = 10000;
     public static final List<Long> REQUIRE_EXP = List.of(44L, 108L, 266L, 444L, 666L, 1414L, 2426L, 3444L, 4444L, 6164L);
+    public static final List<Long> HEALTH_BONUS = List.of(0L, 1L, 0L);
 
     //R
     public HashMap<UUID, Boolean> rskill_using = new HashMap<>();

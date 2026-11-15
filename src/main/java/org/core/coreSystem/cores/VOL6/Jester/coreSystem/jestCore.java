@@ -65,41 +65,6 @@ public class jestCore extends absCore {
         plugin.getLogger().info("Jester downloaded...");
     }
 
-    @EventHandler(priority = EventPriority.NORMAL)
-    public void onJoin(PlayerJoinEvent event) {
-        if(!contains(event.getPlayer())) return;
-
-        Player player = event.getPlayer();
-        applyAdditionalHealth(player, false);
-    }
-
-    @EventHandler(priority = EventPriority.NORMAL)
-    public void onRespawn(PlayerRespawnEvent event) {
-        if(!contains(event.getPlayer())) return;
-
-        Player player = event.getPlayer();
-        Bukkit.getScheduler().runTaskLater(plugin, () -> applyAdditionalHealth(player, true), 1L);
-    }
-
-    private void applyAdditionalHealth(Player player, boolean healFull) {
-        long addHP = player.getPersistentDataContainer().getOrDefault(
-                new NamespacedKey(plugin, "R"), PersistentDataType.LONG, 0L) * 3;
-
-        AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
-        if (maxHealth != null) {
-            double current = maxHealth.getBaseValue();
-            double newMax = current + addHP;
-
-            maxHealth.setBaseValue(newMax);
-
-            if (healFull) {
-                player.setHealth(newMax);
-            } else if (player.getHealth() > newMax) {
-                player.setHealth(newMax);
-            }
-        }
-    }
-
     public void syncCooldowns(Player player) {
         if (!contains(player)) return;
 

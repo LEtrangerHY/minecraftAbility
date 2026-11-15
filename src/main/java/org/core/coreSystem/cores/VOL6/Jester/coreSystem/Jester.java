@@ -15,6 +15,7 @@ public class Jester {
 
     public long frozenCool = 10000;
     public static final List<Long> REQUIRE_EXP = List.of(66L, 202L, 363L, 666L, 1001L, 1111L, 2002L, 3003L, 4004L, 6006L);
+    public static final List<Long> HEALTH_BONUS = List.of(3L, 0L, 0L);
 
     //passive
     public HashMap<UUID, Boolean> canUseSkill = new HashMap<>();

@@ -4,8 +4,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
@@ -79,7 +77,6 @@ public class benzCore extends absCore {
         if(!contains(event.getPlayer())) return;
 
         Player player = event.getPlayer();
-        applyAdditionalHealth(player, false);
 
         chainResonance.updateChainResList(player);
     }
@@ -89,28 +86,8 @@ public class benzCore extends absCore {
         if(!contains(event.getPlayer())) return;
 
         Player player = event.getPlayer();
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            applyAdditionalHealth(player, true);
-        }, 1L);
 
         chainResonance.updateChainResList(player);
-    }
-
-    private void applyAdditionalHealth(Player player, boolean healFull) {
-        long addHP = player.getPersistentDataContainer().getOrDefault(
-                new NamespacedKey(plugin, "Q"), PersistentDataType.LONG, 0L);
-
-        AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
-        if (maxHealth != null) {
-            double current = maxHealth.getBaseValue();
-            double newMax = current + addHP;
-
-            maxHealth.setBaseValue(newMax);
-
-            if (healFull) {
-                player.setHealth(newMax);
-            }
-        }
     }
 
     private final Map<UUID, BossBar> activeChargeBars = new HashMap<>();

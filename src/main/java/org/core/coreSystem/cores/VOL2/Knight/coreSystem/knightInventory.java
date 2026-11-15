@@ -5,8 +5,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -92,7 +90,6 @@ public class knightInventory extends absInventory {
             lore.add(Component.text("메뉴북 아이템 없어도 인벤토리 화면에서 철검을 우클릭해서 메뉴 화면 진입 가능").color(NamedTextColor.AQUA));
             return lore;
         }
-
 
         long level = getSkillLevel(player, skill);
         long playerLevel = player.getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "level"), PersistentDataType.LONG, 0L);
@@ -210,10 +207,9 @@ public class knightInventory extends absInventory {
                 .getOrDefault(new NamespacedKey(plugin, skill), PersistentDataType.LONG, 0L);
 
         List<Long> requireExpList;
-        long hpBonus = 0;
         switch (skill) {
-            case "R": requireExpList = requireExpOfR; hpBonus = 1; break;
-            case "Q": requireExpList = requireExpOfQ; hpBonus = 2; break;
+            case "R": requireExpList = requireExpOfR; break;
+            case "Q": requireExpList = requireExpOfQ; break;
             case "F": requireExpList = requireExpOfF; break;
             default: return;
         }
@@ -223,7 +219,6 @@ public class knightInventory extends absInventory {
 
         if (totalExp >= requiredExp) {
             deductExp(player, requiredExp);
-            if (hpBonus > 0) applyAdditionalHealth(player, hpBonus);
 
             player.getPersistentDataContainer().set(
                     new NamespacedKey(plugin, skill),
@@ -244,18 +239,6 @@ public class knightInventory extends absInventory {
                     Component.text("경험치(Minecraft EXP) 부족 " + requiredExp + "Exp 필요")
                             .color(NamedTextColor.RED)
             );
-        }
-    }
-
-    private void applyAdditionalHealth(Player player, long addHP) {
-
-        AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
-        if (maxHealth != null) {
-            double current = maxHealth.getBaseValue();
-            double newMax = current + addHP;
-
-            maxHealth.setBaseValue(newMax);
-
         }
     }
 
@@ -284,7 +267,6 @@ public class knightInventory extends absInventory {
         else if (level >= 16 && level <= 30) return 5 * level - 38;
         else return 9 * level - 158;
     }
-
 
     @Override
     protected InventoryWrapper getInventoryWrapper() {

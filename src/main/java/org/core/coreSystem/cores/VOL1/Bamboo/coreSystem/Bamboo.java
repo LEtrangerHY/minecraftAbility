@@ -18,6 +18,7 @@ public class Bamboo {
 
     public long frozenCool = 10000;
     public static final List<Long> REQUIRE_EXP = List.of(67L, 130L, 238L, 445L, 940L, 1183L, 2380L, 3208L, 4306L, 5620L);
+    public static final List<Long> HEALTH_BONUS = List.of(0L, 1L, 1L);
 
     //R
     public HashMap<UUID, Boolean> reloaded = new HashMap<>();

@@ -5,8 +5,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.persistence.PersistentDataType;
@@ -180,11 +178,10 @@ public class burstInventory extends absInventory {
                 .getOrDefault(new NamespacedKey(plugin, skill), PersistentDataType.LONG, 0L);
 
         List<Long> requireExpList;
-        long hpBonus = 0;
         switch (skill) {
             case "R": requireExpList = requireExpOfR; break;
             case "Q": requireExpList = requireExpOfQ; break;
-            case "F": requireExpList = requireExpOfF; hpBonus = 2; break;
+            case "F": requireExpList = requireExpOfF; break;
             default: return;
         }
 
@@ -193,7 +190,6 @@ public class burstInventory extends absInventory {
 
         if (totalExp >= requiredExp) {
             deductExp(player, requiredExp);
-            if (hpBonus > 0) applyAdditionalHealth(player, hpBonus);
 
             player.getPersistentDataContainer().set(
                     new NamespacedKey(plugin, skill),
@@ -214,18 +210,6 @@ public class burstInventory extends absInventory {
                     Component.text("경험치(Minecraft EXP) 부족 " + requiredExp + "Exp 필요")
                             .color(NamedTextColor.RED)
             );
-        }
-    }
-
-    private void applyAdditionalHealth(Player player, long addHP) {
-
-        AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
-        if (maxHealth != null) {
-            double current = maxHealth.getBaseValue();
-            double newMax = current + addHP;
-
-            maxHealth.setBaseValue(newMax);
-
         }
     }
 
@@ -254,7 +238,6 @@ public class burstInventory extends absInventory {
         else if (level >= 16 && level <= 30) return 5 * level - 38;
         else return 9 * level - 158;
     }
-
 
     @Override
     protected InventoryWrapper getInventoryWrapper() {
