@@ -75,7 +75,12 @@ public class bambInventory extends absInventory {
             lore.add(Component.text("타입 : 기동형 암살자").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("장착 : 메인핸드에 대나무 장착, 오프핸드에 철 조각 장전.").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-            lore.add(Component.text("패시브 : 일반 공격 피해량이 3으로 고정되며, 죽창에 표창이 장착되어 있으면 6이 된다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("패시브 : W를 누른 채 좌클릭하면 찌르기(피해 3), S를 누른 채 좌클릭하면 사선 베기(피해 2)가 나간다. (둘 다 아니면 무작위)").color(NamedTextColor.GREEN));
+            lore.add(Component.text("베기는 / → \\ → / → \\ 순서로 번갈아 나가며, 배율이 초기화되면 / 부터 다시 시작한다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("같은 공격이 연속으로 적중하면 피해 배율이 0.05씩 올라 최대 1.6배가 된다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("창끝에 가까울수록 강하고, 가까이 붙은 대상에게는 피해가 최대 75% 줄어든다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("다른 공격으로 바꾸거나, 빗나가거나, 3초간 공격하지 않으면 배율이 초기화된다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("죽창에 표창이 장착되어 있으면 찌르기는 2연속(3씩 총 6), 베기는 회전베기(피해 4)가 된다.").color(NamedTextColor.GREEN));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text(""));
             lore.add(Component.text("메뉴북 아이템 없어도 인벤토리 화면에서 대나무를 우클릭해서 메뉴 화면 진입 가능").color(NamedTextColor.AQUA));
@@ -106,7 +111,7 @@ public class bambInventory extends absInventory {
                 lore.add(Component.text("대상 : 플레이어/블럭/적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
                 lore.add(Component.text("코스트 : 철 조각 1개").color(NamedTextColor.GREEN));
-                lore.add(Component.text("패시브 : 죽창에 표창이 장착되어 있을 시 일반 공격 피해량이 3에서 6으로 증가한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("패시브 : 죽창에 표창이 장착되어 있을 시 일반 공격이 강화된다(찌르기 2연속, 회전베기).").color(NamedTextColor.GREEN));
                 lore.add(Component.text("비장착 : 철 조각을 1개 소모해 죽창에 장착한다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("장착 : 전방으로 죽창을 던진다.").color(NamedTextColor.GREEN));
                 lore.add(Component.text("명중 : 죽창이 명중된 위치를 기폭시킨다.").color(NamedTextColor.GREEN));

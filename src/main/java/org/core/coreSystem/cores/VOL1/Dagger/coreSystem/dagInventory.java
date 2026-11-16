@@ -73,9 +73,12 @@ public class dagInventory extends absInventory {
         if (skill.equals("main")) {
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text("타입 : 암살자").color(NamedTextColor.LIGHT_PURPLE));
-            lore.add(Component.text("장착 : 메인핸드에 메아리 조각 장착, 오프핸드는 장착 금지.").color(NamedTextColor.LIGHT_PURPLE));
+            lore.add(Component.text("장착 : 메인핸드에 메아리 조각 장착, 오프핸드는 비우거나 메아리 조각 장착(쌍수).").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-            lore.add(Component.text("패시브 : 일반 공격 피해량이 4로 고정된다. (F 사용 중에는 적용되지 않음)").color(NamedTextColor.GREEN));
+            lore.add(Component.text("패시브 : 좌클릭 시 무작위 사선으로 베며, 같은 대상을 계속 베면 베기 횟수가 1회씩 늘어 최대 4회가 된다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("시전당 총 피해 4 / 4.8 / 5.6 / 6.4 (조준한 대상 기준, 궤적 가장자리의 적은 최대 75% 감소).").color(NamedTextColor.GREEN));
+            lore.add(Component.text("쌍수 상태에서는 베기 횟수가 2 → 4회로 늘어난다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("다른 대상을 조준하거나, 2초간 공격하지 않거나, 시전 중 대상을 한 번도 못 맞히면 1회로 돌아간다. (F 사용 중에는 적용되지 않음)").color(NamedTextColor.GREEN));
             lore.add(Component.text("R, Q 스킬과 F의 돌진으로 피해를 가할 때 대상 현재 체력의 6%만큼 추가 피해를 가한다. (F의 검기에는 적용되지 않음)").color(NamedTextColor.GREEN));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text(""));
@@ -129,8 +132,10 @@ public class dagInventory extends absInventory {
                 lore.add(Component.text("시스템 : 횟수").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("1~2회 : 일반 공격을 통해 검기를 투사한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("3~n 회 : 검기에 피격된 대상 수 만큼 돌진을 시전할 수 있다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("좌클릭 1~2회 : 사선(\\, /) 검기를 투사한다. 검기는 처음 닿은 대상 하나만 베고 기억한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("쌍수 상태의 첫 좌클릭은 두 검기를 십자로 동시에 투사한다. (피해 1.6배, 적중 시 돌진 1회 피해 1.6배)").color(NamedTextColor.GREEN));
+                lore.add(Component.text("이후 F를 누를 때마다 기억한 대상 방향으로 돌진하며, 그 대상에게 닿으면 멈추고 그 대상에게만 피해를 가한다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("두 검기가 같은 대상을 베었다면 돌진은 1회, 피해 1.5배.").color(NamedTextColor.GREEN));
                 break;
             default:
                 break;

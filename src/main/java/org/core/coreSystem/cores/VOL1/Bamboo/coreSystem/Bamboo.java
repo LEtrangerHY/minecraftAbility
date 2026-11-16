@@ -20,6 +20,30 @@ public class Bamboo {
     public static final List<Long> REQUIRE_EXP = List.of(67L, 130L, 238L, 445L, 940L, 1183L, 2380L, 3208L, 4306L, 5620L);
     public static final List<Long> HEALTH_BONUS = List.of(0L, 1L, 1L);
 
+    //L
+    public long basic_Attack_Cool = 400;
+    public double thrust_Damage = 3.0;
+    public double slash_Damage = 2.0;
+    public double spin_Damage = 4.0;
+    public double basic_Combo_Step = 0.05;
+    public double basic_Combo_Max = 1.6;
+    public double basic_Close_Ratio = 0.25;
+    public long basic_Combo_Reset = 3000;
+    public double thrust_Reach = 6.0;
+    public double thrust_Width = 0.4;
+    public long thrust_Interval = 3;
+    public double thrust_Knockback = 0.35;
+    public double slash_Radius = 5.0;
+    public double slash_Angle = 140;
+    public double spin_Angle = 270;
+    public double slash_Tilt = 20;
+    public double slash_Knockback = 0.3;
+    public double spin_Knockback = 0.45;
+    public HashMap<UUID, Integer> comboMode = new HashMap<>();
+    public HashMap<UUID, Integer> comboCount = new HashMap<>();
+    public HashMap<UUID, Long> comboTime = new HashMap<>();
+    public HashSet<UUID> comboHit = new HashSet<>();
+
     //R
     public HashMap<UUID, Boolean> reloaded = new HashMap<>();
     public HashMap<UUID, HashSet<Entity>> damaged = new HashMap<>();
@@ -61,5 +85,10 @@ public class Bamboo {
         r_damaged.remove(player.getUniqueId());
 
         isDashing.remove(player.getUniqueId());
+
+        comboMode.remove(player.getUniqueId());
+        comboCount.remove(player.getUniqueId());
+        comboTime.remove(player.getUniqueId());
+        comboHit.remove(player.getUniqueId());
     }
 }

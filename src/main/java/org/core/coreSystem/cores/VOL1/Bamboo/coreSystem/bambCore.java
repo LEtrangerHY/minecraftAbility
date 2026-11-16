@@ -1,20 +1,21 @@
 package org.core.coreSystem.cores.VOL1.Bamboo.coreSystem;
 
+import io.papermc.paper.event.player.PlayerArmSwingEvent;
+import io.papermc.paper.event.player.PrePlayerAttackEntityEvent;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.Sound;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityUnleashEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
@@ -24,9 +25,16 @@ import org.core.main.coreConfig;
 import org.core.coreSystem.absCoreSystem.ConfigWrapper;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.absCoreSystem.absCore;
+import org.core.coreSystem.cores.VOL1.Bamboo.Passive.basicAttack;
 import org.core.coreSystem.cores.VOL1.Bamboo.Skill.F;
 import org.core.coreSystem.cores.VOL1.Bamboo.Skill.Q;
 import org.core.coreSystem.cores.VOL1.Bamboo.Skill.R;
+import org.core.effect.crowdControl.Stun;
+import org.core.effect.effectPlugin.swingEchoGuard;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class bambCore extends absCore {
 
@@ -36,6 +44,8 @@ public class bambCore extends absCore {
     private final R Rskill;
     private final Q Qskill;
     private final F Fskill;
+    private final basicAttack attack;
+    private final Map<UUID, Integer> lastUseTick = new HashMap<>();
 
     public bambCore(Core plugin, coreConfig tag, Bamboo config, Cool cool) {
         super(tag, cool);
@@ -46,6 +56,7 @@ public class bambCore extends absCore {
         this.Rskill = new R(config, plugin, cool);
         this.Qskill = new Q(config, plugin, cool);
         this.Fskill = new F(config, plugin, cool, Rskill);
+        this.attack = new basicAttack(config, plugin);
 
         plugin.getLogger().info("Bamboo downloaded...");
     }
@@ -143,29 +154,40 @@ public class bambCore extends absCore {
         return item.getItemMeta().getPersistentDataContainer().has(key, PersistentDataType.BYTE);
     }
 
-    @EventHandler
-    public void passiveEffect(EntityDamageByEntityEvent event) {
+    @EventHandler(priority = EventPriority.LOW)
+    public void onVanillaAttack(PrePlayerAttackEntityEvent event) {
+        Player player = event.getPlayer();
+        if (!contains(player) || !hasProperItems(player)) return;
 
-        if (event.getCause() == EntityDamageEvent.DamageCause.THORNS) return;
+        event.setCancelled(true);
+    }
 
-        if (!(event.getDamager() instanceof Player player)) return;
-        if (!(event.getEntity() instanceof LivingEntity target)) return;
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onUseInput(PlayerInteractEvent event) {
+        if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 
-        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK &&
-                event.getCause() != EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK) {
-            return;
-        }
+        Player player = event.getPlayer();
+        if (!contains(player)) return;
 
-        if(tag.Bamboo.contains(player)) {
-            if (hasProperItems(player)) {
-                if (config.reloaded.getOrDefault(player.getUniqueId(), false)) {
-                    player.playSound(player.getLocation(), Sound.ITEM_TRIDENT_HIT_GROUND, 1, 1);
-                    event.setDamage(6.0);
-                } else {
-                    event.setDamage(3.0);
-                }
-            }
-        }
+        lastUseTick.put(player.getUniqueId(), Bukkit.getCurrentTick());
+    }
+
+    @EventHandler(priority = EventPriority.LOW)
+    public void onAttackSwing(PlayerArmSwingEvent event) {
+        if (event.getHand() != EquipmentSlot.HAND) return;
+
+        Player player = event.getPlayer();
+        if (!contains(player) || !hasProperItems(player) || Stun.isStunned(player)) return;
+        if (player.getInventory().getItemInMainHand().getType() != Material.BAMBOO) return;
+        if (swingEchoGuard.isEchoPending(player)) return;
+
+        Integer used = lastUseTick.get(player.getUniqueId());
+        if (used != null && Bukkit.getCurrentTick() - used <= 1) return;
+
+        if (cool.isReloading(player, "L")) return;
+
+        cool.setCooldown(player, config.basic_Attack_Cool, "L");
+        attack.attack(player);
     }
 
     @EventHandler

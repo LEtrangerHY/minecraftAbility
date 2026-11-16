@@ -1,32 +1,32 @@
 package org.core.coreSystem.cores.VOL1.Dagger.coreSystem;
 
+import io.papermc.paper.event.player.PlayerArmSwingEvent;
+import io.papermc.paper.event.player.PrePlayerAttackEntityEvent;
 import org.bukkit.*;
-import org.bukkit.damage.DamageSource;
-import org.bukkit.damage.DamageType;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 import org.core.cool.Cool;
 import org.core.main.Core;
-import org.core.effect.crowdControl.ForceDamage;
 import org.core.main.coreConfig;
 import org.core.coreSystem.absCoreSystem.ConfigWrapper;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.absCoreSystem.absCore;
+import org.core.coreSystem.cores.VOL1.Dagger.Passive.basicAttack;
 import org.core.coreSystem.cores.VOL1.Dagger.Passive.bloodStroke;
 import org.core.coreSystem.cores.VOL1.Dagger.Skill.F;
 import org.core.coreSystem.cores.VOL1.Dagger.Skill.Q;
 import org.core.coreSystem.cores.VOL1.Dagger.Skill.R;
+import org.core.effect.crowdControl.Stun;
+import org.core.effect.effectPlugin.swingEchoGuard;
 
-import java.util.HashSet;
-import java.util.LinkedHashSet;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class dagCore extends absCore {
     private final Core plugin;
@@ -37,6 +37,8 @@ public class dagCore extends absCore {
     private final R Rskill;
     private final Q Qskill;
     private final F Fskill;
+    private final basicAttack attack;
+    private final Map<UUID, Integer> lastUseTick = new HashMap<>();
 
     public dagCore(Core plugin, coreConfig tag, Dagger config, Cool cool) {
         super(tag, cool);
@@ -48,31 +50,46 @@ public class dagCore extends absCore {
 
         this.Rskill = new R(config, plugin, cool, bloodStroker);
         this.Qskill = new Q(config, plugin, cool, bloodStroker);
-        this.Fskill = new F(config, plugin, cool, bloodStroker);
+        this.attack = new basicAttack(config, plugin);
+        this.Fskill = new F(config, plugin, cool, bloodStroker, attack);
 
         plugin.getLogger().info("Dagger downloaded...");
     }
 
-    @EventHandler
-    public void passiveDamage(EntityDamageByEntityEvent event) {
-        if (event.getCause() == EntityDamageEvent.DamageCause.THORNS) return;
+    @EventHandler(priority = EventPriority.LOW)
+    public void onVanillaAttack(PrePlayerAttackEntityEvent event) {
+        Player player = event.getPlayer();
+        if (!contains(player) || !hasProperItems(player)) return;
 
-        if (!(event.getDamager() instanceof Player player)) return;
-        if (!(event.getEntity() instanceof LivingEntity target)) return;
+        event.setCancelled(true);
+    }
 
-        if(tag.Dagger.contains(player) && hasProperItems(player)){
-            if(!config.r_damaged.getOrDefault(player.getUniqueId(), false) && !config.f_using.getOrDefault(player.getUniqueId(), false) && !config.f_damaging.getOrDefault(player.getUniqueId(), false)) {
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onUseInput(PlayerInteractEvent event) {
+        if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 
-                Vector direction = player.getEyeLocation().add(0, -0.5, 0).getDirection().normalize();
-                Location particleLocation = player.getEyeLocation().clone()
-                        .add(direction.clone().multiply(2.6));
+        Player player = event.getPlayer();
+        if (!contains(player)) return;
 
-                player.getWorld().spawnParticle(Particle.SWEEP_ATTACK, particleLocation, 1, 0, 0, 0, 0);
+        lastUseTick.put(player.getUniqueId(), Bukkit.getCurrentTick());
+    }
 
-                player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
-                event.setDamage(4.0);
-            }
-        }
+    @EventHandler(priority = EventPriority.LOW)
+    public void onAttackSwing(PlayerArmSwingEvent event) {
+        if (event.getHand() != EquipmentSlot.HAND) return;
+
+        Player player = event.getPlayer();
+        if (!contains(player) || !hasProperItems(player) || Stun.isStunned(player)) return;
+        if (config.f_using.getOrDefault(player.getUniqueId(), false)) return;
+        if (swingEchoGuard.isEchoPending(player)) return;
+
+        Integer used = lastUseTick.get(player.getUniqueId());
+        if (used != null && Bukkit.getCurrentTick() - used <= 1) return;
+
+        if (cool.isReloading(player, "L")) return;
+
+        cool.setCooldown(player, config.basic_Attack_Cool, "L");
+        attack.attack(player);
     }
 
     @Override
@@ -90,58 +107,8 @@ public class dagCore extends absCore {
 
     @Override
     protected void LSkill(PlayerInteractEvent event, Player player) {
-        World world = player.getWorld();
-        Location playerLocation = player.getLocation();
-        Vector direction = playerLocation.getDirection().normalize().multiply(1.3);
-
-        config.f_damaged.put(player.getUniqueId(), new HashSet<>());
-
-        DamageSource source = DamageSource.builder(DamageType.PLAYER_ATTACK)
-                .withCausingEntity(player)
-                .withDirectEntity(player)
-                .build();
-
-        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
         event.setCancelled(true);
-
-        new BukkitRunnable() {
-            int ticks = 0;
-
-            @Override
-            public void run() {
-                if (ticks >= 10 || !config.f_using.getOrDefault(player.getUniqueId(), false)) {
-                    config.f_slash.put(player.getUniqueId(), config.f_slash.getOrDefault(player.getUniqueId(), 0) + 1);
-                    this.cancel();
-                    return;
-                }
-
-                Location particleLocation = playerLocation.clone()
-                        .add(direction.clone().multiply(ticks * 1.8))
-                        .add(0, 1.5, 0);
-
-                world.spawnParticle(Particle.SWEEP_ATTACK, particleLocation, 1, 0, 0, 0, 0);
-                world.spawnParticle(Particle.SMOKE, particleLocation, 1, 0, 0, 0, 0);
-
-                for (Entity entity : world.getNearbyEntities(particleLocation, 0.6, 0.6, 0.6)) {
-                    if (entity instanceof LivingEntity target
-                            && entity != player
-                            && !config.f_damaged.getOrDefault(player.getUniqueId(), new HashSet<>()).contains(entity)) {
-
-                        config.f_damaging.put(player.getUniqueId(), true);
-
-                        ForceDamage forceDamage = new ForceDamage(target, config.f_Skill_Damage, source, true);
-                        forceDamage.applyEffect(player);
-                        config.f_damaging.remove(player.getUniqueId());
-
-                        config.f_damaged.computeIfAbsent(player.getUniqueId(), k -> new HashSet<>()).add(target);
-
-                        config.dash_object.computeIfAbsent(player.getUniqueId(), k -> new LinkedHashSet<>()).add(target);
-                    }
-                }
-
-                ticks++;
-            }
-        }.runTaskTimer(plugin, 0L, 1L);
+        Fskill.wave(player);
     }
 
     @Override
@@ -162,7 +129,7 @@ public class dagCore extends absCore {
     private boolean hasProperItems(Player player) {
         ItemStack main = player.getInventory().getItemInMainHand();
         ItemStack off = player.getInventory().getItemInOffHand();
-        return main.getType() == Material.ECHO_SHARD && off.getType() == Material.AIR;
+        return main.getType() == Material.ECHO_SHARD && (off.getType() == Material.AIR || off.getType() == Material.ECHO_SHARD);
     }
 
     private boolean canUseRSkill(Player player) { return true; }
@@ -180,7 +147,7 @@ public class dagCore extends absCore {
     protected boolean isDropRequired(Player player, ItemStack droppedItem){
         ItemStack off = player.getInventory().getItemInOffHand();
         return droppedItem.getType() == Material.ECHO_SHARD &&
-                off.getType() == Material.AIR;
+                (off.getType() == Material.AIR || off.getType() == Material.ECHO_SHARD);
     }
 
     @Override
