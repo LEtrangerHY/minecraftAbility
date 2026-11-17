@@ -43,6 +43,7 @@ public class Bamboo {
     public HashMap<UUID, Integer> comboCount = new HashMap<>();
     public HashMap<UUID, Long> comboTime = new HashMap<>();
     public HashSet<UUID> comboHit = new HashSet<>();
+    public HashMap<UUID, Boolean> slashRising = new HashMap<>();
 
     //R
     public HashMap<UUID, Boolean> reloaded = new HashMap<>();
@@ -90,5 +91,6 @@ public class Bamboo {
         comboCount.remove(player.getUniqueId());
         comboTime.remove(player.getUniqueId());
         comboHit.remove(player.getUniqueId());
+        slashRising.remove(player.getUniqueId());
     }
 }

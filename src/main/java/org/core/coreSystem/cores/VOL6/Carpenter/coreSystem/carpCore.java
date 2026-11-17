@@ -2,25 +2,43 @@ package org.core.coreSystem.cores.VOL6.Carpenter.coreSystem;
 
 import org.bukkit.*;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import io.papermc.paper.event.player.PrePlayerAttackEntityEvent;
+import io.papermc.paper.event.player.PlayerArmSwingEvent;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityResurrectEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryAction;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
+import org.bukkit.inventory.PlayerInventory;
 import org.core.cool.Cool;
+import org.core.effect.crowdControl.Stun;
+import org.core.effect.effectPlugin.swingEchoGuard;
 import org.core.main.Core;
 import org.core.main.coreConfig;
 import org.core.coreSystem.absCoreSystem.ConfigWrapper;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.absCoreSystem.absCore;
 import org.core.coreSystem.cores.VOL6.Carpenter.Passive.Christmas;
+import org.core.coreSystem.cores.VOL6.Carpenter.Passive.basicAttack;
 import org.core.coreSystem.cores.VOL6.Carpenter.Skill.F;
 import org.core.coreSystem.cores.VOL6.Carpenter.Skill.Q;
 import org.core.coreSystem.cores.VOL6.Carpenter.Skill.R;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class carpCore extends absCore {
     private final Core plugin;
@@ -31,6 +49,8 @@ public class carpCore extends absCore {
     private final R Rskill;
     private final Q Qskill;
     private final F Fskill;
+    private final basicAttack attack;
+    private final Map<UUID, Integer> lastUseTick = new HashMap<>();
 
     public carpCore(Core plugin, coreConfig tag, Carpenter config, Cool cool) {
         super(tag, cool);
@@ -40,34 +60,101 @@ public class carpCore extends absCore {
 
         this.torque = new Christmas(tag, config, plugin, cool);
 
-        this.Rskill = new R(config, plugin, cool);
+        this.attack = new basicAttack(config, plugin);
+        this.Rskill = new R(config, plugin, cool, attack);
         this.Qskill = new Q(config, plugin, cool);
         this.Fskill = new F(config, plugin, cool);
 
         plugin.getLogger().info("Carpenter downloaded...");
     }
 
+    @EventHandler(priority = EventPriority.LOW)
+    public void onVanillaAttack(PrePlayerAttackEntityEvent event) {
+        Player player = event.getPlayer();
+        if (!contains(player) || !hasProperItems(player)) return;
+
+        event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onUseInput(PlayerInteractEvent event) {
+        if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+
+        Player player = event.getPlayer();
+        if (!contains(player)) return;
+
+        lastUseTick.put(player.getUniqueId(), Bukkit.getCurrentTick());
+    }
+
+    @EventHandler(priority = EventPriority.LOW)
+    public void onAttackSwing(PlayerArmSwingEvent event) {
+        if (event.getHand() != EquipmentSlot.HAND) return;
+
+        Player player = event.getPlayer();
+        if (!contains(player) || !hasProperItems(player) || Stun.isStunned(player)) return;
+        if (swingEchoGuard.isEchoPending(player)) return;
+
+        Integer used = lastUseTick.get(player.getUniqueId());
+        if (used != null && Bukkit.getCurrentTick() - used <= 1) return;
+
+        if (cool.isReloading(player, "L")) return;
+
+        cool.setCooldown(player, config.basic_Attack_Cool, "L");
+        attack.attack(player);
+    }
+
+    @EventHandler(priority = EventPriority.LOW)
+    public void totemDeath(PlayerDeathEvent event) {
+        Fskill.death(event);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void totemQuit(PlayerQuitEvent event) {
+        Fskill.release(event.getPlayer());
+    }
+
     @EventHandler
-    public void passiveDamage(EntityDamageByEntityEvent event) {
-        if (event.getCause() == EntityDamageEvent.DamageCause.THORNS) return;
+    public void totemJoin(PlayerJoinEvent event) {
+        Fskill.release(event.getPlayer());
+    }
 
-        if (!(event.getDamager() instanceof Player player)) return;
-        if (!(event.getEntity() instanceof LivingEntity target)) return;
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void totemUsed(EntityResurrectEvent event) {
+        if (!(event.getEntity() instanceof Player player) || !Fskill.isActive(player)) return;
+        Bukkit.getScheduler().runTaskLater(plugin, () -> Fskill.release(player), 1L);
+    }
 
-        if(tag.Carpenter.contains(player) && hasProperItems(player)){
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void totemSwap(PlayerSwapHandItemsEvent event) {
+        if (Fskill.isActive(event.getPlayer())) event.setCancelled(true);
+    }
 
-            if(config.r_damaging.getOrDefault(player.getUniqueId(), false) || config.q_damaging.getOrDefault(player.getUniqueId(), false)) return;
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void totemDrop(PlayerDropItemEvent event) {
+        if (Fskill.isSkillTotem(event.getItemDrop().getItemStack())) event.setCancelled(true);
+    }
 
-            Vector direction = player.getEyeLocation().add(0, -0.5, 0).getDirection().normalize();
-            Location particleLocation = player.getEyeLocation().clone()
-                    .add(direction.clone().multiply(2.6));
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void totemClick(InventoryClickEvent event) {
+        if (!(event.getWhoClicked() instanceof Player player) || !Fskill.isActive(player)) return;
 
-            player.getWorld().spawnParticle(Particle.EXPLOSION, particleLocation, 1, 0, 0, 0, 0);
+        boolean offHand = event.getClickedInventory() instanceof PlayerInventory && event.getSlot() == 40;
+        boolean collect = event.getAction() == InventoryAction.COLLECT_TO_CURSOR && event.getCursor().getType() == Material.TOTEM_OF_UNDYING;
+        if (offHand || collect || event.getClick() == ClickType.SWAP_OFFHAND
+                || Fskill.isSkillTotem(event.getCurrentItem()) || Fskill.isSkillTotem(event.getCursor())) {
+            event.setCancelled(true);
+        }
+    }
 
-            player.getWorld().playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_IRON, 1, 1);
-            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_STRONG, 1, 1);
-            event.setDamage(event.getDamage() * 4.3);
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void totemDrag(InventoryDragEvent event) {
+        if (!(event.getWhoClicked() instanceof Player player) || !Fskill.isActive(player)) return;
 
+        for (int raw : event.getRawSlots()) {
+            if (event.getView().getInventory(raw) instanceof PlayerInventory && event.getView().convertSlot(raw) == 40) {
+                event.setCancelled(true);
+                return;
+            }
         }
     }
 
@@ -166,6 +253,7 @@ public class carpCore extends absCore {
         return new ConfigWrapper() {
             @Override
             public void variableReset(Player player) {
+                Fskill.release(player);
                 config.variableReset(player);
             }
 

@@ -24,7 +24,6 @@ import org.core.effect.crowdControl.ForceDamage;
 import org.core.models.absModelSystem.modelManager;
 
 import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class basicAttack {
 
@@ -57,7 +56,8 @@ public class basicAttack {
         if (mode == THRUST) {
             thrust(player, config.thrust_Damage * rate, count, reinforced ? 2 : 1);
         } else {
-            boolean rising = count % 2 == 1;
+            boolean rising = !config.slashRising.getOrDefault(uuid, false);
+            config.slashRising.put(uuid, rising);
             double damage = reinforced ? config.spin_Damage : config.slash_Damage;
             slash(player, damage * rate, count, reinforced, rising);
         }
@@ -67,7 +67,8 @@ public class basicAttack {
         Input input = player.getCurrentInput();
         if (input.isForward() && !input.isBackward()) return THRUST;
         if (input.isBackward() && !input.isForward()) return SLASH;
-        return ThreadLocalRandom.current().nextInt(2);
+        Integer last = config.comboMode.get(player.getUniqueId());
+        return last == null || last == SLASH ? THRUST : SLASH;
     }
 
     private int combo(UUID uuid, int mode) {

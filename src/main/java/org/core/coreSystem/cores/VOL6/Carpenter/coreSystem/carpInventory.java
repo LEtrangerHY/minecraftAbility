@@ -74,8 +74,8 @@ public class carpInventory extends absInventory {
             lore.add(Component.text("타입 : 서포터").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("장착 : 메인핸드에 철사 덫 갈고리 장착, 오프핸드는 장착 금지.").color(NamedTextColor.LIGHT_PURPLE));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-            lore.add(Component.text("패시브 : 철사 덫 갈고리로 적을 직접 공격하면 갈고리의 피해(1)가 4.3배가 된다. (완충 공격 시 4.3, 치명타 시 6.45)").color(NamedTextColor.GREEN));
-            lore.add(Component.text("R, Q 스킬 피해에는 적용되지 않는다.").color(NamedTextColor.GREEN));
+            lore.add(Component.text("패시브 : 좌클릭으로 망치를 내려치기 → 올려치기 순서로 번갈아 휘둘러, 궤적에서 처음 닿은 대상 하나에게 피해 6을 가하고 살짝 밀쳐낸다. (0.75초마다)").color(NamedTextColor.GREEN));
+            lore.add(Component.text("망치는 대상에게 닿는 순간 멈추며, 바라보는 대상이 있으면 그 대상을 기준으로 휘두른다.").color(NamedTextColor.GREEN));
             lore.add(Component.text("불사의 토템이 발동하면 21.5초간 저항 III를 얻고, 체력을 12 회복하며, 주위 5블록 안의 대상들을 밀쳐낸다.").color(NamedTextColor.GREEN));
             lore.add(Component.text("------------").color(NamedTextColor.WHITE));
             lore.add(Component.text(""));
@@ -102,12 +102,12 @@ public class carpInventory extends absInventory {
                 lore.add(requireXp.color(NamedTextColor.AQUA));
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("타입 : 공격").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("타입 : 제어").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("시스템 : -").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("대상 : 적 오브젝트").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("전방으로 돌진하여 피격된 대상에게 피해를 가한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("돌진한 속도에 비례한 시간만큼 대상을 기절시킨다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("갈고리로 전방 140° 부채꼴(반경 4.5)의 발밑을 낮게 쓸어 다리를 건다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("걸린 대상은 피해 3을 받고, 이동이 멈추며 1.5초간 구속 V에 걸린다.").color(NamedTextColor.GREEN));
                 break;
             case "Q":
                 requireXp = (level < 6) ? Component.text("Require EXP : " + requireExpOfQ.get((int) level)) : Component.text("Require EXP : MAX");
@@ -126,12 +126,13 @@ public class carpInventory extends absInventory {
                 lore.add(requireXp.color(NamedTextColor.AQUA));
 
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("타입 : 효과").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("시스템 : 횟수").color(NamedTextColor.LIGHT_PURPLE));
-                lore.add(Component.text("대상 : 플레이어").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("타입 : 지원").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("시스템 : 지속").color(NamedTextColor.LIGHT_PURPLE));
+                lore.add(Component.text("대상 : 자신 및 아군 플레이어").color(NamedTextColor.LIGHT_PURPLE));
                 lore.add(Component.text("------------").color(NamedTextColor.WHITE));
-                lore.add(Component.text("1~3회 : 체력을 3 회복한다.").color(NamedTextColor.GREEN));
-                lore.add(Component.text("4회 : 불사의 토템 1개가 지급된다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("3초간 자신을 따라다니는 반경 7블록의 장판을 펼쳐, 0.5초마다 자신과 아군의 체력을 1 회복시킨다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("장판이 끝나면 불사의 토템이 왼손에 지급되며, 34초간 왼손에 고정된 후 사라진다.").color(NamedTextColor.GREEN));
+                lore.add(Component.text("원래 왼손 아이템은 빈 칸(핫바 → 인벤토리)으로 옮겨지며, 빈 칸이 없으면 보관했다가 토템이 사라질 때 돌려받는다.").color(NamedTextColor.GREEN));
                 break;
             default:
                 break;
