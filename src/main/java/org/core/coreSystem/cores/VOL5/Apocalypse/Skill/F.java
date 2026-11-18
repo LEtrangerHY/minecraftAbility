@@ -1,5 +1,6 @@
 package org.core.coreSystem.cores.VOL5.Apocalypse.Skill;
 
+import org.core.coreSystem.cores.VOL5.Apocalypse.Passive.BatCombo;
 import io.papermc.paper.entity.LookAnchor;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -68,11 +69,9 @@ public class F implements SkillBase {
                         double[] lineOffsets, double[] lineFractions, float[] lineSizes) {}
 
     private static final Look FLURRY_LOOK = new Look(0.09, 0.62f, 0.1, 1.2, 0.1, 0.2, 0.56f, 0.44f, 0.1,
-            new double[]{0.3, 0.75, 1.35, 2.05}, new double[]{1.0, 0.8, 0.6, 0.45},
-            new float[]{0.45f, 0.42f, 0.39f, 0.36f});
+            new double[]{0.3, 0.75, 1.35, 2.05}, new double[]{1.0, 0.8, 0.6, 0.45}, new float[]{0.45f, 0.42f, 0.39f, 0.36f});
     private static final Look COUNTER_LOOK = new Look(0.1, 0.66f, 0.1, 1.4, 0.1, 0.2, 0.56f, 0.46f, 0.1,
-            new double[]{0.3, 0.75, 1.35, 2.05, 2.85}, new double[]{1.0, 0.85, 0.7, 0.55, 0.45},
-            new float[]{0.45f, 0.42f, 0.39f, 0.36f, 0.34f});
+            new double[]{0.3, 0.75, 1.35, 2.05, 2.85}, new double[]{1.0, 0.85, 0.7, 0.55, 0.45}, new float[]{0.45f, 0.42f, 0.39f, 0.36f, 0.34f});
     private static final Look GUARD_LOOK = new Look(0.05, 0.45f, 0.06, 0.25, 0.05, 0.09, 0.42f, 0.38f, 0.07,
             new double[]{0.12}, new double[]{1.0}, new float[]{0.35f});
 
@@ -897,8 +896,7 @@ public class F implements SkillBase {
         } else {
             loud(world, voice, Sound.ENTITY_PLAYER_ATTACK_STRONG, 1.0f, 0.9f, config.f_sound_slashLayers);
             loud(world, voice, Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 0.9f, 0.85f);
-            Bukkit.getScheduler().runTaskLater(plugin,
-                    () -> loud(world, voice, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.0f, 1.0f), 1L);
+            Bukkit.getScheduler().runTaskLater(plugin, () -> loud(world, voice, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.0f, 1.0f), 1L);
         }
     }
 
@@ -935,10 +933,8 @@ public class F implements SkillBase {
             world.spawnParticle(Particle.DUST_PILLAR, target.getLocation().add(0, 0.1, 0), 24,
                     0.8, 0.05, 0.8, 0, ground.getBlockData());
         }
-        Bukkit.getScheduler().runTaskLater(plugin,
-                () -> loud(world, voice, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.0f, 0.9f), 1L);
-        Bukkit.getScheduler().runTaskLater(plugin,
-                () -> loud(world, voice, Sound.ENTITY_GENERIC_BIG_FALL, 0.8f, 0.8f, 1), 2L);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> loud(world, voice, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.0f, 0.9f), 1L);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> loud(world, voice, Sound.ENTITY_GENERIC_BIG_FALL, 0.8f, 0.8f, 1), 2L);
     }
 
     private void cutMark(World world, Location center, Vector along, Vector across) {

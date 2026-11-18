@@ -1,4 +1,4 @@
-package org.core.coreSystem.cores.VOL5.Apocalypse.Skill;
+package org.core.coreSystem.cores.VOL5.Apocalypse.Passive;
 
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
@@ -321,7 +321,7 @@ public class BatCombo {
         return hits;
     }
 
-    void swingWhoosh(World world, Location at, boolean heavy) {
+    public void swingWhoosh(World world, Location at, boolean heavy) {
         world.playSound(at, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.4f, heavy ? 0.48f : 0.55f);
         world.playSound(at, Sound.ENTITY_PLAYER_ATTACK_NODAMAGE, 1.4f, heavy ? 0.45f : 0.5f);
         world.playSound(at, Sound.ENTITY_PLAYER_ATTACK_SWEEP, heavy ? 1.0f : 0.8f, heavy ? 0.7f : 0.8f);
@@ -332,12 +332,12 @@ public class BatCombo {
         world.playSound(at, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.0f, 0.45f);
     }
 
-    void airBurst(World world, Location at, boolean strong) {
+    public void airBurst(World world, Location at, boolean strong) {
         world.playSound(at, Sound.ENTITY_WIND_CHARGE_WIND_BURST, strong ? 1.0f : 0.85f, strong ? 0.68f : 0.85f);
         world.playSound(at, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.2f, 0.5f);
     }
 
-    void impactSound(LivingEntity primary, int power) {
+    public void impactSound(LivingEntity primary, int power) {
         World world = primary.getWorld();
         Location at = primary.getBoundingBox().getCenter().toLocation(world);
 
@@ -386,7 +386,7 @@ public class BatCombo {
         Bukkit.getScheduler().runTaskLater(plugin, task, ticks);
     }
 
-    void hitVisual(LivingEntity target, int power, Vector dir, boolean rust) {
+    public void hitVisual(LivingEntity target, int power, Vector dir, boolean rust) {
         World world = target.getWorld();
         Location body = target.getBoundingBox().getCenter().toLocation(world);
 
@@ -407,7 +407,7 @@ public class BatCombo {
         }
     }
 
-    void lowHealthPress(List<LivingEntity> victims, boolean heavy) {
+    public void lowHealthPress(List<LivingEntity> victims, boolean heavy) {
         for (LivingEntity victim : victims) {
             if (!isLowHealth(victim)) continue;
             Location body = victim.getBoundingBox().getCenter().toLocation(victim.getWorld());
@@ -642,13 +642,13 @@ public class BatCombo {
         return null;
     }
 
-    boolean isValidTarget(Player player, Entity entity) {
+    public boolean isValidTarget(Player player, Entity entity) {
         if (!(entity instanceof LivingEntity target)) return false;
         if (entity.equals(player) || target.isDead() || entity instanceof ArmorStand) return false;
         return !(entity instanceof Player p && p.getGameMode() == GameMode.SPECTATOR);
     }
 
-    void skillHit(Player player, LivingEntity target, double damage, DamageSource source) {
+    public void skillHit(Player player, LivingEntity target, double damage, DamageSource source) {
         config.skillDamaging.add(player.getUniqueId());
         try {
             new ForceDamage(target, damage, source, true).applyEffect(player);
@@ -657,16 +657,16 @@ public class BatCombo {
         }
     }
 
-    static int impactTick(double[] keys) {
+    public static int impactTick(double[] keys) {
         for (int i = 0; i < keys.length - 1; i++) {
             if (keys[i + 1] >= 0.5) return i;
         }
         return keys.length - 2;
     }
 
-    void playSwingTrail(Player player, PivotPath path, Vector forward, Vector right, Vector up,
-                        double tiltDeg, double sweepDeg, boolean downward, double length, Palette palette,
-                        double[] keys, boolean heavy, Runnable onImpact) {
+    public void playSwingTrail(Player player, PivotPath path, Vector forward, Vector right, Vector up,
+                               double tiltDeg, double sweepDeg, boolean downward, double length, Palette palette,
+                               double[] keys, boolean heavy, Runnable onImpact) {
         int impactTick = impactTick(keys);
         World world = player.getWorld();
 
@@ -818,11 +818,11 @@ public class BatCombo {
     }
 
     @FunctionalInterface
-    interface PivotPath {
+    public interface PivotPath {
         Location at(double progress);
     }
 
-    record Palette(Particle.DustOptions faint, Particle.DustOptions inner,
-                   Particle.DustOptions edge, Particle.DustOptions core, Particle.DustOptions haze) {
+    public record Palette(Particle.DustOptions faint, Particle.DustOptions inner,
+                          Particle.DustOptions edge, Particle.DustOptions core, Particle.DustOptions haze) {
     }
 }

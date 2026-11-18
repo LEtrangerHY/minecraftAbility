@@ -28,7 +28,7 @@ import org.core.cool.Cool;
 import org.core.coreSystem.absCoreSystem.ConfigWrapper;
 import org.core.coreSystem.absCoreSystem.SkillBase;
 import org.core.coreSystem.absCoreSystem.absCore;
-import org.core.coreSystem.cores.VOL5.Apocalypse.Skill.BatCombo;
+import org.core.coreSystem.cores.VOL5.Apocalypse.Passive.BatCombo;
 import org.core.coreSystem.cores.VOL5.Apocalypse.Skill.F;
 import org.core.coreSystem.cores.VOL5.Apocalypse.Skill.Q;
 import org.core.coreSystem.cores.VOL5.Apocalypse.Skill.R;
